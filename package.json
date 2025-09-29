@@ -65,7 +65,7 @@
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
-		"@vitejs/plugin-react-swc": "^3.10.2",
+		"@vitejs/plugin-react-swc": "^4.1.0",
 		"dotenv": "^17.2.1",
 		"eslint": "^9.31.0",
 		"eslint-config-prettier": "^10.1.8",
