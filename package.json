@@ -70,7 +70,7 @@
 		"eslint": "^9.31.0",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-react-dom": "^2.0.2",
-		"eslint-plugin-react-hooks": "^5.2.0",
+		"eslint-plugin-react-hooks": "^7.0.0",
 		"eslint-plugin-react-refresh": "^0.4.20",
 		"eslint-plugin-react-x": "^2.0.2",
 		"globals": "^16.3.0",
