@@ -2,7 +2,22 @@
 
 ## 🎯 目标
 
-移除对 `ai-sdk` 的依赖，用 `fetch` 直接调用 LLM API。允许用户通过注入自定义函数来完全控制 LLM 交互逻辑。
+移除对 `ai-sdk` 的依赖，用 `fetch` 直接调用 LLM API。允许用户通过注入自定义 Client 来完全控制 LLM 交互逻辑。
+
+## 🔑 核心决策速览
+
+| 决策点 | 方案 | 理由 |
+|--------|------|------|
+| **架构模式** | Client 接口模式 | 避免每次传 config，支持有状态的 SDK 实例管理 |
+| **Message 格式** | OpenAI 标准 | 业界事实标准，兼容性最好 |
+| **Tool Schema** | Zod + 泛型 | 类型安全，`z.infer` 推断类型，易转换为任何格式 |
+| **Retry 位置** | LLM.invoke() 外层 | 与 Panel UI 集成，Client 实现更简单 |
+| **Claude 兼容** | 自动检测 model name | 省略 `tool_choice`，无需用户配置 |
+| **Cache Tokens** | 支持 | 提取 `cachedTokens` 和 `reasoningTokens` |
+| **类型安全** | `unknown` + 泛型 | 严格类型，支持从 Zod 推断 |
+| **Usage 鲁棒性** | `??` 提供默认值 | 兼容不完全遵循 OpenAI 格式的接口 |
+| **JSON Schema** | Zod 4 原生 `z.toJSONSchema()` | 无需第三方库 |
+| **向后兼容** | 不考虑 | 可破坏性变更，pre-1.0 版本 |
 
 ## 📋 背景与动机
 
@@ -561,54 +576,43 @@ export class LLM {
 
 ### Phase 4: 重构 Tool 定义
 
-**File**: `src/tools/index.ts`
-
-1. Remove `tool()` wrapper from ai-sdk
-2. Change to plain object format:
-
-```typescript
-// Before
-tools.set('done', tool({
-  description: '...',
-  inputSchema: zod.object({...}),
-  execute: function(input) {...}
-}))
-
 **文件**: `src/tools/index.ts`
 
 1. 移除 ai-sdk 的 `tool()` 包装器
-2. 改为简单对象格式:
+2. 改为简单对象格式，支持泛型:
 
 ```typescript
-// Before
+// Before (ai-sdk)
 tools.set('done', tool({
   description: '...',
   inputSchema: zod.object({...}),
   execute: function(input) {...}
 }))
 
-// After
+// After (支持泛型)
+const doneSchema = z.object({
+  text: z.string(),
+  success: z.boolean().default(true)
+})
+
 tools.set('done', {
   name: 'done',
-  description: '...',
-  parameters: zod.object({...}),
-  execute: async function(input) {...}
-}))
+  description: 'Complete task...',
+  parameters: doneSchema,
+  execute: async function(input: z.infer<typeof doneSchema>) {
+    // input 类型安全
+    return `Task completed: ${input.text}`
+  }
+})
 ```
 
 **验收标准**:
 - 所有 tools 转换为新格式
 - `tools/` 中无 ai-sdk imports
 - Tools 与新 invoke 逻辑配合良好
+- 使用泛型提供类型安全
 
 ### Phase 5: 重构 PageAgent
-
-**Acceptance Criteria**:
-- All tools converted to new format
-- No ai-sdk imports in tools/
-- Tools work with new invoke logic
-
-### Phase 5: Refactor PageAgent (1h)
 
 **文件**: `src/PageAgent.ts`
 
