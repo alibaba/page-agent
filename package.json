@@ -50,8 +50,6 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"@ai-sdk/openai": "^2.0.49",
-		"ai": "^5.0.68",
 		"ai-motion": "^0.4.7",
 		"chalk": "^5.6.2",
 		"zod": "^4.1.12"

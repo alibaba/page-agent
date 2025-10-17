@@ -48,6 +48,5 @@ export const DEFAULT_BASE_URL: string =
 
 // internal
 
-export const MACRO_TOOL_NAME = 'AgentOutput' as const
 export const LLM_MAX_RETRIES = 2
 export const MAX_STEPS = 20

@@ -2,21 +2,19 @@
  * Copyright (C) 2025 Alibaba Group Holding Limited
  * All rights reserved.
  */
-import { tool } from 'ai'
-import type { LanguageModelUsage, ToolSet } from 'ai'
 import chalk from 'chalk'
 import zod from 'zod'
 
 import type { PageAgentConfig } from './config'
-import { MACRO_TOOL_NAME, MAX_STEPS, VIEWPORT_EXPANSION } from './config/constants'
+import { MAX_STEPS, VIEWPORT_EXPANSION } from './config/constants'
 import * as dom from './dom'
 import { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
 import { getPageInfo } from './dom/getPageInfo'
 import { I18n } from './i18n'
-import { LLM } from './llms'
+import { type InvokeResult, LLM, type Message, type Tool } from './llms'
 import { patchReact } from './patches/react'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
-import { tools } from './tools'
+import { type PageAgentTool, tools } from './tools'
 import { Panel, getToolCompletedText, getToolExecutingText } from './ui/Panel'
 import { SimulatorMask } from './ui/SimulatorMask'
 import { trimLines, uid, waitUntil } from './utils'
@@ -32,14 +30,38 @@ export interface AgentBrain {
 	next_goal: string
 }
 
+/**
+ * MacroTool input structure
+ */
+export interface MacroToolInput {
+	evaluation_previous_goal?: string
+	memory?: string
+	next_goal?: string
+	action: Record<string, any>
+}
+
+/**
+ * MacroTool output structure
+ */
+export interface MacroToolResult {
+	input: MacroToolInput
+	output: string
+}
+
 export interface AgentHistory {
 	brain: AgentBrain
 	action: {
 		name: string
 		input: any
-		output: any
+		output: string
 	}
-	usage: LanguageModelUsage
+	usage: {
+		promptTokens: number
+		completionTokens: number
+		totalTokens: number
+		cachedTokens?: number
+		reasoningTokens?: number
+	}
 }
 
 export interface ExecutionResult {
@@ -148,19 +170,17 @@ export class PageAgent extends EventTarget {
 							content: this.#assembleUserPrompt(),
 						},
 					],
-					// tools,
-					this.#packMacroTool(),
+					{ AgentOutput: this.#packMacroTool() },
 					this.#abortController.signal
 				)
 
-				const toolResult = result.toolResult
-				const input = toolResult.input
-				const output = toolResult.output
+				const macroResult = result.toolResult as MacroToolResult
+				const input = macroResult.input
+				const output = macroResult.output
 				const brain = {
-					thinking: input.thinking,
-					evaluation_previous_goal: input.evaluation_previous_goal,
-					memory: input.memory,
-					next_goal: input.next_goal,
+					evaluation_previous_goal: input.evaluation_previous_goal || '',
+					memory: input.memory || '',
+					next_goal: input.next_goal || '',
 				}
 				const actionName = Object.keys(input.action)[0]
 				const action = {
@@ -188,8 +208,8 @@ export class PageAgent extends EventTarget {
 					}
 				}
 				if (actionName === 'done') {
-					const success = action.input.success || false
-					const text = action.input.text || 'no text provided'
+					const success = action.input?.success ?? false
+					const text = action.input?.text || 'no text provided'
 					console.log(chalk.green.bold('Task completed'), success, text)
 					this.#onDone(text, success)
 					return {
@@ -219,24 +239,8 @@ export class PageAgent extends EventTarget {
 	 * - action: { toolName: toolInput }
 	 * where action must be selected from tools defined in this.tools
 	 */
-	#packMacroTool(): ToolSet {
+	#packMacroTool(): Tool<MacroToolInput, MacroToolResult> {
 		const tools = this.tools
-		// discriminated version
-		// @note Success rate ~0, model seems unable to understand discriminated union
-
-		// // Create discriminated union schemas from tools
-		// const actionSchemas = Array.from(tools.entries()).map(([toolName, tool]) => {
-		// 	return zod.object({
-		// 		name: zod.literal(toolName),
-		// 		input: tool.inputSchema,
-		// 	})
-		// })
-
-		// // Ensure at least one tool exists
-		// assert(actionSchemas.length, 'No tools available to create macro tool')
-
-		// const actionSchema = zod.discriminatedUnion('name', actionSchemas as any)
-
 		// union version
 		const actionSchemas = Array.from(tools.entries()).map(([toolName, tool]) => {
 			return zod.object({
@@ -244,89 +248,96 @@ export class PageAgent extends EventTarget {
 			})
 		})
 
-		const actionSchema = zod.union(actionSchemas)
+		const actionSchema = zod.union(
+			actionSchemas as unknown as [zod.ZodType, zod.ZodType, ...zod.ZodType[]]
+		)
+
+		const macroToolSchema = zod.object({
+			// thinking: zod.string().optional(),
+			evaluation_previous_goal: zod.string().optional(),
+			memory: zod.string().optional(),
+			next_goal: zod.string().optional(),
+			action: actionSchema,
+		})
 
 		return {
-			[MACRO_TOOL_NAME]: tool({
-				// description: 'Output the result of the agent',
-				inputSchema: zod.object({
-					// thinking: zod.string().optional(),
-					evaluation_previous_goal: zod.string().optional(),
-					memory: zod.string().optional(),
-					next_goal: zod.string().optional(),
-					action: actionSchema,
-				}),
-				execute: async (input, options) => {
-					// abort
-					if (this.#abortController.signal.aborted) throw new Error('AbortError')
-					// pause
-					await waitUntil(() => !this.paused)
+			// name: MACRO_TOOL_NAME,
+			// description: 'Execute agent action', // @todo remote
+			inputSchema: macroToolSchema as zod.ZodType<MacroToolInput>,
+			execute: async (input: MacroToolInput): Promise<MacroToolResult> => {
+				// abort
+				if (this.#abortController.signal.aborted) throw new Error('AbortError')
+				// pause
+				await waitUntil(() => !this.paused)
 
-					console.log(chalk.blue.bold('MacroTool execute'), input)
-					const action = input.action!
+				console.log(chalk.blue.bold('MacroTool execute'), input)
+				const action = input.action
 
-					const toolName = Object.keys(action)[0]
-					const toolInput = action[toolName]
-					const brain = trimLines(`✅: ${input.evaluation_previous_goal}
+				const toolName = Object.keys(action)[0]
+				const toolInput = action[toolName]
+				const brain = trimLines(`✅: ${input.evaluation_previous_goal}
 						💾: ${input.memory}
 						🎯: ${input.next_goal}
 					`)
 
-					console.log(brain)
-					this.bus.emit('panel:update', {
-						type: 'thinking',
-						displayText: brain,
-					})
+				console.log(brain)
+				this.bus.emit('panel:update', {
+					type: 'thinking',
+					displayText: brain,
+				})
 
-					// Find the corresponding tool
-					const tool = tools.get(toolName)
-					assert(tool, `Tool ${toolName} not found. (@note should have been caught before this!!!)`)
+				// Find the corresponding tool
+				const tool = tools.get(toolName)
+				assert(tool, `Tool ${toolName} not found. (@note should have been caught before this!!!)`)
 
-					console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput, options)
+				console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput)
+				this.bus.emit('panel:update', {
+					type: 'tool_executing',
+					toolName,
+					toolArgs: toolInput,
+					displayText: getToolExecutingText(toolName, toolInput, this.i18n),
+				})
+
+				const startTime = Date.now()
+
+				// Execute tool, bind `this` to PageAgent
+				let result = await tool.execute.bind(this)(toolInput)
+
+				const duration = Date.now() - startTime
+				console.log(chalk.green.bold(`Tool (${toolName}) executed for ${duration}ms`), result)
+
+				if (toolName === 'wait') {
+					this.#totalWaitTime += Math.round(toolInput.seconds + duration / 1000)
+					result += `\n<sys> You have waited ${this.#totalWaitTime} seconds accumulatively.`
+					if (this.#totalWaitTime >= 3)
+						result += '\nDo NOT wait any longer unless you have a good reason.\n'
+					result += '</sys>'
+				} else {
+					// For other tools, reset wait time
+					this.#totalWaitTime = 0
+				}
+
+				// Briefly display execution result
+				const displayResult = getToolCompletedText(toolName, toolInput, this.i18n)
+				if (displayResult)
 					this.bus.emit('panel:update', {
 						type: 'tool_executing',
 						toolName,
 						toolArgs: toolInput,
-						displayText: getToolExecutingText(toolName, toolInput, this.i18n),
+						toolResult: result,
+						displayText: displayResult,
+						duration,
 					})
 
-					const startTime = Date.now()
+				// Wait a moment to let user see the result
+				await new Promise((resolve) => setTimeout(resolve, 100))
 
-					// Execute tool, passing options parameter
-					let result = await tool.execute!.bind(this)(toolInput, options)
-
-					const duration = Date.now() - startTime
-					console.log(chalk.green.bold(`Tool (${toolName}) executed for ${duration}ms`), result)
-
-					if (toolName === 'wait') {
-						this.#totalWaitTime += Math.round(toolInput.seconds + duration / 1000)
-						result += `\n<sys> You have waited ${this.#totalWaitTime} seconds accumulatively.`
-						if (this.#totalWaitTime >= 3)
-							result += '\nDo NOT wait any longer unless you have a good reason.\n'
-						result += '</sys>'
-					} else {
-						// For other tools, reset wait time
-						this.#totalWaitTime = 0
-					}
-
-					// Briefly display execution result
-					const displayResult = getToolCompletedText(toolName, toolInput, this.i18n)
-					if (displayResult)
-						this.bus.emit('panel:update', {
-							type: 'tool_executing',
-							toolName,
-							toolArgs: toolInput,
-							toolResult: result,
-							displayText: displayResult,
-							duration,
-						})
-
-					// Wait a moment to let user see the result
-					await new Promise((resolve) => setTimeout(resolve, 100))
-
-					return result
-				},
-			}),
+				// Return structured result
+				return {
+					input,
+					output: result,
+				}
+			},
 		}
 	}
 

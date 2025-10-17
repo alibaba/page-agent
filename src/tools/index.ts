@@ -2,8 +2,7 @@
  * Internal tools for PageAgent.
  * @note Adapted from browser-use
  */
-import { Tool, tool } from 'ai'
-import zod from 'zod'
+import zod, { type z } from 'zod'
 
 import type { PageAgent } from '@/PageAgent'
 
@@ -24,9 +23,24 @@ import * as utils from './actions'
 window.utils = utils
 
 /**
- * Internal tools for PageAgent.
+ * Internal tool definition that has access to PageAgent `this` context
  */
-export const tools = new Map<string, Tool>()
+export interface PageAgentTool<TParams = any> {
+	// name: string
+	description: string
+	inputSchema: z.ZodType<TParams>
+	execute: (this: PageAgent, args: TParams) => Promise<string>
+}
+
+export function tool<TParams>(options: PageAgentTool<TParams>): PageAgentTool<TParams> {
+	return options
+}
+
+/**
+ * Internal tools for PageAgent.
+ * Note: Using any to allow different parameter types for each tool
+ */
+export const tools = new Map<string, PageAgentTool>()
 
 // tools.set(
 // 	'get_current_html',
@@ -49,9 +63,10 @@ tools.set(
 			text: zod.string(),
 			success: zod.boolean().default(true),
 		}),
-		execute: function (this: PageAgent, input) {
+		execute: async function (this: PageAgent, input) {
 			// @note main loop will handle this one
 			// this.onDone(input.text, input.success)
+			return Promise.resolve('Task completed')
 		},
 	})
 )
@@ -143,7 +158,7 @@ tools.set(
 		execute: async function (this: PageAgent, input) {
 			const element = getElementByIndex(this, input.index)
 			const elemText = this.elementTextMap.get(input.index)
-			await selectOptionElement(element as any, input.text)
+			await selectOptionElement(element as HTMLSelectElement, input.text)
 			return (
 				`✅ Selected option (${input.text}) in element (${elemText ? elemText : input.index}).` +
 				(await getSystemInfo())

@@ -31,29 +31,22 @@
  * - 永远使用 tool call 来返回结构化数据，禁止模型直接返回（视为出错）
  * - 不能假设 tool 参数合法，必须有修复机制，而且修复也应该使用 tool call 返回
  */
-import { OpenAIProvider, OpenAIResponsesProviderOptions, createOpenAI } from '@ai-sdk/openai'
-import type { LanguageModelV2, LanguageModelV2ToolCall } from '@ai-sdk/provider'
-import type { LanguageModelUsage, ModelMessage, TypedToolCall, TypedToolResult } from 'ai'
-import { ToolSet, generateText, stepCountIs } from 'ai'
 import chalk from 'chalk'
 
+import type { LLMConfig } from '@/config'
 import { parseLLMConfig } from '@/config'
-import { MACRO_TOOL_NAME } from '@/config/constants'
-import { assert } from '@/utils/assert'
 import { EventBus, getEventBus } from '@/utils/bus'
 
-export interface LLMConfig {
-	baseURL?: string
-	apiKey?: string
-	modelName?: string
-	maxRetries?: number
-}
+import { OpenAIClient } from './OpenAIClient'
+import { InvokeError } from './errors'
+import type { InvokeResult, LLMClient, Message, Tool } from './types'
+
+export type { Message, Tool, InvokeResult, LLMClient }
 
 export class LLM {
 	config: Required<LLMConfig>
 	id: string
-	#openai: OpenAIProvider
-	#model: LanguageModelV2
+	client: LLMClient
 	#bus: EventBus
 
 	constructor(config: LLMConfig, id: string) {
@@ -62,11 +55,14 @@ export class LLM {
 
 		this.#bus = getEventBus(id)
 
-		this.#openai = createOpenAI({ baseURL: this.config.baseURL, apiKey: this.config.apiKey })
-		this.#model = this.#openai.chat(this.config.modelName)
-
-		// @note Will throw JSON parsing error
-		// this.#model = this.#openai.responses(modelName)
+		// Default to OpenAI client
+		this.client = new OpenAIClient({
+			model: this.config.modelName,
+			apiKey: this.config.apiKey,
+			baseURL: this.config.baseURL,
+			temperature: this.config.temperature,
+			maxTokens: this.config.maxTokens,
+		})
 	}
 
 	/**
@@ -74,96 +70,18 @@ export class LLM {
 	 * - invoke tool call *once*
 	 * - return the result of the tool
 	 */
-	async invoke<T extends ToolSet>(
-		messages: ModelMessage[],
-		tools: T,
+	async invoke(
+		messages: Message[],
+		tools: Record<string, Tool>,
 		abortSignal: AbortSignal
-	): Promise<{
-		toolCall: TypedToolCall<T>
-		toolResult: TypedToolResult<T>
-		usage: LanguageModelUsage
-	}> {
-		const isClaude = this.config.modelName.slice(0, 8).includes('claude')
-		// const isQwen = this.config.modelName.slice(0, 6).includes('qwen')
-		// const isGPT = this.config.modelName.slice(0, 5).includes('gpt')
-
+	): Promise<InvokeResult> {
 		return await withRetry(
 			async () => {
-				const result = await generateText({
-					model: this.#model,
-					messages,
-					tools,
-					abortSignal,
-					/**
-					 * 文档中没有说明，从源码看，@facts
-					 * - 只会重试被识别为 retryable 的 API_CALL_ERROR
-					 * - 返回无法解析的 json 应该不会重试
-					 * - experimental_repairToolCall 只会执行一次，不算作重试
-					 * @facts
-					 * - 许多 proxy 过的 openAI 兼容接口返回的错误格式并不规范，通常不会被识别为 retryable
-					 * @conclusion
-					 * - 看起来并不实用，不如完全手工控制粗粒度重试
-					 */
-					// maxRetries: this.config.maxRetries,
-					maxRetries: 0,
-					// toolChoice: 'required',
-					// @note incompatible to Claude
-					toolChoice: isClaude ? undefined : { type: 'tool', toolName: MACRO_TOOL_NAME as any },
-					/**
-					 * controlled by main loop. our method only call api once
-					 */
-					// stopWhen: [hasToolCall('done'), stepCountIs(100)],
-					stopWhen: [stepCountIs(1)],
-					// stopWhen: [hasToolCall('AgentOutput')],
-					providerOptions: {
-						openai: {
-							// @note this one needs all fields in tool schema must be `required`
-							// strictJsonSchema: true,
-							// This way only at most one tool can be called at a time
-							parallelToolCalls: false,
-							reasoningEffort: 'minimal',
-							// @note not working
-							// serviceTier: 'priority',
-							textVerbosity: 'low',
-							// @note Optimize OpenAI model caching, should be unique per user, currently has no effect
-							promptCacheKey: 'page-agent:' + this.id,
-						} as OpenAIResponsesProviderOptions,
-					},
-					/**
-					 * schema 出错时执行一次，不确定是否计入重试
-					 * 目前看起来像是会直接抛错，被 withRetry 处理
-					 * @note
-					 * 如果不提供，则 ai-sdk 会把 tool-error 加入 message 中重新调用一次，
-					 * 配合 stepCountIs 或者 hasToolCall 都会导致错误被 silent，toolResults 永远为 0
-					 * 遗憾的是，这里没有办法抛错（抛错后回到默认逻辑），只要这里 repair 不好，就会导致 silent error
-					 * 更糟糕的是，只要传入了 tools，无论 stopWhen 如何设置，都会被当作 multi-step，
-					 * 本质上就和我们 single step 的逻辑冲突
-					 * 长远来看必须删掉 ai-sdk，直接用 openAI API 实现
-					 */
-					// experimental_repairToolCall: (options): Promise<LanguageModelV2ToolCall | null> => {
-					// 	console.error('hahhah', options)
-					// 	throw options.error
-					// },
-				})
+				const result = await this.client.invoke(messages, tools, abortSignal)
 
 				console.log(chalk.blue.bold('LLM:invoke finished'), result)
 
-				const toolError: any = result.content.find((part) => part.type === 'tool-error')
-				if (toolError) throw toolError.error
-
-				assert(!result.text, 'Model returned text without calling done tool', true)
-				assert(result.toolCalls.length === 1, 'Model must call exactly one tool', true)
-				assert(result.toolResults.length === 1, 'Step must have exactly one tool result', true)
-
-				const toolCall = result.toolCalls[0]
-				const toolResult = result.toolResults[0]
-				const usage = result.totalUsage
-
-				return {
-					toolCall,
-					toolResult,
-					usage,
-				}
+				return result
 			},
 			// retry settings
 			{
@@ -203,12 +121,15 @@ async function withRetry<T>(
 
 		try {
 			return await fn()
-		} catch (error: any) {
+		} catch (error: unknown) {
 			console.error(error)
 			settings.onError(error as Error, retries < settings.maxRetries)
 
 			// do not retry if aborted by user
-			if (error?.name === 'AbortError') throw error
+			if ((error as { name?: string })?.name === 'AbortError') throw error
+
+			// do not retry if error is not retryable (InvokeError)
+			if (error instanceof InvokeError && !error.retryable) throw error
 
 			lastError = error as Error
 			retries++
