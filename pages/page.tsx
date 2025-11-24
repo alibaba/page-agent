@@ -18,7 +18,7 @@ const injectionA = `
 	class="inline-flex items-center text-xs px-3 py-2 bg-blue-500 text-white font-medium rounded-lg hover:shadow-md transform hover:scale-105 transition-all duration-200 cursor-move border-2 border-dashed border-green-300"
 	draggable="true"
 	onclick="return false;"
-	title="拖拽我到收藏夹栏"
+	title="App;y"
 >
 	✨PageAgent
 </a>
