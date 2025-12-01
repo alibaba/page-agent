@@ -10,7 +10,6 @@ Brief description of changes.
 - [ ] Documentation
 - [ ] Website
 - [ ] Demo / Testing
-
 - [ ] Breaking change
 
 ## Testing
