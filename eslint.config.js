@@ -8,7 +8,7 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
 export default defineConfig([
-	globalIgnores(['dist', 'test-pages']),
+	globalIgnores(['**/dist', '**/test-pages', '**/node_modules']),
 	{
 		plugins: {
 			'react-hooks': reactHooks,
@@ -37,7 +37,7 @@ export default defineConfig([
 		],
 		languageOptions: {
 			parserOptions: {
-				project: ['./tsconfig.json'],
+				project: ['./packages/*/tsconfig.json'],
 				tsconfigRootDir: import.meta.dirname,
 			},
 			ecmaVersion: 2020,

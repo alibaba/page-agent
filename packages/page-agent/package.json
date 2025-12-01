@@ -1,0 +1,57 @@
+{
+	"name": "page-agent",
+	"private": false,
+	"version": "0.0.4",
+	"type": "module",
+	"main": "./dist/lib/page-agent.js",
+	"module": "./dist/lib/page-agent.js",
+	"types": "./dist/lib/PageAgent.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/lib/PageAgent.d.ts",
+			"import": "./dist/lib/page-agent.js",
+			"default": "./dist/lib/page-agent.js"
+		}
+	},
+	"files": [
+		"dist/",
+		"README.md",
+		"LICENSE",
+		"NOTICE"
+	],
+	"description": "AI-powered UI agent for web applications - add intelligent automation to any webpage with a single script tag",
+	"keywords": [
+		"ai",
+		"automation",
+		"ui-agent",
+		"browser-automation",
+		"web-agent",
+		"llm",
+		"dom-interaction",
+		"intelligent-ui"
+	],
+	"author": "Simon<gaomeng1900>",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/alibaba/page-agent.git",
+		"directory": "packages/page-agent"
+	},
+	"homepage": "https://alibaba.github.io/page-agent/",
+	"scripts": {
+		"build": "MODE=lib vite build && MODE=umd vite build",
+		"build:lib": "MODE=lib vite build",
+		"build:umd": "MODE=umd vite build",
+		"build:watch": "MODE=lib vite build --watch"
+	},
+	"dependencies": {
+		"ai-motion": "^0.4.7",
+		"chalk": "^5.6.2",
+		"zod": "^4.1.12"
+	},
+	"devDependencies": {
+		"@microsoft/api-extractor": "^7.55.1",
+		"unplugin-dts": "^1.0.0-beta.6",
+		"vite-plugin-css-injected-by-js": "^3.5.2"
+	}
+}

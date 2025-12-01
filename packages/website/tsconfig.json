@@ -1,0 +1,17 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"composite": true,
+		"tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+		"baseUrl": "./",
+		"paths": {
+			// Self root
+			"@/*": ["src/*"],
+
+			// Simplified monorepo solution (raw npm workspace with hoisting)
+			"page-agent": ["../page-agent/src/PageAgent.ts"]
+		}
+	},
+	"include": ["src", "env.d.ts"],
+	"references": [{ "path": "../page-agent" }]
+}

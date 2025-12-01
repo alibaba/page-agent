@@ -1,35 +1,12 @@
 {
-	"name": "page-agent",
-	"private": false,
+	"name": "root",
+	"private": true,
 	"version": "0.0.4",
 	"type": "module",
-	"main": "./dist/lib/page-agent.js",
-	"module": "./dist/lib/page-agent.js",
-	"types": "./dist/lib/PageAgent.d.ts",
-	"exports": {
-		".": {
-			"types": "./dist/lib/PageAgent.d.ts",
-			"import": "./dist/lib/page-agent.js",
-			"default": "./dist/lib/page-agent.js"
-		}
-	},
-	"files": [
-		"dist/lib/",
-		"README.md",
-		"LICENSE",
-		"NOTICE"
+	"workspaces": [
+		"packages/*"
 	],
-	"description": "AI-powered UI agent for web applications - add intelligent automation to any webpage with a single script tag",
-	"keywords": [
-		"ai",
-		"automation",
-		"ui-agent",
-		"browser-automation",
-		"web-agent",
-		"llm",
-		"dom-interaction",
-		"intelligent-ui"
-	],
+	"description": "AI-powered UI agent for web applications",
 	"author": "Simon<gaomeng1900>",
 	"license": "MIT",
 	"repository": {
@@ -38,56 +15,36 @@
 	},
 	"homepage": "https://alibaba.github.io/page-agent/",
 	"engines": {
-		"node": ">=20.0.0"
+		"node": ">=20.0.0",
+		"npm": ">=10.0.0"
 	},
 	"scripts": {
-		"dev": "vite",
-		"start": "vite",
-		"build": "tsc -b && vite build && npm run build:lib && npm run build:umd",
-		"build:lib": "MODE=lib vite build",
-		"build:lib:watch": "MODE=lib vite build --watch",
-		"build:umd": "MODE=umd vite build",
+		"dev": "npm run dev --workspace=@page-agent/website",
+		"start": "npm run dev --workspace=@page-agent/website",
+		"build": "npm run build --workspaces --if-present",
+		"build:lib": "npm run build --workspace=page-agent",
 		"lint": "eslint .",
 		"prepare": "husky"
-	},
-	"dependencies": {
-		"ai-motion": "^0.4.7",
-		"chalk": "^5.6.2",
-		"zod": "^4.1.12"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^20.1.0",
 		"@commitlint/config-conventional": "^20.0.0",
 		"@eslint/js": "^9.37.0",
-		"@microsoft/api-extractor": "^7.53.1",
-		"@tailwindcss/vite": "^4.1.14",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"@types/react": "^19.2.2",
-		"@types/react-dom": "^19.2.1",
-		"@vitejs/plugin-react-swc": "^4.1.0",
 		"dotenv": "^17.2.3",
 		"eslint": "^9.37.0",
 		"eslint-config-prettier": "^10.1.8",
-		"eslint-plugin-react-dom": "^2.0.6",
-		"eslint-plugin-react-hooks": "^7.0.0",
-		"eslint-plugin-react-refresh": "^0.4.23",
-		"eslint-plugin-react-x": "^2.0.6",
+		"eslint-plugin-react-dom": "^2.3.9",
+		"eslint-plugin-react-hooks": "^7.0.1",
+		"eslint-plugin-react-refresh": "^0.4.24",
+		"eslint-plugin-react-x": "^2.3.9",
 		"globals": "^16.4.0",
 		"husky": "^9.1.7",
-		"i18next": "^25.6.0",
-		"i18next-browser-languagedetector": "^8.2.0",
 		"lint-staged": "^16.2.4",
 		"prettier": "^3.6.2",
-		"react": "^19.2.0",
-		"react-dom": "^19.2.0",
-		"react-i18next": "^16.1.4",
-		"tailwindcss": "^4.1.14",
 		"typescript": "^5.9.3",
 		"typescript-eslint": "^8.46.0",
-		"unplugin-dts": "^1.0.0-beta.6",
-		"vite": "^7.1.9",
-		"vite-plugin-css-injected-by-js": "^3.5.2",
-		"wouter": "^3.7.1"
+		"vite": "^7.1.9"
 	},
 	"lint-staged": {
 		"*.{js,ts,cjs,cts,mjs,mts}": [

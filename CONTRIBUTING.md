@@ -22,10 +22,12 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
 
 ### Project Structure
 
-This project has **two separate parts**:
+This is a **monorepo** with npm workspaces containing **two main packages**:
 
-- **Core Library** (`src/`) - Pure JavaScript AI agent library
-- **Documentation Website** (`pages/`) - React web app for landing page and docs
+1. **Core Library** (`packages/page-agent/`) - Pure JavaScript/TypeScript AI agent library for browser DOM automation, published as `page-agent` on npm
+2. **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
+
+We use a simplified monorepo solution with native npm-workspace. No fancy tooling. Hoisting is required.
 
 ## 🤝 How to Contribute
 

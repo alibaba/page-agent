@@ -2,36 +2,56 @@
 
 ## Project Overview
 
-This is a dual-architecture project with **two separate parts**:
+This is a **monorepo** with npm workspaces containing **two main packages**:
 
-1. **Core Library** (`src/`) - Pure JavaScript/TypeScript AI agent library for browser DOM automation
-2. **Demo&docs Website** (`pages/`) - React documentation and landing page
+1. **Core Library** (`packages/page-agent/`) - Pure JavaScript/TypeScript AI agent library for browser DOM automation, published as `page-agent` on npm
+2. **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
 
 ## Development Commands
 
 ### Core Commands
 
 ```bash
-npm start                    # Start React website development server
-npm run build                # Build both library AND website
-npm run build:lib            # Build pure JS library only (src/ → dist/lib/)
-npm run build:lib:watch      # Library development with auto-rebuild
+npm start                    # Start website dev server
+npm run dev                  # Same as start
+npm run build                # Build all packages
+npm run build:lib            # Build page-agent library only
 npm run lint                 # ESLint with TypeScript strict rules
+```
+
+### Package-specific Commands
+
+```bash
+# Core library
+npm run build --workspace=page-agent
+npm run build:watch --workspace=page-agent
+
+# Website
+npm run dev --workspace=@page-agent/website
+npm run build --workspace=@page-agent/website
 ```
 
 ## Architecture & Critical Patterns
 
-### Dual Build System
+### Monorepo Structure
 
-- **Website build**: `vite.config.js` → React SPA with hash routing → `dist/`
-- **Library build**: `vite.lib.config.js` → UMD/ES modules → `dist/lib/`
-- **Entry points**: `src/entry.ts` (library), `pages/main.tsx` (website)
+```
+packages/
+├── page-agent/              # npm: "page-agent"
+│   ├── src/                 # Core library source
+│   ├── vite.config.js       # Library build (ES + UMD)
+│   └── package.json
+└── website/                 # npm: "@page-agent/website" (private)
+    ├── src/                 # Website source (formerly pages/)
+    ├── index.html
+    ├── vite.config.js       # Website build
+    └── package.json
+```
 
 ### Module Boundaries (Critical)
 
-- **Core library** (`src/`): NEVER import from `pages/` - must remain pure JavaScript
-- **Website** (`pages/`): CAN import from `src/` via `@/` alias for demos
-- **Import aliases**: `@/` → `src/`, `@pages/` → `pages/`
+- **Core library** (`packages/page-agent/`): NEVER import from website - must remain pure JavaScript
+- **Website** (`packages/website/`): CAN import from `page-agent` for demos. Alias `@/` → `website/src/`
 
 ### DOM Pipeline
 
@@ -73,7 +93,7 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 
 ## File Organization
 
-### Core Library (`src/`)
+### Core Library (`packages/page-agent/src/`)
 
 - `entry.ts` - CDN/UMD entry point with auto-initialization
 - `PageAgent.ts` - **Main AI agent class** orchestrating DOM operations
@@ -85,7 +105,7 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 - `dom/` - HTML serialization and page analysis utilities
 - `config/` - Configuration constants and settings
 
-### Website (`pages/`)
+### Website (`packages/website/src/`)
 
 - `main.tsx` - Site entry with hash routing setup
 - `router.tsx` - **Manual route definitions** (requires explicit registration)
@@ -97,21 +117,20 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 
 ### New Documentation Page
 
-1. Create `pages/docs/<section>/<slug>/page.tsx`
-2. Add route to `pages/router.tsx` with `<Header /> + <DocsLayout>` wrapper
+1. Create `packages/website/src/docs/<section>/<slug>/page.tsx`
+2. Add route to `packages/website/src/router.tsx` with `<Header /> + <DocsLayout>` wrapper
 3. Add navigation item to `DocsLayout.tsx`
 
 ### New Agent Tool
 
-1. Implement under `src/tools/`
-2. Export via `src/tools/index.ts`
+1. Implement under `packages/page-agent/src/tools/`
+2. Export via `packages/page-agent/src/tools/index.ts`
 3. Wire into `PageAgent.ts` if needed
 
 ### New UI Component
 
-1. Create in `src/ui/` with colocated CSS modules
+1. Create in `packages/page-agent/src/ui/` with colocated CSS modules
 2. Use event bus for PageAgent communication
-3. Test via `pages/test-pages/`
 
 ## Code Standards
 
@@ -136,26 +155,28 @@ Query params configure `PageAgentConfig` automatically in `src/entry.ts`.
 
 ## Critical Files to Understand
 
-- `pages/router.tsx` - Central routing definition (manual registration required)
-- `pages/components/DocsLayout.tsx` - Navigation structure
-- `src/PageAgent.ts` - Core AI agent class with DOM manipulation
-- `src/dom/dom_tree/index.js` - DOM extraction engine
-- `src/utils/bus.ts` - Type-safe event bus system
-- `src/entry.ts` - Library entry point for CDN usage
-- `vite.config.js` / `vite.lib.config.js` - Dual build configuration
+- `packages/page-agent/src/PageAgent.ts` - Core AI agent class with DOM manipulation
+- `packages/page-agent/src/dom/dom_tree/index.js` - DOM extraction engine
+- `packages/page-agent/src/utils/bus.ts` - Type-safe event bus system
+- `packages/page-agent/src/entry.ts` - Library entry point for CDN usage
+- `packages/page-agent/vite.config.js` - Library build configuration
+
+- `packages/website/src/router.tsx` - Central routing definition (manual registration required)
+- `packages/website/src/components/DocsLayout.tsx` - Navigation structure
+- `packages/website/vite.config.js` - Website build configuration
 
 ## Debugging Common Issues
 
 ### Blank Documentation Pages
 
-1. Verify route exists in `pages/router.tsx`
+1. Verify route exists in `packages/website/src/router.tsx`
 2. Check component import path
 3. Verify CSS isn't hiding content (check dark mode classes)
 4. Test with minimal component first
 
 ### Library Integration Issues
 
-1. Check `dist/lib/page-agent.umd.js` builds correctly
+1. Check `packages/page-agent/dist/lib/page-agent.umd.js` builds correctly
 2. Test CDN injection with query params
 3. Verify event bus communications are properly typed
-4. Use `pages/test-pages/` for isolated testing
+4. Use `packages/website/src/test-pages/` for isolated testing

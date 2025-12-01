@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="UTF-8" />
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href="https://img.alicdn.com/imgextra/i2/O1CN012eGDRI1X6nnMt9clU_!!6000000002875-49-tps-64-64.webp"
+		/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PageAgent - The GUI Agent Living in Your Webpage</title>
+		<meta
+			name="description"
+			content="PageAgent.js: Intelligent GUI Agent for any website. Modern web AI automation with minimal integration."
+		/>
+		<meta
+			name="keywords"
+			content="PageAgent, AI Agent, GUI Agent, Web Automation, GUI Automation, Frontend, CDN, JavaScript, React, Vite, LLM"
+		/>
+		<meta
+			property="og:image"
+			content="https://img.alicdn.com/imgextra/i3/O1CN01JPT4Fj1FJTfmHfNxO_!!6000000000466-49-tps-512-512.webp"
+		/>
+		<meta property="og:url" content="https://alibaba.github.io/page-agent" />
+		<meta property="og:type" content="website" />
+		<meta name="theme-color" content="#58c0fc" />
+		<meta name="color-scheme" content="light dark" />
+		<meta name="author" content="PageAgent.js Team" />
+		<meta property="og:title" content="PageAgent.js - AI-powered GUI Agent" />
+		<meta property="og:description" content="The GUI Agent living in your website." />
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:locale:alternate" content="zh_CN" />
+
+		<!-- Google tag (gtag.js) -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=G-HCGRJTN3HM"></script>
+		<script>
+			window.dataLayer = window.dataLayer || []
+			function gtag() {
+				dataLayer.push(arguments)
+			}
+			gtag('js', new Date())
+
+			gtag('config', 'G-HCGRJTN3HM')
+		</script>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script type="module" src="./src/main.tsx"></script>
+		<script>
+			// Dynamically update html lang attribute based on i18n detection
+			const updateHtmlLang = () => {
+				const lang = localStorage.getItem('i18nextLng') || navigator.language || 'zh-CN'
+				document.documentElement.lang = lang
+			}
+			updateHtmlLang()
+			window.addEventListener('storage', updateHtmlLang)
+		</script>
+	</body>
+</html>
