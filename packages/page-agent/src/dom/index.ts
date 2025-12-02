@@ -95,6 +95,35 @@ interface TreeNode {
 }
 
 /**
+ * 数据脱敏过滤器
+ * 过滤规则：
+ * 1. 手机号：11位数字，以1开头 -> 138****1234
+ * 2. 邮箱：xxx@xxx.com -> x***@xxx.com
+ * 3. 身份证号：18位数字 -> 330106********1234
+ * 4. 银行卡号：16-19位数字 -> 6222***********1234
+ */
+function maskSensitiveData(text: string): string {
+	if (!text) return text
+
+	// 手机号 (1开头，11位数字)
+	text = text.replace(/\b(1[3-9]\d)(\d{4})(\d{4})\b/g, '$1****$3')
+
+	// 邮箱 (简单匹配)
+	text = text.replace(/\b([a-zA-Z0-9._%+-])[^@]*(@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\b/g, '$1***$2')
+
+	// 身份证号 (18位)
+	text = text.replace(
+		/\b(\d{6})(19|20\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])(\d{3}[\dXx])\b/g,
+		'$1********$5'
+	)
+
+	// 银行卡号 (16-19位数字)
+	text = text.replace(/\b(\d{4})\d{8,11}(\d{4})\b/g, '$1********$2')
+
+	return text
+}
+
+/**
  * 对应 python 中的 views::clickable_elements_to_string,
  * 将 dom 信息处理成适合 llm 阅读的文本格式
  * @形如
@@ -114,8 +143,6 @@ interface TreeNode {
  * 其中可交互元素用序号标出，提示llm可以用序号操作。
  * 缩进代表父子关系。
  * 普通文本则直接列出来。
- *
- * @todo 数据脱敏过滤器
  */
 export function flatTreeToString(flatTree: FlatDomTree, include_attributes?: string[]): string {
 	const DEFAULT_INCLUDE_ATTRIBUTES = [
@@ -295,7 +322,7 @@ export function flatTreeToString(flatTree: FlatDomTree, include_attributes?: str
 
 					if (Object.keys(attributesToInclude).length > 0) {
 						attributesHtmlStr = Object.entries(attributesToInclude)
-							.map(([key, value]) => `${key}=${capTextLength(value, 20)}`)
+							.map(([key, value]) => `${key}=${capTextLength(maskSensitiveData(value), 20)}`)
 							.join(' ')
 					}
 				}
@@ -329,7 +356,7 @@ export function flatTreeToString(flatTree: FlatDomTree, include_attributes?: str
 				}
 
 				if (text) {
-					const trimmedText = text.trim()
+					const trimmedText = maskSensitiveData(text).trim()
 					if (!attributesHtmlStr) {
 						line += ' '
 					}
@@ -358,7 +385,7 @@ export function flatTreeToString(flatTree: FlatDomTree, include_attributes?: str
 				node.parent.isVisible &&
 				node.parent.isTopElement
 			) {
-				result.push(`${depthStr}${node.text ?? ''}`)
+				result.push(`${depthStr}${maskSensitiveData(node.text ?? '')}`)
 			}
 		}
 	}
