@@ -88,5 +88,8 @@
 		],
 		"importOrderSeparation": true,
 		"importOrderSortSpecifiers": true
+	},
+	"dependencies": {
+		"lightningcss": "^1.30.2"
 	}
 }
