@@ -36,6 +36,6 @@
 		"postpublish": "node -e \"['LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
 	},
 	"dependencies": {
-		"ai-motion": "^0.4.7"
+		"ai-motion": "^0.4.8"
 	}
 }
