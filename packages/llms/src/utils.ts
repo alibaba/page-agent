@@ -34,7 +34,7 @@ export function modelPatch(body: Record<string, any>) {
 
 	const modelName = normalizeModelName(model)
 
-	if (modelName === 'qwen3') {
+	if (modelName.startsWith('qwen3')) {
 		debug('Applying Qwen-3 patch: use higher temperature for auto fixing')
 		body.temperature = Math.max(body.temperature || 0, 1.0)
 	}
