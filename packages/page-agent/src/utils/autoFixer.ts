@@ -74,6 +74,9 @@ export function normalizeResponse(response: any): any {
 
 	// fix double stringified arguments
 	resolvedArguments = safeJsonParse(resolvedArguments)
+	if (resolvedArguments.action) {
+		resolvedArguments.action = safeJsonParse(resolvedArguments.action)
+	}
 
 	// fix incomplete formats
 	if (!resolvedArguments.action) {

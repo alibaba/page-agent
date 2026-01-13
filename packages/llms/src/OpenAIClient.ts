@@ -165,6 +165,7 @@ export class OpenAIClient implements LLMClient {
 		// Validate with schema
 		const validation = tool.inputSchema.safeParse(parsedArgs)
 		if (!validation.success) {
+			console.error(validation.error)
 			throw new InvokeError(
 				InvokeErrorType.INVALID_TOOL_ARGS,
 				'Tool arguments validation failed',
