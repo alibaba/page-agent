@@ -30,7 +30,7 @@ export default function App() {
 	}, [history, activity])
 
 	const handleSubmit = useCallback(
-		(e?: React.FormEvent) => {
+		(e?: React.SyntheticEvent) => {
 			e?.preventDefault()
 			if (!inputValue.trim() || status === 'running') return
 
