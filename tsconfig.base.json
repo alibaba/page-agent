@@ -28,20 +28,5 @@
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true
-
-        // "paths": {
-        // 	// Simplified monorepo solution (raw npm workspace with hoisting)
-        // 	"@page-agent/page-controller": ["./packages/page-controller/src/PageController.ts"],
-        // 	"page-agent": ["./packages/page-agent/src/PageAgent.ts"]
-        // }
     }
-    // "references": [
-    // 	{ "path": "./packages/page-controller" },
-    // 	{ "path": "./packages/page-agent" },
-    // 	{ "path": "./packages/website" }
-    // ],
-    // "include": ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
-    // "exclude": ["node_modules", "dist", "packages/*/dist"]
-    // "files": ["env.d.ts"]
-    // "files": []
 }

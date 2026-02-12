@@ -1,4 +1,4 @@
-# PageAgent 🤖🪄
+# Page Agent
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://img.alicdn.com/imgextra/i4/O1CN01qKig1P1FnhpFKNdi6_!!6000000000532-2-tps-1280-256.png">
@@ -19,18 +19,16 @@
 
 ## ✨ Features
 
-- **🎯 轻松集成**
-    - 无需 Python，无需无头浏览器，无需浏览器插件。纯页面内脚本。
-- **🔐 端侧运行**
-- **🧠 HTML 脱水**
-- **💬 自然语言接口**
-- **🎨 HITL 交互界面**
-
-以及 😉
-
-- **🧪 实验性的 Chrome 扩展，支持跨页面控制** - `packages/extension`
-
-👉 [**🗺️ Roadmap**](https://github.com/alibaba/page-agent/issues/96)
+- **🎯 轻松集成** 
+  - 无需 `浏览器插件` / `Python` / `无头浏览器`。
+  - 纯页面内 JavaScript，一切都在你的网页中完成。
+  - The best tool for your agent to control web pages.
+- **📖 基于文本的 DOM 操作**
+  - 无需截图，无需 OCR 或多模态模型。
+  - 无需特殊权限。
+- **🧠 用你自己的 LLM**
+- **🎨 精美 UI，支持人机协同**
+- **🐙 可选的 [Chrome 扩展](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension)，支持跨页面任务。**
 
 ## 🚀 快速开始
 
@@ -39,19 +37,15 @@
 通过我们免费的 Demo LLM 快速体验 PageAgent：
 
 ```html
-<script
-    src="https://registry.npmmirror.com/page-agent/1.2.0/files/dist/iife/page-agent.demo.js"
-    crossorigin="true"
-></script>
+<script src="{URL}" crossorigin="true"></script>
 ```
-
-> - **⚠️ 仅用于技术评估。** Demo LLM 有速率和使用限制，可能随时变更。
-> - **🌷 建议使用自己的 LLM API。**
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
 | Global  | https://cdn.jsdelivr.net/npm/page-agent@1.2.0/dist/iife/page-agent.demo.js         |
 | China   | https://registry.npmmirror.com/page-agent/1.2.0/files/dist/iife/page-agent.demo.js |
+
+> **⚠️ 仅用于技术评估。** Demo LLM 有速率和使用限制，速度较慢，可能随时变更。
 
 ### NPM 安装
 
@@ -72,7 +66,7 @@ const agent = new PageAgent({
 await agent.execute('点击登录按钮')
 ```
 
-适用于无法使用 NPM 的环境，我们也提供了 IIFE 构建的 CDN 方式。[@see CDN Usage](https://alibaba.github.io/page-agent/#/docs/integration/cdn-setup)
+更多编程用法，请参阅 [📖 文档](https://alibaba.github.io/page-agent/#/docs/introduction/overview)。
 
 ## 🏗️ 架构设计
 
@@ -80,12 +74,13 @@ PageAgent adopts a simplified monorepo structure:
 
 ```
 packages/
-├── core/                # ** Core agent logic without UI(npm: @page-agent/core) **
-├── page-agent/          # Exported agent and demo(npm: page-agent)
+├── core/                # ** Core agent logic (npm: @page-agent/core) **
 ├── llms/                # LLM 客户端 (npm: @page-agent/llms)
-├── page-controller/     # DOM 操作 & 蒙层 & 模拟鼠标 (npm: @page-agent/page-controller)
-├── ui/                  # 面板 & i18n (npm: @page-agent/ui)
-└── website/             # 文档站点
+├── page-controller/     # DOM 操作 (npm: @page-agent/page-controller)
+├── ui/                  # 面板 UI (npm: @page-agent/ui)
+├── page-agent/          # 入口类 & iife 包 (npm: page-agent)
+├── extension/           # Chrome 扩展，支持跨页面任务
+└── website/             # 网站 & 文档站点
 ```
 
 ## 🤝 贡献

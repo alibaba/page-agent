@@ -20,10 +20,11 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
 
 ### Project Structure
 
-This is a **monorepo** with npm workspaces containing **3 main packages**:
+This is a **monorepo** with npm workspaces containing **4 main packages**:
 
 - **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
 - **Core** (`packages/core/`) - Core agent logic without UI (npm: `@page-agent/core`)
+- **Extension** (`packages/extension/`) - Chrome extension for multi-page tasks and browser-level automation
 - **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
 
 We use a simplified monorepo solution with `native npm-workspace + ts reference + vite alias`. No fancy tooling. Hoisting is required.
@@ -145,6 +146,16 @@ If your lame AI assistant does not support [AGENTS.md](https://agents.md/). Add 
 npm start
 ```
 
+### Extension Development
+
+```bash
+npm run dev -w @page-agent/ext
+npm run zip -w @page-agent/ext
+```
+
+- Load extension in Chrome via `chrome://extensions` -> **Load unpacked**
+- Use `packages/extension/docs/extension_api.md` (EN) or `packages/extension/docs/extension_api_zh.md` (ZH) for API integration details
+
 ### Testing on Other Websites
 
 - Start and serve a local `iife` script
@@ -192,14 +203,6 @@ We especially welcome contributions in:
 By contributing to this project, you agree that your contributions will be licensed under the MIT License.
 
 > You may need to sign a github CLA before you create a PR.
-
-### Browser-Use Attribution
-
-Parts of this project are derived from the [browser-use](https://github.com/browser-use/browser-use) project (MIT License). When contributing to DOM-related functionality:
-
-- Maintain existing attribution comments
-- Follow similar patterns for consistency
-- Credit browser-use for derived concepts
 
 ## 💬 Questions?
 

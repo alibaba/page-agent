@@ -1,3 +1,5 @@
+// this is only for IDE ts language server to work.
+// do not use this for building or linting.
 {
     "extends": "./tsconfig.base.json",
     "references": [

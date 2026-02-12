@@ -1,12 +1,18 @@
 # Page Agent Extension API
 
-This document describes how to integrate the Page Agent browser extension into your web application.
+Integrate the Page Agent extension into your web app and trigger multi-page browser tasks from page JavaScript.
 
 ## Installation
 
 ### 1. Install the browser extension
 
-Install the Page Agent extension from the Chrome Web Store.
+Primary channel:
+
+- Chrome Web Store: https://chromewebstore.google.com/detail/page-agent-ext/akldabonmimlicnjlflnapfeklbfemhj
+
+Latest updates are often published earlier on:
+
+- GitHub Releases: https://github.com/alibaba/page-agent/releases
 
 ### 2. Install type definitions (recommended)
 
@@ -14,11 +20,19 @@ Install the Page Agent extension from the Chrome Web Store.
 npm install @page-agent/core --save-dev
 ```
 
-### 3. Set up authentication
+### 3. Authorization (Token)
 
-The extension only injects APIs when it detects a valid token in `localStorage`.
+The token allows your page JS to call the extension API (`window.PAGE_AGENT_EXT`) and execute multi-page tasks.
 
-1. Open the extension's side panel to get your authorization token
+Why token-based access is required:
+
+- The extension has broad browser permissions (page access, navigation, multi-tab control).
+- If abused, it can harm user privacy and security.
+- Users must explicitly provide the token only to applications they trust.
+
+Setup:
+
+1. Open the extension side panel and copy your auth token.
 2. Set the token in your page:
 
 ```typescript
@@ -60,36 +74,36 @@ if (await waitForExtension()) {
 
 ## Global API
 
-The extension injects the following APIs into the `window` object:
+After token match, the extension injects APIs into `window`.
 
 ### `window.PAGE_AGENT_EXT_VERSION`
 
-Extension version string (e.g., `"1.0.0"`). This is exposed separately to allow version checking before accessing the main API object.
+Extension version string (for capability checks before using the main API).
 
 ### `window.PAGE_AGENT_EXT`
 
-Main API namespace object containing:
+Main namespace object.
 
 #### `PAGE_AGENT_EXT.execute(task, config)`
 
-Execute an agent task.
+Execute one agent task.
 
-**Parameters:**
+Parameters:
 
 | Name | Type | Required | Description |
-|------|------|----------|-------------|
+| ---- | ---- | -------- | ----------- |
 | `task` | `string` | Yes | Task description |
-| `config` | `ExecuteConfig` | Yes | Execution configuration (LLM settings, options, and event callbacks) |
+| `config` | `ExecuteConfig` | Yes | LLM settings, options, and callbacks |
 
-**Returns:** `Promise<ExecutionResult>`
+Returns: `Promise<ExecutionResult>`
 
 #### `PAGE_AGENT_EXT.dispose()`
 
-Stop and destroy the current running agent.
+Stop the current task.
 
 ## Types
 
-Install `@page-agent/core` for full type definitions:
+Install `@page-agent/core` for complete types:
 
 ```typescript
 import type {
@@ -104,10 +118,7 @@ export interface ExecuteConfig {
   apiKey: string
   model: string
 
-  /**
-   * Whether to include the initial tab (that holds this main world script) in the task.
-   * @default true
-   */
+  // Include the initial tab where page JS starts. Default: true.
   includeInitialTab?: boolean
 
   onStatusChange?: (status: AgentStatus) => void
@@ -119,20 +130,13 @@ export interface ExecuteConfig {
 export type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
 ```
 
-### AgentStatus
+`AgentStatus`
 
 ```typescript
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
 ```
 
-| Status | Description |
-|--------|-------------|
-| `idle` | Agent is idle, ready to execute |
-| `running` | Agent is executing a task |
-| `completed` | Task completed successfully |
-| `error` | Task failed with an error |
-
-### AgentActivity
+`AgentActivity`
 
 ```typescript
 type AgentActivity =
@@ -143,15 +147,7 @@ type AgentActivity =
   | { type: 'error'; message: string }
 ```
 
-| Type | Description |
-|------|-------------|
-| `thinking` | Agent is analyzing the page and planning |
-| `executing` | Agent is executing a tool action |
-| `executed` | Tool execution completed |
-| `retrying` | Retrying after a failure |
-| `error` | An error occurred |
-
-### HistoricalEvent
+`HistoricalEvent`
 
 ```typescript
 type HistoricalEvent =
@@ -162,7 +158,7 @@ type HistoricalEvent =
   | { type: 'error'; message: string; rawResponse?: unknown }
 ```
 
-### ExecutionResult
+`ExecutionResult`
 
 ```typescript
 interface ExecutionResult {
@@ -183,81 +179,22 @@ const result = await window.PAGE_AGENT_EXT!.execute(
     baseURL: 'https://api.openai.com/v1',
     apiKey: process.env.OPENAI_API_KEY!,
     model: 'gpt-5.2',
-  }
-)
-
-if (result.success) {
-  console.log('Task completed:', result.data)
-} else {
-  console.error('Task failed')
-}
-```
-
-### Exclude Initial Tab
-
-By default, the agent includes the initial tab (where the script runs) in the task. Set `includeInitialTab: false` to exclude it:
-
-```typescript
-const result = await window.PAGE_AGENT_EXT!.execute(
-  'Open a new tab and search for page-agent on GitHub',
-  {
-    baseURL: 'https://api.openai.com/v1',
-    apiKey: process.env.OPENAI_API_KEY!,
-    model: 'gpt-5.2',
-    includeInitialTab: false,  // Agent will open new tabs only
+    includeInitialTab: false, // Optional: exclude current tab
+    onStatusChange: (status) => console.log(status),
+    onActivity: (activity) => console.log(activity),
   }
 )
 ```
 
-### With Event Callbacks
+### Stop the Current Task
 
 ```typescript
-await window.PAGE_AGENT_EXT!.execute('Navigate to the settings page', {
-  baseURL: 'https://api.openai.com/v1',
-  apiKey: process.env.OPENAI_API_KEY!,
-  model: 'gpt-5.2',
-  onStatusChange: (status) => {
-    updateUI({ agentStatus: status })
-  },
-  onActivity: (activity) => {
-    switch (activity.type) {
-      case 'thinking':
-        showSpinner('Agent is thinking...')
-        break
-      case 'executing':
-        showSpinner(`Executing: ${activity.tool}`)
-        break
-      case 'executed':
-        log(`${activity.tool} completed in ${activity.duration}ms`)
-        break
-      case 'error':
-        showError(activity.message)
-        break
-    }
-  },
-  onHistoryUpdate: (history) => {
-    renderHistory(history)
-  },
-})
-```
-
-### Stop Execution
-
-```typescript
-// Start a task
-window.PAGE_AGENT_EXT!.execute('Scroll through all pages', {
-  baseURL: 'https://api.openai.com/v1',
-  apiKey: process.env.OPENAI_API_KEY!,
-  model: 'gpt-5.2',
-})
-
-// Later, stop it
 window.PAGE_AGENT_EXT!.dispose()
 ```
 
 ## Window Type Declaration
 
-If not using `@page-agent/core`, add this to your project:
+If you are not importing `@page-agent/core`, add:
 
 ```typescript
 import type {
@@ -283,7 +220,7 @@ declare global {
     PAGE_AGENT_EXT_VERSION?: string
     PAGE_AGENT_EXT?: {
       version: string
-      execute: (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
+      execute: Execute
       dispose: () => void
     }
   }

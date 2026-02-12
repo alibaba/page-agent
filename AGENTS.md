@@ -22,6 +22,7 @@ npm start                    # Start website dev server
 npm run build                # Build all packages
 npm run build:libs           # Build all libraries
 npm run lint                 # ESLint with TypeScript strict rules
+npm run zip -w @page-agent/ext # Zip the extension package
 ```
 
 ## Architecture
@@ -36,7 +37,7 @@ packages/
 ├── page-agent/              # npm: "page-agent" entry class (with UI + controller + demo builds)
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
-├── extension/               # 🚧 WIP: Browser extension (WXT + React)
+├── extension/               # Browser extension (WXT + React)
 ├── page-controller/         # @page-agent/page-controller
 └── ui/                      # @page-agent/ui
 ```

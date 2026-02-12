@@ -1,4 +1,4 @@
-# PageAgent 🤖🪄
+# Page Agent
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://img.alicdn.com/imgextra/i4/O1CN01qKig1P1FnhpFKNdi6_!!6000000000532-2-tps-1280-256.png">
@@ -19,18 +19,16 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ## ✨ Features
 
-- **🎯 Easy Integration**
-    - No python. No headless browser. No browser extension. Just in-page scripts.
-- **🔐 Client-Side Processing**
-- **🧠 DOM Extraction**
-- **💬 Natural Language Interface**
-- **🎨 UI with Human in the loop**
-
-And 😉
-
-- **🧪 `cross-page` control with an experimental chrome extension** - `packages/extension`
-
-👉 [**🗺️ Roadmap**](https://github.com/alibaba/page-agent/issues/96)
+- **🎯 Easy integration** 
+  - No need for `browser extension` / `python` / `headless browser`. 
+  - Just in-page javascript. Everything happens in your web page.
+  - The best tool for your agent to control web pages.
+- **📖 Text-based DOM manipulation**
+  - No screenshots. No OCR or multi-modal LLMs needed.
+  - No special permissions required.
+- **🧠 Bring your own LLMs**
+- **🎨 Pretty UI with human-in-the-loop**
+- **🐙 Optional [chrome extension](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension) for multi-page tasks.**
 
 ## 🚀 Quick Start
 
@@ -39,19 +37,15 @@ And 😉
 Fastest way to try PageAgent with our free Demo LLM:
 
 ```html
-<script
-    src="https://cdn.jsdelivr.net/npm/page-agent@1.2.0/dist/iife/page-agent.demo.js"
-    crossorigin="true"
-></script>
+<script src="{URL}" crossorigin="true"></script>
 ```
-
-> - **⚠️ For technical evaluation only.** Demo LLM has rate limits and usage restrictions. May change without notice.
-> - **🌷 Bring your own LLM API.**
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
 | Global  | https://cdn.jsdelivr.net/npm/page-agent@1.2.0/dist/iife/page-agent.demo.js         |
 | China   | https://registry.npmmirror.com/page-agent/1.2.0/files/dist/iife/page-agent.demo.js |
+
+> **⚠️ For technical evaluation only.** Demo LLM has rate limits and usage restrictions. Slow. May change without notice.
 
 ### NPM Installation
 
@@ -72,18 +66,21 @@ const agent = new PageAgent({
 await agent.execute('Click the login button')
 ```
 
+For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/#/docs/introduction/overview).
+
 ## 🏗️ Structure
 
 PageAgent adopts a simplified monorepo structure:
 
 ```
 packages/
-├── core/                # ** Core agent logic without UI(npm: @page-agent/core) **
-├── page-agent/          # Exported agent and demo(npm: page-agent)
+├── core/                # ** Core agent logic (npm: @page-agent/core) **
 ├── llms/                # LLM client (npm: @page-agent/llms)
-├── page-controller/     # DOM operations & Visual Mask (npm: @page-agent/page-controller)
-├── ui/                  # Panel & i18n (npm: @page-agent/ui)
-└── website/             # Demo & Documentation site
+├── page-controller/     # DOM operations (npm: @page-agent/page-controller)
+├── ui/                  # Panel UI (npm: @page-agent/ui)
+├── page-agent/          # Entry class and iife builds(npm: page-agent)
+├── extension/           # Chrome extension for multi-page tasks
+└── website/             # Website & Documentation site
 ```
 
 ## 🤝 Contributing

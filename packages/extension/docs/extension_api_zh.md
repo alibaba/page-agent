@@ -1,12 +1,18 @@
 # Page Agent 浏览器插件 API
 
-本文档介绍如何在网页应用中接入 Page Agent 浏览器插件。
+在你的网页应用中接入 Page Agent 插件，并通过页面 JavaScript 发起多页面浏览器任务。
 
 ## 安装
 
 ### 1. 安装浏览器插件
 
-从 Chrome 应用商店安装 Page Agent 插件。
+首选渠道：
+
+- Chrome 应用商店：https://chromewebstore.google.com/detail/page-agent-ext/akldabonmimlicnjlflnapfeklbfemhj
+
+通常更快提供最新构建的渠道：
+
+- GitHub Releases：https://github.com/alibaba/page-agent/releases
 
 ### 2. 安装类型定义（推荐）
 
@@ -14,11 +20,19 @@
 npm install @page-agent/core --save-dev
 ```
 
-### 3. 配置认证
+### 3. 授权（Token）
 
-插件在页面加载后检测 `localStorage` 中的 token，匹配时才会注入 API。
+token 用于让页面 JS 调用扩展 API（`window.PAGE_AGENT_EXT`）并执行多页面任务。
 
-1. 打开插件的侧边栏面板，获取授权 token
+为什么必须使用 token：
+
+- 插件具备较广的浏览器权限（页面访问、导航、多标签控制）。
+- 若被滥用，可能危害用户隐私与安全。
+- 用户必须主动将 token 提供给其信任的应用。
+
+配置步骤：
+
+1. 在扩展侧边栏中复制 auth token。
 2. 在页面中设置 token：
 
 ```typescript
@@ -60,32 +74,32 @@ if (await waitForExtension()) {
 
 ## 全局 API
 
-插件在 `window` 对象上注入以下 API：
+token 匹配后，插件会在 `window` 上注入 API。
 
 ### `window.PAGE_AGENT_EXT_VERSION`
 
-插件版本号字符串（例如 `"1.0.0"`）。单独暴露版本号，方便在访问主 API 对象前进行版本检查。
+插件版本号字符串，可用于在访问主 API 前做能力检查。
 
 ### `window.PAGE_AGENT_EXT`
 
-主 API 命名空间对象，包含：
+主命名空间对象。
 
 #### `PAGE_AGENT_EXT.execute(task, config)`
 
 执行 Agent 任务。
 
-**参数：**
+参数：
 
 | 名称 | 类型 | 必填 | 说明 |
-|------|------|------|------|
+| ---- | ---- | ---- | ---- |
 | `task` | `string` | 是 | 任务描述 |
-| `config` | `ExecuteConfig` | 是 | 执行配置（LLM 设置、选项和事件回调） |
+| `config` | `ExecuteConfig` | 是 | LLM 设置、执行选项和回调 |
 
-**返回：** `Promise<ExecutionResult>`
+返回：`Promise<ExecutionResult>`
 
 #### `PAGE_AGENT_EXT.dispose()`
 
-停止并销毁当前运行的 Agent。
+停止当前任务。
 
 ## 类型定义
 
@@ -104,10 +118,7 @@ export interface ExecuteConfig {
   apiKey: string
   model: string
 
-  /**
-   * 是否将初始标签页（运行此脚本的页面）包含在任务中。
-   * @default true
-   */
+  // 是否包含启动脚本所在标签页。默认 true。
   includeInitialTab?: boolean
 
   onStatusChange?: (status: AgentStatus) => void
@@ -119,20 +130,13 @@ export interface ExecuteConfig {
 export type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
 ```
 
-### AgentStatus
+`AgentStatus`
 
 ```typescript
 type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
 ```
 
-| 状态 | 说明 |
-|------|------|
-| `idle` | 空闲，准备执行 |
-| `running` | 正在执行任务 |
-| `completed` | 任务成功完成 |
-| `error` | 任务执行失败 |
-
-### AgentActivity
+`AgentActivity`
 
 ```typescript
 type AgentActivity =
@@ -143,15 +147,7 @@ type AgentActivity =
   | { type: 'error'; message: string }
 ```
 
-| 类型 | 说明 |
-|------|------|
-| `thinking` | Agent 正在分析页面并规划 |
-| `executing` | 正在执行工具操作 |
-| `executed` | 工具执行完成 |
-| `retrying` | 失败后重试 |
-| `error` | 发生错误 |
-
-### HistoricalEvent
+`HistoricalEvent`
 
 ```typescript
 type HistoricalEvent =
@@ -162,7 +158,7 @@ type HistoricalEvent =
   | { type: 'error'; message: string; rawResponse?: unknown }
 ```
 
-### ExecutionResult
+`ExecutionResult`
 
 ```typescript
 interface ExecutionResult {
@@ -183,81 +179,22 @@ const result = await window.PAGE_AGENT_EXT!.execute(
     baseURL: 'https://api.openai.com/v1',
     apiKey: process.env.OPENAI_API_KEY!,
     model: 'gpt-5.2',
-  }
-)
-
-if (result.success) {
-  console.log('任务完成:', result.data)
-} else {
-  console.error('任务失败')
-}
-```
-
-### 排除初始标签页
-
-默认情况下，Agent 会将初始标签页（运行脚本的页面）包含在任务中。设置 `includeInitialTab: false` 可以排除它：
-
-```typescript
-const result = await window.PAGE_AGENT_EXT!.execute(
-  '打开新标签页并在 GitHub 上搜索 page-agent',
-  {
-    baseURL: 'https://api.openai.com/v1',
-    apiKey: process.env.OPENAI_API_KEY!,
-    model: 'gpt-5.2',
-    includeInitialTab: false,  // Agent 只会打开新标签页
+    includeInitialTab: false, // 可选：排除当前标签页
+    onStatusChange: (status) => console.log(status),
+    onActivity: (activity) => console.log(activity),
   }
 )
 ```
 
-### 使用事件回调
+### 停止当前任务
 
 ```typescript
-await window.PAGE_AGENT_EXT!.execute('导航到设置页面', {
-  baseURL: 'https://api.openai.com/v1',
-  apiKey: process.env.OPENAI_API_KEY!,
-  model: 'gpt-5.2',
-  onStatusChange: (status) => {
-    updateUI({ agentStatus: status })
-  },
-  onActivity: (activity) => {
-    switch (activity.type) {
-      case 'thinking':
-        showSpinner('Agent 正在思考...')
-        break
-      case 'executing':
-        showSpinner(`正在执行: ${activity.tool}`)
-        break
-      case 'executed':
-        log(`${activity.tool} 完成，耗时 ${activity.duration}ms`)
-        break
-      case 'error':
-        showError(activity.message)
-        break
-    }
-  },
-  onHistoryUpdate: (history) => {
-    renderHistory(history)
-  },
-})
-```
-
-### 停止执行
-
-```typescript
-// 启动任务
-window.PAGE_AGENT_EXT!.execute('滚动浏览所有页面', {
-  baseURL: 'https://api.openai.com/v1',
-  apiKey: process.env.OPENAI_API_KEY!,
-  model: 'gpt-5.2',
-})
-
-// 稍后停止
 window.PAGE_AGENT_EXT!.dispose()
 ```
 
 ## Window 类型声明
 
-如果不使用 `@page-agent/core`，可以添加以下声明：
+如果你不直接引入 `@page-agent/core`，可添加以下声明：
 
 ```typescript
 import type {
@@ -283,7 +220,7 @@ declare global {
     PAGE_AGENT_EXT_VERSION?: string
     PAGE_AGENT_EXT?: {
       version: string
-      execute: (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
+      execute: Execute
       dispose: () => void
     }
   }
