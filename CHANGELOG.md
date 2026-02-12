@@ -5,6 +5,48 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-11
+
+### Features
+
+- **Observe Phase** - Agent now observes the page before each action, improving decision accuracy on dynamic pages
+- **Better Abort Handling** - Improved `abortSignal` support for cleaner task cancellation
+
+### Improvements
+
+- Pruned system prompts for lower token usage and faster responses
+- Improved error handling during agent steps with better error messages
+- Zod tree-shaking for smaller bundle size
+
+### Bug Fixes
+
+- Fixed indentation lost in DOM extraction caused by `trimLines`
+- Fixed `gpt-5-mini` temperature configuration
+
+---
+
+## [1.1.0] - 2026-02-02
+
+### Features
+
+- **Custom System Prompt** - New `systemPrompt` config option to customize or extend the default system prompt
+- **Chrome Extension** - Extension with multi-tab control, main-world API with token auth, and tab lifecycle management
+
+### Improvements
+
+- Renamed `include_attributes` to `includeAttributes` in PageController config (camelCase consistency)
+- Lazy-loaded mask module for faster initialization
+- Better date formatting and error messages from LLM client
+- Added `rawRequest` to step history for easier debugging
+
+### Bug Fixes
+
+- Fixed CSP errors by using local SVGs for cursor mask instead of inline styles
+- Fixed `AbortError` being incorrectly retried and shown to users
+- Fixed mask not working correctly when starting a new task after stopping a previous one
+
+---
+
 ## [1.0.0] - 2026-01-19
 
 ### 🎉 First Stable Release
