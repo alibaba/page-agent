@@ -42,8 +42,8 @@
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.2.0/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.2.0/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.3.0/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.3.0/files/dist/iife/page-agent.demo.js |
 
 > **⚠️ 仅用于技术评估。** Demo LLM 有速率和使用限制，速度较慢，可能随时变更。
 

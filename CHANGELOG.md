@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-02-13
+
+### Breaking Changes
+
+- **Lifecycle: `stop()` vs `dispose()`** - New `stop()` method to cancel the current task while keeping the agent reusable. `dispose()` is now terminal — a disposed agent cannot be reused. This affects both `PageAgentCore` and `PanelAgentAdapter`.
+
+### Features
+
+- **Panel action button** - The panel button now morphs between Stop (■) and Close (X) based on agent status
+- **Error history** - Errors and max-step failures are now recorded in `history` as `AgentErrorEvent`, making post-task analysis more complete
+
+### Bug Fixes
+
+- **AbortError handling** - `AbortError` is no longer retried by the LLM client, and shows a clean "Task stopped" message instead of a raw error stack
+
+---
+
 ## [1.2.0] - 2026-02-11
 
 ### Features
