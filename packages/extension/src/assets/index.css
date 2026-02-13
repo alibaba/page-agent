@@ -113,6 +113,18 @@
 	--color-sidebar-ring: var(--sidebar-ring);
 }
 
+@keyframes glow-breathe {
+	0%,
+	100% {
+		opacity: 0;
+		transform: scale(0.85);
+	}
+	50% {
+		opacity: 0.35;
+		transform: scale(1.1);
+	}
+}
+
 @layer base {
 	* {
 		@apply border-border outline-ring/50;

@@ -15,7 +15,7 @@ import { ConfigPanel } from './components/ConfigPanel'
 import { HistoryDetail } from './components/HistoryDetail'
 import { HistoryList } from './components/HistoryList'
 import { ActivityCard, EventCard } from './components/cards'
-import { EmptyState, Logo, StatusDot } from './components/misc'
+import { EmptyState, Logo, MotionOverlay, StatusDot } from './components/misc'
 
 type View =
 	| { name: 'chat' }
@@ -117,7 +117,8 @@ export default function App() {
 	const showEmptyState = !currentTask && history.length === 0 && !isRunning
 
 	return (
-		<div className="flex flex-col h-screen bg-background">
+		<div className="relative flex flex-col h-screen bg-background">
+			<MotionOverlay active={isRunning} />
 			{/* Header */}
 			<header className="flex items-center justify-between border-b px-3 py-2">
 				<div className="flex items-center gap-2">
