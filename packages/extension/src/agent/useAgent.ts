@@ -84,7 +84,7 @@ export function useAgent(): UseAgentResult {
 	}, [])
 
 	const stop = useCallback(() => {
-		agentRef.current?.dispose()
+		agentRef.current?.stop()
 	}, [])
 
 	const configure = useCallback(async (newConfig: LLMConfig) => {

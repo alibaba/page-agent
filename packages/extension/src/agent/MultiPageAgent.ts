@@ -89,8 +89,7 @@ export class MultiPageAgent extends PageAgentCore {
 					isAgentRunning: false,
 				})
 
-				// no need to dispose tabsController and pageController
-				// as they do not keep references
+				tabsController.dispose()
 			},
 		})
 	}

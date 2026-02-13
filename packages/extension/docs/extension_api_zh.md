@@ -97,7 +97,7 @@ token 匹配后，插件会在 `window` 上注入 API。
 
 返回：`Promise<ExecutionResult>`
 
-#### `PAGE_AGENT_EXT.dispose()`
+#### `PAGE_AGENT_EXT.stop()`
 
 停止当前任务。
 
@@ -124,7 +124,6 @@ export interface ExecuteConfig {
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
   onHistoryUpdate?: (history: HistoricalEvent[]) => void
-  onDispose?: () => void
 }
 
 export type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
@@ -189,7 +188,7 @@ const result = await window.PAGE_AGENT_EXT!.execute(
 ### 停止当前任务
 
 ```typescript
-window.PAGE_AGENT_EXT!.dispose()
+window.PAGE_AGENT_EXT!.stop()
 ```
 
 ## Window 类型声明
@@ -212,7 +211,6 @@ interface ExecuteConfig {
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
   onHistoryUpdate?: (history: HistoricalEvent[]) => void
-  onDispose?: () => void
 }
 
 declare global {
@@ -221,7 +219,7 @@ declare global {
     PAGE_AGENT_EXT?: {
       version: string
       execute: Execute
-      dispose: () => void
+      stop: () => void
     }
   }
 }

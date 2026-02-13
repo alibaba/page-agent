@@ -33,7 +33,7 @@ export class Panel {
 	#statusText: HTMLElement
 	#historySection: HTMLElement
 	#expandButton: HTMLElement
-	#stopButton: HTMLElement
+	#actionButton: HTMLElement
 	#inputSection: HTMLElement
 	#taskInput: HTMLInputElement
 
@@ -76,7 +76,7 @@ export class Panel {
 		this.#statusText = this.#wrapper.querySelector(`.${styles.statusText}`)!
 		this.#historySection = this.#wrapper.querySelector(`.${styles.historySection}`)!
 		this.#expandButton = this.#wrapper.querySelector(`.${styles.expandButton}`)!
-		this.#stopButton = this.#wrapper.querySelector(`.${styles.stopButton}`)!
+		this.#actionButton = this.#wrapper.querySelector(`.${styles.stopButton}`)!
 		this.#inputSection = this.#wrapper.querySelector(`.${styles.inputSectionWrapper}`)!
 		this.#taskInput = this.#wrapper.querySelector(`.${styles.taskInput}`)!
 
@@ -104,6 +104,15 @@ export class Panel {
 		const indicatorType =
 			status === 'running' ? 'thinking' : status === 'idle' ? 'thinking' : status
 		this.#updateStatusIndicator(indicatorType)
+
+		// Morph action button: running = stop (■), not running = close (X)
+		if (status === 'running') {
+			this.#actionButton.textContent = '■'
+			this.#actionButton.title = this.#i18n.t('ui.panel.stop')
+		} else {
+			this.#actionButton.textContent = 'X'
+			this.#actionButton.title = this.#i18n.t('ui.panel.close')
+		}
 
 		// Show/hide based on status
 		if (status === 'running') {
@@ -266,10 +275,14 @@ export class Panel {
 	}
 
 	/**
-	 * Stop Agent
+	 * Action button handler: stop when running, close (dispose) when idle
 	 */
-	#stopAgent(): void {
-		this.#agent.dispose()
+	#handleActionButton(): void {
+		if (this.#agent.status === 'running') {
+			this.#agent.stop()
+		} else {
+			this.#agent.dispose()
+		}
 	}
 
 	/**
@@ -383,7 +396,7 @@ export class Panel {
 					<button class="${styles.controlButton} ${styles.expandButton}" title="${this.#i18n.t('ui.panel.expand')}">
 						▼
 					</button>
-					<button class="${styles.controlButton} ${styles.stopButton}" title="${this.#i18n.t('ui.panel.stop')}">
+					<button class="${styles.controlButton} ${styles.stopButton}" title="${this.#i18n.t('ui.panel.close')}">
 						X
 					</button>
 				</div>
@@ -420,10 +433,10 @@ export class Panel {
 			this.#toggle()
 		})
 
-		// Stop button
-		this.#stopButton.addEventListener('click', (e) => {
+		// Action button (stop / close)
+		this.#actionButton.addEventListener('click', (e) => {
 			e.stopPropagation()
-			this.#stopAgent()
+			this.#handleActionButton()
 		})
 
 		// Submit on Enter key in input field

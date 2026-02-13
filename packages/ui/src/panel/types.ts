@@ -68,6 +68,9 @@ export interface PanelAgentAdapter extends EventTarget {
 	/** Execute a task */
 	execute(task: string): Promise<unknown>
 
-	/** Dispose the agent */
+	/** Stop the current task (agent remains reusable) */
+	stop(): void
+
+	/** Dispose the agent (terminal, cannot be reused) */
 	dispose(): void
 }

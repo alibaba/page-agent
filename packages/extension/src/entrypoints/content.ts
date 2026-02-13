@@ -71,7 +71,8 @@ async function exposeAgentToPage() {
 				try {
 					const { task, config } = payload
 
-					// create when used
+					// Dispose old instance before creating new one
+					multiPageAgent?.dispose()
 
 					multiPageAgent = new MultiPageAgent(config)
 
@@ -116,17 +117,6 @@ async function exposeAgentToPage() {
 						)
 					})
 
-					multiPageAgent.addEventListener('dispose', () => {
-						window.postMessage(
-							{
-								channel: 'PAGE_AGENT_EXT_RESPONSE',
-								id,
-								action: 'dispose_event',
-							},
-							'*'
-						)
-					})
-
 					// result
 
 					const result = await multiPageAgent.execute(task)
@@ -155,9 +145,8 @@ async function exposeAgentToPage() {
 				break
 			}
 
-			case 'dispose': {
-				// @note stop ongoing processes but can still be re-used later
-				multiPageAgent?.dispose()
+			case 'stop': {
+				multiPageAgent?.stop()
 				break
 			}
 

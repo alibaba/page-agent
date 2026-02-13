@@ -206,7 +206,6 @@ interface ExecuteConfig {
 	onStatusChange?: (status: AgentStatus) => void
 	onActivity?: (activity: AgentActivity) => void
 	onHistoryUpdate?: (history: HistoricalEvent[]) => void
-	onDispose?: () => void
 }
 
 type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
@@ -217,7 +216,7 @@ declare global {
 		PAGE_AGENT_EXT?: {
 			version: string
 			execute: Execute
-			dispose: () => void
+			stop: () => void
 		}
 	}
 }`
@@ -237,7 +236,6 @@ interface ExecuteConfig {
 	onStatusChange?: (status: AgentStatus) => void
 	onActivity?: (activity: AgentActivity) => void
 	onHistoryUpdate?: (history: HistoricalEvent[]) => void
-	onDispose?: () => void
 }
 
 type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
@@ -248,7 +246,7 @@ declare global {
 		PAGE_AGENT_EXT?: {
 			version: string
 			execute: Execute
-			dispose: () => void
+			stop: () => void
 		}
 	}
 }`
@@ -271,8 +269,7 @@ const result = await window.PAGE_AGENT_EXT.execute(
 		// includeInitialTab: false, // 设为 false 排除初始标签页
 		onStatusChange: status => console.log('状态变化:', status),
 		onActivity: activity => console.log('活动:', activity),
-		onHistoryUpdate: history => console.log('历史更新:', history),
-		onDispose: () => console.log('已停止')
+		onHistoryUpdate: history => console.log('历史更新:', history)
 	}
 )
 
@@ -287,8 +284,7 @@ const result = await window.PAGE_AGENT_EXT.execute(
 		// includeInitialTab: false, // Set to false to exclude initial tab
 		onStatusChange: status => console.log('Status change:', status),
 		onActivity: activity => console.log('Activity:', activity),
-		onHistoryUpdate: history => console.log('History update:', history),
-		onDispose: () => console.log('Disposed')
+		onHistoryUpdate: history => console.log('History update:', history)
 	}
 )
 
@@ -297,20 +293,18 @@ console.log(result) // Task execution result`
 						language="javascript"
 					/>
 
-					<h3 className="text-xl font-semibold mt-6 mb-3">PAGE_AGENT_EXT.dispose()</h3>
+					<h3 className="text-xl font-semibold mt-6 mb-3">PAGE_AGENT_EXT.stop()</h3>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
-						{isZh
-							? '停止当前正在运行的任务。停止后 Agent 可以重新使用。'
-							: 'Stop the current running task. The agent can be reused after disposal.'}
+						{isZh ? '停止当前正在运行的任务。' : 'Stop the current running task.'}
 					</p>
 
 					<CodeEditor
 						code={
 							isZh
 								? `// 停止当前任务
-window.PAGE_AGENT_EXT.dispose()`
+window.PAGE_AGENT_EXT.stop()`
 								: `// Stop current task execution
-window.PAGE_AGENT_EXT.dispose()`
+window.PAGE_AGENT_EXT.stop()`
 						}
 						language="javascript"
 					/>

@@ -16,7 +16,6 @@ export interface ExecuteConfig {
 	onStatusChange?: (status: AgentStatus) => void
 	onActivity?: (activity: AgentActivity) => void
 	onHistoryUpdate?: (history: HistoricalEvent[]) => void
-	onDispose?: () => void
 }
 
 export default defineUnlistedScript(() => {
@@ -60,12 +59,6 @@ export default defineUnlistedScript(() => {
 					return
 				}
 
-				if (data.action === 'dispose_event' && config.onDispose) {
-					config.onDispose()
-					window.removeEventListener('message', handleMessage)
-					return
-				}
-
 				if (data.action !== 'execute_result') return
 
 				// execute_result
@@ -104,14 +97,14 @@ export default defineUnlistedScript(() => {
 		return promise
 	}
 
-	const dispose = () => {
+	const stop = () => {
 		const id = getId()
 
 		window.postMessage(
 			{
 				channel: 'PAGE_AGENT_EXT_REQUEST',
 				id,
-				action: 'dispose',
+				action: 'stop',
 			},
 			'*'
 		)
@@ -121,6 +114,6 @@ export default defineUnlistedScript(() => {
 	;(window as any).PAGE_AGENT_EXT = {
 		version: __EXT_VERSION__,
 		execute,
-		dispose,
+		stop,
 	}
 })

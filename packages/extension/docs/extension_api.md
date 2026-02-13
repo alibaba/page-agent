@@ -97,7 +97,7 @@ Parameters:
 
 Returns: `Promise<ExecutionResult>`
 
-#### `PAGE_AGENT_EXT.dispose()`
+#### `PAGE_AGENT_EXT.stop()`
 
 Stop the current task.
 
@@ -124,7 +124,6 @@ export interface ExecuteConfig {
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
   onHistoryUpdate?: (history: HistoricalEvent[]) => void
-  onDispose?: () => void
 }
 
 export type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
@@ -189,7 +188,7 @@ const result = await window.PAGE_AGENT_EXT!.execute(
 ### Stop the Current Task
 
 ```typescript
-window.PAGE_AGENT_EXT!.dispose()
+window.PAGE_AGENT_EXT!.stop()
 ```
 
 ## Window Type Declaration
@@ -212,7 +211,6 @@ interface ExecuteConfig {
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
   onHistoryUpdate?: (history: HistoricalEvent[]) => void
-  onDispose?: () => void
 }
 
 declare global {
@@ -221,7 +219,7 @@ declare global {
     PAGE_AGENT_EXT?: {
       version: string
       execute: Execute
-      dispose: () => void
+      stop: () => void
     }
   }
 }

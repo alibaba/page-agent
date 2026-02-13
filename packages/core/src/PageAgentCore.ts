@@ -68,6 +68,8 @@ export class PageAgentCore extends EventTarget {
 	taskId = ''
 	/** History events */
 	history: HistoricalEvent[] = []
+	/** Whether this agent has been disposed */
+	disposed = false
 
 	/**
 	 * Callback for when agent needs user input (ask_user tool)
@@ -183,7 +185,15 @@ export class PageAgentCore extends EventTarget {
 		this.#observations.push(content)
 	}
 
+	/** Stop the current task. Agent remains reusable. */
+	stop() {
+		this.pageController.cleanUpHighlights()
+		this.pageController.hideMask()
+		this.#abortController.abort()
+	}
+
 	async execute(task: string): Promise<ExecutionResult> {
+		if (this.disposed) throw new Error('PageAgent has been disposed. Create a new instance.')
 		if (!task) throw new Error('Task is required')
 		this.task = task
 		this.taskId = uid()
@@ -300,9 +310,13 @@ export class PageAgentCore extends EventTarget {
 				}
 			} catch (error: unknown) {
 				console.groupEnd() // to prevent nested groups
+				const isAbortError = (error as any)?.rawError?.name === 'AbortError'
+
 				console.error('Task failed', error)
-				const errorMessage = String(error)
+				const errorMessage = isAbortError ? 'Task stopped' : String(error)
 				this.#emitActivity({ type: 'error', message: errorMessage })
+				this.history.push({ type: 'error', message: errorMessage, rawResponse: error })
+				this.#emitHistoryChange()
 				this.#onDone(false)
 				const result: ExecutionResult = {
 					success: false,
@@ -315,10 +329,13 @@ export class PageAgentCore extends EventTarget {
 
 			step++
 			if (step > this.config.maxSteps) {
+				const errorMessage = 'Step count exceeded maximum limit'
+				this.history.push({ type: 'error', message: errorMessage })
+				this.#emitHistoryChange()
 				this.#onDone(false)
 				const result: ExecutionResult = {
 					success: false,
-					data: 'Step count exceeded maximum limit',
+					data: errorMessage,
 					history: this.history,
 				}
 				await onAfterTask?.(this, result)
@@ -601,6 +618,7 @@ export class PageAgentCore extends EventTarget {
 
 	dispose() {
 		console.log('Disposing PageAgent...')
+		this.disposed = true
 		this.pageController.dispose()
 		// this.history = []
 		this.#abortController.abort()

@@ -34,12 +34,15 @@ export class InvokeError extends Error {
 		super(message)
 		this.name = 'InvokeError'
 		this.type = type
-		this.retryable = this.isRetryable(type)
+		this.retryable = this.isRetryable(type, rawError)
 		this.rawError = rawError
 		this.rawResponse = rawResponse
 	}
 
-	private isRetryable(type: InvokeErrorType): boolean {
+	private isRetryable(type: InvokeErrorType, rawError?: unknown): boolean {
+		const isAbortError = (rawError as any)?.name === 'AbortError'
+		if (isAbortError) return false
+
 		const retryableTypes: InvokeErrorType[] = [
 			InvokeErrorType.NETWORK_ERROR,
 			InvokeErrorType.RATE_LIMIT,
