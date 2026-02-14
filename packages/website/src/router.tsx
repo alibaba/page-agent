@@ -1,14 +1,23 @@
-import { Suspense, lazy } from 'react'
-import { Route, Switch } from 'wouter'
+import { Suspense, lazy, useLayoutEffect } from 'react'
+import { Route, Switch, useLocation } from 'wouter'
 
 import HomePage from './pages/Home'
 import DocsPages from './pages/docs/index'
 
 // const DocsPages = lazy(() => import('./pages/docs/index'))
 
+function ScrollToTop() {
+	const [pathname] = useLocation()
+	useLayoutEffect(() => {
+		window.scrollTo(0, 0)
+	}, [pathname])
+	return null
+}
+
 export default function Router() {
 	return (
 		<Suspense>
+			<ScrollToTop />
 			<Switch>
 				{/* Home page */}
 				<Route path="/">
