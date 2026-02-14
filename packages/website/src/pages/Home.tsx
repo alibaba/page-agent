@@ -10,6 +10,7 @@ import {
 	Users,
 	Zap,
 } from 'lucide-react'
+import { PageAgent } from 'page-agent'
 import { useEffect, useState } from 'react'
 import { siGooglechrome } from 'simple-icons'
 import { Link, useSearchParams } from 'wouter'
@@ -75,9 +76,7 @@ export default function HomePage() {
 
 		const win = window as any
 
-		// Lazy load PageAgent only when user clicks execute
 		if (!win.pageAgent || win.pageAgent.disposed) {
-			const { PageAgent } = await import('page-agent')
 			win.pageAgent = new PageAgent({
 				// 把 react 根元素排除掉，挂了很多冒泡时间导致假阳
 				interactiveBlacklist: [document.getElementById('root')!],

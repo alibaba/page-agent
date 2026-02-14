@@ -26,7 +26,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 	],
 	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
 	MoonshotAI: ['kimi-k2.5'],
-	'Z.AI': ['glm-4.7'],
+	'Z.AI': ['glm-5', 'glm-4.7'],
 }
 
 const ModelBadge = ({ model, baseline }: { model: string; baseline?: boolean }) => (
