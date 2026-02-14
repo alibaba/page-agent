@@ -164,15 +164,7 @@ localStorage.setItem('PageAgentExtUserAuthToken', '<your-token-from-extension>')
 								rel="noopener noreferrer"
 								className="block text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
 							>
-								📄 {isZh ? '英文版 API 文档' : 'API Documentation (English)'}
-							</a>
-							<a
-								href="https://github.com/alibaba/page-agent/blob/main/packages/extension/docs/extension_api_zh.md"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="block text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
-							>
-								📄 {isZh ? '中文版 API 文档' : 'API Documentation (Chinese)'}
+								📄 {isZh ? 'API 文档' : 'API Documentation'}
 							</a>
 						</div>
 					</section>
