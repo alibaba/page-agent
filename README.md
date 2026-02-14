@@ -30,6 +30,13 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 - **🎨 Pretty UI with human-in-the-loop**
 - **🐙 Optional [chrome extension](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension) for multi-page tasks.**
 
+## 💡 Use Cases
+
+- **SaaS AI Copilot** — Ship an AI copilot in your product in lines of code. No backend rewrite needed.
+- **Smart Form Filling** — Turn 20-click workflows into one sentence. Perfect for ERP, CRM, and admin systems.
+- **Accessibility** — Make any web app accessible through natural language. Voice commands, screen readers, zero barrier.
+- **Multi-page Agent** — Extend your agent's reach across browser tabs with the optional [chrome extension](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension).
+
 ## 🚀 Quick Start
 
 ### One-line integration
@@ -67,21 +74,6 @@ await agent.execute('Click the login button')
 ```
 
 For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/#/docs/introduction/overview).
-
-## 🏗️ Structure
-
-PageAgent adopts a simplified monorepo structure:
-
-```
-packages/
-├── core/                # ** Core agent logic (npm: @page-agent/core) **
-├── llms/                # LLM client (npm: @page-agent/llms)
-├── page-controller/     # DOM operations (npm: @page-agent/page-controller)
-├── ui/                  # Panel UI (npm: @page-agent/ui)
-├── page-agent/          # Entry class and iife builds(npm: page-agent)
-├── extension/           # Chrome extension for multi-page tasks
-└── website/             # Website & Documentation site
-```
 
 ## 🤝 Contributing
 

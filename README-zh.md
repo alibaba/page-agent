@@ -30,6 +30,13 @@
 - **🎨 精美 UI，支持人机协同**
 - **🐙 可选的 [Chrome 扩展](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension)，支持跨页面任务。**
 
+## 💡 应用场景
+
+- **SaaS AI 副驾驶** — 几行代码为你的产品加上 AI 副驾驶，不需要重写后端。
+- **智能表单填写** — 把 20 次点击变成一句话。ERP、CRM、管理后台的最佳拍档。
+- **无障碍增强** — 用自然语言让任何网页无障碍。语音指令、屏幕阅读器，零门槛。
+- **跨页面 Agent** — 通过可选的 [Chrome 扩展](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension)，让你的 Agent 跨标签页工作。
+
 ## 🚀 快速开始
 
 ### 一行代码集成
@@ -67,21 +74,6 @@ await agent.execute('点击登录按钮')
 ```
 
 更多编程用法，请参阅 [📖 文档](https://alibaba.github.io/page-agent/#/docs/introduction/overview)。
-
-## 🏗️ 架构设计
-
-PageAgent adopts a simplified monorepo structure:
-
-```
-packages/
-├── core/                # ** Core agent logic (npm: @page-agent/core) **
-├── llms/                # LLM 客户端 (npm: @page-agent/llms)
-├── page-controller/     # DOM 操作 (npm: @page-agent/page-controller)
-├── ui/                  # 面板 UI (npm: @page-agent/ui)
-├── page-agent/          # 入口类 & iife 包 (npm: page-agent)
-├── extension/           # Chrome 扩展，支持跨页面任务
-└── website/             # 网站 & 文档站点
-```
 
 ## 🤝 贡献
 

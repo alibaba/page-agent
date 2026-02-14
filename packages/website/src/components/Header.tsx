@@ -44,7 +44,7 @@ export default function Header() {
 									animateOnHover={true}
 									aria-hidden="true"
 								>
-									GUI Agent in your webpage
+									AI Agent In Your Webpage
 								</HyperText>
 							</div>
 						</Link>
