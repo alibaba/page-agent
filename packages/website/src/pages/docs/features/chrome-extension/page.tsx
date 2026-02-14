@@ -63,7 +63,7 @@ export default function ChromeExtension() {
 							href={chromeWebStoreUrl}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+							className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white! font-medium rounded-lg transition-colors"
 						>
 							<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
 								<path d={siChromewebstore.path} />
@@ -74,7 +74,7 @@ export default function ChromeExtension() {
 							href={githubReleasesUrl}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 text-white font-medium rounded-lg transition-colors"
+							className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 text-white! font-medium rounded-lg transition-colors"
 						>
 							<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
 								<path d={siGithub.path} />
@@ -309,6 +309,7 @@ window.PAGE_AGENT_EXT.stop()`
 							? '将 MultiPageAgent 集成你自己的插件'
 							: 'Integrate MultiPageAgent into Your Extension'}
 					</h2>
+					<p>@TODO</p>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
 							? '建议先阅读扩展 API 文档，再参考 background entry implementation。'

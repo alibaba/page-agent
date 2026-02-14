@@ -125,7 +125,7 @@ export default function App() {
 					<Logo className="size-5" />
 					<span className="text-sm font-medium">Page Agent Ext</span>
 				</div>
-				<div className="flex items-center gap-3">
+				<div className="flex items-center gap-1">
 					<StatusDot status={status} />
 					<Button
 						variant="ghost"

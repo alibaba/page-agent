@@ -5,7 +5,7 @@
     "tsx": true,
     "tailwind": {
         "config": "",
-        "css": "src/index.css",
+        "css": "src/assets/index.css",
         "baseColor": "neutral",
         "cssVariables": true,
         "prefix": ""
@@ -16,7 +16,7 @@
         "utils": "@/lib/utils",
         "ui": "@/components/ui",
         "lib": "@/lib",
-        "hooks": "@/hooks"
+        "hooks": "@/lib/hooks"
     },
     "registries": {
         "@magicui": "https://magicui.design/r/{name}.json"
