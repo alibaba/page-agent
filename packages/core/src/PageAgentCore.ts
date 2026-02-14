@@ -7,7 +7,7 @@ import type { BrowserState, PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
 import * as zod from 'zod'
 
-import { type PageAgentConfig } from './config'
+import { type PageAgentConfig, type SupportedLanguage } from './config'
 import { DEFAULT_MAX_STEPS } from './config/constants'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
@@ -24,6 +24,7 @@ import type {
 import { assert, normalizeResponse, uid, waitFor } from './utils'
 
 export { type PageAgentConfig }
+export type { SupportedLanguage }
 export { tool, type PageAgentTool } from './tools'
 export type * from './types'
 

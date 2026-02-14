@@ -1,22 +1,34 @@
 /**
  * React hook for using AgentController
  */
-import type { AgentActivity, AgentStatus, HistoricalEvent } from '@page-agent/core'
+import type {
+	AgentActivity,
+	AgentStatus,
+	HistoricalEvent,
+	SupportedLanguage,
+} from '@page-agent/core'
 import type { LLMConfig } from '@page-agent/llms'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { MultiPageAgent } from './MultiPageAgent'
 import { DEMO_CONFIG } from './constants'
 
+/** Language preference: undefined means follow system */
+export type LanguagePreference = SupportedLanguage | undefined
+
+export interface ExtConfig extends LLMConfig {
+	language?: LanguagePreference
+}
+
 export interface UseAgentResult {
 	status: AgentStatus
 	history: HistoricalEvent[]
 	activity: AgentActivity | null
 	currentTask: string
-	config: LLMConfig | null
+	config: ExtConfig | null
 	execute: (task: string) => Promise<void>
 	stop: () => void
-	configure: (config: LLMConfig) => Promise<void>
+	configure: (config: ExtConfig) => Promise<void>
 }
 
 export function useAgent(): UseAgentResult {
@@ -25,16 +37,17 @@ export function useAgent(): UseAgentResult {
 	const [history, setHistory] = useState<HistoricalEvent[]>([])
 	const [activity, setActivity] = useState<AgentActivity | null>(null)
 	const [currentTask, setCurrentTask] = useState('')
-	const [config, setConfig] = useState<LLMConfig | null>(null)
+	const [config, setConfig] = useState<ExtConfig | null>(null)
 
 	useEffect(() => {
-		chrome.storage.local.get('llmConfig').then((result) => {
-			if (result.llmConfig) {
-				setConfig(result.llmConfig as LLMConfig)
-			} else {
+		chrome.storage.local.get(['llmConfig', 'language']).then((result) => {
+			const llmConfig = (result.llmConfig as LLMConfig) ?? DEMO_CONFIG
+			const language = (result.language as SupportedLanguage) || undefined
+			const full = { ...llmConfig, language }
+			if (!result.llmConfig) {
 				chrome.storage.local.set({ llmConfig: DEMO_CONFIG })
-				setConfig(DEMO_CONFIG)
 			}
+			setConfig(full)
 		})
 	}, [])
 
@@ -87,9 +100,14 @@ export function useAgent(): UseAgentResult {
 		agentRef.current?.stop()
 	}, [])
 
-	const configure = useCallback(async (newConfig: LLMConfig) => {
-		await chrome.storage.local.set({ llmConfig: newConfig })
-		setConfig(newConfig)
+	const configure = useCallback(async ({ language, ...llmConfig }: ExtConfig) => {
+		await chrome.storage.local.set({ llmConfig })
+		if (language) {
+			await chrome.storage.local.set({ language })
+		} else {
+			await chrome.storage.local.remove('language')
+		}
+		setConfig({ ...llmConfig, language })
 	}, [])
 
 	return {

@@ -1,15 +1,15 @@
-import type { LLMConfig } from '@page-agent/llms'
 import { Copy, CornerUpLeft, Eye, EyeOff, HatGlasses, Home, Loader2, Scale } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
 
 import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
+import type { ExtConfig, LanguagePreference } from '@/agent/useAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 interface ConfigPanelProps {
-	config: LLMConfig | null
-	onSave: (config: LLMConfig) => Promise<void>
+	config: ExtConfig | null
+	onSave: (config: ExtConfig) => Promise<void>
 	onClose: () => void
 }
 
@@ -17,6 +17,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [apiKey, setApiKey] = useState(config?.apiKey || DEMO_API_KEY)
 	const [baseURL, setBaseURL] = useState(config?.baseURL || DEMO_BASE_URL)
 	const [model, setModel] = useState(config?.model || DEMO_MODEL)
+	const [language, setLanguage] = useState<LanguagePreference>(config?.language)
 	const [saving, setSaving] = useState(false)
 	const [userAuthToken, setUserAuthToken] = useState<string>('')
 	const [copied, setCopied] = useState(false)
@@ -28,6 +29,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		setApiKey(config?.apiKey || DEMO_API_KEY)
 		setBaseURL(config?.baseURL || DEMO_BASE_URL)
 		setModel(config?.model || DEMO_MODEL)
+		setLanguage(config?.language)
 	}, [config])
 
 	// Poll for user auth token every second until found
@@ -65,7 +67,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const handleSave = async () => {
 		setSaving(true)
 		try {
-			await onSave({ apiKey, baseURL, model })
+			await onSave({ apiKey, baseURL, model, language })
 		} finally {
 			setSaving(false)
 		}
@@ -163,6 +165,19 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						{showApiKey ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
 					</Button>
 				</div>
+			</div>
+
+			<div className="flex flex-col gap-1.5">
+				<label className="text-xs text-muted-foreground">Language</label>
+				<select
+					value={language ?? ''}
+					onChange={(e) => setLanguage((e.target.value || undefined) as LanguagePreference)}
+					className="h-8 text-xs rounded-md border border-input bg-background px-2 cursor-pointer"
+				>
+					<option value="">System</option>
+					<option value="en-US">English</option>
+					<option value="zh-CN">中文</option>
+				</select>
 			</div>
 
 			<div className="flex gap-2 mt-2">
