@@ -1,0 +1,30 @@
+AI-powered browser automation. Control web pages with natural language.
+
+Page Agent Ext — AI-Powered Browser Automation
+
+🌟 What is Page Agent Ext?
+
+Page Agent Ext brings AI-powered automation to your browser. Built on the open-source Page Agent framework, it lets you control web pages across multiple tabs using natural language — no scripting required.
+
+🌟 Key Features:
+
+- Natural Language Control — Command your browser in plain language, no code needed
+- Cross-Tab Automation — Seamlessly operate across multiple tabs and pages
+- Smart HTML Cleaning — Intelligently extracts and simplifies page structure for accurate AI understanding
+- Bring Your Own LLM — Use OpenAI, Anthropic, or any compatible API with full data control
+- Privacy-First — Zero data collection; all data flows directly to your chosen LLM provider
+- Open Source — MIT licensed, built on the Page Agent framework with full transparency
+
+🌟 How It Works & Privacy:
+
+Page Agent Ext performs DOM analysis locally in your browser. When you initiate a task, sanitized page structure is sent to the LLM API you configure. Your data is never collected or stored by us.
+
+- Your API Key — Configure your own LLM API (OpenAI, Anthropic, etc.). Data goes directly to your provider
+- Test API — A free test endpoint is available for evaluation; we recommend your own key for regular use
+
+Privacy policy: https://github.com/alibaba/page-agent/blob/main/packages/extension/PRIVACY.md
+
+🌟 Open Source:
+
+This project is MIT licensed. Review the code, verify privacy claims, or extend it for your needs:
+https://github.com/alibaba/page-agent

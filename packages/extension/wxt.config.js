@@ -38,9 +38,9 @@ export default defineConfig({
 		},
 	}),
 	manifest: {
-		name: 'Page Agent Ext',
-		description:
-			'AI-powered browser automation assistant. Control web pages with natural language.',
+		default_locale: 'en',
+		name: '__MSG_extName__',
+		description: '__MSG_extDescription__',
 		homepage_url: 'https://alibaba.github.io/page-agent/',
 		permissions: ['tabs', 'tabGroups', 'sidePanel', 'storage'],
 		host_permissions: ['<all_urls>'],
@@ -48,7 +48,7 @@ export default defineConfig({
 			64: 'assets/page-agent-64.png',
 		},
 		action: {
-			default_title: 'Open Page Agent',
+			default_title: '__MSG_extActionTitle__',
 		},
 		web_accessible_resources: [
 			{

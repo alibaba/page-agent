@@ -1,6 +1,6 @@
 # Privacy Policy for Page Agent Extension
 
-**Last updated:** January 2026
+**Last updated:** February 2026
 
 ## Overview
 
@@ -26,6 +26,7 @@ are sent to the LLM API endpoint configured in **your settings**.
 **If you use our testing endpoint**, your requests are proxied to [DeepSeek](https://deepseek.com) for AI processing. Regarding this test endpoint:
 
 - This endpoint is provided for evaluation purposes only and is not recommended for production or daily use
+- The free model provided may change at any time without prior notice
 - We do **not** store your task content, page content, or visited URLs
 - Minimal logging (timestamps, request metadata, IP addresses) may occur for abuse prevention and service stability
 - DeepSeek's [Privacy Policy](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html) applies to their processing of your requests

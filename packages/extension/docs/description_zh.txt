@@ -1,0 +1,30 @@
+AI 驱动的浏览器自动化助手，用自然语言控制网页。
+
+Page Agent Ext — AI 驱动的浏览器自动化助手
+
+🌟 什么是 Page Agent Ext？
+
+Page Agent Ext 为浏览器带来 AI 自动化能力。基于开源的 Page Agent 框架，你可以用自然语言跨标签页控制网页，无需编写任何脚本。
+
+🌟 核心特性：
+
+- 自然语言控制 — 用日常语言指挥浏览器，无需编程
+- 跨标签页操作 — 在多个标签页之间无缝切换和操控
+- HTML 智能清洗 — 智能提取和精简页面结构，让 AI 准确理解网页内容
+- 使用你自己的模型 — 支持 OpenAI、Anthropic 或任何兼容 API，数据完全自主可控
+- 隐私优先 — 零数据收集，所有数据直接发送到你配置的 LLM 服务商
+- 开源透明 — MIT 协议，基于 Page Agent 开源框架，代码完全公开
+
+🌟 工作原理与隐私：
+
+Page Agent Ext 在浏览器本地进行 DOM 分析。当你发起任务时，经清洗的页面结构会发送到你配置的 LLM API。我们不会收集或存储你的任何数据。
+
+- 你的 API Key — 配置你自己的 LLM API（OpenAI、Anthropic 等），数据直接发送到你的服务商
+- 测试 API — 提供免费测试端点供体验，日常使用建议配置自己的 Key
+
+隐私政策：https://github.com/alibaba/page-agent/blob/main/packages/extension/PRIVACY.md
+
+🌟 开源项目：
+
+MIT 协议开源。查看源码、验证隐私承诺，或按需扩展：
+https://github.com/alibaba/page-agent
