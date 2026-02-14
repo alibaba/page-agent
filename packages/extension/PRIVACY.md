@@ -10,25 +10,27 @@ Page Agent Extension is a browser automation tool that uses AI to help you inter
 
 ### Local Processing
 
-The extension performs DOM analysis and automation actions **locally in your browser**. Your browsing history, passwords, and form data are not accessed or collected by the extension itself.
+The extension performs DOM analysis and automation actions **locally in your browser**. Your browsing history, passwords, and form data are not accessed or collected by the extension developer.
 
 ### Data Transmission
 
 Data is transmitted to external servers **only when you initiate an automation task**. When this occurs:
 
 - Your task instructions (natural language commands)
-- Sanitized page structure (simplified DOM, excluding sensitive form values)
+- Simplified page structure (cleaned DOM) of all pages under the extension's control
 
 are sent to the LLM API endpoint configured in **your settings**.
+
+> **Note:** The DOM cleaning process simplifies page structure for AI readability but **does not guarantee removal of sensitive information** (e.g., visible text, form values, or personal data on the page). Please be mindful of the page content when initiating tasks.
 
 **If you configure a third-party LLM provider** (e.g., OpenAI, Anthropic, or others), data is sent directly to that provider. Their privacy policies apply.
 
 **If you use our testing endpoint**, your requests are proxied to [DeepSeek](https://deepseek.com) for AI processing. Regarding this test endpoint:
 
 - This endpoint is provided for evaluation purposes only and is not recommended for production or daily use
-- The free model provided may change at any time without prior notice
+- The free model and their service providers may change at any time without prior notice
 - We do **not** store your task content, page content, or visited URLs
-- Minimal logging (timestamps, request metadata, IP addresses) may occur for abuse prevention and service stability
+- Minimal logging (timestamps, request metadata, IP addresses) may be collected for abuse prevention and service stability
 - DeepSeek's [Privacy Policy](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html) applies to their processing of your requests
 
 ## Data Storage
