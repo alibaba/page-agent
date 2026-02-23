@@ -5,7 +5,7 @@ export const CDN_DEMO_CN_URL =
 	'https://registry.npmmirror.com/page-agent/1.3.0/files/dist/iife/page-agent.demo.js'
 
 // Demo LLM for website testing
-export const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+export const DEMO_MODEL = 'qwen3.5-plus'
 export const DEMO_BASE_URL =
-	'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
-export const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+	'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy-qwen'
+export const DEMO_API_KEY = 'NA'

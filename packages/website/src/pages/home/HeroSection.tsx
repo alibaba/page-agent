@@ -290,8 +290,8 @@ export default function HeroSection() {
 													<li className="flex items-start text-left">
 														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
 														{isZh
-															? '使用 DeepSeek 模型，参考 DeepSeek 用户协议和隐私政策'
-															: 'This free demo uses DeepSeek API (see their terms and privacy policy)'}
+															? '使用 Qwen 模型（阿里云百炼），参考阿里云隐私政策'
+															: 'This free demo uses Qwen via Alibaba Cloud Bailian (see their privacy policy)'}
 													</li>
 													<li className="flex items-start text-left">
 														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>

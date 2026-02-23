@@ -25,13 +25,17 @@ are sent to the LLM API endpoint configured in **your settings**.
 
 **If you configure a third-party LLM provider** (e.g., OpenAI, Anthropic, or others), data is sent directly to that provider. Their privacy policies apply.
 
-**If you use our testing endpoint**, your requests are proxied to [DeepSeek](https://deepseek.com) for AI processing. Regarding this test endpoint:
+**If you use our testing endpoints**, your requests are proxied to an LLM provider for AI processing. We currently offer two free testing endpoints:
 
-- This endpoint is provided for evaluation purposes only and is not recommended for production or daily use
+- **Qwen**: Proxied to `https://dashscope-intl.aliyuncs.com/compatible-mode/v1` ([Alibaba Cloud Bailian](https://bailian.console.aliyun.com/)). [Bailian Terms of Service](https://terms.alicdn.com/legal-agreement/terms/common_platform_service/20230728213935489/20230728213935489.html) applies.
+- **DeepSeek**: Proxied to `https://api.deepseek.com`. [DeepSeek Privacy Policy](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html) applies.
+
+Regarding these test endpoints:
+
+- These endpoints are provided for evaluation purposes only and are not recommended for production or daily use
 - The free model and their service providers may change at any time without prior notice
 - We do **not** store your task content, page content, or visited URLs
 - Minimal logging (timestamps, request metadata, IP addresses) may be collected for abuse prevention and service stability
-- DeepSeek's [Privacy Policy](https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html) applies to their processing of your requests
 
 ## Data Storage
 

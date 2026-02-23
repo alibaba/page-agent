@@ -140,7 +140,7 @@ export default function Models() {
 const pageAgent = new PageAgent({
   baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   apiKey: 'your-api-key',
-  model: 'qwen-plus'
+  model: 'qwen3.5-plus'
 });
 
 // Self-hosted models (e.g., Ollama)
@@ -150,14 +150,75 @@ const pageAgent = new PageAgent({
   model: 'qwen3:14b'
 });
 
-// Free testing endpoint
-// Note: Rate-limited, content-filtered, subject to change. Replace with your own.
-// Note: Uses official DeepSeek-chat (3.2). See DeepSeek website for terms & privacy.
-const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
-const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
 `}
 				/>
+			</section>
+
+			{/* Free Testing API Section */}
+			<section className="mb-10">
+				<h2 className="text-2xl font-semibold mb-4">
+					{isZh ? '免费测试接口' : 'Free Testing API'}
+				</h2>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+					{isZh
+						? '以下免费测试接口仅供 PageAgent.js 和 PageAgent Extension 的技术评估使用。有速率限制，可能随时变更。请勿用于生产环境。'
+						: 'The following free testing endpoints are provided for technical evaluation of PageAgent.js and PageAgent Extension only. Rate-limited, subject to change. Not for production use.'}
+				</p>
+				<div className="space-y-4">
+					<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
+						<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Qwen (Default)</h3>
+						<p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+							{isZh ? '转发至阿里云百炼平台' : 'Proxied to'}{' '}
+							<code className="text-xs bg-gray-200 dark:bg-gray-700 px-1 rounded">
+								https://dashscope-intl.aliyuncs.com/compatible-mode/v1
+							</code>
+							{' · '}
+							<a
+								href="https://terms.alicdn.com/legal-agreement/terms/common_platform_service/20230728213935489/20230728213935489.html"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-blue-500 hover:underline"
+							>
+								{isZh ? '百炼服务协议' : 'Bailian Terms'}
+							</a>
+						</p>
+						<CodeEditor
+							code={`LLM_BASE_URL="https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy-qwen"
+LLM_MODEL_NAME="qwen3.5-plus"
+LLM_API_KEY="NA"`}
+						/>
+					</div>
+					<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
+						<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">DeepSeek</h3>
+						<p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+							{isZh ? '转发至 DeepSeek 官方 API' : 'Proxied to'}{' '}
+							<code className="text-xs bg-gray-200 dark:bg-gray-700 px-1 rounded">
+								https://api.deepseek.com
+							</code>
+							{' · '}
+							<a
+								href="https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-blue-500 hover:underline"
+							>
+								{isZh ? 'DeepSeek 隐私政策' : 'DeepSeek Privacy Policy'}
+							</a>
+						</p>
+						<CodeEditor
+							code={`LLM_BASE_URL="https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy"
+LLM_MODEL_NAME="PAGE-AGENT-FREE-TESTING-RANDOM"
+LLM_API_KEY="PAGE-AGENT-FREE-TESTING-RANDOM"`}
+						/>
+					</div>
+				</div>
+				<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+					<p className="text-xs text-gray-600 dark:text-gray-400">
+						{isZh
+							? '⚠️ 测试接口仅供技术评估。免费模型及其提供商可能随时变更，恕不另行通知。请参阅各 LLM 提供商的隐私政策了解数据处理方式。'
+							: "⚠️ Testing endpoints are for technical evaluation only. The free model and service providers may change at any time without notice. Refer to each LLM provider's privacy policy for data handling details."}
+					</p>
+				</div>
 			</section>
 
 			{/* Ollama Section */}
