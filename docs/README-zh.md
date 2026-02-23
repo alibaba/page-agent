@@ -9,7 +9,7 @@
 
 纯 JS 实现的 GUI agent。使用自然语言操作你的 Web 应用。无须后端、客户端、浏览器插件。
 
-🌐 [English](./README.md) | **中文**
+🌐 [English](../README.md) | **中文**
 
 👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
@@ -19,13 +19,13 @@
 
 ## ✨ Features
 
-- **🎯 轻松集成** 
-  - 无需 `浏览器插件` / `Python` / `无头浏览器`。
-  - 纯页面内 JavaScript，一切都在你的网页中完成。
-  - The best tool for your agent to control web pages.
+- **🎯 轻松集成**
+    - 无需 `浏览器插件` / `Python` / `无头浏览器`。
+    - 纯页面内 JavaScript，一切都在你的网页中完成。
+    - The best tool for your agent to control web pages.
 - **📖 基于文本的 DOM 操作**
-  - 无需截图，无需 OCR 或多模态模型。
-  - 无需特殊权限。
+    - 无需截图，无需 OCR 或多模态模型。
+    - 无需特殊权限。
 - **🧠 用你自己的 LLM**
 - **🎨 精美 UI，支持人机协同**
 - **🐙 可选的 [Chrome 扩展](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension)，支持跨页面任务。**
@@ -77,7 +77,7 @@ await agent.execute('点击登录按钮')
 
 ## 🤝 贡献
 
-欢迎社区贡献！请参阅 [CONTRIBUTING.md](CONTRIBUTING.md) 了解环境配置和本地开发说明。
+欢迎社区贡献！请参阅 [CONTRIBUTING.md](../CONTRIBUTING.md) 了解环境配置和本地开发说明。
 
 请在贡献前阅读[行为准则](CODE_OF_CONDUCT.md)。
 
@@ -106,7 +106,7 @@ file and in the node_modules directory after installation.
 
 ## 📄 许可证
 
-[MIT License](LICENSE)
+[MIT License](../LICENSE)
 
 ---
 

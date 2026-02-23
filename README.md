@@ -9,7 +9,7 @@
 
 The GUI Agent Living in Your Webpage. Control web interfaces with natural language.
 
-🌐 **English** | [中文](./README-zh.md)
+🌐 **English** | [中文](./docs/README-zh.md)
 
 👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
@@ -19,13 +19,13 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ## ✨ Features
 
-- **🎯 Easy integration** 
-  - No need for `browser extension` / `python` / `headless browser`. 
-  - Just in-page javascript. Everything happens in your web page.
-  - The best tool for your agent to control web pages.
+- **🎯 Easy integration**
+    - No need for `browser extension` / `python` / `headless browser`.
+    - Just in-page javascript. Everything happens in your web page.
+    - The best tool for your agent to control web pages.
 - **📖 Text-based DOM manipulation**
-  - No screenshots. No OCR or multi-modal LLMs needed.
-  - No special permissions required.
+    - No screenshots. No OCR or multi-modal LLMs needed.
+    - No special permissions required.
 - **🧠 Bring your own LLMs**
 - **🎨 Pretty UI with human-in-the-loop**
 - **🐙 Optional [chrome extension](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension) for multi-page tasks.**
@@ -79,7 +79,7 @@ For more programmatic usage, see [📖 Documentations](https://alibaba.github.io
 
 We welcome contributions from the community! Follow our instructions in [CONTRIBUTING.md](CONTRIBUTING.md) for environment setup and local development.
 
-Please read [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
+Please read [Code of Conduct](docs/CODE_OF_CONDUCT.md) before contributing.
 
 ## 👏 Acknowledgments
 

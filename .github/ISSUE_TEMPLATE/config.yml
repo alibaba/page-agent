@@ -10,5 +10,5 @@ contact_links:
     url: https://github.com/alibaba/page-agent/blob/main/CONTRIBUTING.md
     about: How to contribute code and ideas. 如何进行贡献与提交代码。
   - name: Code of Conduct / 行为准则
-    url: https://github.com/alibaba/page-agent/blob/main/CODE_OF_CONDUCT.md
+    url: https://github.com/alibaba/page-agent/blob/main/docs/CODE_OF_CONDUCT.md
     about: Community expectations and standards. 社区行为期望与标准。

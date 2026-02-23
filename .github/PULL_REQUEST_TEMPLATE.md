@@ -22,4 +22,4 @@ Closes #(issue)
 
 ## Requirements / 要求
 
-- [ ] I have read and follow the [Code of Conduct](CODE_OF_CONDUCT.md) and [Contributing Guide](CONTRIBUTING.md) . / 我已阅读并遵守行为准则。
+- [ ] I have read and follow the [Code of Conduct](../docs/CODE_OF_CONDUCT.md) and [Contributing Guide](../CONTRIBUTING.md) . / 我已阅读并遵守行为准则。

@@ -9,7 +9,7 @@ body:
         Thanks for your interest in improving the project! Before submitting, please read our guidelines.
         感谢您对改进项目的兴趣！提交前请阅读我们的指南。
 
-        - [Code of Conduct](https://github.com/alibaba/page-agent/blob/main/CODE_OF_CONDUCT.md)
+        - [Code of Conduct](https://github.com/alibaba/page-agent/blob/main/docs/CODE_OF_CONDUCT.md)
         - [Contributing Guide](https://github.com/alibaba/page-agent/blob/main/CONTRIBUTING.md)
 
   - type: textarea

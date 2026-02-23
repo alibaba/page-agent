@@ -111,7 +111,7 @@ const CDN_DEMO_URL_NEW = `https://cdn.jsdelivr.net/npm/page-agent@${newVersion}/
 const CDN_DEMO_CN_URL_OLD = `https://registry.npmmirror.com/page-agent/${oldVersion}/files/dist/iife/page-agent.demo.js`
 const CDN_DEMO_CN_URL_NEW = `https://registry.npmmirror.com/page-agent/${newVersion}/files/dist/iife/page-agent.demo.js`
 
-const filesToUpdateCdn = ['README.md', 'README-zh.md', 'packages/website/src/constants.ts']
+const filesToUpdateCdn = ['README.md', 'docs/README-zh.md', 'packages/website/src/constants.ts']
 
 for (const relPath of filesToUpdateCdn) {
 	const filePath = join(rootDir, relPath)
