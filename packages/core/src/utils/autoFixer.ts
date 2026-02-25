@@ -1,4 +1,7 @@
 import chalk from 'chalk'
+import * as z from 'zod'
+
+import type { PageAgentTool } from '../tools'
 
 /**
  * Normalize LLM response and fix common format issues.
@@ -9,9 +12,10 @@ import chalk from 'chalk'
  * - Arguments wrapped as double JSON string
  * - Nested function call format
  * - Missing action field (fallback to wait)
+ * - Primitive action input for single-field tools (e.g. `{"click_element_by_index": 2}`)
  * - etc.
  */
-export function normalizeResponse(response: any): any {
+export function normalizeResponse(response: any, tools?: Map<string, PageAgentTool>): any {
 	let resolvedArguments = null as any
 
 	const choice = (response as { choices?: Choice[] }).choices?.[0]
@@ -76,6 +80,27 @@ export function normalizeResponse(response: any): any {
 	resolvedArguments = safeJsonParse(resolvedArguments)
 	if (resolvedArguments.action) {
 		resolvedArguments.action = safeJsonParse(resolvedArguments.action)
+	}
+
+	// fix primitive action input for single-field tools
+	// e.g. {"click_element_by_index": 2} → {"click_element_by_index": {"index": 2}}
+	if (resolvedArguments.action && tools) {
+		const action = resolvedArguments.action
+		const toolName = Object.keys(action)[0]
+		const value = action[toolName]
+		const schema = toolName && tools.get(toolName)?.inputSchema
+
+		if (schema instanceof z.ZodObject && value !== null && typeof value !== 'object') {
+			const requiredKey = Object.keys(schema.shape).find(
+				(k) => !(schema.shape as Record<string, z.ZodType>)[k].safeParse(undefined).success
+			)
+			if (requiredKey) {
+				console.log(
+					chalk.yellow(`[normalizeResponse] #6: coercing primitive action input for "${toolName}"`)
+				)
+				resolvedArguments.action = { [toolName]: { [requiredKey]: value } }
+			}
+		}
 	}
 
 	// fix incomplete formats

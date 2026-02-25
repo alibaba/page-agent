@@ -248,16 +248,16 @@ export class PageAgentCore extends EventTarget {
 					{ role: 'user' as const, content: await this.#assembleUserPrompt() },
 				]
 
-				const tools = { AgentOutput: this.#packMacroTool() }
+				const macroTool = { AgentOutput: this.#packMacroTool() }
 
 				// invoke LLM
 
 				console.log(chalk.blue.bold('🧠 Thinking...'))
 				this.#emitActivity({ type: 'thinking' })
 
-				const result = await this.#llm.invoke(messages, tools, this.#abortController.signal, {
+				const result = await this.#llm.invoke(messages, macroTool, this.#abortController.signal, {
 					toolChoiceName: 'AgentOutput',
-					normalizeResponse,
+					normalizeResponse: (res) => normalizeResponse(res, this.tools),
 				})
 
 				// assemble history
