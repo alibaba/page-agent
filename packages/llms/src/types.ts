@@ -1,7 +1,7 @@
 /**
  * Core types for LLM integration
  */
-import type { z } from 'zod'
+import type * as z from 'zod'
 
 /**
  * Message format - OpenAI standard (industry standard)

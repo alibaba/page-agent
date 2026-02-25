@@ -5,7 +5,7 @@
 import { InvokeError, LLM, type Tool } from '@page-agent/llms'
 import type { BrowserState, PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
-import * as zod from 'zod'
+import * as z from 'zod'
 
 import { type PageAgentConfig, type SupportedLanguage } from './config'
 import { DEFAULT_MAX_STEPS } from './config/constants'
@@ -358,24 +358,22 @@ export class PageAgentCore extends EventTarget {
 		const tools = this.tools
 
 		const actionSchemas = Array.from(tools.entries()).map(([toolName, tool]) => {
-			return zod.object({ [toolName]: tool.inputSchema }).describe(tool.description)
+			return z.object({ [toolName]: tool.inputSchema }).describe(tool.description)
 		})
 
-		const actionSchema = zod.union(
-			actionSchemas as unknown as [zod.ZodType, zod.ZodType, ...zod.ZodType[]]
-		)
+		const actionSchema = z.union(actionSchemas as unknown as [z.ZodType, z.ZodType, ...z.ZodType[]])
 
-		const macroToolSchema = zod.object({
-			// thinking: zod.string().optional(),
-			evaluation_previous_goal: zod.string().optional(),
-			memory: zod.string().optional(),
-			next_goal: zod.string().optional(),
+		const macroToolSchema = z.object({
+			// thinking: z.string().optional(),
+			evaluation_previous_goal: z.string().optional(),
+			memory: z.string().optional(),
+			next_goal: z.string().optional(),
 			action: actionSchema,
 		})
 
 		return {
 			description: 'You MUST call this tool every step!',
-			inputSchema: macroToolSchema as zod.ZodType<MacroToolInput>,
+			inputSchema: macroToolSchema as z.ZodType<MacroToolInput>,
 			execute: async (input: MacroToolInput): Promise<MacroToolResult> => {
 				// abort
 				if (this.#abortController.signal.aborted) throw new Error('AbortError')

@@ -2,7 +2,7 @@
  * Internal tools for PageAgent.
  * @note Adapted from browser-use
  */
-import * as zod from 'zod'
+import * as z from 'zod'
 
 import type { PageAgentCore } from '../PageAgentCore'
 import { waitFor } from '../utils'
@@ -13,7 +13,7 @@ import { waitFor } from '../utils'
 export interface PageAgentTool<TParams = any> {
 	// name: string
 	description: string
-	inputSchema: zod.ZodType<TParams>
+	inputSchema: z.ZodType<TParams>
 	execute: (this: PageAgentCore, args: TParams) => Promise<string>
 }
 
@@ -32,9 +32,9 @@ tools.set(
 	tool({
 		description:
 			'Complete task. Text is your final response to the user — keep it concise unless the user explicitly asks for detail.',
-		inputSchema: zod.object({
-			text: zod.string(),
-			success: zod.boolean().default(true),
+		inputSchema: z.object({
+			text: z.string(),
+			success: z.boolean().default(true),
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			// @note main loop will handle this one
@@ -47,8 +47,8 @@ tools.set(
 	'wait',
 	tool({
 		description: 'Wait for x seconds. Can be used to wait until the page or data is fully loaded.',
-		inputSchema: zod.object({
-			seconds: zod.number().min(1).max(10).default(1),
+		inputSchema: z.object({
+			seconds: z.number().min(1).max(10).default(1),
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			// try to subtract LLM calling time from the actual wait time
@@ -67,8 +67,8 @@ tools.set(
 	tool({
 		description:
 			'Ask the user a question and wait for their answer. Use this if you need more information or clarification.',
-		inputSchema: zod.object({
-			question: zod.string(),
+		inputSchema: z.object({
+			question: z.string(),
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			if (!this.onAskUser) {
@@ -84,8 +84,8 @@ tools.set(
 	'click_element_by_index',
 	tool({
 		description: 'Click element by index',
-		inputSchema: zod.object({
-			index: zod.int().min(0),
+		inputSchema: z.object({
+			index: z.int().min(0),
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.clickElement(input.index)
@@ -98,9 +98,9 @@ tools.set(
 	'input_text',
 	tool({
 		description: 'Click and type text into an interactive input element',
-		inputSchema: zod.object({
-			index: zod.int().min(0),
-			text: zod.string(),
+		inputSchema: z.object({
+			index: z.int().min(0),
+			text: z.string(),
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.inputText(input.index, input.text)
@@ -114,9 +114,9 @@ tools.set(
 	tool({
 		description:
 			'Select dropdown option for interactive element index by the text of the option you want to select',
-		inputSchema: zod.object({
-			index: zod.int().min(0),
-			text: zod.string(),
+		inputSchema: z.object({
+			index: z.int().min(0),
+			text: z.string(),
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.selectOption(input.index, input.text)
@@ -132,11 +132,11 @@ tools.set(
 	'scroll',
 	tool({
 		description: 'Scroll the page vertically. Use index for scroll elements (dropdowns/custom UI).',
-		inputSchema: zod.object({
-			down: zod.boolean().default(true),
-			num_pages: zod.number().min(0).max(10).optional().default(0.1),
-			pixels: zod.number().int().min(0).optional(),
-			index: zod.number().int().min(0).optional(),
+		inputSchema: z.object({
+			down: z.boolean().default(true),
+			num_pages: z.number().min(0).max(10).optional().default(0.1),
+			pixels: z.number().int().min(0).optional(),
+			index: z.number().int().min(0).optional(),
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.scroll({
@@ -156,10 +156,10 @@ tools.set(
 	tool({
 		description:
 			'Scroll the page horizontally, or within a specific element by index. Useful for wide tables.',
-		inputSchema: zod.object({
-			right: zod.boolean().default(true),
-			pixels: zod.number().int().min(0),
-			index: zod.number().int().min(0).optional(),
+		inputSchema: z.object({
+			right: z.boolean().default(true),
+			pixels: z.number().int().min(0),
+			index: z.number().int().min(0).optional(),
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.scrollHorizontally(input)
@@ -173,8 +173,8 @@ tools.set(
 	tool({
 		description:
 			'Execute JavaScript code on the current page. Supports async/await syntax. Use with caution!',
-		inputSchema: zod.object({
-			script: zod.string(),
+		inputSchema: z.object({
+			script: z.string(),
 		}),
 		execute: async function (this: PageAgentCore, input) {
 			const result = await this.pageController.executeJavascript(input.script)
