@@ -1,3 +1,4 @@
+import { InvokeError, InvokeErrorType } from '@page-agent/llms'
 import chalk from 'chalk'
 import * as z from 'zod'
 
@@ -82,25 +83,9 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
 		resolvedArguments.action = safeJsonParse(resolvedArguments.action)
 	}
 
-	// fix primitive action input for single-field tools
-	// e.g. {"click_element_by_index": 2} → {"click_element_by_index": {"index": 2}}
+	// validate and fix action input using tool schemas
 	if (resolvedArguments.action && tools) {
-		const action = resolvedArguments.action
-		const toolName = Object.keys(action)[0]
-		const value = action[toolName]
-		const schema = toolName && tools.get(toolName)?.inputSchema
-
-		if (schema instanceof z.ZodObject && value !== null && typeof value !== 'object') {
-			const requiredKey = Object.keys(schema.shape).find(
-				(k) => !(schema.shape as Record<string, z.ZodType>)[k].safeParse(undefined).success
-			)
-			if (requiredKey) {
-				console.log(
-					chalk.yellow(`[normalizeResponse] #6: coercing primitive action input for "${toolName}"`)
-				)
-				resolvedArguments.action = { [toolName]: { [requiredKey]: value } }
-			}
-		}
+		resolvedArguments.action = validateAction(resolvedArguments.action, tools)
 	}
 
 	// fix incomplete formats
@@ -131,6 +116,55 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
 			},
 		],
 	}
+}
+
+/**
+ * Validate action against tool schemas. Provides clear error messages
+ * instead of letting the union schema produce unreadable errors.
+ *
+ * Also coerces primitive inputs for single-field tools:
+ * e.g. `{"click_element_by_index": 2}` → `{"click_element_by_index": {"index": 2}}`
+ */
+function validateAction(action: any, tools: Map<string, PageAgentTool>): any {
+	if (typeof action !== 'object' || action === null) return action
+
+	const toolName = Object.keys(action)[0]
+	if (!toolName) return action
+
+	const tool = tools.get(toolName)
+	if (!tool) {
+		const available = Array.from(tools.keys()).join(', ')
+		throw new InvokeError(
+			InvokeErrorType.INVALID_TOOL_ARGS,
+			`Unknown action "${toolName}". Available: ${available}`
+		)
+	}
+
+	let value = action[toolName]
+	const schema = tool.inputSchema
+
+	// coerce primitive input for single-field tools
+	if (schema instanceof z.ZodObject && value !== null && typeof value !== 'object') {
+		const requiredKey = Object.keys(schema.shape).find(
+			(k) => !(schema.shape as Record<string, z.ZodType>)[k].safeParse(undefined).success
+		)
+		if (requiredKey) {
+			console.log(
+				chalk.yellow(`[normalizeResponse] coercing primitive action input for "${toolName}"`)
+			)
+			value = { [requiredKey]: value }
+		}
+	}
+
+	const result = schema.safeParse(value)
+	if (!result.success) {
+		throw new InvokeError(
+			InvokeErrorType.INVALID_TOOL_ARGS,
+			`Invalid input for action "${toolName}": ${z.prettifyError(result.error)}`
+		)
+	}
+
+	return { [toolName]: result.data }
 }
 
 /**
