@@ -11,7 +11,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 🌐 **English** | [中文](./docs/README-zh.md)
 
-👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/#/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
+👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
 <video id="demo-video" src="https://github.com/user-attachments/assets/34d8444d-cbfb-44a3-a24e-fd5c167bb0bf" controls crossorigin muted></video>
 
@@ -28,14 +28,14 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
     - No special permissions required.
 - **🧠 Bring your own LLMs**
 - **🎨 Pretty UI with human-in-the-loop**
-- **🐙 Optional [chrome extension](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension) for multi-page tasks.**
+- **🐙 Optional [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension) for multi-page tasks.**
 
 ## 💡 Use Cases
 
 - **SaaS AI Copilot** — Ship an AI copilot in your product in lines of code. No backend rewrite needed.
 - **Smart Form Filling** — Turn 20-click workflows into one sentence. Perfect for ERP, CRM, and admin systems.
 - **Accessibility** — Make any web app accessible through natural language. Voice commands, screen readers, zero barrier.
-- **Multi-page Agent** — Extend your agent's reach across browser tabs with the optional [chrome extension](https://alibaba.github.io/page-agent/#/docs/features/chrome-extension).
+- **Multi-page Agent** — Extend your agent's reach across browser tabs with the optional [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension).
 
 ## 🚀 Quick Start
 
@@ -73,7 +73,7 @@ const agent = new PageAgent({
 await agent.execute('Click the login button')
 ```
 
-For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/#/docs/introduction/overview).
+For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/docs/introduction/overview).
 
 ## 🤝 Contributing
 

@@ -125,7 +125,7 @@ export function EmptyState() {
 					</svg>
 				</a>
 				<a
-					href="https://alibaba.github.io/page-agent/#/docs/features/chrome-extension"
+					href="https://alibaba.github.io/page-agent/docs/features/chrome-extension"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="hover:text-foreground transition-colors"

@@ -170,7 +170,7 @@ export default function HeroSection() {
 								<div className="flex border-b border-gray-200 dark:border-gray-700">
 									<button
 										onClick={() => setActiveTab('try')}
-										className={`flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 rounded-tl-2xl ${
+										className={`cursor-pointer flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 rounded-tl-2xl ${
 											activeTab === 'try'
 												? 'bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 text-blue-700 dark:text-blue-300 border-b-2 border-blue-500'
 												: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'
@@ -180,7 +180,7 @@ export default function HeroSection() {
 									</button>
 									<button
 										onClick={() => setActiveTab('other')}
-										className={`flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 rounded-tr-2xl ${
+										className={`cursor-pointer flex-1 px-4 py-4 text-lg font-medium transition-colors duration-200 rounded-tr-2xl ${
 											activeTab === 'other'
 												? 'bg-linear-to-r from-green-50 to-blue-50 dark:from-green-900/30 dark:to-blue-900/30 text-green-700 dark:text-green-300 border-b-2 border-green-500'
 												: 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-700'

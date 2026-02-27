@@ -1,4 +1,5 @@
 import CodeEditor from '@/components/CodeEditor'
+import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 export default function Instructions() {
@@ -16,9 +17,9 @@ export default function Instructions() {
 
 			{/* System Instructions */}
 			<section className="mb-12">
-				<h2 className="text-3xl font-bold mb-6">
+				<Heading id="system-instructions" className="text-3xl font-bold mb-6">
 					{isZh ? '系统级指导 (System Instructions)' : 'System Instructions'}
-				</h2>
+				</Heading>
 
 				<p className="text-gray-600 dark:text-gray-300 mb-6">
 					{isZh
@@ -46,9 +47,9 @@ Guidelines:
 
 			{/* Page Instructions */}
 			<section className="mb-12">
-				<h2 className="text-3xl font-bold mb-6">
+				<Heading id="page-instructions" className="text-3xl font-bold mb-6">
 					{isZh ? '页面级指导 (Page Instructions)' : 'Page Instructions'}
-				</h2>
+				</Heading>
 
 				<p className="text-gray-600 dark:text-gray-300 mb-6">
 					{isZh
@@ -90,7 +91,9 @@ This is the product listing page.
 
 			{/* How It Works */}
 			<section className="mb-12">
-				<h2 className="text-3xl font-bold mb-6">{isZh ? '工作原理' : 'How It Works'}</h2>
+				<Heading id="how-it-works" className="text-3xl font-bold mb-6">
+					{isZh ? '工作原理' : 'How It Works'}
+				</Heading>
 
 				<p className="text-gray-600 dark:text-gray-300 mb-4">
 					{isZh

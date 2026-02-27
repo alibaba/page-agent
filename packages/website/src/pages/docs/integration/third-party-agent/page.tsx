@@ -1,4 +1,5 @@
 import CodeEditor from '@/components/CodeEditor'
+import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 export default function ThirdPartyAgentPage() {
@@ -26,7 +27,9 @@ export default function ThirdPartyAgentPage() {
 				</p>
 			</div>
 
-			<h2 className="text-2xl font-bold mb-4">{isZh ? '集成方式' : 'Integration Method'}</h2>
+			<Heading id="integration-method" className="text-2xl font-bold mb-4">
+				{isZh ? '集成方式' : 'Integration Method'}
+			</Heading>
 
 			<div className="space-y-4 mb-6">
 				<div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -57,7 +60,9 @@ const pageAgentTool = {
 				</div>
 			</div>
 
-			<h2 className="text-2xl font-bold mb-4">{isZh ? '应用场景' : 'Use Cases'}</h2>
+			<Heading id="use-cases" className="text-2xl font-bold mb-4">
+				{isZh ? '应用场景' : 'Use Cases'}
+			</Heading>
 			<div className="grid md:grid-cols-2 gap-4 mb-6">
 				<div className="bg-linear-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 p-4 rounded-lg">
 					<h4 className="font-semibold mb-2 text-gray-900 dark:text-white">

@@ -23,7 +23,7 @@ export default function Header() {
 					<div className="flex items-center justify-between gap-2">
 						{/* Logo */}
 						<Link
-							href="~/"
+							href="/"
 							className="flex items-center gap-2 sm:gap-3 group shrink-0"
 							aria-label={isZh ? 'page-agent 首页' : 'page-agent home'}
 							onClick={() => setMobileMenuOpen(false)}
@@ -56,7 +56,7 @@ export default function Header() {
 							aria-label="Mobile navigation"
 						>
 							<Link
-								href="~/docs/introduction/overview"
+								href="/docs/introduction/overview"
 								className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 shrink-0"
 								aria-label={isZh ? '文档' : 'Docs'}
 							>
@@ -90,7 +90,7 @@ export default function Header() {
 								{import.meta.env.VERSION}
 							</span>
 							<Link
-								href="~/docs/introduction/overview"
+								href="/docs/introduction/overview"
 								className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
 							>
 								<BookOpen className="w-4 h-4" />
@@ -138,7 +138,7 @@ export default function Header() {
 							role="navigation"
 						>
 							<Link
-								href="~/docs/introduction/overview"
+								href="/docs/introduction/overview"
 								className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
 								onClick={() => setMobileMenuOpen(false)}
 							>

@@ -1,4 +1,5 @@
 import BetaNotice from '@/components/BetaNotice'
+import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 export default function SecurityPermissions() {
@@ -18,9 +19,9 @@ export default function SecurityPermissions() {
 
 			<div className="space-y-6">
 				<section>
-					<h2 className="text-2xl font-bold mb-3">
+					<Heading id="element-interaction-allowlist-blocklist" className="text-2xl font-bold mb-3">
 						{isZh ? '元素操作黑白名单' : 'Element Interaction Allowlist/Blocklist'}
-					</h2>
+					</Heading>
 					<div className="space-y-3">
 						<div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg">
 							<h3 className="text-lg font-semibold text-red-900 dark:text-red-300">
@@ -46,9 +47,9 @@ export default function SecurityPermissions() {
 				</section>
 
 				<section>
-					<h2 className="text-2xl font-bold mb-3">
+					<Heading id="instruction-safety-constraints" className="text-2xl font-bold mb-3">
 						{isZh ? 'Instruction 安全约束' : 'Instruction Safety Constraints'}
-					</h2>
+					</Heading>
 					<div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
 						<h3 className="text-lg font-semibold mb-2 text-yellow-900 dark:text-yellow-300">
 							⚠️ {isZh ? '高危操作控制' : 'High-Risk Operation Control'}

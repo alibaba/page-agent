@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 
 import CodeEditor from '@/components/CodeEditor'
+import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 const BASELINE = new Set([
@@ -63,7 +64,9 @@ export default function Models() {
 
 			{/* Models Section */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-3">{isZh ? '已测试模型' : 'Tested Models'}</h2>
+				<Heading id="tested-models" className="text-2xl font-semibold mb-3">
+					{isZh ? '已测试模型' : 'Tested Models'}
+				</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '推荐使用 ToolCall 能力强的轻量级模型。'
@@ -141,7 +144,7 @@ export default function Models() {
 
 			{/* Configuration Section */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">{isZh ? '配置方式' : 'Configuration'}</h2>
+				<Heading id="configuration">{isZh ? '配置方式' : 'Configuration'}</Heading>
 				<CodeEditor
 					code={`// OpenAI-compatible services (e.g., Alibaba Bailian)
 const pageAgent = new PageAgent({
@@ -163,9 +166,7 @@ const pageAgent = new PageAgent({
 
 			{/* Free Testing API Section */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">
-					{isZh ? '免费测试接口' : 'Free Testing API'}
-				</h2>
+				<Heading id="free-testing-api">{isZh ? '免费测试接口' : 'Free Testing API'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '以下免费测试接口仅供 PageAgent.js 和 PageAgent Extension 的技术评估使用。有速率限制，可能随时变更。请勿用于生产环境。'
@@ -215,7 +216,7 @@ LLM_API_KEY="NA"`}
 
 			{/* Ollama Section */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">Ollama</h2>
+				<Heading id="ollama">Ollama</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '已在 Ollama 0.15 + qwen3:14b (RTX3090 24GB) 上测试通过。'

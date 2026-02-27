@@ -1,4 +1,5 @@
 import CodeEditor from '@/components/CodeEditor'
+import { Heading } from '@/components/Heading'
 import { CDN_DEMO_CN_URL, CDN_DEMO_URL } from '@/constants'
 import { useLanguage } from '@/i18n/context'
 
@@ -13,7 +14,9 @@ export default function QuickStart() {
 				{isZh ? '几分钟内完成 page-agent 的集成。' : 'Integrate page-agent in minutes.'}
 			</p>
 
-			<h2 className="text-2xl font-bold mb-3">{isZh ? '安装步骤' : 'Installation Steps'}</h2>
+			<Heading id="installation-steps" className="text-2xl font-bold mb-3">
+				{isZh ? '安装步骤' : 'Installation Steps'}
+			</Heading>
 
 			<div className="space-y-4 mb-6">
 				{/* Demo CDN - One Line */}

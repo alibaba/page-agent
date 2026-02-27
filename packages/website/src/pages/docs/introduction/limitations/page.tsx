@@ -1,5 +1,6 @@
 import { Link } from 'wouter'
 
+import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 export default function LimitationsPage() {
@@ -20,9 +21,9 @@ export default function LimitationsPage() {
 
 			<div className="prose prose-lg dark:prose-invert max-w-none">
 				{/* PageAgent.js vs PageAgentExt */}
-				<h2 className="text-2xl font-bold mb-3">
+				<Heading id="pageagent-js-vs-pageagentext" className="text-2xl font-bold mb-3">
 					{isZh ? 'PageAgent.js vs PageAgentExt' : 'PageAgent.js vs PageAgentExt'}
-				</h2>
+				</Heading>
 				<p className="text-gray-600 dark:text-gray-300 mb-4">
 					{isZh
 						? 'PageAgent.js 是核心库，运行在页面内。PageAgentExt 是可选的浏览器扩展，提供额外的浏览器级控制能力。'
@@ -37,7 +38,7 @@ export default function LimitationsPage() {
 								<th className="text-left py-3 pl-4 font-semibold">
 									PageAgentExt{' '}
 									<Link
-										href="/docs/features/chrome-extension"
+										href="/features/chrome-extension"
 										className="text-xs font-normal text-blue-600 dark:text-blue-400 hover:underline"
 									>
 										{isZh ? '了解更多' : 'learn more'}
@@ -82,9 +83,9 @@ export default function LimitationsPage() {
 				</div>
 
 				{/* Interaction Limitations */}
-				<h2 className="text-2xl font-bold mb-3">
+				<Heading id="interaction-capabilities" className="text-2xl font-bold mb-3">
 					{isZh ? '交互能力' : 'Interaction Capabilities'}
-				</h2>
+				</Heading>
 				<div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
 					<div className="grid md:grid-cols-2 gap-6">
 						<div>
@@ -127,7 +128,9 @@ export default function LimitationsPage() {
 				</div>
 
 				{/* Understanding Limitations */}
-				<h2 className="text-2xl font-bold mb-3">{isZh ? '理解能力' : 'Understanding'}</h2>
+				<Heading id="understanding" className="text-2xl font-bold mb-3">
+					{isZh ? '理解能力' : 'Understanding'}
+				</Heading>
 				<div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-400 p-4 mb-6">
 					<p className="text-amber-800 dark:text-amber-200 mb-2 font-medium">
 						{isZh
@@ -142,9 +145,9 @@ export default function LimitationsPage() {
 				</div>
 
 				{/* Website Quality */}
-				<h2 className="text-2xl font-bold mb-3">
+				<Heading id="page-quality-matters" className="text-2xl font-bold mb-3">
 					{isZh ? '网页质量影响' : 'Page Quality Matters'}
-				</h2>
+				</Heading>
 				<div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
 					<p className="text-gray-600 dark:text-gray-300 text-sm">
 						{isZh

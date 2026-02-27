@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'wouter'
 
 import CodeEditor from '@/components/CodeEditor'
+import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 // ---------------------------------------------------------------------------
@@ -369,10 +370,13 @@ export default function TroubleshootingPage() {
 				{/* Main content */}
 				<div className="flex-1 min-w-0 space-y-12">
 					{SECTIONS.map((section) => (
-						<section key={section.id} id={section.id} className="scroll-mt-24">
-							<h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+						<section key={section.id} className="scroll-mt-24">
+							<Heading
+								id={section.id}
+								className="text-2xl font-bold mb-4 text-gray-900 dark:text-white"
+							>
 								{isZh ? section.title.zh : section.title.en}
-							</h2>
+							</Heading>
 
 							{/* Symptom callout */}
 							<div

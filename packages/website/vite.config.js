@@ -1,9 +1,9 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react-swc'
 import { config as dotenvConfig } from 'dotenv'
-import { readFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, readFileSync } from 'node:fs'
 import process from 'node:process'
-import { dirname, resolve } from 'path'
+import { dirname, join, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 
@@ -15,11 +15,47 @@ const pageAgentPkg = JSON.parse(
 // Load .env from repo root
 dotenvConfig({ path: resolve(__dirname, '../../.env') })
 
+// All SPA routes that need index.html copies for direct access on static hosts
+const SPA_ROUTES = [
+	'docs',
+	'docs/introduction/overview',
+	'docs/introduction/quick-start',
+	'docs/introduction/limitations',
+	'docs/introduction/troubleshooting',
+	'docs/features/custom-tools',
+	'docs/features/data-masking',
+	'docs/features/custom-instructions',
+	'docs/features/models',
+	'docs/features/chrome-extension',
+	'docs/advanced/page-agent',
+	'docs/advanced/page-agent-core',
+	'docs/advanced/custom-ui',
+	'docs/integration/security-permissions',
+	'docs/integration/best-practices',
+	'docs/integration/third-party-agent',
+]
+
+function spaRoutes() {
+	return {
+		name: 'spa-routes',
+		closeBundle() {
+			const dist = resolve(__dirname, 'dist')
+			const src = join(dist, 'index.html')
+			for (const route of SPA_ROUTES) {
+				const dir = join(dist, route)
+				mkdirSync(dir, { recursive: true })
+				copyFileSync(src, join(dir, 'index.html'))
+			}
+			console.log(`  ✓ Copied index.html to ${SPA_ROUTES.length} SPA routes`)
+		},
+	}
+}
+
 // Website Config (React Documentation Site)
 export default defineConfig(({ mode }) => ({
-	base: './',
+	base: '/page-agent/',
 	clearScreen: false,
-	plugins: [react(), tailwindcss()],
+	plugins: [react(), tailwindcss(), spaRoutes()],
 	build: {
 		chunkSizeWarningLimit: 2000,
 		cssCodeSplit: true,
