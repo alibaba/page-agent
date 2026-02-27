@@ -11,7 +11,7 @@ export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 	if (!config.baseURL || !config.apiKey || !config.model) {
 		throw new Error(
 			'[PageAgent] LLM configuration required. Please provide: baseURL, apiKey, model. ' +
-				'See: https://alibaba.github.io/page-agent/#/docs/features/models'
+				'See: https://alibaba.github.io/page-agent/docs/features/models'
 		)
 	}
 

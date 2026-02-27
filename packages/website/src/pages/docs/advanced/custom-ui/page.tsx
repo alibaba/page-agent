@@ -1,4 +1,5 @@
 import CodeEditor from '@/components/CodeEditor'
+import { Heading } from '@/components/Heading'
 import { APIDivider, APIReference } from '@/components/ui/api-reference'
 import { useLanguage } from '@/i18n/context'
 
@@ -17,7 +18,9 @@ export default function CustomUIDocs() {
 
 			{/* Architecture */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">{isZh ? '架构' : 'Architecture'}</h2>
+				<Heading id="architecture" level={2} className="text-2xl font-semibold mb-4">
+					{isZh ? '架构' : 'Architecture'}
+				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? 'PageAgent 由三个独立模块组成，可自由组合：'
@@ -45,7 +48,9 @@ export default function CustomUIDocs() {
 
 			{/* Two Event Streams */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">{isZh ? '两个事件流' : 'Two Event Streams'}</h2>
+				<Heading id="two-event-streams" level={2} className="text-2xl font-semibold mb-4">
+					{isZh ? '两个事件流' : 'Two Event Streams'}
+				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? 'PageAgentCore 提供两种不同性质的事件流，方便 UI 渲染：'
@@ -120,7 +125,9 @@ export default function CustomUIDocs() {
 
 			{/* All Events */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">{isZh ? '所有事件' : 'All Events'}</h2>
+				<Heading id="all-events" level={2} className="text-2xl font-semibold mb-4">
+					{isZh ? '所有事件' : 'All Events'}
+				</Heading>
 				<APIReference
 					properties={[
 						{
@@ -155,7 +162,9 @@ export default function CustomUIDocs() {
 
 			{/* HistoricalEvent Types */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">HistoricalEvent</h2>
+				<Heading id="historicalevent" level={2} className="text-2xl font-semibold mb-4">
+					HistoricalEvent
+				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh ? 'agent.history 数组中的事件类型：' : 'Event types in agent.history array:'}
 				</p>
@@ -172,7 +181,9 @@ export default function CustomUIDocs() {
 
 			{/* AgentActivity Types */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">AgentActivity</h2>
+				<Heading id="agentactivity" level={2} className="text-2xl font-semibold mb-4">
+					AgentActivity
+				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh ? 'activity 事件的 detail 类型：' : 'The detail type of activity events:'}
 				</p>
@@ -191,9 +202,9 @@ export default function CustomUIDocs() {
 
 			{/* React Hooks Example */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">
+				<Heading id="using-react-hooks" level={2} className="text-2xl font-semibold mb-4">
 					{isZh ? '使用 React Hooks' : 'Using React Hooks'}
-				</h2>
+				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh ? '监听事件并更新 React 状态：' : 'Listen to events and update React state:'}
 				</p>
@@ -229,9 +240,13 @@ export default function CustomUIDocs() {
 
 			{/* Assembly Example */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">
+				<Heading
+					id="assembling-core-controller-custom-ui"
+					level={2}
+					className="text-2xl font-semibold mb-4"
+				>
 					{isZh ? '组装 Core + Controller + 自定义 UI' : 'Assembling Core + Controller + Custom UI'}
-				</h2>
+				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '参考内置 PageAgent 的实现方式，用自定义 UI 替换 Panel：'

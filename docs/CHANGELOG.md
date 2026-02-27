@@ -146,7 +146,7 @@ interface PageAgentConfig {
 - Single-page application only (cannot navigate across pages)
 - No visual recognition (relies on DOM structure)
 - Limited interaction support (no hover, drag-drop, canvas operations)
-- See [Limitations](https://alibaba.github.io/page-agent/#/docs/introduction/limitations) for details
+- See [Limitations](https://alibaba.github.io/page-agent/docs/introduction/limitations) for details
 
 ### Acknowledgments
 

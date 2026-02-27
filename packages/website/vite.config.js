@@ -17,7 +17,7 @@ dotenvConfig({ path: resolve(__dirname, '../../.env') })
 
 // Website Config (React Documentation Site)
 export default defineConfig(({ mode }) => ({
-	base: './',
+	base: '/page-agent/',
 	clearScreen: false,
 	plugins: [react(), tailwindcss()],
 	build: {

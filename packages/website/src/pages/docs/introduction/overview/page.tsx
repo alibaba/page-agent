@@ -1,3 +1,4 @@
+import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 export default function Overview() {
@@ -48,9 +49,9 @@ export default function Overview() {
 			</div>
 
 			<section>
-				<h2 className="text-2xl font-bold mb-4">
+				<Heading id="what-is-page-agent" level={2} className="text-2xl font-bold mb-4">
 					{isZh ? '什么是 page-agent？' : 'What is page-agent?'}
-				</h2>
+				</Heading>
 
 				<p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed ">
 					{isZh
@@ -60,7 +61,9 @@ export default function Overview() {
 			</section>
 
 			<section>
-				<h2 className="text-2xl font-bold mb-3">{isZh ? '核心特性' : 'Core Features'}</h2>
+				<Heading id="core-features" level={2} className="text-2xl font-bold mb-3">
+					{isZh ? '核心特性' : 'Core Features'}
+				</Heading>
 
 				<div className="grid md:grid-cols-2 gap-4 mb-8" role="list">
 					<div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -108,9 +111,9 @@ export default function Overview() {
 					</div>
 				</div>
 
-				<h2 className="text-2xl font-bold mb-4">
+				<Heading id="vs-browser-use" level={2} className="text-2xl font-bold mb-4">
 					{isZh ? '与 browser-use 的区别' : 'vs. browser-use'}
-				</h2>
+				</Heading>
 
 				<div className="overflow-x-auto mb-8">
 					<table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
@@ -174,7 +177,9 @@ export default function Overview() {
 					</table>
 				</div>
 
-				<h2 className="text-2xl font-bold mb-4">{isZh ? '应用场景' : 'Use Cases'}</h2>
+				<Heading id="use-cases" level={2} className="text-2xl font-bold mb-4">
+					{isZh ? '应用场景' : 'Use Cases'}
+				</Heading>
 
 				<ul className="space-y-4 mb-8">
 					<li className="flex items-start space-x-3">

@@ -1,5 +1,6 @@
 import BetaNotice from '@/components/BetaNotice'
 import CodeEditor from '@/components/CodeEditor'
+import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 export default function CustomTools() {
@@ -17,7 +18,9 @@ export default function CustomTools() {
 
 			<div className="space-y-8">
 				<section>
-					<h2 className="text-2xl font-bold mb-4">{isZh ? '工具注册' : 'Tool Registration'}</h2>
+					<Heading id="tool-registration" level={2} className="text-2xl font-bold mb-4">
+						{isZh ? '工具注册' : 'Tool Registration'}
+					</Heading>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
 							? '每个自定义工具需要定义四个核心属性：name、description、input schema 和 execute 函数。'
@@ -55,7 +58,9 @@ const pageAgent = new PageAgent({customTools})
 				</section>
 
 				<section>
-					<h2 className="text-2xl font-bold mb-4">{isZh ? '页面过滤器' : 'Page Filter'}</h2>
+					<Heading id="page-filter" level={2} className="text-2xl font-bold mb-4">
+						{isZh ? '页面过滤器' : 'Page Filter'}
+					</Heading>
 
 					<BetaNotice />
 
@@ -89,7 +94,9 @@ const pageAgent = new PageAgent({customTools})
 				</section>
 
 				<section>
-					<h2 className="text-2xl font-bold mb-4">{isZh ? '最佳实践' : 'Best Practices'}</h2>
+					<Heading id="best-practices" level={2} className="text-2xl font-bold mb-4">
+						{isZh ? '最佳实践' : 'Best Practices'}
+					</Heading>
 					<div className="space-y-4">
 						<div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
 							<h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-300 mb-2">

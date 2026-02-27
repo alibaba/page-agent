@@ -46,6 +46,15 @@
 	</head>
 	<body>
 		<div id="root"></div>
+		<script>
+			// Restore SPA path from 404.html redirect (GitHub Pages)
+			;(function () {
+				var p = new URLSearchParams(window.location.search).get('p')
+				if (p) {
+					window.history.replaceState(null, '', window.location.pathname + p + window.location.hash)
+				}
+			})()
+		</script>
 		<script type="module" src="./src/main.tsx"></script>
 		<script>
 			// Dynamically update html lang attribute based on i18n detection

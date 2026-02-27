@@ -1,4 +1,5 @@
 import CodeEditor from '@/components/CodeEditor'
+import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 export default function DataMasking() {
@@ -15,7 +16,9 @@ export default function DataMasking() {
 			</p>
 
 			<section className="mb-12">
-				<h2 className="text-3xl font-bold mb-6">{isZh ? '接口定义' : 'API Definition'}</h2>
+				<Heading id="api-definition" level={2} className="text-3xl font-bold mb-6">
+					{isZh ? '接口定义' : 'API Definition'}
+				</Heading>
 
 				<CodeEditor
 					className="mb-6"
@@ -30,9 +33,9 @@ export default function DataMasking() {
 			</section>
 
 			<section className="mb-12">
-				<h2 className="text-3xl font-bold mb-6">
+				<Heading id="common-masking-patterns" level={2} className="text-3xl font-bold mb-6">
 					{isZh ? '常用脱敏规则' : 'Common Masking Patterns'}
-				</h2>
+				</Heading>
 
 				<p className="text-gray-600 dark:text-gray-300 mb-6">
 					{isZh
