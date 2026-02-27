@@ -8,7 +8,10 @@ export default function ScenariosSection() {
 	const { isZh } = useLanguage()
 
 	return (
-		<section className="px-6 py-16" aria-labelledby="scenarios-heading">
+		<section
+			className="px-6 py-16 bg-linear-to-b from-blue-100 to-purple-100 dark:from-blue-950/40 dark:to-gray-800"
+			aria-labelledby="scenarios-heading"
+		>
 			<div className="max-w-6xl mx-auto">
 				<BlurFade inView>
 					<div className="text-center mb-12">

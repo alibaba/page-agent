@@ -62,7 +62,7 @@ export default function FeaturesSection() {
 													color="#ef4444aa"
 													strokeWidth={1.5}
 													// multiline={false}
-													isView
+													// isView
 												>
 													{cmd}
 												</Highlighter>
