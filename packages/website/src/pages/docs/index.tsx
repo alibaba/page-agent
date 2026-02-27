@@ -27,12 +27,12 @@ function DocsPage({ children }: { children: React.ReactNode }) {
 	return (
 		<div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
 			<Header />
-			<DocsLayout>
-				<Suspense>{children}</Suspense>
-			</DocsLayout>
-			<div className="mt-auto">
-				<Footer />
+			<div className="flex-1">
+				<DocsLayout>
+					<Suspense>{children}</Suspense>
+				</DocsLayout>
 			</div>
+			<Footer />
 		</div>
 	)
 }
