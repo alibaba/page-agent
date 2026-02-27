@@ -5,9 +5,9 @@
 - **React** with TypeScript
 - **Vite** for dev server and build
 - **Tailwind CSS** for styling
-- **shadcn/ui** (new-york style) for UI components
+- **shadcn/ui** (new-york style) for UI components — **do NOT hand-edit `src/components/ui/` files**
 - **Magic UI** for animations and effects
-- **wouter** with hash routing for static hosting
+- **wouter** with browser routing (`base: "/page-agent"`)
 - **lucide-react** for icons
 
 ## Component Guidelines
@@ -53,58 +53,74 @@ Located in `src/components/ui/`:
 ### Styling Rules
 
 1. **Prefer Tailwind classes** over custom CSS
-2. Use CSS modules only for complex component-specific styles
-3. Support dark mode via `dark:` classes
-4. Use CSS variables from `src/index.css` for theme colors
+2. Support dark mode via `dark:` classes
+3. Use CSS variables from `src/index.css` for theme colors
 
 ## Project Structure
 
 ```
 src/
 ├── pages/
-│   ├── Home.tsx         # Homepage
+│   ├── home/
+│   │   ├── HomeContent.tsx  # Homepage sections
+│   │   └── ...Section.tsx
 │   └── docs/
-│       ├── Layout.tsx   # Documentation sidebar
+│       ├── index.tsx    # Docs route switch
+│       ├── Layout.tsx   # Sidebar navigation
 │       └── [section]/[topic]/page.tsx
 ├── components/
-│   ├── ui/              # shadcn/ui + Magic UI components
+│   ├── ui/              # shadcn/ui + Magic UI (DO NOT hand-edit)
+│   ├── Heading.tsx      # Anchor heading for doc pages
 │   ├── Header.tsx       # Site header
 │   └── Footer.tsx       # Site footer
 ├── i18n/                # Internationalization
-├── router.tsx           # Central routing
+├── router.tsx           # Root layout + routing
 └── main.tsx             # App entry
 ```
+
+## Routing
+
+Uses wouter browser routing with base path for GitHub Pages deployment at `https://alibaba.github.io/page-agent/`.
+
+```tsx
+// main.tsx
+<Router base="/page-agent">
+  <PagesRouter />
+</Router>
+```
+
+**Key rules:**
+
+- Header and Footer live in `router.tsx` **outside** `<Switch>`, so they always see the root router context (`base="/page-agent"`)
+- Docs pages are nested via `<Route path="/docs" nest>`, which creates a child context (`base="/page-agent/docs"`)
+- Inside the docs nest, Link hrefs are relative to `/docs` (e.g. `href="/features/models"`, NOT `href="/docs/features/models"`)
+- **Never use `~` prefix** in Link hrefs — it bypasses the base path entirely
+- Doc page headings use `<Heading id="slug" level={2}>` for anchor links
+
+### SPA on GitHub Pages
+
+Instead of `404.html` redirects, the build copies `index.html` into every route directory. Add new routes to the `SPA_ROUTES` array in `vite.config.js`.
 
 ## Adding New Pages
 
 ### Documentation Page
 
 1. Create `src/pages/docs/<section>/<slug>/page.tsx`
-2. Add route to `src/router.tsx` with `<Header /> + <DocsLayout>` wrapper
-3. Add navigation item to `pages/docs/Layout.tsx`
-
-## Routing
-
-Uses hash-based routing for static hosting:
-
-```tsx
-import { Router } from 'wouter'
-import { useHashLocation } from 'wouter/use-hash-location'
-
-;<Router hook={useHashLocation}>{/* routes */}</Router>
-```
+2. Add route in `src/pages/docs/index.tsx`
+3. Add navigation item in `src/pages/docs/Layout.tsx`
+4. Add path to `SPA_ROUTES` in `vite.config.js`
 
 ## Configuration Files
 
 | File              | Purpose                 |
 | ----------------- | ----------------------- |
 | `components.json` | shadcn/ui configuration |
-| `vite.config.js`  | Vite build settings     |
+| `vite.config.js`  | Vite build + SPA routes |
 | `tsconfig.json`   | TypeScript config       |
 
 ## Commands
 
 ```bash
-npm start        # Dev server (from root)
+npm start            # Dev server (from root)
 npm run build:website    # Build website (from root)
 ```
