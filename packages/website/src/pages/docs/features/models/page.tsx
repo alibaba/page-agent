@@ -140,7 +140,7 @@ export default function Models() {
 const pageAgent = new PageAgent({
   baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   apiKey: 'your-api-key',
-  model: 'qwen-plus'
+  model: 'qwen3.5-plus'
 });
 
 // Self-hosted models (e.g., Ollama)
@@ -150,14 +150,60 @@ const pageAgent = new PageAgent({
   model: 'qwen3:14b'
 });
 
-// Free testing endpoint
-// Note: Rate-limited, content-filtered, subject to change. Replace with your own.
-// Note: Uses official DeepSeek-chat (3.2). See DeepSeek website for terms & privacy.
-const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
-const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
 `}
 				/>
+			</section>
+
+			{/* Free Testing API Section */}
+			<section className="mb-10">
+				<h2 className="text-2xl font-semibold mb-4">
+					{isZh ? '免费测试接口' : 'Free Testing API'}
+				</h2>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+					{isZh
+						? '以下免费测试接口仅供 PageAgent.js 和 PageAgent Extension 的技术评估使用。有速率限制，可能随时变更。请勿用于生产环境。'
+						: 'The following free testing endpoints are provided for technical evaluation of PageAgent.js and PageAgent Extension only. Rate-limited, subject to change. Not for production use.'}
+				</p>
+				<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
+					<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+						Qwen (Alibaba Cloud China)
+					</h3>
+					<p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+						{isZh
+							? '通过阿里云函数计算（中国大陆）转发至百炼 Qwen 模型'
+							: 'Proxied via Alibaba Cloud FC (Mainland China) to BaiLian Qwen models'}
+						{' · '}
+						<a
+							href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-blue-500 hover:underline"
+						>
+							{isZh ? '使用条款' : 'Terms of Use'}
+						</a>
+					</p>
+					<CodeEditor
+						code={`# qwen3.5-plus (default for demos) or qwen3.5-flash (lighter)
+LLM_BASE_URL="https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run"
+LLM_MODEL_NAME="qwen3.5-plus"
+LLM_API_KEY="NA"`}
+					/>
+				</div>
+				<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+					<p className="text-xs text-gray-600 dark:text-gray-400">
+						{isZh
+							? '⚠️ 仅供技术评估和研发用途，禁止用于生产环境。数据通过中国大陆服务器处理。请勿输入任何个人身份信息或敏感数据。使用即表示您同意'
+							: '⚠️ Strictly for technical evaluation and R&D only. Data is processed via servers in Mainland China. Do not input any PII or sensitive data. By using this API you agree to the'}{' '}
+						<a
+							href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-blue-500 hover:underline"
+						>
+							{isZh ? '使用条款' : 'Terms of Use'}
+						</a>
+					</p>
+				</div>
 			</section>
 
 			{/* Ollama Section */}

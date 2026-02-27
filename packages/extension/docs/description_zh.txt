@@ -22,7 +22,7 @@ Page Agent Ext 在浏览器本地进行 DOM 分析。当你发起任务时，经
 - 你的 API Key — 配置你自己的 LLM API（OpenAI、Anthropic 等），数据直接发送到你的服务商
 - 测试 API — 提供免费测试端点供体验，日常使用建议配置自己的 Key
 
-隐私政策：https://github.com/alibaba/page-agent/blob/main/packages/extension/PRIVACY.md
+使用条款与隐私：https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md
 
 🌟 开源项目：
 

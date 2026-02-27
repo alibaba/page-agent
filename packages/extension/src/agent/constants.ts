@@ -1,10 +1,9 @@
 import type { LLMConfig } from '@page-agent/llms'
 
 // Demo LLM for testing
-export const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-export const DEMO_BASE_URL =
-	'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
-export const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+export const DEMO_MODEL = 'qwen3.5-plus'
+export const DEMO_BASE_URL = 'https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run'
+export const DEMO_API_KEY = 'NA'
 
 export const DEMO_CONFIG: LLMConfig = {
 	apiKey: DEMO_API_KEY,

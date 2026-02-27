@@ -214,6 +214,33 @@ export default function HeroSection() {
 													{isZh ? '执行' : 'Run'}
 												</button>
 											</div>
+											<p className="text-xs text-gray-500 dark:text-gray-400 text-left">
+												{isZh ? (
+													<>
+														使用免费测试 LLM API，点击执行即表示您同意
+														<a
+															href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+															target="_blank"
+															rel="noopener noreferrer"
+															className="underline"
+														>
+															使用条款
+														</a>
+													</>
+												) : (
+													<>
+														Powered by free testing LLM API. By clicking Run you agree to the{' '}
+														<a
+															href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+															target="_blank"
+															rel="noopener noreferrer"
+															className="underline"
+														>
+															Terms of Use
+														</a>
+													</>
+												)}
+											</p>
 										</div>
 									)}
 
@@ -252,10 +279,8 @@ export default function HeroSection() {
 															}
 															className="px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200"
 														>
-															<option value="international">
-																{isZh ? '国际' : 'International'}
-															</option>
-															<option value="china">{isZh ? '国内镜像' : 'China Mirror'}</option>
+															<option value="international">jsdelivr CDN</option>
+															<option value="china">npmmirror CDN</option>
 														</select>
 														<div
 															dangerouslySetInnerHTML={{
@@ -283,15 +308,37 @@ export default function HeroSection() {
 												<ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
 													<li className="flex items-start text-left">
 														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-														{isZh
-															? '仅做技术评估，链接定期失效'
-															: 'Demo only—link may expire without notice'}
+														{isZh ? (
+															<span>
+																使用免费测试 LLM API，使用即表示同意
+																<a
+																	href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="text-yellow-700 dark:text-yellow-300 underline"
+																>
+																	使用条款
+																</a>
+															</span>
+														) : (
+															<span>
+																Uses free testing LLM API. By using you agree to the{' '}
+																<a
+																	href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+																	target="_blank"
+																	rel="noopener noreferrer"
+																	className="text-yellow-700 dark:text-yellow-300 underline"
+																>
+																	Terms of Use
+																</a>
+															</span>
+														)}
 													</li>
 													<li className="flex items-start text-left">
 														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
 														{isZh
-															? '使用 DeepSeek 模型，参考 DeepSeek 用户协议和隐私政策'
-															: 'This free demo uses DeepSeek API (see their terms and privacy policy)'}
+															? '数据通过中国大陆服务器处理'
+															: 'Data processed via servers in Mainland China'}
 													</li>
 													<li className="flex items-start text-left">
 														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
@@ -301,9 +348,7 @@ export default function HeroSection() {
 													</li>
 													<li className="flex items-start text-left">
 														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-														{isZh
-															? '仅支持单页应用，页面跳转后需要重新注入'
-															: 'Works on single-page apps only—reload required after navigation'}
+														{isZh ? '支持单页应用' : 'Works on single-page apps'}
 													</li>
 													<li className="flex items-start text-left">
 														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
@@ -313,10 +358,10 @@ export default function HeroSection() {
 													</li>
 													<li className="flex items-start text-left">
 														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-														{isZh ? '详细使用限制参照' : 'Full limitations in'}{' '}
+														{isZh ? '详细使用限制参照' : 'Full limitations in'}
 														<Link
 															href="/docs/introduction/limitations"
-															className="text-blue-600 dark:text-blue-400 hover:underline"
+															className="text-blue-600 dark:text-blue-400 hover:underline pl-1"
 														>
 															{isZh ? '《文档》' : 'Docs'}
 														</Link>

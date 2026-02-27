@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { Route, Switch } from 'wouter'
 
+import Footer from '../../components/Footer'
 import Header from '../../components/Header'
 import DocsLayout from './Layout'
 import CustomUIDocs from './advanced/custom-ui/page'
@@ -24,11 +25,14 @@ import Troubleshooting from './introduction/troubleshooting/page'
 
 function DocsPage({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="min-h-screen bg-white dark:bg-gray-900">
+		<div className="min-h-screen bg-white dark:bg-gray-900 flex flex-col">
 			<Header />
-			<DocsLayout>
-				<Suspense>{children}</Suspense>
-			</DocsLayout>
+			<div className="flex-1">
+				<DocsLayout>
+					<Suspense>{children}</Suspense>
+				</DocsLayout>
+			</div>
+			<Footer />
 		</div>
 	)
 }

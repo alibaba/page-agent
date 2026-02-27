@@ -13,9 +13,9 @@ window.PageAgent = PageAgent
 
 console.log('🚀 page-agent.js loaded!')
 
-const DEMO_MODEL = 'PAGE-AGENT-FREE-TESTING-RANDOM'
-const DEMO_BASE_URL = 'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy'
-const DEMO_API_KEY = 'PAGE-AGENT-FREE-TESTING-RANDOM'
+const DEMO_MODEL = 'qwen3.5-plus'
+const DEMO_BASE_URL = 'https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run'
+const DEMO_API_KEY = 'NA'
 
 // in case document.x is not ready yet
 setTimeout(() => {

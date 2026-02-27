@@ -52,7 +52,7 @@
 | Global  | https://cdn.jsdelivr.net/npm/page-agent@1.3.0/dist/iife/page-agent.demo.js         |
 | China   | https://registry.npmmirror.com/page-agent/1.3.0/files/dist/iife/page-agent.demo.js |
 
-> **⚠️ 仅用于技术评估。** Demo LLM 有速率和使用限制，速度较慢，可能随时变更。
+> **⚠️ 仅用于技术评估。** 该 Demo CDN 使用了免费的[测试 LLM API](terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use)，使用即表示您同意其条款。
 
 ### NPM 安装
 
@@ -64,8 +64,8 @@ npm install page-agent
 import { PageAgent } from 'page-agent'
 
 const agent = new PageAgent({
-    model: 'deepseek-chat',
-    baseURL: 'https://api.deepseek.com',
+    model: 'qwen3.5-plus',
+    baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     apiKey: 'YOUR_API_KEY',
     language: 'zh-CN',
 })
