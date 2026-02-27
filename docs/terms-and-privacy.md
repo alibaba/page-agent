@@ -76,7 +76,7 @@ are sent to the LLM API endpoint configured in **your settings**.
 
 ## Changes
 
-We may update these terms as the project evolves. Significant changes will be noted in release notes.
+We may update these terms as the project evolves.
 
 ## Contact
 
