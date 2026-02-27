@@ -18,7 +18,7 @@ export default function PageAgentCoreDocs() {
 
 			{/* When to use */}
 			<section className="mb-10">
-				<Heading id="when-to-use-pageagentcore" level={2} className="text-2xl font-semibold mb-4">
+				<Heading id="when-to-use-pageagentcore">
 					{isZh ? '何时使用 PageAgentCore' : 'When to Use PageAgentCore'}
 				</Heading>
 				<ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2">
@@ -39,9 +39,7 @@ export default function PageAgentCoreDocs() {
 
 			{/* Basic Usage */}
 			<section className="mb-10">
-				<Heading id="basic-usage" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '基本用法' : 'Basic Usage'}
-				</Heading>
+				<Heading id="basic-usage">{isZh ? '基本用法' : 'Basic Usage'}</Heading>
 				<CodeEditor
 					language="typescript"
 					code={`import { PageAgentCore } from '@page-agent/core'
@@ -79,9 +77,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* LLM Configuration */}
 			<section className="mb-10">
-				<Heading id="llmconfig" level={2} className="text-2xl font-semibold mb-4">
-					LLMConfig
-				</Heading>
+				<Heading id="llmconfig">LLMConfig</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '配置与大语言模型的连接参数。支持 OpenAI 兼容的 API。'
@@ -138,9 +134,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* Agent Configuration */}
 			<section className="mb-10">
-				<Heading id="agentconfig" level={2} className="text-2xl font-semibold mb-4">
-					AgentConfig
-				</Heading>
+				<Heading id="agentconfig">AgentConfig</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '配置 Agent 的行为、生命周期钩子和扩展能力。'
@@ -217,9 +211,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* Lifecycle Hooks */}
 			<section className="mb-10">
-				<Heading id="lifecycle-hooks" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '生命周期钩子' : 'Lifecycle Hooks'}
-				</Heading>
+				<Heading id="lifecycle-hooks">{isZh ? '生命周期钩子' : 'Lifecycle Hooks'}</Heading>
 				<div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
 					<p className="text-amber-800 dark:text-amber-200 text-sm">
 						<strong>⚠️ {isZh ? '警告' : 'Warning'}:</strong>{' '}
@@ -271,9 +263,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* PageController Configuration */}
 			<section className="mb-10">
-				<Heading id="pagecontrollerconfig" level={2} className="text-2xl font-semibold mb-4">
-					PageControllerConfig
-				</Heading>
+				<Heading id="pagecontrollerconfig">PageControllerConfig</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '配置 DOM 提取、元素交互和视觉反馈。'
@@ -332,9 +322,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* Properties */}
 			<section className="mb-10">
-				<Heading id="properties" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '属性' : 'Properties'}
-				</Heading>
+				<Heading id="properties">{isZh ? '属性' : 'Properties'}</Heading>
 				<APIReference
 					properties={[
 						{
@@ -379,9 +367,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* Methods */}
 			<section className="mb-10">
-				<Heading id="methods" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '方法' : 'Methods'}
-				</Heading>
+				<Heading id="methods">{isZh ? '方法' : 'Methods'}</Heading>
 				<APIReference
 					properties={[
 						{
@@ -404,9 +390,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* Events */}
 			<section className="mb-10">
-				<Heading id="events" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '事件' : 'Events'}
-				</Heading>
+				<Heading id="events">{isZh ? '事件' : 'Events'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh ? (
 						<>
@@ -455,9 +439,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* ExecutionResult */}
 			<section className="mb-10">
-				<Heading id="executionresult" level={2} className="text-2xl font-semibold mb-4">
-					ExecutionResult
-				</Heading>
+				<Heading id="executionresult">ExecutionResult</Heading>
 				<CodeEditor
 					language="typescript"
 					code={`interface ExecutionResult {
@@ -473,9 +455,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* AgentActivity */}
 			<section className="mb-10">
-				<Heading id="agentactivity" level={2} className="text-2xl font-semibold mb-4">
-					AgentActivity
-				</Heading>
+				<Heading id="agentactivity">AgentActivity</Heading>
 				<CodeEditor
 					language="typescript"
 					code={`type AgentActivity =
@@ -491,9 +471,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* Headless Usage */}
 			<section className="mb-10">
-				<Heading id="headless-mode" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '无头模式' : 'Headless Mode'}
-				</Heading>
+				<Heading id="headless-mode">{isZh ? '无头模式' : 'Headless Mode'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '在非 DOM 环境中，你必须实现自定义的 PageController（例如远程操作页面或 Puppeteer）。'

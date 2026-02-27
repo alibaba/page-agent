@@ -19,11 +19,7 @@ export default function SecurityPermissions() {
 
 			<div className="space-y-6">
 				<section>
-					<Heading
-						id="element-interaction-allowlist-blocklist"
-						level={2}
-						className="text-2xl font-bold mb-3"
-					>
+					<Heading id="element-interaction-allowlist-blocklist" className="text-2xl font-bold mb-3">
 						{isZh ? '元素操作黑白名单' : 'Element Interaction Allowlist/Blocklist'}
 					</Heading>
 					<div className="space-y-3">
@@ -51,11 +47,7 @@ export default function SecurityPermissions() {
 				</section>
 
 				<section>
-					<Heading
-						id="instruction-safety-constraints"
-						level={2}
-						className="text-2xl font-bold mb-3"
-					>
+					<Heading id="instruction-safety-constraints" className="text-2xl font-bold mb-3">
 						{isZh ? 'Instruction 安全约束' : 'Instruction Safety Constraints'}
 					</Heading>
 					<div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">

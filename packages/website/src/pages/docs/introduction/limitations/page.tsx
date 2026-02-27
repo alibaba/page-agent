@@ -21,7 +21,7 @@ export default function LimitationsPage() {
 
 			<div className="prose prose-lg dark:prose-invert max-w-none">
 				{/* PageAgent.js vs PageAgentExt */}
-				<Heading id="pageagent-js-vs-pageagentext" level={2} className="text-2xl font-bold mb-3">
+				<Heading id="pageagent-js-vs-pageagentext" className="text-2xl font-bold mb-3">
 					{isZh ? 'PageAgent.js vs PageAgentExt' : 'PageAgent.js vs PageAgentExt'}
 				</Heading>
 				<p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -83,7 +83,7 @@ export default function LimitationsPage() {
 				</div>
 
 				{/* Interaction Limitations */}
-				<Heading id="interaction-capabilities" level={2} className="text-2xl font-bold mb-3">
+				<Heading id="interaction-capabilities" className="text-2xl font-bold mb-3">
 					{isZh ? '交互能力' : 'Interaction Capabilities'}
 				</Heading>
 				<div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
@@ -128,7 +128,7 @@ export default function LimitationsPage() {
 				</div>
 
 				{/* Understanding Limitations */}
-				<Heading id="understanding" level={2} className="text-2xl font-bold mb-3">
+				<Heading id="understanding" className="text-2xl font-bold mb-3">
 					{isZh ? '理解能力' : 'Understanding'}
 				</Heading>
 				<div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-400 p-4 mb-6">
@@ -145,7 +145,7 @@ export default function LimitationsPage() {
 				</div>
 
 				{/* Website Quality */}
-				<Heading id="page-quality-matters" level={2} className="text-2xl font-bold mb-3">
+				<Heading id="page-quality-matters" className="text-2xl font-bold mb-3">
 					{isZh ? '网页质量影响' : 'Page Quality Matters'}
 				</Heading>
 				<div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">

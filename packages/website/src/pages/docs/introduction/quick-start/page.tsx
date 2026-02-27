@@ -14,7 +14,7 @@ export default function QuickStart() {
 				{isZh ? '几分钟内完成 page-agent 的集成。' : 'Integrate page-agent in minutes.'}
 			</p>
 
-			<Heading id="installation-steps" level={2} className="text-2xl font-bold mb-3">
+			<Heading id="installation-steps" className="text-2xl font-bold mb-3">
 				{isZh ? '安装步骤' : 'Installation Steps'}
 			</Heading>
 

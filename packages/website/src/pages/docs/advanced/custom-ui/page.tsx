@@ -18,9 +18,7 @@ export default function CustomUIDocs() {
 
 			{/* Architecture */}
 			<section className="mb-10">
-				<Heading id="architecture" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '架构' : 'Architecture'}
-				</Heading>
+				<Heading id="architecture">{isZh ? '架构' : 'Architecture'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? 'PageAgent 由三个独立模块组成，可自由组合：'
@@ -48,9 +46,7 @@ export default function CustomUIDocs() {
 
 			{/* Two Event Streams */}
 			<section className="mb-10">
-				<Heading id="two-event-streams" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '两个事件流' : 'Two Event Streams'}
-				</Heading>
+				<Heading id="two-event-streams">{isZh ? '两个事件流' : 'Two Event Streams'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? 'PageAgentCore 提供两种不同性质的事件流，方便 UI 渲染：'
@@ -125,9 +121,7 @@ export default function CustomUIDocs() {
 
 			{/* All Events */}
 			<section className="mb-10">
-				<Heading id="all-events" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '所有事件' : 'All Events'}
-				</Heading>
+				<Heading id="all-events">{isZh ? '所有事件' : 'All Events'}</Heading>
 				<APIReference
 					properties={[
 						{
@@ -162,9 +156,7 @@ export default function CustomUIDocs() {
 
 			{/* HistoricalEvent Types */}
 			<section className="mb-10">
-				<Heading id="historicalevent" level={2} className="text-2xl font-semibold mb-4">
-					HistoricalEvent
-				</Heading>
+				<Heading id="historicalevent">HistoricalEvent</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh ? 'agent.history 数组中的事件类型：' : 'Event types in agent.history array:'}
 				</p>
@@ -181,9 +173,7 @@ export default function CustomUIDocs() {
 
 			{/* AgentActivity Types */}
 			<section className="mb-10">
-				<Heading id="agentactivity" level={2} className="text-2xl font-semibold mb-4">
-					AgentActivity
-				</Heading>
+				<Heading id="agentactivity">AgentActivity</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh ? 'activity 事件的 detail 类型：' : 'The detail type of activity events:'}
 				</p>
@@ -202,9 +192,7 @@ export default function CustomUIDocs() {
 
 			{/* React Hooks Example */}
 			<section className="mb-10">
-				<Heading id="using-react-hooks" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '使用 React Hooks' : 'Using React Hooks'}
-				</Heading>
+				<Heading id="using-react-hooks">{isZh ? '使用 React Hooks' : 'Using React Hooks'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh ? '监听事件并更新 React 状态：' : 'Listen to events and update React state:'}
 				</p>
@@ -240,11 +228,7 @@ export default function CustomUIDocs() {
 
 			{/* Assembly Example */}
 			<section className="mb-10">
-				<Heading
-					id="assembling-core-controller-custom-ui"
-					level={2}
-					className="text-2xl font-semibold mb-4"
-				>
+				<Heading id="assembling-core-controller-custom-ui">
 					{isZh ? '组装 Core + Controller + 自定义 UI' : 'Assembling Core + Controller + Custom UI'}
 				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">

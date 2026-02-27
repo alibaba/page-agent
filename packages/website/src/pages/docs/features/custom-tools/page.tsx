@@ -18,7 +18,7 @@ export default function CustomTools() {
 
 			<div className="space-y-8">
 				<section>
-					<Heading id="tool-registration" level={2} className="text-2xl font-bold mb-4">
+					<Heading id="tool-registration" className="text-2xl font-bold mb-4">
 						{isZh ? '工具注册' : 'Tool Registration'}
 					</Heading>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -58,7 +58,7 @@ const pageAgent = new PageAgent({customTools})
 				</section>
 
 				<section>
-					<Heading id="page-filter" level={2} className="text-2xl font-bold mb-4">
+					<Heading id="page-filter" className="text-2xl font-bold mb-4">
 						{isZh ? '页面过滤器' : 'Page Filter'}
 					</Heading>
 
@@ -94,7 +94,7 @@ const pageAgent = new PageAgent({customTools})
 				</section>
 
 				<section>
-					<Heading id="best-practices" level={2} className="text-2xl font-bold mb-4">
+					<Heading id="best-practices" className="text-2xl font-bold mb-4">
 						{isZh ? '最佳实践' : 'Best Practices'}
 					</Heading>
 					<div className="space-y-4">

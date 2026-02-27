@@ -23,7 +23,7 @@ export default function ChromeExtension() {
 			<div className="space-y-8 mt-8">
 				{/* Features */}
 				<section>
-					<Heading id="key-features" level={2} className="text-2xl font-bold mb-4">
+					<Heading id="key-features" className="text-2xl font-bold mb-4">
 						{isZh ? '核心特性' : 'Key Features'}
 					</Heading>
 					<div className="grid md:grid-cols-3 gap-4">
@@ -60,7 +60,7 @@ export default function ChromeExtension() {
 
 				{/* Install */}
 				<section>
-					<Heading id="get-the-extension" level={2} className="text-2xl font-bold mb-4">
+					<Heading id="get-the-extension" className="text-2xl font-bold mb-4">
 						{isZh ? '获取扩展' : 'Get the Extension'}
 					</Heading>
 					<div className="flex flex-wrap gap-3">
@@ -91,11 +91,7 @@ export default function ChromeExtension() {
 
 				{/* Relationship with PageAgent.js */}
 				<section>
-					<Heading
-						id="how-it-relates-to-page-agent-js"
-						level={2}
-						className="text-2xl font-bold mb-4"
-					>
+					<Heading id="how-it-relates-to-page-agent-js" className="text-2xl font-bold mb-4">
 						{isZh ? '与 PageAgent.js 的关系' : 'How It Relates to PageAgent.js'}
 					</Heading>
 					<div className="p-5 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3 text-gray-600 dark:text-gray-300">
@@ -114,7 +110,7 @@ export default function ChromeExtension() {
 
 				{/* Third-party Integration */}
 				<section>
-					<Heading id="third-party-integration" level={2} className="text-2xl font-bold mb-4">
+					<Heading id="third-party-integration" className="text-2xl font-bold mb-4">
 						{isZh ? '第三方接入' : 'Third-Party Integration'}
 					</Heading>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -154,7 +150,7 @@ localStorage.setItem('PageAgentExtUserAuthToken', '<your-token-from-extension>')
 
 				{/* API Reference */}
 				<section>
-					<Heading id="api-reference" level={2} className="text-2xl font-bold mb-4">
+					<Heading id="api-reference" className="text-2xl font-bold mb-4">
 						{isZh ? 'API 参考' : 'API Reference'}
 					</Heading>
 
@@ -181,7 +177,7 @@ localStorage.setItem('PageAgentExtUserAuthToken', '<your-token-from-extension>')
 					</section>
 
 					{/* TypeScript Declaration */}
-					<Heading id="typescript-declaration" level={2} className="text-2xl font-bold mb-4">
+					<Heading id="typescript-declaration" className="text-2xl font-bold mb-4">
 						{isZh ? 'TypeScript 类型声明' : 'TypeScript Declaration'}
 					</Heading>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -317,7 +313,6 @@ window.PAGE_AGENT_EXT.stop()`
 				<section>
 					<Heading
 						id="integrate-multipageagent-into-your-extension"
-						level={2}
 						className="text-2xl font-bold mb-4"
 					>
 						{isZh

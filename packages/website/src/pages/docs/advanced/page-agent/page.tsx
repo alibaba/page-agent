@@ -20,7 +20,7 @@ export default function PageAgentDocs() {
 
 			{/* When to use */}
 			<section className="mb-10">
-				<Heading id="when-to-use-pageagent" level={2} className="text-2xl font-semibold mb-4">
+				<Heading id="when-to-use-pageagent">
 					{isZh ? '何时使用 PageAgent' : 'When to Use PageAgent'}
 				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
@@ -44,9 +44,7 @@ export default function PageAgentDocs() {
 
 			{/* Basic Usage */}
 			<section className="mb-10">
-				<Heading id="basic-usage" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '基本用法' : 'Basic Usage'}
-				</Heading>
+				<Heading id="basic-usage">{isZh ? '基本用法' : 'Basic Usage'}</Heading>
 				<CodeEditor
 					language="typescript"
 					code={`import { PageAgent } from 'page-agent'
@@ -72,9 +70,7 @@ console.log(result.history) // Full execution history`}
 
 			{/* Class Definition */}
 			<section className="mb-10">
-				<Heading id="class-definition" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '类定义' : 'Class Definition'}
-				</Heading>
+				<Heading id="class-definition">{isZh ? '类定义' : 'Class Definition'}</Heading>
 				<CodeEditor
 					language="typescript"
 					code={`class PageAgent extends PageAgentCore {
@@ -114,9 +110,7 @@ console.log(result.history) // Full execution history`}
 
 			{/* Configuration */}
 			<section className="mb-10">
-				<Heading id="configuration" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '配置' : 'Configuration'}
-				</Heading>
+				<Heading id="configuration">{isZh ? '配置' : 'Configuration'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? 'PageAgent 使用与 PageAgentCore 相同的配置接口。'
@@ -151,9 +145,7 @@ console.log(result.history) // Full execution history`}
 
 			{/* Panel Property */}
 			<section className="mb-10">
-				<Heading id="panel-property" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? 'Panel 属性' : 'Panel Property'}
-				</Heading>
+				<Heading id="panel-property">{isZh ? 'Panel 属性' : 'Panel Property'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? 'PageAgent 自动创建一个 Panel 实例。你可以通过 panel 属性访问它来控制 UI：'
@@ -194,7 +186,7 @@ agent.panel.dispose()`}
 
 			{/* Comparison with PageAgentCore */}
 			<section className="mb-10">
-				<Heading id="pageagent-vs-pageagentcore" level={2} className="text-2xl font-semibold mb-4">
+				<Heading id="pageagent-vs-pageagentcore">
 					{isZh ? 'PageAgent vs PageAgentCore' : 'PageAgent vs PageAgentCore'}
 				</Heading>
 				<div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">

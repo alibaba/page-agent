@@ -17,7 +17,7 @@ export default function Instructions() {
 
 			{/* System Instructions */}
 			<section className="mb-12">
-				<Heading id="system-instructions" level={2} className="text-3xl font-bold mb-6">
+				<Heading id="system-instructions" className="text-3xl font-bold mb-6">
 					{isZh ? '系统级指导 (System Instructions)' : 'System Instructions'}
 				</Heading>
 
@@ -47,7 +47,7 @@ Guidelines:
 
 			{/* Page Instructions */}
 			<section className="mb-12">
-				<Heading id="page-instructions" level={2} className="text-3xl font-bold mb-6">
+				<Heading id="page-instructions" className="text-3xl font-bold mb-6">
 					{isZh ? '页面级指导 (Page Instructions)' : 'Page Instructions'}
 				</Heading>
 
@@ -91,7 +91,7 @@ This is the product listing page.
 
 			{/* How It Works */}
 			<section className="mb-12">
-				<Heading id="how-it-works" level={2} className="text-3xl font-bold mb-6">
+				<Heading id="how-it-works" className="text-3xl font-bold mb-6">
 					{isZh ? '工作原理' : 'How It Works'}
 				</Heading>
 

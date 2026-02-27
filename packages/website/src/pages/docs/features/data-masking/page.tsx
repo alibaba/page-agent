@@ -16,7 +16,7 @@ export default function DataMasking() {
 			</p>
 
 			<section className="mb-12">
-				<Heading id="api-definition" level={2} className="text-3xl font-bold mb-6">
+				<Heading id="api-definition" className="text-3xl font-bold mb-6">
 					{isZh ? '接口定义' : 'API Definition'}
 				</Heading>
 
@@ -33,7 +33,7 @@ export default function DataMasking() {
 			</section>
 
 			<section className="mb-12">
-				<Heading id="common-masking-patterns" level={2} className="text-3xl font-bold mb-6">
+				<Heading id="common-masking-patterns" className="text-3xl font-bold mb-6">
 					{isZh ? '常用脱敏规则' : 'Common Masking Patterns'}
 				</Heading>
 

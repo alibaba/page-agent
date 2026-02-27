@@ -64,7 +64,7 @@ export default function Models() {
 
 			{/* Models Section */}
 			<section className="mb-10">
-				<Heading id="tested-models" level={2} className="text-2xl font-semibold mb-3">
+				<Heading id="tested-models" className="text-2xl font-semibold mb-3">
 					{isZh ? '已测试模型' : 'Tested Models'}
 				</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -144,9 +144,7 @@ export default function Models() {
 
 			{/* Configuration Section */}
 			<section className="mb-10">
-				<Heading id="configuration" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '配置方式' : 'Configuration'}
-				</Heading>
+				<Heading id="configuration">{isZh ? '配置方式' : 'Configuration'}</Heading>
 				<CodeEditor
 					code={`// OpenAI-compatible services (e.g., Alibaba Bailian)
 const pageAgent = new PageAgent({
@@ -168,9 +166,7 @@ const pageAgent = new PageAgent({
 
 			{/* Free Testing API Section */}
 			<section className="mb-10">
-				<Heading id="free-testing-api" level={2} className="text-2xl font-semibold mb-4">
-					{isZh ? '免费测试接口' : 'Free Testing API'}
-				</Heading>
+				<Heading id="free-testing-api">{isZh ? '免费测试接口' : 'Free Testing API'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '以下免费测试接口仅供 PageAgent.js 和 PageAgent Extension 的技术评估使用。有速率限制，可能随时变更。请勿用于生产环境。'
@@ -220,9 +216,7 @@ LLM_API_KEY="NA"`}
 
 			{/* Ollama Section */}
 			<section className="mb-10">
-				<Heading id="ollama" level={2} className="text-2xl font-semibold mb-4">
-					Ollama
-				</Heading>
+				<Heading id="ollama">Ollama</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
 						? '已在 Ollama 0.15 + qwen3:14b (RTX3090 24GB) 上测试通过。'

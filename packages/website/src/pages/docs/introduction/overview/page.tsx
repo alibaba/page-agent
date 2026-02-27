@@ -49,7 +49,7 @@ export default function Overview() {
 			</div>
 
 			<section>
-				<Heading id="what-is-page-agent" level={2} className="text-2xl font-bold mb-4">
+				<Heading id="what-is-page-agent" className="text-2xl font-bold mb-4">
 					{isZh ? '什么是 page-agent？' : 'What is page-agent?'}
 				</Heading>
 
@@ -61,7 +61,7 @@ export default function Overview() {
 			</section>
 
 			<section>
-				<Heading id="core-features" level={2} className="text-2xl font-bold mb-3">
+				<Heading id="core-features" className="text-2xl font-bold mb-3">
 					{isZh ? '核心特性' : 'Core Features'}
 				</Heading>
 
@@ -111,7 +111,7 @@ export default function Overview() {
 					</div>
 				</div>
 
-				<Heading id="vs-browser-use" level={2} className="text-2xl font-bold mb-4">
+				<Heading id="vs-browser-use" className="text-2xl font-bold mb-4">
 					{isZh ? '与 browser-use 的区别' : 'vs. browser-use'}
 				</Heading>
 
@@ -177,7 +177,7 @@ export default function Overview() {
 					</table>
 				</div>
 
-				<Heading id="use-cases" level={2} className="text-2xl font-bold mb-4">
+				<Heading id="use-cases" className="text-2xl font-bold mb-4">
 					{isZh ? '应用场景' : 'Use Cases'}
 				</Heading>
 

@@ -373,7 +373,6 @@ export default function TroubleshootingPage() {
 						<section key={section.id} className="scroll-mt-24">
 							<Heading
 								id={section.id}
-								level={2}
 								className="text-2xl font-bold mb-4 text-gray-900 dark:text-white"
 							>
 								{isZh ? section.title.zh : section.title.en}

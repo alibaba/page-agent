@@ -27,7 +27,7 @@ export default function ThirdPartyAgentPage() {
 				</p>
 			</div>
 
-			<Heading id="integration-method" level={2} className="text-2xl font-bold mb-4">
+			<Heading id="integration-method" className="text-2xl font-bold mb-4">
 				{isZh ? '集成方式' : 'Integration Method'}
 			</Heading>
 
@@ -60,7 +60,7 @@ const pageAgentTool = {
 				</div>
 			</div>
 
-			<Heading id="use-cases" level={2} className="text-2xl font-bold mb-4">
+			<Heading id="use-cases" className="text-2xl font-bold mb-4">
 				{isZh ? '应用场景' : 'Use Cases'}
 			</Heading>
 			<div className="grid md:grid-cols-2 gap-4 mb-6">
