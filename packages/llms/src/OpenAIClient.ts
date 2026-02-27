@@ -1,6 +1,8 @@
 /**
  * OpenAI Client implementation
  */
+import * as z from 'zod'
+
 import { InvokeError, InvokeErrorType } from './errors'
 import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
 import { modelPatch, zodToOpenAITool } from './utils'
@@ -182,7 +184,7 @@ export class OpenAIClient implements LLMClient {
 		// Validate with schema
 		const validation = tool.inputSchema.safeParse(parsedArgs)
 		if (!validation.success) {
-			console.error(validation.error)
+			console.error(z.prettifyError(validation.error))
 			throw new InvokeError(
 				InvokeErrorType.INVALID_TOOL_ARGS,
 				'Tool arguments validation failed',

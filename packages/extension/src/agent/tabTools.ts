@@ -6,14 +6,14 @@
  * - switch_to_tab: Switch to an existing tab
  * - close_tab: Close a tab (optionally switch to another)
  */
-import * as zod from 'zod'
+import * as z from 'zod'
 
 import type { TabsController } from './TabsController'
 
 /** Tool definition compatible with PageAgentCore customTools */
 interface TabTool {
 	description: string
-	inputSchema: zod.ZodType
+	inputSchema: z.ZodType
 	execute: (input: unknown) => Promise<string>
 }
 
@@ -26,8 +26,8 @@ export function createTabTools(tabsController: TabsController): Record<string, T
 		open_new_tab: {
 			description:
 				'Open a new browser tab with the specified URL. The new tab becomes the current tab for all subsequent page operations.',
-			inputSchema: zod.object({
-				url: zod.string().describe('The URL to open in the new tab'),
+			inputSchema: z.object({
+				url: z.string().describe('The URL to open in the new tab'),
 			}),
 			execute: async (input: unknown) => {
 				const { url } = input as { url: string }
@@ -42,8 +42,8 @@ export function createTabTools(tabsController: TabsController): Record<string, T
 		switch_to_tab: {
 			description:
 				'Switch to an existing tab by its ID. After switching, all page operations will target the new current tab. You can only switch to tabs in the tab list shown in browser state.',
-			inputSchema: zod.object({
-				tab_id: zod.number().int().describe('The tab ID to switch to'),
+			inputSchema: z.object({
+				tab_id: z.number().int().describe('The tab ID to switch to'),
 			}),
 			execute: async (input: unknown) => {
 				const { tab_id } = input as { tab_id: number }
@@ -58,8 +58,8 @@ export function createTabTools(tabsController: TabsController): Record<string, T
 		close_tab: {
 			description:
 				'Close a tab by its ID. Cannot close the initial tab. Optionally specify which tab to switch to after closing.',
-			inputSchema: zod.object({
-				tab_id: zod.number().int().describe('The tab ID to close'),
+			inputSchema: z.object({
+				tab_id: z.number().int().describe('The tab ID to close'),
 			}),
 			execute: async (input: unknown) => {
 				const { tab_id } = input as { tab_id: number }
