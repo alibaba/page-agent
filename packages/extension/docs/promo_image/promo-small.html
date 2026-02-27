@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=440">
+<title>Page Agent - Small Promo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 440px; height: 280px; overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #08081a;
+    color: #fff;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    position: relative;
+  }
+
+  .bg {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .bg::before {
+    content: ''; position: absolute;
+    width: 500px; height: 500px;
+    top: -200px; left: 50%; transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, rgba(139,92,246,0.06) 50%, transparent 70%);
+  }
+  .bg::after {
+    content: ''; position: absolute;
+    width: 300px; height: 300px;
+    bottom: -100px; right: -50px;
+    background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%);
+  }
+
+  .grid-pattern {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.025;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .logo-glow {
+    position: absolute;
+    width: 200px; height: 200px;
+    top: 50%; left: 50%; transform: translate(-50%, -55%);
+    background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .logo {
+    width: 88px; height: 88px; border-radius: 20px;
+    position: relative; z-index: 1;
+    margin-bottom: 14px;
+    filter: drop-shadow(0 4px 24px rgba(59,130,246,0.18));
+  }
+
+  .title {
+    font-size: 34px; font-weight: 700; letter-spacing: -0.02em;
+    position: relative; z-index: 1;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, #fff, rgba(255,255,255,0.75));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .tagline {
+    font-size: 17px; color: rgba(255,255,255,0.4);
+    position: relative; z-index: 1;
+    font-weight: 400;
+  }
+  .tagline span {
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="grid-pattern"></div>
+  <div class="logo-glow"></div>
+
+  <img class="logo" src="https://img.alicdn.com/imgextra/i3/O1CN013yoxy71k7LGcGOm0m_!!6000000004636-2-tps-512-512.png" alt="Page Agent">
+
+  <div class="title">Page Agent</div>
+  <div class="tagline"><span>AI</span> Browser Automation</div>
+</body>
+</html>

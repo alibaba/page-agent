@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1400">
+<title>Page Agent - Marquee Banner</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1400px; height: 560px; overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #06060f;
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+
+  .bg {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+
+  .bg-orb-1 {
+    position: absolute;
+    width: 800px; height: 800px;
+    top: -300px; left: -100px;
+    background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .bg-orb-2 {
+    position: absolute;
+    width: 700px; height: 700px;
+    bottom: -300px; right: -50px;
+    background: radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .bg-orb-3 {
+    position: absolute;
+    width: 400px; height: 400px;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(99,102,241,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .grid-pattern {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.025;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
+    background-size: 70px 70px;
+  }
+
+  .center-line {
+    position: absolute; top: 50%; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59,130,246,0.06) 30%, rgba(139,92,246,0.06) 70%, transparent);
+    pointer-events: none;
+  }
+
+  .content {
+    display: flex; flex-direction: column; align-items: center; gap: 28px;
+    position: relative; z-index: 1;
+  }
+
+  .logo-area {
+    position: relative;
+  }
+  .logo-glow {
+    position: absolute;
+    width: 180px; height: 180px;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, rgba(139,92,246,0.05) 50%, transparent 70%);
+    pointer-events: none;
+    animation: glow-pulse 4s ease-in-out infinite;
+  }
+  @keyframes glow-pulse {
+    0%, 100% { opacity: 0.7; transform: translate(-50%, -50%) scale(1); }
+    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+  }
+  .logo {
+    width: 80px; height: 80px; border-radius: 20px;
+    position: relative; z-index: 1;
+    filter: drop-shadow(0 4px 30px rgba(59,130,246,0.12));
+  }
+
+  .text-area {
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    text-align: center;
+  }
+
+  .brand {
+    font-size: 52px; font-weight: 300; letter-spacing: -0.02em; line-height: 1.15;
+    background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.65) 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding-bottom: 4px;
+  }
+
+  .tagline {
+    font-size: 20px; font-weight: 300; line-height: 1.4;
+    color: rgba(255,255,255,0.32);
+  }
+  .tagline em {
+    font-style: normal;
+    background: linear-gradient(90deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 400;
+  }
+
+  .divider {
+    width: 48px; height: 1px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+    border-radius: 1px;
+    opacity: 0.35;
+  }
+
+  .sub {
+    font-size: 13px; color: rgba(255,255,255,0.18);
+    letter-spacing: 0.1em; text-transform: uppercase; font-weight: 400;
+  }
+
+  .dots {
+    position: absolute; pointer-events: none; z-index: 0;
+  }
+  .dot {
+    position: absolute; border-radius: 50%;
+    background: rgba(99,102,241,0.15);
+  }
+  .dot:nth-child(1) { width: 3px; height: 3px; top: 80px; left: 200px; }
+  .dot:nth-child(2) { width: 4px; height: 4px; top: 150px; right: 300px; }
+  .dot:nth-child(3) { width: 2px; height: 2px; bottom: 120px; left: 400px; }
+  .dot:nth-child(4) { width: 3px; height: 3px; top: 200px; left: 600px; }
+  .dot:nth-child(5) { width: 2px; height: 2px; bottom: 80px; right: 200px; }
+  .dot:nth-child(6) { width: 3px; height: 3px; top: 100px; right: 500px; }
+  .dot:nth-child(7) { width: 4px; height: 4px; bottom: 160px; right: 450px; }
+  .dot:nth-child(8) { width: 2px; height: 2px; top: 250px; left: 150px; }
+  .dot:nth-child(9) { width: 3px; height: 3px; bottom: 100px; left: 700px; }
+  .dot:nth-child(10) { width: 2px; height: 2px; top: 120px; left: 900px; }
+</style>
+</head>
+<body>
+  <div class="bg">
+    <div class="bg-orb-1"></div>
+    <div class="bg-orb-2"></div>
+    <div class="bg-orb-3"></div>
+  </div>
+  <div class="grid-pattern"></div>
+  <div class="center-line"></div>
+
+  <div class="dots">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+
+  <div class="content">
+    <div class="logo-area">
+      <div class="logo-glow"></div>
+      <img class="logo" src="https://img.alicdn.com/imgextra/i3/O1CN013yoxy71k7LGcGOm0m_!!6000000004636-2-tps-512-512.png" alt="Page Agent">
+    </div>
+
+    <div class="text-area">
+      <div class="brand">Page Agent</div>
+      <div class="tagline">The <em>AI Operator</em> in Your Browser</div>
+      <div class="divider"></div>
+      <div class="sub">Natural Language Browser Automation</div>
+    </div>
+  </div>
+</body>
+</html>

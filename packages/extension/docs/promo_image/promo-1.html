@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Page Agent - AI Browser Automation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1280px; height: 800px; overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #08081a;
+    color: #fff;
+    display: flex;
+    position: relative;
+  }
+
+  .bg-glow {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .bg-glow::before {
+    content: ''; position: absolute;
+    width: 900px; height: 900px;
+    top: -300px; left: -200px;
+    background: radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .bg-glow::after {
+    content: ''; position: absolute;
+    width: 800px; height: 800px;
+    bottom: -200px; right: -100px;
+    background: radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .grid-pattern {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.04;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .left {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: 80px 60px 80px 80px; position: relative; z-index: 1;
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; border-radius: 20px;
+    background: rgba(59,130,246,0.12);
+    border: 1px solid rgba(59,130,246,0.25);
+    font-size: 13px; font-weight: 500; color: #93c5fd;
+    margin-bottom: 32px; width: fit-content;
+  }
+  .badge-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #3b82f6;
+  }
+
+  h1 {
+    font-size: 52px; font-weight: 800; line-height: 1.1;
+    letter-spacing: -0.02em; margin-bottom: 20px;
+  }
+  h1 span {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6, #a855f7);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    font-size: 20px; line-height: 1.6; color: rgba(255,255,255,0.55);
+    max-width: 440px; margin-bottom: 48px;
+  }
+
+  .features {
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .feature {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .feature-icon {
+    width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.2);
+  }
+  .feature-icon svg { width: 20px; height: 20px; color: #60a5fa; }
+  .feature-text h3 {
+    font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.9);
+    margin-bottom: 2px;
+  }
+  .feature-text p {
+    font-size: 13px; color: rgba(255,255,255,0.4);
+  }
+
+  .right {
+    width: 560px; display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1; padding-right: 60px;
+  }
+
+  /* Sidepanel mockup */
+  .panel {
+    width: 380px; background: #16161f;
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid rgba(99,130,246,0.18);
+    box-shadow: 0 0 120px rgba(59,130,246,0.15), 0 0 60px rgba(139,92,246,0.1), 0 20px 60px rgba(0,0,0,0.5);
+    display: flex; flex-direction: column;
+    height: 580px;
+  }
+
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-header-left {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .panel-logo {
+    width: 20px; height: 20px; border-radius: 4px;
+  }
+  .panel-title {
+    font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85);
+  }
+  .panel-header-right {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .status {
+    display: flex; align-items: center; gap: 5px;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #3b82f6;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+  .status-text {
+    font-size: 11px; color: rgba(255,255,255,0.4);
+  }
+  .header-btn {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.35);
+  }
+  .header-btn svg { width: 14px; height: 14px; }
+
+  .panel-task {
+    padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-task-label {
+    font-size: 9px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.3); margin-bottom: 3px;
+  }
+  .panel-task-text {
+    font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.8);
+  }
+
+  .panel-content {
+    flex: 1; overflow: hidden; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+  }
+
+  .step-card {
+    border-radius: 10px; padding: 10px 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-left: 2px solid rgba(59,130,246,0.6);
+  }
+  .step-label {
+    font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.7);
+    margin-bottom: 8px; letter-spacing: 0.03em;
+  }
+  .step-action {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+  }
+  .step-action-icon {
+    color: #60a5fa; display: flex; align-items: center;
+  }
+  .step-action-icon svg { width: 13px; height: 13px; }
+  .step-action-name {
+    font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.8);
+  }
+  .step-action-val {
+    font-size: 11px; color: rgba(255,255,255,0.45); margin-left: 4px;
+  }
+  .step-output {
+    font-size: 10px; color: rgba(255,255,255,0.3);
+    padding-left: 21px; margin-top: 4px;
+  }
+
+  .result-card {
+    border-radius: 10px; padding: 10px 12px;
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .result-icon {
+    color: #10b981; display: flex;
+  }
+  .result-icon svg { width: 14px; height: 14px; }
+  .result-text {
+    font-size: 11px; font-weight: 500; color: #6ee7b7;
+  }
+
+  .activity-card {
+    border-radius: 10px; padding: 10px 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    display: flex; align-items: center; gap: 8px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .activity-icon {
+    color: #60a5fa; display: flex;
+  }
+  .activity-icon svg { width: 13px; height: 13px; }
+  .activity-text {
+    font-size: 11px; color: rgba(255,255,255,0.5);
+  }
+  .activity-ping {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #3b82f6;
+    animation: ping 1.5s cubic-bezier(0,0,0.2,1) infinite;
+  }
+  @keyframes ping {
+    75%, 100% { transform: scale(2); opacity: 0; }
+  }
+
+  .panel-input {
+    padding: 12px; border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .input-box {
+    display: flex; align-items: center;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px; padding: 8px 12px;
+  }
+  .input-placeholder {
+    flex: 1; font-size: 11px; color: rgba(255,255,255,0.25);
+  }
+  .input-send {
+    width: 24px; height: 24px; border-radius: 6px;
+    background: rgba(255,255,255,0.08);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.4); flex-shrink: 0;
+  }
+  .input-send svg { width: 12px; height: 12px; }
+
+  .panel-glow {
+    position: absolute;
+    width: 460px; height: 640px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(139,92,246,0.1));
+    filter: blur(50px);
+    z-index: 0;
+  }
+</style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="grid-pattern"></div>
+
+  <div class="left">
+    <div class="badge">
+      <div class="badge-dot"></div>
+      Page Agent Ext
+    </div>
+
+    <h1><span>AI-Powered<br>Browser<br>Automation</span></h1>
+
+    <p class="subtitle">Control any web page with natural language. No coding required.</p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <h3>Cross-Tab Control</h3>
+          <p>Automate tasks across multiple browser tabs seamlessly</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <h3>Your LLM API</h3>
+          <p>Bring your own key or connect to local models like Ollama</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/>
+            <path d="M9 18c-4.51 2-5-2-7-2"/>
+          </svg>
+        </div>
+        <div class="feature-text">
+          <h3>Open Source</h3>
+          <p>MIT licensed — inspect, extend, and contribute</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="panel-glow"></div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <img class="panel-logo" src="https://img.alicdn.com/imgextra/i3/O1CN013yoxy71k7LGcGOm0m_!!6000000004636-2-tps-512-512.png" alt="logo">
+          <span class="panel-title">Page Agent Ext</span>
+        </div>
+        <div class="panel-header-right">
+          <div class="status">
+            <div class="status-dot"></div>
+            <span class="status-text">Running</span>
+          </div>
+          <div class="header-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-task">
+        <div class="panel-task-label">Task</div>
+        <div class="panel-task-text">Find the cheapest flight from NYC to Tokyo next month</div>
+      </div>
+
+      <div class="panel-content">
+        <div class="step-card">
+          <div class="step-label">Step 1</div>
+          <div class="step-action">
+            <div class="step-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </div>
+            <span class="step-action-name">navigate</span>
+            <span class="step-action-val">google.com/flights</span>
+          </div>
+          <div class="step-output">└ Page loaded successfully</div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-label">Step 2</div>
+          <div class="step-action">
+            <div class="step-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </div>
+            <span class="step-action-name">input_text</span>
+            <span class="step-action-val">"New York" → From</span>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-label">Step 3</div>
+          <div class="step-action">
+            <div class="step-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <span class="step-action-name">click</span>
+            <span class="step-action-val">Search flights</span>
+          </div>
+        </div>
+
+        <div class="activity-card">
+          <div class="activity-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          </div>
+          <span class="activity-text">Analyzing search results...</span>
+          <div class="activity-ping"></div>
+        </div>
+      </div>
+
+      <div class="panel-input">
+        <div class="input-box">
+          <span class="input-placeholder">Describe your task...</span>
+          <div class="input-send">
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

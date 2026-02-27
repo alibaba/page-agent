@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1400">
+<title>Page Agent - Marquee Banner 2</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1400px; height: 560px; overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #07071a;
+    color: #fff;
+    display: flex; align-items: center;
+    position: relative;
+  }
+
+  .bg-orb-1 {
+    position: absolute;
+    width: 800px; height: 800px;
+    top: -300px; left: -100px;
+    background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .bg-orb-2 {
+    position: absolute;
+    width: 700px; height: 700px;
+    bottom: -300px; right: 100px;
+    background: radial-gradient(circle, rgba(139,92,246,0.07) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .grid-pattern {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.025;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
+    background-size: 70px 70px;
+  }
+
+  .left {
+    flex: 1; display: flex; flex-direction: column; justify-content: center;
+    padding: 0 60px 0 100px; position: relative; z-index: 1;
+  }
+
+  .logo-row {
+    display: flex; align-items: center; gap: 16px;
+    margin-bottom: 28px;
+  }
+  .logo {
+    width: 52px; height: 52px; border-radius: 14px;
+    filter: drop-shadow(0 2px 20px rgba(59,130,246,0.15));
+  }
+  .logo-text {
+    font-size: 28px; font-weight: 300; letter-spacing: -0.01em;
+    background: linear-gradient(135deg, #fff 30%, rgba(255,255,255,0.6));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  h1 {
+    font-size: 40px; font-weight: 300; line-height: 1.2;
+    letter-spacing: -0.02em; margin-bottom: 18px;
+    color: rgba(255,255,255,0.9);
+  }
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 400;
+  }
+
+  .desc {
+    font-size: 16px; line-height: 1.7; color: rgba(255,255,255,0.35);
+    max-width: 420px; margin-bottom: 32px;
+  }
+
+  .pills {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 36px;
+  }
+  .pill {
+    padding: 5px 14px; border-radius: 14px;
+    font-size: 12px; font-weight: 450;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.45);
+  }
+  .pill em {
+    font-style: normal;
+    color: rgba(255,255,255,0.65);
+  }
+
+  .oss {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: rgba(255,255,255,0.2);
+    letter-spacing: 0.06em;
+  }
+  .oss-dot {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+  }
+
+  /* Right: compact sidepanel preview */
+  .right {
+    width: 540px; display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1; padding-right: 80px;
+  }
+
+  .panel-glow {
+    position: absolute;
+    width: 380px; height: 500px; border-radius: 20px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(139,92,246,0.08));
+    filter: blur(50px); z-index: 0;
+  }
+
+  .panel {
+    width: 320px; background: #14141e;
+    border-radius: 14px; overflow: hidden;
+    border: 1px solid rgba(99,130,246,0.15);
+    box-shadow: 0 0 100px rgba(59,130,246,0.12), 0 0 50px rgba(139,92,246,0.08), 0 16px 48px rgba(0,0,0,0.5);
+    display: flex; flex-direction: column;
+    height: 420px; position: relative; z-index: 1;
+  }
+
+  .panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.07);
+    background: rgba(255,255,255,0.02);
+  }
+  .panel-header-left {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .panel-logo {
+    width: 16px; height: 16px; border-radius: 3px;
+  }
+  .panel-title {
+    font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.8);
+  }
+  .status {
+    display: flex; align-items: center; gap: 4px;
+  }
+  .status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #3b82f6;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+  }
+  .status-text {
+    font-size: 10px; color: rgba(255,255,255,0.35);
+  }
+
+  .panel-task {
+    padding: 8px 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.015);
+  }
+  .panel-task-label {
+    font-size: 8px; text-transform: uppercase; letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.25); margin-bottom: 2px;
+  }
+  .panel-task-text {
+    font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.75);
+  }
+
+  .panel-content {
+    flex: 1; overflow: hidden; padding: 10px; display: flex; flex-direction: column; gap: 6px;
+  }
+
+  .step-card {
+    border-radius: 8px; padding: 8px 10px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-left: 2px solid rgba(59,130,246,0.5);
+  }
+  .step-label {
+    font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.6);
+    margin-bottom: 5px;
+  }
+  .step-action {
+    display: flex; align-items: center; gap: 6px;
+  }
+  .step-action-icon { color: #60a5fa; display: flex; }
+  .step-action-icon svg { width: 11px; height: 11px; }
+  .step-action-name {
+    font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.75);
+  }
+  .step-action-val {
+    font-size: 10px; color: rgba(255,255,255,0.4);
+  }
+
+  .result-card {
+    border-radius: 8px; padding: 8px 10px;
+    background: rgba(16,185,129,0.06);
+    border: 1px solid rgba(16,185,129,0.18);
+    display: flex; align-items: center; gap: 7px;
+  }
+  .result-icon { color: #10b981; display: flex; }
+  .result-icon svg { width: 12px; height: 12px; }
+  .result-text {
+    font-size: 10px; font-weight: 500; color: #6ee7b7;
+  }
+
+  .panel-input {
+    padding: 10px; border-top: 1px solid rgba(255,255,255,0.05);
+  }
+  .input-box {
+    display: flex; align-items: center;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px; padding: 7px 10px;
+  }
+  .input-placeholder {
+    flex: 1; font-size: 10px; color: rgba(255,255,255,0.2);
+  }
+  .input-send {
+    width: 20px; height: 20px; border-radius: 5px;
+    background: rgba(59,130,246,0.15);
+    display: flex; align-items: center; justify-content: center;
+    color: #60a5fa; flex-shrink: 0;
+  }
+  .input-send svg { width: 10px; height: 10px; }
+</style>
+</head>
+<body>
+  <div class="bg-orb-1"></div>
+  <div class="bg-orb-2"></div>
+  <div class="grid-pattern"></div>
+
+  <div class="left">
+    <div class="logo-row">
+      <img class="logo" src="https://img.alicdn.com/imgextra/i3/O1CN013yoxy71k7LGcGOm0m_!!6000000004636-2-tps-512-512.png" alt="Page Agent">
+      <span class="logo-text">Page Agent</span>
+    </div>
+
+    <h1>The <em>AI Operator</em><br>in Your Browser</h1>
+
+    <p class="desc">Control any web page with natural language. Cross-tab automation, form filling, data extraction — powered by the LLM of your choice.</p>
+
+    <div class="pills">
+      <div class="pill"><em>Cross-Tab</em> Automation</div>
+      <div class="pill"><em>BYOK</em> &amp; Local Models</div>
+      <div class="pill"><em>Developer</em> API</div>
+      <div class="pill"><em>Open</em> Source</div>
+    </div>
+
+    <div class="oss">
+      <span>Alibaba Open Source</span>
+      <div class="oss-dot"></div>
+      <span>MIT License</span>
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="panel-glow"></div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <img class="panel-logo" src="https://img.alicdn.com/imgextra/i3/O1CN013yoxy71k7LGcGOm0m_!!6000000004636-2-tps-512-512.png" alt="">
+          <span class="panel-title">Page Agent Ext</span>
+        </div>
+        <div class="status">
+          <div class="status-dot"></div>
+          <span class="status-text">Running</span>
+        </div>
+      </div>
+
+      <div class="panel-task">
+        <div class="panel-task-label">Task</div>
+        <div class="panel-task-text">Submit the feedback form on this page</div>
+      </div>
+
+      <div class="panel-content">
+        <div class="step-card">
+          <div class="step-label">Step 1</div>
+          <div class="step-action">
+            <div class="step-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </div>
+            <span class="step-action-name">input_text</span>
+            <span class="step-action-val">[3] "Great product"</span>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-label">Step 2</div>
+          <div class="step-action">
+            <div class="step-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <span class="step-action-name">click</span>
+            <span class="step-action-val">[5] "★★★★★"</span>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-label">Step 3</div>
+          <div class="step-action">
+            <div class="step-action-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg>
+            </div>
+            <span class="step-action-name">click</span>
+            <span class="step-action-val">[7] Submit</span>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="result-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="result-text">Form submitted successfully</span>
+        </div>
+      </div>
+
+      <div class="panel-input">
+        <div class="input-box">
+          <span class="input-placeholder">Describe your task...</span>
+          <div class="input-send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

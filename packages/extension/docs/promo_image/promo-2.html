@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1280">
+<title>Page Agent - How It Works</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    width: 1280px; height: 800px; overflow: hidden;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #08081a;
+    color: #fff;
+    display: flex; flex-direction: column; align-items: center;
+    position: relative;
+  }
+
+  .bg-glow {
+    position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  }
+  .bg-glow::before {
+    content: ''; position: absolute;
+    width: 700px; height: 700px;
+    top: -100px; left: 50%; transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
+  }
+  .bg-glow::after {
+    content: ''; position: absolute;
+    width: 600px; height: 600px;
+    bottom: -100px; right: 100px;
+    background: radial-gradient(circle, rgba(139,92,246,0.06) 0%, transparent 70%);
+  }
+
+  .grid-pattern {
+    position: absolute; inset: 0; pointer-events: none; opacity: 0.03;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  .header-section {
+    text-align: center; padding-top: 70px; position: relative; z-index: 1;
+    margin-bottom: 60px;
+  }
+  .header-section h1 {
+    font-size: 48px; font-weight: 800; letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+  .header-section h1 span {
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .header-section p {
+    font-size: 18px; color: rgba(255,255,255,0.45); max-width: 500px; margin: 0 auto;
+  }
+
+  .steps {
+    display: flex; gap: 32px; padding: 0 80px;
+    position: relative; z-index: 1;
+  }
+
+  .step {
+    flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center;
+    position: relative;
+  }
+
+  .step-num {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(139,92,246,0.15));
+    border: 1px solid rgba(59,130,246,0.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 700; color: #93c5fd;
+    margin-bottom: 20px;
+  }
+
+  .step h3 {
+    font-size: 20px; font-weight: 700; margin-bottom: 8px;
+    color: rgba(255,255,255,0.9);
+  }
+  .step > p {
+    font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .step-visual {
+    width: 100%; border-radius: 14px; overflow: hidden;
+    background: #111118;
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  }
+
+  /* Step 1: input mockup */
+  .mock-input-area {
+    padding: 20px;
+  }
+  .mock-input-header {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  }
+  .mock-input-logo {
+    width: 18px; height: 18px; border-radius: 4px;
+  }
+  .mock-input-title {
+    font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.7);
+  }
+  .mock-input-box {
+    border-radius: 10px; padding: 12px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(59,130,246,0.3);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.08), 0 0 20px rgba(59,130,246,0.06);
+  }
+  .mock-input-text {
+    font-size: 12px; color: rgba(255,255,255,0.8); line-height: 1.5;
+  }
+  .mock-cursor {
+    display: inline-block; width: 1px; height: 14px;
+    background: #60a5fa; margin-left: 2px; vertical-align: middle;
+    animation: blink 1s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* Step 2: DOM tree */
+  .mock-dom {
+    padding: 18px 20px;
+  }
+  .dom-node {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 0; font-size: 11px; font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  .dom-indent { width: 20px; flex-shrink: 0; }
+  .dom-tag { color: #60a5fa; }
+  .dom-attr { color: #a78bfa; }
+  .dom-text { color: rgba(255,255,255,0.35); }
+  .dom-highlight {
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.2);
+    border-radius: 4px; padding: 2px 6px;
+    margin-left: 4px;
+  }
+  .dom-index {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 4px;
+    background: rgba(59,130,246,0.2); color: #93c5fd;
+    font-size: 9px; font-weight: 700; margin-right: 4px;
+  }
+
+  /* Step 3: actions */
+  .mock-actions {
+    padding: 16px 20px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .mock-action-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .mock-action-icon {
+    width: 28px; height: 28px; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .mock-action-icon.click-icon {
+    background: rgba(59,130,246,0.12); color: #60a5fa;
+  }
+  .mock-action-icon.type-icon {
+    background: rgba(168,85,247,0.12); color: #c084fc;
+  }
+  .mock-action-icon.scroll-icon {
+    background: rgba(16,185,129,0.12); color: #34d399;
+  }
+  .mock-action-icon svg { width: 14px; height: 14px; }
+  .mock-action-text {
+    font-size: 11px; color: rgba(255,255,255,0.6);
+  }
+  .mock-action-text strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+  .mock-check {
+    margin-left: auto; color: #10b981;
+    display: flex; align-items: center;
+  }
+  .mock-check svg { width: 14px; height: 14px; }
+
+  /* Arrows between steps */
+  .arrow-connector {
+    position: absolute; top: 24px; right: -20px;
+    color: rgba(255,255,255,0.15); z-index: 2;
+  }
+  .arrow-connector svg { width: 16px; height: 16px; }
+
+  .footer-note {
+    position: absolute; bottom: 48px; left: 0; right: 0;
+    text-align: center; z-index: 1;
+  }
+  .footer-note p {
+    font-size: 15px; color: rgba(255,255,255,0.3);
+  }
+  .footer-note span {
+    color: rgba(255,255,255,0.55); font-weight: 500;
+  }
+</style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="grid-pattern"></div>
+
+  <div class="header-section">
+    <h1><span>How It Works</span></h1>
+    <p>Three simple steps from your words to browser actions</p>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Describe Your Task</h3>
+      <p>Type what you want in plain English</p>
+      <div class="step-visual">
+        <div class="mock-input-area">
+          <div class="mock-input-header">
+            <img class="mock-input-logo" src="https://img.alicdn.com/imgextra/i3/O1CN013yoxy71k7LGcGOm0m_!!6000000004636-2-tps-512-512.png" alt="">
+            <span class="mock-input-title">Page Agent Ext</span>
+          </div>
+          <div class="mock-input-box">
+            <span class="mock-input-text">Fill out the contact form and submit it<span class="mock-cursor"></span></span>
+          </div>
+        </div>
+      </div>
+      <div class="arrow-connector">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>AI Reads the Page</h3>
+      <p>DOM is extracted and simplified for the LLM</p>
+      <div class="step-visual">
+        <div class="mock-dom">
+          <div class="dom-node">
+            <span class="dom-tag">&lt;form&gt;</span>
+            <span class="dom-attr">id="contact"</span>
+          </div>
+          <div class="dom-node">
+            <div class="dom-indent"></div>
+            <span class="dom-index">1</span>
+            <span class="dom-tag">&lt;input&gt;</span>
+            <span class="dom-text dom-highlight">placeholder="Name"</span>
+          </div>
+          <div class="dom-node">
+            <div class="dom-indent"></div>
+            <span class="dom-index">2</span>
+            <span class="dom-tag">&lt;input&gt;</span>
+            <span class="dom-text">placeholder="Email"</span>
+          </div>
+          <div class="dom-node">
+            <div class="dom-indent"></div>
+            <span class="dom-index">3</span>
+            <span class="dom-tag">&lt;textarea&gt;</span>
+            <span class="dom-text">placeholder="Message"</span>
+          </div>
+          <div class="dom-node">
+            <div class="dom-indent"></div>
+            <span class="dom-index">4</span>
+            <span class="dom-tag">&lt;button&gt;</span>
+            <span class="dom-text">Submit</span>
+          </div>
+        </div>
+      </div>
+      <div class="arrow-connector">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Auto Execute</h3>
+      <p>Actions run on the real page automatically</p>
+      <div class="step-visual">
+        <div class="mock-actions">
+          <div class="mock-action-item">
+            <div class="mock-action-icon type-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </div>
+            <span class="mock-action-text"><strong>input_text</strong> &nbsp;[1] "Jane Doe"</span>
+            <div class="mock-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </div>
+          <div class="mock-action-item">
+            <div class="mock-action-icon type-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+            </div>
+            <span class="mock-action-text"><strong>input_text</strong> &nbsp;[2] "jane@…"</span>
+            <div class="mock-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </div>
+          <div class="mock-action-item">
+            <div class="mock-action-icon click-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 9h.01"/><rect x="2" y="2" width="20" height="20" rx="5"/></svg>
+            </div>
+            <span class="mock-action-text"><strong>click</strong> &nbsp;[4] Submit</span>
+            <div class="mock-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <p>Works with <span>OpenAI</span>, <span>Anthropic</span>, <span>Gemini</span>, or any OpenAI-compatible API</p>
+  </div>
+</body>
+</html>
