@@ -2,7 +2,7 @@ import { Copy, CornerUpLeft, Eye, EyeOff, HatGlasses, Home, Loader2, Scale } fro
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
 
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL } from '@/agent/constants'
+import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/agent/constants'
 import type { ExtConfig, LanguagePreference } from '@/agent/useAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -86,6 +86,23 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					<CornerUpLeft className="size-3.5" />
 				</Button>
 			</div>
+
+			{/* Testing API notice */}
+			{isTestingEndpoint(baseURL) && (
+				<div className="p-2.5 rounded-md border border-amber-500/30 bg-amber-500/5 text-[10px] text-muted-foreground leading-relaxed">
+					<Scale className="size-3 inline-block mr-1 -mt-0.5 text-amber-600" />
+					You are using the free testing API. By using this service you agree to the{' '}
+					<a
+						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="underline hover:text-foreground"
+					>
+						Terms of Use & Privacy Policy
+					</a>
+					. No sensitive data. No guaranteed availability.
+				</div>
+			)}
 
 			{/* User Auth Token Section */}
 			<div className="flex flex-col gap-1.5 p-3 bg-muted/50 rounded-md border">
