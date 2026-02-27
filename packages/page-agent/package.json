@@ -1,7 +1,7 @@
 {
     "name": "page-agent",
     "private": false,
-    "version": "1.3.0",
+    "version": "1.4.0",
     "type": "module",
     "main": "./dist/esm/page-agent.js",
     "module": "./dist/esm/page-agent.js",
@@ -44,10 +44,10 @@
         "postpublish": "node -e \"['README.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
     },
     "dependencies": {
-        "@page-agent/core": "1.3.0",
-        "@page-agent/llms": "1.3.0",
-        "@page-agent/page-controller": "1.3.0",
-        "@page-agent/ui": "1.3.0",
+        "@page-agent/core": "1.4.0",
+        "@page-agent/llms": "1.4.0",
+        "@page-agent/page-controller": "1.4.0",
+        "@page-agent/ui": "1.4.0",
         "chalk": "^5.6.2",
         "zod": "^4.3.5"
     }

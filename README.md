@@ -13,7 +13,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
-<video id="demo-video" src="https://github.com/user-attachments/assets/34d8444d-cbfb-44a3-a24e-fd5c167bb0bf" controls crossorigin muted></video>
+<video id="demo-video" src="https://github.com/user-attachments/assets/11aed429-b69c-49d5-8982-fa99b4a0e9a8" controls crossorigin muted></video>
 
 ---
 
@@ -49,10 +49,10 @@ Fastest way to try PageAgent with our free Demo LLM:
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.3.0/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.3.0/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.4.0/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.4.0/files/dist/iife/page-agent.demo.js |
 
-> **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use). By using it, you agree to its terms.
+> **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api). By using it, you agree to its [terms](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md).
 
 ### NPM Installation
 
