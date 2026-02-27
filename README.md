@@ -52,7 +52,7 @@ Fastest way to try PageAgent with our free Demo LLM:
 | Global  | https://cdn.jsdelivr.net/npm/page-agent@1.3.0/dist/iife/page-agent.demo.js         |
 | China   | https://registry.npmmirror.com/page-agent/1.3.0/files/dist/iife/page-agent.demo.js |
 
-> **⚠️ For technical evaluation only.** Demo LLM has rate limits and usage restrictions. Slow. May change without notice.
+> **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use). By using it, you agree to its terms.
 
 ### NPM Installation
 

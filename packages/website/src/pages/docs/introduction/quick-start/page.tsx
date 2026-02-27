@@ -23,7 +23,32 @@ export default function QuickStart() {
 					</h3>
 					<div className="bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded mb-3 text-sm">
 						<span className="text-yellow-800 dark:text-yellow-200">
-							⚠️ {isZh ? '仅用于技术评估' : 'For evaluation only'}
+							⚠️{' '}
+							{isZh ? (
+								<>
+									该 Demo CDN 使用了免费的测试 LLM API，使用即表示您同意其
+									<a
+										href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+										target="_blank"
+										rel="noopener noreferrer"
+										className="underline"
+									>
+										使用条款
+									</a>
+								</>
+							) : (
+								<>
+									This demo CDN uses our free testing LLM API. By using it you agree to the{' '}
+									<a
+										href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+										target="_blank"
+										rel="noopener noreferrer"
+										className="underline"
+									>
+										Terms of Use
+									</a>
+								</>
+							)}
 						</span>
 					</div>
 					<CodeEditor

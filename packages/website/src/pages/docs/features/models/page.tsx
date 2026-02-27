@@ -164,59 +164,44 @@ const pageAgent = new PageAgent({
 						? '以下免费测试接口仅供 PageAgent.js 和 PageAgent Extension 的技术评估使用。有速率限制，可能随时变更。请勿用于生产环境。'
 						: 'The following free testing endpoints are provided for technical evaluation of PageAgent.js and PageAgent Extension only. Rate-limited, subject to change. Not for production use.'}
 				</p>
-				<div className="space-y-4">
-					<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
-						<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">Qwen (Default)</h3>
-						<p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-							{isZh ? '转发至阿里云百炼平台' : 'Proxied to'}{' '}
-							<code className="text-xs bg-gray-200 dark:bg-gray-700 px-1 rounded">
-								https://dashscope-intl.aliyuncs.com/compatible-mode/v1
-							</code>
-							{' · '}
-							<a
-								href="https://terms.alicdn.com/legal-agreement/terms/common_platform_service/20230728213935489/20230728213935489.html"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="text-blue-500 hover:underline"
-							>
-								{isZh ? '百炼服务协议' : 'Bailian Terms'}
-							</a>
-						</p>
-						<CodeEditor
-							code={`LLM_BASE_URL="https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy-qwen"
+				<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
+					<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+						Qwen (Alibaba Cloud China)
+					</h3>
+					<p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+						{isZh
+							? '通过阿里云函数计算（中国大陆）转发至百炼 Qwen 模型'
+							: 'Proxied via Alibaba Cloud FC (Mainland China) to BaiLian Qwen models'}
+						{' · '}
+						<a
+							href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-blue-500 hover:underline"
+						>
+							{isZh ? '使用条款' : 'Terms of Use'}
+						</a>
+					</p>
+					<CodeEditor
+						code={`# qwen3.5-plus (default for demos) or qwen3.5-flash (lighter)
+LLM_BASE_URL="https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run"
 LLM_MODEL_NAME="qwen3.5-plus"
 LLM_API_KEY="NA"`}
-						/>
-					</div>
-					<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
-						<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">DeepSeek</h3>
-						<p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-							{isZh ? '转发至 DeepSeek 官方 API' : 'Proxied to'}{' '}
-							<code className="text-xs bg-gray-200 dark:bg-gray-700 px-1 rounded">
-								https://api.deepseek.com
-							</code>
-							{' · '}
-							<a
-								href="https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="text-blue-500 hover:underline"
-							>
-								{isZh ? 'DeepSeek 隐私政策' : 'DeepSeek Privacy Policy'}
-							</a>
-						</p>
-						<CodeEditor
-							code={`LLM_BASE_URL="https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy"
-LLM_MODEL_NAME="PAGE-AGENT-FREE-TESTING-RANDOM"
-LLM_API_KEY="PAGE-AGENT-FREE-TESTING-RANDOM"`}
-						/>
-					</div>
+					/>
 				</div>
 				<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
 					<p className="text-xs text-gray-600 dark:text-gray-400">
 						{isZh
-							? '⚠️ 测试接口仅供技术评估。免费模型及其提供商可能随时变更，恕不另行通知。请参阅各 LLM 提供商的隐私政策了解数据处理方式。'
-							: "⚠️ Testing endpoints are for technical evaluation only. The free model and service providers may change at any time without notice. Refer to each LLM provider's privacy policy for data handling details."}
+							? '⚠️ 仅供技术评估和研发用途，禁止用于生产环境。数据通过中国大陆服务器处理。请勿输入任何个人身份信息或敏感数据。使用即表示您同意'
+							: '⚠️ Strictly for technical evaluation and R&D only. Data is processed via servers in Mainland China. Do not input any PII or sensitive data. By using this API you agree to the'}{' '}
+						<a
+							href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-blue-500 hover:underline"
+						>
+							{isZh ? '使用条款' : 'Terms of Use'}
+						</a>
 					</p>
 				</div>
 			</section>

@@ -17,6 +17,14 @@ export default function Footer() {
 					</p>
 					<div className="flex items-center space-x-6">
 						<a
+							href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 text-sm"
+						>
+							{isZh ? '使用条款与隐私' : 'Terms & Privacy'}
+						</a>
+						<a
 							href="https://github.com/alibaba/page-agent"
 							target="_blank"
 							rel="noopener noreferrer"

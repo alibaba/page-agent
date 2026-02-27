@@ -22,7 +22,7 @@ Page Agent Ext performs DOM analysis locally in your browser. When you initiate 
 - Your API Key — Configure your own LLM API (OpenAI, Anthropic, etc.). Data goes directly to your provider
 - Test API — A free test endpoint is available for evaluation; we recommend your own key for regular use
 
-Privacy policy: https://github.com/alibaba/page-agent/blob/main/packages/extension/PRIVACY.md
+Terms of Use & Privacy: https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md
 
 🌟 Open Source:
 
