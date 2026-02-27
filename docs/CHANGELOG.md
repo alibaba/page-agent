@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2026-02-27
+
+### Features
+
+- Update Terms of Use and Privacy Policy
+- **Robust tool-call validation** - Action inputs are now validated against tool schemas individually, producing clear error messages (e.g. `Invalid input for action "click_element_by_index"`) instead of unreadable union parse errors
+- **Primitive action input coercion** - Small models that output `{"click_element_by_index": 2}` instead of `{"click_element_by_index": {"index": 2}}` are now auto-corrected using tool schemas
+- **Qwen model updates** - Added `qwen3.5-plus` as the default free testing model; disabled `enable_thinking` for Qwen models to avoid incompatible responses
+- **Updated default LLM endpoint** - Migrated demo and extension to a new testing endpoint with legacy endpoint auto-migration
+
+### Improvements
+
+- Unified zod imports (`* as z`) across all packages for consistency
+- Better Zod error formatting with `z.prettifyError()` in LLM client
+- Exported `InvokeError` and `InvokeErrorType` as values (not just types) from `@page-agent/llms`
+- Exported `SupportedLanguage` type from `@page-agent/core`
+
+### Extension v0.1.8
+
+- **Language setting** - Added language selector (System / English / 中文) in config panel
+- **UI makeover** - New empty state with breathing glow and typing animation; ai-motion glow overlay while running; refined focus styles
+- **Testing endpoint notice** - Shows terms of use notice when using the free testing API
+- **Legacy endpoint migration** - Auto-migrates old Supabase testing endpoint to new endpoint on startup
+
+---
+
 ## [1.3.0] - 2026-02-13
 
 ### Breaking Changes
