@@ -15,7 +15,7 @@ const enUS = {
 			close: 'Close',
 			expand: 'Expand history',
 			collapse: 'Collapse history',
-			step: 'Step {{number}} · {{time}}{{duration}}',
+			step: 'Step {{number}}',
 		},
 		tools: {
 			clicking: 'Clicking element [{{index}}]...',
@@ -63,7 +63,7 @@ const zhCN = {
 			close: '关闭',
 			expand: '展开历史',
 			collapse: '收起历史',
-			step: '步骤 {{number}} · {{time}}{{duration}}',
+			step: '步骤 {{number}}',
 		},
 		tools: {
 			clicking: '正在点击元素 [{{index}}]...',
