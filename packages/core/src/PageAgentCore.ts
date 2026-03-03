@@ -342,6 +342,8 @@ export class PageAgentCore extends EventTarget {
 				await onAfterTask?.(this, result)
 				return result
 			}
+
+			await waitFor(0.4) // @TODO: configurable
 		}
 	}
 

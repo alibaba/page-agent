@@ -86,7 +86,7 @@ export async function clickElement(element: HTMLElement) {
 	// dispatch a click event
 	// element.click()
 
-	await waitFor(0.1) // Wait to ensure click event processing completes
+	await waitFor(0.2) // Wait to ensure click event processing completes
 }
 
 // eslint-disable-next-line @typescript-eslint/unbound-method
