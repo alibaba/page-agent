@@ -181,11 +181,6 @@ export async function scrollVertically(
 	// Element-specific scrolling if element is provided
 	if (element) {
 		const targetElement = element
-		console.log(
-			'[SCROLL DEBUG] Starting direct container scroll for element:',
-			targetElement.tagName
-		)
-
 		let currentElement = targetElement as HTMLElement | null
 		let scrollSuccess = false
 		let scrolledElement: HTMLElement | null = null
@@ -197,19 +192,6 @@ export async function scrollVertically(
 			const computedStyle = window.getComputedStyle(currentElement)
 			const hasScrollableY = /(auto|scroll|overlay)/.test(computedStyle.overflowY)
 			const canScrollVertically = currentElement.scrollHeight > currentElement.clientHeight
-
-			console.log(
-				'[SCROLL DEBUG] Checking element:',
-				currentElement.tagName,
-				'hasScrollableY:',
-				hasScrollableY,
-				'canScrollVertically:',
-				canScrollVertically,
-				'scrollHeight:',
-				currentElement.scrollHeight,
-				'clientHeight:',
-				currentElement.clientHeight
-			)
 
 			if (hasScrollableY && canScrollVertically) {
 				const beforeScroll = currentElement.scrollTop
@@ -228,27 +210,10 @@ export async function scrollVertically(
 				const afterScroll = currentElement.scrollTop
 				const actualScrollDelta = afterScroll - beforeScroll
 
-				console.log(
-					'[SCROLL DEBUG] Scroll attempt:',
-					currentElement.tagName,
-					'before:',
-					beforeScroll,
-					'after:',
-					afterScroll,
-					'delta:',
-					actualScrollDelta
-				)
-
 				if (Math.abs(actualScrollDelta) > 0.5) {
 					scrollSuccess = true
 					scrolledElement = currentElement
 					scrollDelta = actualScrollDelta
-					console.log(
-						'[SCROLL DEBUG] Successfully scrolled container:',
-						currentElement.tagName,
-						'delta:',
-						actualScrollDelta
-					)
 					break
 				}
 			}
@@ -344,11 +309,6 @@ export async function scrollHorizontally(
 	// Element-specific scrolling if element is provided
 	if (element) {
 		const targetElement = element
-		console.log(
-			'[SCROLL DEBUG] Starting direct container scroll for element:',
-			targetElement.tagName
-		)
-
 		let currentElement = targetElement as HTMLElement | null
 		let scrollSuccess = false
 		let scrolledElement: HTMLElement | null = null
@@ -360,19 +320,6 @@ export async function scrollHorizontally(
 			const computedStyle = window.getComputedStyle(currentElement)
 			const hasScrollableX = /(auto|scroll|overlay)/.test(computedStyle.overflowX)
 			const canScrollHorizontally = currentElement.scrollWidth > currentElement.clientWidth
-
-			console.log(
-				'[SCROLL DEBUG] Checking element:',
-				currentElement.tagName,
-				'hasScrollableX:',
-				hasScrollableX,
-				'canScrollHorizontally:',
-				canScrollHorizontally,
-				'scrollWidth:',
-				currentElement.scrollWidth,
-				'clientWidth:',
-				currentElement.clientWidth
-			)
 
 			if (hasScrollableX && canScrollHorizontally) {
 				const beforeScroll = currentElement.scrollLeft
@@ -391,27 +338,10 @@ export async function scrollHorizontally(
 				const afterScroll = currentElement.scrollLeft
 				const actualScrollDelta = afterScroll - beforeScroll
 
-				console.log(
-					'[SCROLL DEBUG] Scroll attempt:',
-					currentElement.tagName,
-					'before:',
-					beforeScroll,
-					'after:',
-					afterScroll,
-					'delta:',
-					actualScrollDelta
-				)
-
 				if (Math.abs(actualScrollDelta) > 0.5) {
 					scrollSuccess = true
 					scrolledElement = currentElement
 					scrollDelta = actualScrollDelta
-					console.log(
-						'[SCROLL DEBUG] Successfully scrolled container:',
-						currentElement.tagName,
-						'delta:',
-						actualScrollDelta
-					)
 					break
 				}
 			}
