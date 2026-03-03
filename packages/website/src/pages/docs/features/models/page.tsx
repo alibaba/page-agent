@@ -247,15 +247,33 @@ LLM_MODEL_NAME="qwen3:14b"`}
 							{isZh
 								? '确保上下文长度大于输入 token 数，否则 Ollama 会静默截断 prompt。普通页面约需 15k token，随步骤增加。默认 4k 上下文长度无法正常工作'
 								: 'Ensure context length exceeds input tokens, or Ollama will silently truncate prompts. ~15k tokens for a typical page, increases with steps. Default 4k context length will NOT work'}
-							<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
-								<li>
-									<code className="text-xs bg-gray-200 dark:bg-gray-700 px-1 rounded">
-										$env:OLLAMA_CONTEXT_LENGTH=64000; ollama serve
-									</code>
-								</li>
-							</ul>
 						</li>
 					</ul>
+				</div>
+
+				<div className="mt-4">
+					<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
+						{isZh ? '建议启动参数' : 'Recommended Startup'}
+					</h3>
+					<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+						{isZh
+							? '启动 Ollama 时建议配置以下环境变量：扩大上下文窗口、允许跨域访问、监听所有网络接口。'
+							: 'Start Ollama with these environment variables: larger context window, allow cross-origin access, and listen on all interfaces.'}
+					</p>
+
+					<div className="space-y-2">
+						<p className="text-xs font-medium text-gray-500 dark:text-gray-400">macOS / Linux</p>
+						<CodeEditor
+							code={`OLLAMA_CONTEXT_LENGTH=64000 OLLAMA_HOST=0.0.0.0:11434 OLLAMA_ORIGINS="*" ollama serve`}
+						/>
+
+						<p className="text-xs font-medium text-gray-500 dark:text-gray-400 pt-2">
+							Windows (PowerShell)
+						</p>
+						<CodeEditor
+							code={`$env:OLLAMA_CONTEXT_LENGTH=64000; $env:OLLAMA_HOST="0.0.0.0:11434"; $env:OLLAMA_ORIGINS="*"; ollama serve`}
+						/>
+					</div>
 				</div>
 			</section>
 		</div>
