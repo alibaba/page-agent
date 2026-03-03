@@ -32,16 +32,6 @@ export function createCard({ icon, content, meta, type }: CardOptions): string {
 	`
 }
 
-/** Format timestamp for cards */
-export function formatTime(locale: string = 'en-US'): string {
-	return new Date().toLocaleTimeString(locale, {
-		hour12: false,
-		hour: '2-digit',
-		minute: '2-digit',
-		second: '2-digit',
-	})
-}
-
 /** Create reflection lines from reflection object */
 export function createReflectionLines(reflection: {
 	evaluation_previous_goal?: string

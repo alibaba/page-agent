@@ -1,6 +1,6 @@
 import { I18n, type SupportedLanguage } from '../i18n'
 import { truncate } from '../utils'
-import { createCard, createReflectionLines, formatTime } from './cards'
+import { createCard, createReflectionLines } from './cards'
 import type { AgentActivity, PanelAgentAdapter } from './types'
 
 import styles from './Panel.module.css'
@@ -187,7 +187,6 @@ export class Panel {
 			tempCard.innerHTML = createCard({
 				icon: '❓',
 				content: `Question: ${question}`,
-				meta: formatTime(this.#config.language ?? 'en-US'),
 				type: 'question',
 			})
 			const cardElement = tempCard.firstElementChild as HTMLElement
@@ -591,15 +590,12 @@ export class Panel {
 	/** Create cards for a history event */
 	#createHistoryCards(event: PanelAgentAdapter['history'][number]): string[] {
 		const cards: string[] = []
-		const time = formatTime(this.#config.language ?? 'en-US')
 		const meta =
 			event.type === 'step' && event.stepIndex !== undefined
 				? this.#i18n.t('ui.panel.step', {
 						number: (event.stepIndex + 1).toString(),
-						time,
-						duration: '',
 					})
-				: time
+				: undefined
 
 		if (event.type === 'step') {
 			// Reflection card
@@ -636,7 +632,7 @@ export class Panel {
 	/** Create cards for an action */
 	#createActionCards(
 		action: { name: string; input: unknown; output: string },
-		meta: string
+		meta?: string
 	): string[] {
 		const cards: string[] = []
 
