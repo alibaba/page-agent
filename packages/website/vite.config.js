@@ -64,6 +64,12 @@ export default defineConfig(({ mode }) => ({
 				if (message.code === 'EVAL') return
 				handler(message)
 			},
+			output: {
+				manualChunks: {
+					vendor: ['react', 'react-dom', 'wouter'],
+					'page-agent': ['page-agent'],
+				},
+			},
 		},
 	},
 	resolve: {

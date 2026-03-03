@@ -1,5 +1,5 @@
 /* eslint-disable react-dom/no-dangerously-set-innerhtml */
-import { PageAgent } from 'page-agent'
+import type { PageAgent as PageAgentType } from 'page-agent'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'wouter'
 
@@ -15,6 +15,8 @@ import {
 	DEMO_MODEL,
 } from '../../constants'
 import { useLanguage } from '../../i18n/context'
+
+const pageAgentModule = import('page-agent')
 
 function getInjection(useCN?: boolean) {
 	const cdn = useCN ? CDN_DEMO_CN_URL : CDN_DEMO_URL
@@ -55,13 +57,19 @@ export default function HeroSection() {
 	const [activeTab, setActiveTab] = useState<'try' | 'other'>(isOther ? 'other' : 'try')
 	const [cdnSource, setCdnSource] = useState<'international' | 'china'>('international')
 
-	const handleExecute = async () => {
-		if (!task.trim()) return
+	const [ready, setReady] = useState(false)
+	useEffect(() => {
+		pageAgentModule.then(() => setReady(true))
+	}, [])
 
+	const handleExecute = async () => {
+		if (!task.trim() || !ready) return
+
+		const { PageAgent } = await pageAgentModule
 		const win = window as any
 
 		if (!win.pageAgent || win.pageAgent.disposed) {
-			win.pageAgent = new PageAgent({
+			win.pageAgent = new (PageAgent as typeof PageAgentType)({
 				interactiveBlacklist: [document.getElementById('root')!],
 				language: language,
 
@@ -208,10 +216,21 @@ export default function HeroSection() {
 												/>
 												<button
 													onClick={handleExecute}
+													disabled={!ready}
 													className="absolute right-2 top-2 px-5 py-1.5 bg-linear-to-r from-blue-600 to-purple-600 text-white font-medium rounded-md hover:shadow-md transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none text-sm"
 													data-page-agent-not-interactive
 												>
-													{isZh ? '执行' : 'Run'}
+													{ready ? (
+														isZh ? (
+															'执行'
+														) : (
+															'Run'
+														)
+													) : (
+														<span className="animate-pulse">
+															{isZh ? '准备中...' : 'Preparing...'}
+														</span>
+													)}
 												</button>
 											</div>
 											<p className="text-xs text-gray-500 dark:text-gray-400 text-left">

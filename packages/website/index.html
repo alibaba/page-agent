@@ -45,13 +45,24 @@
 		</script>
 	</head>
 	<body>
-		<div id="root"></div>
+		<div id="root">
+			<div id="sk">
+				<p class="sk-text" id="sk-text">Loading...</p>
+				<style>
+					#sk{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#eff6ff,#f5f3ff)}
+					@media(prefers-color-scheme:dark){#sk{background:linear-gradient(135deg,#111827,#1f2937)}}
+					.sk-text{font:400 14px/1 system-ui,sans-serif;color:#94a3b8;animation:skf 2s ease-in-out infinite}
+					@keyframes skf{0%,100%{opacity:.6}50%{opacity:.3}}
+				</style>
+			</div>
+		</div>
 		<script type="module" src="./src/main.tsx"></script>
 		<script>
-			// Dynamically update html lang attribute based on i18n detection
 			const updateHtmlLang = () => {
 				const lang = localStorage.getItem('i18nextLng') || navigator.language || 'zh-CN'
 				document.documentElement.lang = lang
+				const el = document.getElementById('sk-text')
+				if (el) el.textContent = lang.startsWith('zh') ? '加载中...' : 'Loading...'
 			}
 			updateHtmlLang()
 			window.addEventListener('storage', updateHtmlLang)
