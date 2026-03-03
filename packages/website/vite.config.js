@@ -67,7 +67,6 @@ export default defineConfig(({ mode }) => ({
 			output: {
 				manualChunks: {
 					vendor: ['react', 'react-dom', 'wouter'],
-					'page-agent': ['page-agent'],
 				},
 			},
 		},

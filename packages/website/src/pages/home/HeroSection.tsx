@@ -16,7 +16,7 @@ import {
 } from '../../constants'
 import { useLanguage } from '../../i18n/context'
 
-const pageAgentModule = import('page-agent')
+let pageAgentModule: Promise<typeof import('page-agent')> | null = null
 
 function getInjection(useCN?: boolean) {
 	const cdn = useCN ? CDN_DEMO_CN_URL : CDN_DEMO_URL
@@ -59,11 +59,12 @@ export default function HeroSection() {
 
 	const [ready, setReady] = useState(false)
 	useEffect(() => {
+		pageAgentModule ??= import('page-agent')
 		pageAgentModule.then(() => setReady(true))
 	}, [])
 
 	const handleExecute = async () => {
-		if (!task.trim() || !ready) return
+		if (!task.trim() || !ready || !pageAgentModule) return
 
 		const { PageAgent } = await pageAgentModule
 		const win = window as any

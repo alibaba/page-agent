@@ -1,18 +1,12 @@
-import { Suspense, lazy, useLayoutEffect } from 'react'
+import { Suspense, lazy, useEffect, useLayoutEffect } from 'react'
 import { Route, Switch, useLocation } from 'wouter'
 
 import Footer from './components/Footer'
 import Header from './components/Header'
-import { useLanguage } from './i18n/context'
 import HomePage from './pages/Home'
-import DocsLayout from './pages/docs/Layout'
 
-const DocsPages = lazy(() => import('./pages/docs/index'))
-
-// Prefetch docs chunk during idle time so navigation feels instant
-if (typeof requestIdleCallback !== 'undefined') {
-	requestIdleCallback(() => import('./pages/docs/index'))
-}
+const docsImport = () => import('./pages/docs/index')
+const DocsPages = lazy(docsImport)
 
 function ScrollToTop() {
 	const [pathname] = useLocation()
@@ -22,19 +16,12 @@ function ScrollToTop() {
 	return null
 }
 
-function DocsLoadingFallback() {
-	const { isZh } = useLanguage()
-	return (
-		<DocsLayout>
-			<div className="flex items-center gap-3 py-12 text-gray-500 dark:text-gray-400">
-				<div className="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-				{isZh ? '文档加载中...' : 'Loading documentation...'}
-			</div>
-		</DocsLayout>
-	)
-}
-
 export default function Router() {
+	useEffect(() => {
+		const id = requestIdleCallback(() => docsImport())
+		return () => cancelIdleCallback(id)
+	}, [])
+
 	return (
 		<div className="flex min-h-screen flex-col">
 			<Header />
@@ -52,7 +39,14 @@ export default function Router() {
 
 					<Route path="/docs" nest>
 						<div className="flex-1 bg-white dark:bg-gray-900">
-							<Suspense fallback={<DocsLoadingFallback />}>
+							<Suspense
+								fallback={
+									<div className="flex items-center justify-center gap-3 py-20 text-gray-400">
+										<div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+										Loading...
+									</div>
+								}
+							>
 								<DocsPages />
 							</Suspense>
 						</div>
