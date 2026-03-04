@@ -21,7 +21,7 @@ import type {
 	MacroToolInput,
 	MacroToolResult,
 } from './types'
-import { assert, normalizeResponse, uid, waitFor } from './utils'
+import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
 
 export { type PageAgentConfig }
 export type { SupportedLanguage }
@@ -222,6 +222,7 @@ export class PageAgentCore extends EventTarget {
 		this.history = []
 		this.#setStatus('running')
 		this.#emitHistoryChange()
+		this.#observations = []
 
 		// Reset internal states
 		this.#states = { totalWaitTime: 0, lastURL: '', browserState: null }
@@ -462,14 +463,13 @@ export class PageAgentCore extends EventTarget {
 	 * Get instructions from config
 	 */
 	async #getInstructions(): Promise<string> {
-		const { instructions } = this.config
-		if (!instructions) return ''
+		const { instructions, experimentalLlmsTxt } = this.config
 
-		const systemInstructions = instructions.system?.trim()
+		const systemInstructions = instructions?.system?.trim()
 		let pageInstructions: string | undefined
 
 		const url = this.#states.browserState?.url || ''
-		if (instructions.getPageInstructions && url) {
+		if (instructions?.getPageInstructions && url) {
 			try {
 				pageInstructions = instructions.getPageInstructions(url)?.trim()
 			} catch (error) {
@@ -479,7 +479,10 @@ export class PageAgentCore extends EventTarget {
 				)
 			}
 		}
-		if (!systemInstructions && !pageInstructions) return ''
+
+		const llmsTxt = experimentalLlmsTxt && url ? await fetchLlmsTxt(url) : undefined
+
+		if (!systemInstructions && !pageInstructions && !llmsTxt) return ''
 
 		let result = '<instructions>\n'
 
@@ -489,6 +492,10 @@ export class PageAgentCore extends EventTarget {
 
 		if (pageInstructions) {
 			result += `<page_instructions>\n${pageInstructions}\n</page_instructions>\n`
+		}
+
+		if (llmsTxt) {
+			result += `<llms_txt>\n${llmsTxt}\n</llms_txt>\n`
 		}
 
 		result += '</instructions>\n\n'
