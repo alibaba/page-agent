@@ -42,7 +42,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
 	return (
 		<div
-			className={`group relative ${containerClasses} rounded-xl border shadow-2xl overflow-hidden ${className}`}
+			className={`group relative ${containerClasses} rounded-xl border shadow-2xl my-4 overflow-hidden ${className}`}
 		>
 			{/* 编辑器顶部栏 */}
 			{showHeader && (

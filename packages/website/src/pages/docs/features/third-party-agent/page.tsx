@@ -105,27 +105,6 @@ const pageAgentTool = {
 					</p>
 				</div>
 			</div>
-
-			<div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-6">
-				<h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
-					{isZh ? '⚠️ 注意事项' : '⚠️ Notes'}
-				</h3>
-				<ul className="text-yellow-800 dark:text-yellow-200 space-y-1 text-sm">
-					<li>
-						•{' '}
-						{isZh
-							? '确保目标网站允许自动化操作'
-							: 'Ensure target website allows automated operations'}
-					</li>
-					<li>• {isZh ? '实现适当的频率限制' : 'Implement appropriate rate limiting'}</li>
-					<li>
-						•{' '}
-						{isZh
-							? '敏感操作建议要求人工确认'
-							: 'Recommend human confirmation for sensitive operations'}
-					</li>
-				</ul>
-			</div>
 		</div>
 	)
 }

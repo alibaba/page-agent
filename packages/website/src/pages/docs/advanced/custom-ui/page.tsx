@@ -1,6 +1,6 @@
+import { APIDivider, APIReference } from '@/components/APIReference'
 import CodeEditor from '@/components/CodeEditor'
 import { Heading } from '@/components/Heading'
-import { APIDivider, APIReference } from '@/components/ui/api-reference'
 import { useLanguage } from '@/i18n/context'
 
 export default function CustomUIDocs() {

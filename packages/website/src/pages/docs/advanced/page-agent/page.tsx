@@ -2,7 +2,6 @@ import { Link } from 'wouter'
 
 import CodeEditor from '@/components/CodeEditor'
 import { Heading } from '@/components/Heading'
-import { APIReference, TypeRef } from '@/components/ui/api-reference'
 import { useLanguage } from '@/i18n/context'
 
 export default function PageAgentDocs() {
@@ -14,8 +13,8 @@ export default function PageAgentDocs() {
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
 				{isZh
-					? 'PageAgent 是带有内置 UI 面板的完整 Agent 类。它继承自 PageAgentCore，并自动创建交互面板。'
-					: 'PageAgent is the complete Agent class with built-in UI panel. It extends PageAgentCore and automatically creates an interactive panel.'}
+					? 'PageAgent 是带有内置 UI 面板的完整 Agent 类。它继承自 PageAgentCore，并自动创建交互面板和 PageController。'
+					: 'PageAgent is the complete Agent class with built-in UI panel. It extends PageAgentCore and automatically creates an interactive panel and PageController.'}
 			</p>
 
 			{/* When to use */}
@@ -29,6 +28,11 @@ export default function PageAgentDocs() {
 						: 'In most cases, you should use PageAgent. It provides a complete out-of-the-box experience:'}
 				</p>
 				<ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 mb-6">
+					<li>
+						{isZh
+							? '自动创建 PageController，处理 DOM 提取和元素操作'
+							: 'Automatically creates PageController for DOM extraction and element actions'}
+					</li>
 					<li>
 						{isZh
 							? '内置 UI 面板，显示任务进度、Agent 思考过程和操作结果'
@@ -74,9 +78,8 @@ console.log(result.history) // Full execution history`}
 				<CodeEditor
 					language="typescript"
 					code={`class PageAgent extends PageAgentCore {
-  /** The UI panel instance */
   panel: Panel
-
+  pageController: PageController
   constructor(config: PageAgentConfig)
 }`}
 				/>
@@ -90,7 +93,21 @@ console.log(result.history) // Full execution history`}
 							>
 								PageAgentCore
 							</Link>
-							，所有核心方法和事件都可用。详细的 API 参考请查看 PageAgentCore 文档。
+							，所有核心方法和事件都可用。配置项合并了{' '}
+							<Link
+								href="/advanced/page-agent-core#configuration"
+								className="text-blue-600 dark:text-blue-400 hover:underline"
+							>
+								AgentConfig
+							</Link>{' '}
+							和{' '}
+							<Link
+								href="/advanced/page-controller#configuration"
+								className="text-blue-600 dark:text-blue-400 hover:underline"
+							>
+								PageControllerConfig
+							</Link>
+							。
 						</>
 					) : (
 						<>
@@ -101,71 +118,34 @@ console.log(result.history) // Full execution history`}
 							>
 								PageAgentCore
 							</Link>
-							. All core methods and events are available. See PageAgentCore docs for detailed API
-							reference.
-						</>
-					)}
-				</p>
-			</section>
-
-			{/* Configuration */}
-			<section className="mb-10">
-				<Heading id="configuration">{isZh ? '配置' : 'Configuration'}</Heading>
-				<p className="text-gray-600 dark:text-gray-400 mb-4">
-					{isZh
-						? 'PageAgent 使用与 PageAgentCore 相同的配置接口。'
-						: 'PageAgent uses the same configuration interface as PageAgentCore.'}
-				</p>
-				<p className="text-gray-600 dark:text-gray-400 mb-4">
-					{isZh ? (
-						<>
-							完整配置请参考{' '}
+							. All core methods and events are available. Config merges{' '}
 							<Link
-								href="/advanced/page-agent-core"
+								href="/advanced/page-agent-core#configuration"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
 							>
-								PageAgentCore 配置文档
-							</Link>
-							。
-						</>
-					) : (
-						<>
-							See{' '}
-							<Link
-								href="/advanced/page-agent-core"
-								className="text-blue-600 dark:text-blue-400 hover:underline"
-							>
-								PageAgentCore configuration docs
+								AgentConfig
 							</Link>{' '}
-							for complete reference.
+							and{' '}
+							<Link
+								href="/advanced/page-controller#configuration"
+								className="text-blue-600 dark:text-blue-400 hover:underline"
+							>
+								PageControllerConfig
+							</Link>
+							.
 						</>
 					)}
 				</p>
 			</section>
 
-			{/* Panel Property */}
+			{/* Panel */}
 			<section className="mb-10">
-				<Heading id="panel-property">{isZh ? 'Panel 属性' : 'Panel Property'}</Heading>
+				<Heading id="panel">{isZh ? 'UI 面板' : 'UI Panel'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? 'PageAgent 自动创建一个 Panel 实例。你可以通过 panel 属性访问它来控制 UI：'
-						: 'PageAgent automatically creates a Panel instance. You can access it via the panel property to control the UI:'}
+						? 'PageAgent 自动创建一个 Panel 实例。你可以通过 panel 属性控制 UI：'
+						: 'PageAgent automatically creates a Panel instance. You can control the UI via the panel property:'}
 				</p>
-
-				<APIReference
-					properties={[
-						{
-							name: 'panel',
-							type: 'Panel',
-							required: true,
-							description: isZh
-								? '内置的 UI 面板实例，用于显示任务进度和接收用户输入。'
-								: 'The built-in UI panel instance for displaying task progress and receiving user input.',
-						},
-					]}
-				/>
-
-				<h3 className="text-lg font-semibold mt-6 mb-3">{isZh ? 'Panel 方法' : 'Panel Methods'}</h3>
 				<CodeEditor
 					language="typescript"
 					code={`// Show/hide the panel
@@ -212,16 +192,16 @@ agent.panel.dispose()`}
 							</tr>
 							<tr className="bg-white dark:bg-gray-900">
 								<td className="px-4 py-3 text-gray-600 dark:text-gray-400">
-									{isZh ? 'Headless 模式' : 'Headless Mode'}
+									{isZh ? '自动创建 PageController' : 'Auto-creates PageController'}
 								</td>
-								<td className="px-4 py-3 text-center text-gray-400 dark:text-gray-600">-</td>
 								<td className="px-4 py-3 text-center text-green-600 dark:text-green-400">✓</td>
+								<td className="px-4 py-3 text-center text-gray-400 dark:text-gray-600">-</td>
 							</tr>
 							<tr className="bg-white dark:bg-gray-900">
 								<td className="px-4 py-3 text-gray-600 dark:text-gray-400">
-									{isZh ? '自定义 PageController' : 'Custom PageController'}
+									{isZh ? 'Headless 模式' : 'Headless Mode'}
 								</td>
-								<td className="px-4 py-3 text-center text-green-600 dark:text-green-400">✓</td>
+								<td className="px-4 py-3 text-center text-gray-400 dark:text-gray-600">-</td>
 								<td className="px-4 py-3 text-center text-green-600 dark:text-green-400">✓</td>
 							</tr>
 							<tr className="bg-white dark:bg-gray-900">

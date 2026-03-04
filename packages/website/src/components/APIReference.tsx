@@ -5,9 +5,8 @@
  */
 import * as React from 'react'
 
+import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-
-import { Badge } from './badge'
 
 // ============================================================================
 // Types
@@ -35,6 +34,8 @@ export interface APIReferenceProps {
 	description?: React.ReactNode
 	/** Property definitions */
 	properties: PropDefinition[]
+	/** Display variant: 'properties' for fields, 'methods' for methods */
+	variant?: 'properties' | 'methods'
 	/** Additional CSS classes */
 	className?: string
 }
@@ -43,7 +44,14 @@ export interface APIReferenceProps {
 // Component
 // ============================================================================
 
-export function APIReference({ title, description, properties, className }: APIReferenceProps) {
+export function APIReference({
+	title,
+	description,
+	properties,
+	variant = 'properties',
+	className,
+}: APIReferenceProps) {
+	const isMethodsVariant = variant === 'methods'
 	return (
 		<div className={cn('my-6', className)}>
 			{title && (
@@ -58,10 +66,10 @@ export function APIReference({ title, description, properties, className }: APIR
 					<thead>
 						<tr className="bg-gray-50 dark:bg-gray-800/50">
 							<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300">
-								Property
+								{isMethodsVariant ? 'Method' : 'Property'}
 							</th>
 							<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300">
-								Type
+								{isMethodsVariant ? 'Return Type' : 'Type'}
 							</th>
 							<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300 hidden md:table-cell">
 								Default
@@ -120,7 +128,7 @@ function PropRow({ name, type, required, defaultValue, description, status }: Pr
 
 			{/* Type */}
 			<td className="px-4 py-3 align-top">
-				<code className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded whitespace-nowrap">
+				<code className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded wrap-break-word">
 					{type}
 				</code>
 			</td>

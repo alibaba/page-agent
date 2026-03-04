@@ -34,10 +34,6 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 					title: isZh ? '故障排查' : 'Troubleshooting',
 					path: '/introduction/troubleshooting',
 				},
-				{
-					title: '🚧 ' + (isZh ? '最佳实践' : 'Best Practices'),
-					path: '/integration/best-practices',
-				},
 			],
 		},
 		{
@@ -50,7 +46,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 				{ title: isZh ? 'Chrome 扩展' : 'Chrome Extension', path: '/features/chrome-extension' },
 				{
 					title: isZh ? '接入第三方 Agent' : 'Third-party Agent',
-					path: '/integration/third-party-agent',
+					path: '/features/third-party-agent',
 				},
 			],
 		},
@@ -59,10 +55,11 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 			items: [
 				{ title: 'PageAgent', path: '/advanced/page-agent' },
 				{ title: 'PageAgentCore', path: '/advanced/page-agent-core' },
+				{ title: 'PageController', path: '/advanced/page-controller' },
 				{ title: isZh ? '自定义 UI' : 'Custom UI', path: '/advanced/custom-ui' },
 				{
 					title: '🚧 ' + (isZh ? '安全与权限' : 'Security & Permissions'),
-					path: '/integration/security-permissions',
+					path: '/advanced/security-permissions',
 				},
 			],
 		},

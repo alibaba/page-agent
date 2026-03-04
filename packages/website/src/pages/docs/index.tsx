@@ -6,15 +6,15 @@ import CustomUIDocs from './advanced/custom-ui/page'
 import PageAgentCoreDocs from './advanced/page-agent-core/page'
 // Advanced
 import PageAgentDocs from './advanced/page-agent/page'
+import PageControllerDocs from './advanced/page-controller/page'
+import SecurityPermissions from './advanced/security-permissions/page'
 // Features
 import ChromeExtension from './features/chrome-extension/page'
 import Instructions from './features/custom-instructions/page'
 import CustomTools from './features/custom-tools/page'
 import DataMasking from './features/data-masking/page'
 import Models from './features/models/page'
-import BestPractices from './integration/best-practices/page'
-import SecurityPermissions from './integration/security-permissions/page'
-import ThirdPartyAgent from './integration/third-party-agent/page'
+import ThirdPartyAgent from './features/third-party-agent/page'
 import Limitations from './introduction/limitations/page'
 // Introduction
 import Overview from './introduction/overview/page'
@@ -80,6 +80,11 @@ export default function DocsRouter() {
 					<ChromeExtension />
 				</DocsPage>
 			</Route>
+			<Route path="/features/third-party-agent">
+				<DocsPage>
+					<ThirdPartyAgent />
+				</DocsPage>
+			</Route>
 
 			{/* Advanced */}
 			<Route path="/advanced/page-agent">
@@ -92,24 +97,19 @@ export default function DocsRouter() {
 					<PageAgentCoreDocs />
 				</DocsPage>
 			</Route>
+			<Route path="/advanced/page-controller">
+				<DocsPage>
+					<PageControllerDocs />
+				</DocsPage>
+			</Route>
 			<Route path="/advanced/custom-ui">
 				<DocsPage>
 					<CustomUIDocs />
 				</DocsPage>
 			</Route>
-			<Route path="/integration/security-permissions">
+			<Route path="/advanced/security-permissions">
 				<DocsPage>
 					<SecurityPermissions />
-				</DocsPage>
-			</Route>
-			<Route path="/integration/best-practices">
-				<DocsPage>
-					<BestPractices />
-				</DocsPage>
-			</Route>
-			<Route path="/integration/third-party-agent">
-				<DocsPage>
-					<ThirdPartyAgent />
 				</DocsPage>
 			</Route>
 

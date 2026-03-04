@@ -1,6 +1,8 @@
+import { Link } from 'wouter'
+
+import { APIDivider, APIReference, TypeRef } from '@/components/APIReference'
 import CodeEditor from '@/components/CodeEditor'
 import { Heading } from '@/components/Heading'
-import { APIDivider, APIReference, TypeRef } from '@/components/ui/api-reference'
 import { useLanguage } from '@/i18n/context'
 
 export default function PageAgentCoreDocs() {
@@ -50,17 +52,11 @@ const agent = new PageAgentCore({
   baseURL: 'https://api.openai.com/v1',
   apiKey: 'your-api-key',
   model: 'gpt-5.2',
-  language: 'en-US',
 })
 
 // Listen to events for UI display
-
 agent.addEventListener('statuschange', () => {
   console.log('Status:', agent.status)
-})
-
-agent.addEventListener('historychange', () => {
-  console.log('History:', agent.history)
 })
 
 agent.addEventListener('activity', (e) => {
@@ -75,14 +71,54 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			<APIDivider title={isZh ? '配置' : 'Configuration'} />
 
-			{/* LLM Configuration */}
+			{/* Configuration */}
 			<section className="mb-10">
-				<Heading id="llmconfig">LLMConfig</Heading>
+				<Heading id="configuration">PageAgentCoreConfig</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? '配置与大语言模型的连接参数。支持 OpenAI 兼容的 API。'
-						: 'Configure connection parameters for the language model. Supports OpenAI-compatible APIs.'}
+						? 'PageAgentCoreConfig = AgentConfig & { pageController: PageController }。AgentConfig 包含以下配置项：'
+						: 'PageAgentCoreConfig = AgentConfig & { pageController: PageController }. AgentConfig contains the following options:'}
 				</p>
+
+				{/* PageController */}
+				<h3 className="text-lg font-semibold mt-6 mb-3 text-gray-800 dark:text-gray-200">
+					PageController
+				</h3>
+				<APIReference
+					properties={[
+						{
+							name: 'pageController',
+							type: 'PageController',
+							required: true,
+							description: isZh ? (
+								<>
+									<Link
+										href="/advanced/page-controller"
+										className="text-blue-600 dark:text-blue-400 hover:underline"
+									>
+										PageController
+									</Link>{' '}
+									实例，用于 DOM 操作和元素交互。
+								</>
+							) : (
+								<>
+									<Link
+										href="/advanced/page-controller"
+										className="text-blue-600 dark:text-blue-400 hover:underline"
+									>
+										PageController
+									</Link>{' '}
+									instance for DOM operations and element interaction.
+								</>
+							),
+						},
+					]}
+				/>
+
+				{/* LLM Config */}
+				<h3 className="text-lg font-semibold mt-6 mb-3 text-gray-800 dark:text-gray-200">
+					{isZh ? 'LLM 配置' : 'LLM Config'}
+				</h3>
 				<APIReference
 					properties={[
 						{
@@ -110,7 +146,6 @@ const result = await agent.execute('Fill in the form with test data')`}
 						{
 							name: 'temperature',
 							type: 'number',
-							defaultValue: '0',
 							description: isZh
 								? '模型温度参数，控制输出随机性'
 								: 'Model temperature, controls output randomness',
@@ -130,16 +165,11 @@ const result = await agent.execute('Fill in the form with test data')`}
 						},
 					]}
 				/>
-			</section>
 
-			{/* Agent Configuration */}
-			<section className="mb-10">
-				<Heading id="agentconfig">AgentConfig</Heading>
-				<p className="text-gray-600 dark:text-gray-400 mb-4">
-					{isZh
-						? '配置 Agent 的行为、生命周期钩子和扩展能力。'
-						: 'Configure agent behavior, lifecycle hooks, and extension capabilities.'}
-				</p>
+				{/* Agent Config */}
+				<h3 className="text-lg font-semibold mt-6 mb-3 text-gray-800 dark:text-gray-200">
+					{isZh ? 'Agent 配置' : 'Agent Config'}
+				</h3>
 				<APIReference
 					properties={[
 						{
@@ -166,8 +196,8 @@ const result = await agent.execute('Fill in the form with test data')`}
 							name: 'instructions',
 							type: 'InstructionsConfig',
 							description: isZh
-								? '指导 Agent 行为的指令配置'
-								: 'Instructions to guide agent behavior',
+								? '指导 Agent 行为的指令配置，见下方类型定义'
+								: 'Instructions to guide agent behavior, see type definition below',
 						},
 						{
 							name: 'transformPageContent',
@@ -177,7 +207,15 @@ const result = await agent.execute('Fill in the form with test data')`}
 								: 'Transform page content before sending to LLM, useful for data masking',
 						},
 						{
-							name: 'experimentalScriptExecutionTool',
+							name: 'customSystemPrompt',
+							type: 'string',
+							status: 'experimental',
+							description: isZh
+								? '完全覆盖默认系统提示词。谨慎使用。'
+								: 'Completely override the default system prompt. Use with caution.',
+						},
+						{
+							name: 'experimentalScript\nExecutionTool',
 							type: 'boolean',
 							defaultValue: 'false',
 							status: 'experimental',
@@ -191,137 +229,52 @@ const result = await agent.execute('Fill in the form with test data')`}
 							defaultValue: 'false',
 							status: 'experimental',
 							description: isZh
-								? '从当前站点根目录获取 /llms.txt 并作为上下文提供给 LLM，每个 origin 仅请求一次'
-								: 'Fetch /llms.txt from site origin and include as LLM context, fetched once per origin',
+								? '从当前站点根目录获取 /llms.txt 并作为上下文提供给 LLM'
+								: 'Fetch /llms.txt from site origin and include as LLM context',
 						},
 					]}
 				/>
 
-				<h3 className="text-lg font-semibold mt-6 mb-3">InstructionsConfig</h3>
-				<APIReference
-					properties={[
-						{
-							name: 'system',
-							type: 'string',
-							description: isZh
-								? '全局系统级指令，应用于所有任务'
-								: 'Global system-level instructions, applied to all tasks',
-						},
-						{
-							name: 'getPageInstructions',
-							type: '(url: string) => string | undefined | null',
-							description: isZh
-								? '动态页面级指令回调，在每个步骤前调用'
-								: 'Dynamic page-level instructions callback, called before each step',
-						},
-					]}
-				/>
-			</section>
-
-			{/* Lifecycle Hooks */}
-			<section className="mb-10">
-				<Heading id="lifecycle-hooks">{isZh ? '生命周期钩子' : 'Lifecycle Hooks'}</Heading>
+				{/* Lifecycle Hooks */}
+				<h3 className="text-lg font-semibold mt-6 mb-3 text-gray-800 dark:text-gray-200">
+					{isZh ? '生命周期钩子' : 'Lifecycle Hooks'}
+					<span className="ml-2 text-xs font-normal text-amber-600 dark:text-amber-400">
+						experimental
+					</span>
+				</h3>
 				<div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
 					<p className="text-amber-800 dark:text-amber-200 text-sm">
-						<strong>⚠️ {isZh ? '警告' : 'Warning'}:</strong>{' '}
 						{isZh
-							? '这些接口高度实验性，可能在未来版本中发生变化。建议优先使用事件系统（Events）来监听 Agent 状态。'
-							: 'These APIs are highly experimental and may change in future versions. Prefer using the Events system for monitoring agent state.'}
+							? '这些接口高度实验性，可能在未来版本中发生变化。'
+							: 'These APIs are highly experimental and may change in future versions. '}
 					</p>
 				</div>
-				<p className="text-gray-600 dark:text-gray-400 mb-4">
-					{isZh
-						? '所有生命周期钩子都接收 agent 实例作为第一个参数，便于在回调中访问 Agent 状态和方法。'
-						: 'All lifecycle hooks receive the agent instance as first parameter, making it easy to access agent state and methods in callbacks.'}
-				</p>
 				<APIReference
 					properties={[
 						{
 							name: 'onBeforeStep',
-							type: '(agent: PageAgentCore, stepCount: number) => void | Promise<void>',
+							type: '(agent, stepCount) => void | Promise<void>',
 							description: isZh ? '每个步骤执行前调用' : 'Called before each step execution',
-							status: 'experimental',
 						},
 						{
 							name: 'onAfterStep',
-							type: '(agent: PageAgentCore, history: HistoricalEvent[]) => void | Promise<void>',
+							type: '(agent, history) => void | Promise<void>',
 							description: isZh ? '每个步骤执行后调用' : 'Called after each step execution',
-							status: 'experimental',
 						},
 						{
 							name: 'onBeforeTask',
-							type: '(agent: PageAgentCore) => void | Promise<void>',
+							type: '(agent) => void | Promise<void>',
 							description: isZh ? '任务开始前调用' : 'Called before task starts',
-							status: 'experimental',
 						},
 						{
 							name: 'onAfterTask',
-							type: '(agent: PageAgentCore, result: ExecutionResult) => void | Promise<void>',
+							type: '(agent, result) => void | Promise<void>',
 							description: isZh ? '任务结束后调用' : 'Called after task ends',
-							status: 'experimental',
 						},
 						{
 							name: 'onDispose',
-							type: '(agent: PageAgentCore, reason?: string) => void',
+							type: '(agent, reason?) => void',
 							description: isZh ? 'Agent 销毁时调用' : 'Called when agent is disposed',
-							status: 'experimental',
-						},
-					]}
-				/>
-			</section>
-
-			{/* PageController Configuration */}
-			<section className="mb-10">
-				<Heading id="pagecontrollerconfig">PageControllerConfig</Heading>
-				<p className="text-gray-600 dark:text-gray-400 mb-4">
-					{isZh
-						? '配置 DOM 提取、元素交互和视觉反馈。'
-						: 'Configure DOM extraction, element interaction, and visual feedback.'}
-				</p>
-				<APIReference
-					properties={[
-						{
-							name: 'pageController',
-							type: 'PageController',
-							status: 'experimental',
-							description: isZh
-								? '自定义 PageController 实例。如不提供，将创建默认实例。'
-								: 'Custom PageController instance. If not provided, a default one will be created.',
-						},
-						{
-							name: 'enableMask',
-							type: 'boolean',
-							defaultValue: 'true',
-							description: isZh
-								? '启用视觉遮罩覆盖层，阻止用户在自动化期间操作'
-								: 'Enable visual mask overlay that blocks user interaction during automation',
-						},
-						{
-							name: 'viewportExpansion',
-							type: 'number',
-							defaultValue: '0',
-							description: isZh
-								? '视口扩展像素数，-1 表示提取整个页面'
-								: 'Viewport expansion in pixels, -1 means extract entire page',
-						},
-						{
-							name: 'interactiveBlacklist',
-							type: '(Element | (() => Element))[]',
-							description: isZh ? '要排除的交互元素列表' : 'Elements to exclude from interaction',
-						},
-						{
-							name: 'interactiveWhitelist',
-							type: '(Element | (() => Element))[]',
-							description: isZh
-								? '要强制包含的交互元素列表'
-								: 'Elements to force include for interaction',
-						},
-						{
-							name: 'includeAttributes',
-							type: 'string[]',
-							description: isZh
-								? '在 DOM 提取中包含的额外属性'
-								: 'Additional attributes to include in DOM extraction',
 						},
 					]}
 				/>
@@ -378,16 +331,24 @@ const result = await agent.execute('Fill in the form with test data')`}
 			<section className="mb-10">
 				<Heading id="methods">{isZh ? '方法' : 'Methods'}</Heading>
 				<APIReference
+					variant="methods"
 					properties={[
 						{
-							name: 'execute(task: string)',
+							name: 'execute(task)',
 							type: 'Promise<ExecutionResult>',
 							description: isZh
 								? '执行任务并返回结果。包含 success、data 和 history 字段。'
 								: 'Execute a task and return result. Contains success, data, and history fields.',
 						},
 						{
-							name: 'dispose(reason?: string)',
+							name: 'stop()',
+							type: 'void',
+							description: isZh
+								? '停止当前任务。Agent 仍可复用。'
+								: 'Stop the current task. Agent remains reusable.',
+						},
+						{
+							name: 'dispose()',
 							type: 'void',
 							description: isZh
 								? '销毁 Agent 并清理资源'
@@ -452,11 +413,8 @@ const result = await agent.execute('Fill in the form with test data')`}
 				<CodeEditor
 					language="typescript"
 					code={`interface ExecutionResult {
-  /** Whether the task completed successfully */
   success: boolean
-  /** Result description from the agent */
   data: string
-  /** Full execution history */
   history: HistoricalEvent[]
 }`}
 				/>
@@ -476,50 +434,21 @@ const result = await agent.execute('Fill in the form with test data')`}
 				/>
 			</section>
 
-			<APIDivider title={isZh ? '无头模式' : 'Headless Mode'} />
-
-			{/* Headless Usage */}
+			{/* InstructionsConfig */}
 			<section className="mb-10">
-				<Heading id="headless-mode">{isZh ? '无头模式' : 'Headless Mode'}</Heading>
-				<p className="text-gray-600 dark:text-gray-400 mb-4">
-					{isZh
-						? '在非 DOM 环境中，你必须实现自定义的 PageController（例如远程操作页面或 Puppeteer）。'
-						: 'In non-DOM environments, you must implement a custom PageController (e.g., remote page control or Puppeteer).'}
-				</p>
+				<Heading id="instructionsconfig">InstructionsConfig</Heading>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgentCore } from '@page-agent/core'
-import type { PageController } from '@page-agent/page-controller'
+					code={`interface InstructionsConfig {
+  /** Global system-level instructions, applied to all tasks */
+  system?: string
 
-class MyRemotePageController implements PageController {
-  // Implement required methods for DOM extraction and interaction
-}
-
-const agent = new PageAgentCore({
-  pageController: new MyRemotePageController(),
-  baseURL: 'https://api.openai.com/v1',
-  apiKey: 'your-api-key',
-  model: 'gpt-5.2',
-  language: 'en-US',
-})
-
-// Listen to events for UI display
-
-agent.addEventListener('statuschange', () => {
-  console.log('Status:', agent.status)
-})
-
-agent.addEventListener('historychange', () => {
-  console.log('History:', agent.history)
-})
-
-agent.addEventListener('activity', (e) => {
-  const activity = (e as CustomEvent).detail
-  console.log('Activity:', activity.type)
-})
-
-// Execute task
-const result = await agent.execute('Fill in the form with test data')`}
+  /**
+   * Dynamic page-level instructions callback.
+   * Called before each step to get instructions for the current page.
+   */
+  getPageInstructions?: (url: string) => string | undefined
+}`}
 				/>
 			</section>
 		</div>

@@ -27,12 +27,12 @@ const SPA_ROUTES = [
 	'docs/features/custom-instructions',
 	'docs/features/models',
 	'docs/features/chrome-extension',
+	'docs/features/third-party-agent',
 	'docs/advanced/page-agent',
 	'docs/advanced/page-agent-core',
+	'docs/advanced/page-controller',
 	'docs/advanced/custom-ui',
-	'docs/integration/security-permissions',
-	'docs/integration/best-practices',
-	'docs/integration/third-party-agent',
+	'docs/advanced/security-permissions',
 ]
 
 function spaRoutes() {

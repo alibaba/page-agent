@@ -83,7 +83,7 @@ export default function LimitationsPage() {
 				</div>
 
 				{/* Interaction Limitations */}
-				<Heading id="interaction-capabilities" className="text-2xl font-bold mb-3">
+				<Heading id="interaction-capabilities" className="text-2xl font-bold mb-3 mt-6">
 					{isZh ? '交互能力' : 'Interaction Capabilities'}
 				</Heading>
 				<div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 mb-6">
@@ -128,33 +128,25 @@ export default function LimitationsPage() {
 				</div>
 
 				{/* Understanding Limitations */}
-				<Heading id="understanding" className="text-2xl font-bold mb-3">
+				<Heading id="understanding" className="text-2xl font-bold mb-3 mt-6">
 					{isZh ? '理解能力' : 'Understanding'}
 				</Heading>
-				<div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-400 p-4 mb-6">
-					<p className="text-amber-800 dark:text-amber-200 mb-2 font-medium">
-						{isZh
-							? 'Page Agent 不使用多模态模型，不截图，没有视觉能力。仅通过 DOM 结构理解页面。'
-							: 'Page Agent does not use multimodal models, does not take screenshots, and has no visual capability. It reads pages through DOM structure only.'}
-					</p>
-					<p className="text-amber-700 dark:text-amber-300 text-sm">
-						{isZh
-							? '图片、Canvas、WebGL、SVG 等视觉内容无法被识别。页面的语义化程度和可访问性直接影响 AI 的理解准确性。'
-							: 'Images, Canvas, WebGL, SVG and other visual content cannot be recognized. Page semantic quality and accessibility directly affect AI accuracy.'}
-					</p>
-				</div>
 
-				{/* Website Quality */}
-				<Heading id="page-quality-matters" className="text-2xl font-bold mb-3">
-					{isZh ? '网页质量影响' : 'Page Quality Matters'}
-				</Heading>
-				<div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
-					<p className="text-gray-600 dark:text-gray-300 text-sm">
-						{isZh
-							? '反常识的交互逻辑、纯视觉的操作提示、快速出现消失的元素等都会降低自动化成功率。语义化的 HTML 和良好的可访问性会显著提升效果。'
-							: 'Counter-intuitive interactions, visual-only cues, and rapidly appearing/disappearing elements reduce automation success. Semantic HTML and good accessibility significantly improve results.'}
-					</p>
-				</div>
+				<p className="mb-2 font-medium">
+					{isZh
+						? 'Page Agent 不使用多模态模型，不截图，没有视觉能力。仅通过 DOM 结构理解页面。'
+						: 'Page Agent does not use multimodal models, does not take screenshots, and has no visual capability. It reads pages through DOM structure only.'}
+				</p>
+				<p className="mb-2 font-medium">
+					{isZh
+						? '图片、Canvas、WebGL、SVG 等视觉内容无法被识别。页面的语义化程度和可访问性直接影响 AI 的理解准确性。'
+						: 'Images, Canvas, WebGL, SVG and other visual content cannot be recognized. Page semantic quality and accessibility directly affect AI accuracy.'}
+				</p>
+				<p className="mb-2 font-medium">
+					{isZh
+						? '反常识的交互逻辑、纯视觉的操作提示、快速出现消失的元素等都会降低自动化成功率。语义化的 HTML 和良好的可访问性会显著提升效果。'
+						: 'Counter-intuitive interactions, visual-only cues, and rapidly appearing/disappearing elements reduce automation success. Semantic HTML and good accessibility significantly improve results.'}
+				</p>
 			</div>
 		</div>
 	)
