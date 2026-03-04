@@ -122,9 +122,10 @@ PageAgent is now ready for production use. The API is stable and breaking change
 - **Ask User Tool** - Agent can ask users for clarification
 - **i18n Support** - English and Chinese localization
 
-### Configuration
+### Configuration 
 
 ```typescript
+// Version 1.0.0
 interface PageAgentConfig {
     // LLM Configuration (required)
     baseURL: string

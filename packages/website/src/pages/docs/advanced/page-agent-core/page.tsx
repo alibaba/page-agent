@@ -185,6 +185,15 @@ const result = await agent.execute('Fill in the form with test data')`}
 								? '启用实验性 JavaScript 执行工具'
 								: 'Enable experimental JavaScript execution tool',
 						},
+						{
+							name: 'experimentalLlmsTxt',
+							type: 'boolean',
+							defaultValue: 'false',
+							status: 'experimental',
+							description: isZh
+								? '从当前站点根目录获取 /llms.txt 并作为上下文提供给 LLM，每个 origin 仅请求一次'
+								: 'Fetch /llms.txt from site origin and include as LLM context, fetched once per origin',
+						},
 					]}
 				/>
 
