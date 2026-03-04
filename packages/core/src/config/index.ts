@@ -127,6 +127,14 @@ export interface AgentConfig {
 	experimentalScriptExecutionTool?: boolean
 
 	/**
+	 * @experimental
+	 * Fetch /llms.txt from current site origin and include as context.
+	 * Only fetched once per origin per task.
+	 * @default false
+	 */
+	experimentalLlmsTxt?: boolean
+
+	/**
 	 * Transform page content before sending to LLM.
 	 * Called after DOM extraction and simplification, before LLM invocation.
 	 * Use cases: inspect extraction results, modify page info, mask sensitive data.

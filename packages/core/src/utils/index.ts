@@ -57,6 +57,31 @@ export function uid() {
 	return id
 }
 
+const llmsTxtCache = new Map<string, string | null>()
+
+/** Fetch /llms.txt for a URL's origin. Cached per origin, `null` = tried and not found. */
+export async function fetchLlmsTxt(url: string): Promise<string | null> {
+	const origin = new URL(url).origin
+	if (llmsTxtCache.has(origin)) return llmsTxtCache.get(origin)!
+
+	const endpoint = `${origin}/llms.txt`
+	let result: string | null = null
+	try {
+		console.log(chalk.gray(`[llms.txt] Fetching ${endpoint}`))
+		const res = await fetch(endpoint, { signal: AbortSignal.timeout(3000) })
+		if (res.ok) {
+			result = await res.text()
+			console.log(chalk.green(`[llms.txt] Found (${result.length} chars)`))
+		} else {
+			console.log(chalk.gray(`[llms.txt] ${res.status} for ${endpoint}`))
+		}
+	} catch (e) {
+		console.log(chalk.gray(`[llms.txt] Failed for ${endpoint}`), e)
+	}
+	llmsTxtCache.set(origin, result)
+	return result
+}
+
 /**
  * Simple assertion function that throws an error if the condition is falsy
  * @param condition - The condition to assert
