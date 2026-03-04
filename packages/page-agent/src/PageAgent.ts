@@ -2,12 +2,13 @@
  * Copyright (C) 2025 Alibaba Group Holding Limited
  * All rights reserved.
  */
-import { type PageAgentConfig, PageAgentCore, type PageAgentTool, tool } from '@page-agent/core'
-import { PageController } from '@page-agent/page-controller'
+import { type AgentConfig, PageAgentCore } from '@page-agent/core'
+import { PageController, type PageControllerConfig } from '@page-agent/page-controller'
 import { Panel } from '@page-agent/ui'
 
-export type { PageAgentConfig, PageAgentTool }
-export { tool }
+export * from '@page-agent/core'
+
+export type PageAgentConfig = AgentConfig & PageControllerConfig
 
 export class PageAgent extends PageAgentCore {
 	panel: Panel

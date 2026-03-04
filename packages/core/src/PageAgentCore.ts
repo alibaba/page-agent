@@ -7,12 +7,11 @@ import type { BrowserState, PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
 import * as z from 'zod'
 
-import { type PageAgentConfig, type SupportedLanguage } from './config'
-import { DEFAULT_MAX_STEPS } from './config/constants'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
 import type {
 	AgentActivity,
+	AgentConfig,
 	AgentReflection,
 	AgentStatus,
 	AgentStepEvent,
@@ -23,10 +22,10 @@ import type {
 } from './types'
 import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
 
-export { type PageAgentConfig }
-export type { SupportedLanguage }
 export { tool, type PageAgentTool } from './tools'
 export type * from './types'
+
+export type PageAgentCoreConfig = AgentConfig & { pageController: PageController }
 
 /**
  * AI agent for browser automation.
@@ -60,7 +59,7 @@ export type * from './types'
  */
 export class PageAgentCore extends EventTarget {
 	readonly id = uid()
-	readonly config: PageAgentConfig & { maxSteps: number }
+	readonly config: PageAgentCoreConfig & { maxSteps: number }
 	readonly tools: typeof tools
 	/** PageController for DOM operations */
 	readonly pageController: PageController
@@ -94,10 +93,10 @@ export class PageAgentCore extends EventTarget {
 		browserState: null as BrowserState | null,
 	}
 
-	constructor(config: PageAgentConfig & { pageController: PageController }) {
+	constructor(config: PageAgentCoreConfig) {
 		super()
 
-		this.config = { ...config, maxSteps: config.maxSteps || DEFAULT_MAX_STEPS }
+		this.config = { ...config, maxSteps: config.maxSteps || 20 }
 
 		this.#llm = new LLM(this.config)
 		this.tools = new Map(tools)
