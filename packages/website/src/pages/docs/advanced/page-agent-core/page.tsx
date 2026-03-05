@@ -181,7 +181,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 						{
 							name: 'maxSteps',
 							type: 'number',
-							defaultValue: '20',
+							defaultValue: '40',
 							description: isZh ? '每个任务的最大步骤数' : 'Maximum number of steps per task',
 						},
 						{

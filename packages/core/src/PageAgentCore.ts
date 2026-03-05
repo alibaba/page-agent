@@ -96,7 +96,7 @@ export class PageAgentCore extends EventTarget {
 	constructor(config: PageAgentCoreConfig) {
 		super()
 
-		this.config = { ...config, maxSteps: config.maxSteps || 20 }
+		this.config = { ...config, maxSteps: config.maxSteps || 40 }
 
 		this.#llm = new LLM(this.config)
 		this.tools = new Map(tools)

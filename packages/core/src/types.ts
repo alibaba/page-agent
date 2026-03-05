@@ -12,7 +12,7 @@ export interface AgentConfig extends LLMConfig {
 
 	/**
 	 * Maximum number of steps the agent can take per task.
-	 * @default 20
+	 * @default 40
 	 */
 	maxSteps?: number
 
