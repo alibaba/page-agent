@@ -24,13 +24,14 @@ export interface AgentConfig extends LLMConfig {
 	 *
 	 * @example
 	 * // override internal tool
+	 * import { z } from 'zod/v4'
 	 * import { tool } from 'page-agent'
 	 * const customTools = {
 	 * ask_user: tool({
 	 * 	description:
 	 * 		'Ask the user or parent model a question and wait for their answer. Use this if you need more information or clarification.',
-	 * 	inputSchema: zod.object({
-	 * 		question: zod.string(),
+	 * 	inputSchema: z.object({
+	 * 		question: z.string(),
 	 * 	}),
 	 * 	execute: async function (this: PageAgent, input) {
 	 * 		const answer = await do_some_thing(input.question)
