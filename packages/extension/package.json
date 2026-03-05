@@ -38,10 +38,10 @@
         "wxt": "^0.20.18"
     },
     "dependencies": {
-        "@page-agent/core": "1.4.4",
-        "@page-agent/llms": "1.4.4",
-        "@page-agent/page-controller": "1.4.4",
-        "@page-agent/ui": "1.4.4",
+        "@page-agent/core": "1.5.1",
+        "@page-agent/llms": "1.5.1",
+        "@page-agent/page-controller": "1.5.1",
+        "@page-agent/ui": "1.5.1",
         "ai-motion": "^0.4.8",
         "chalk": "^5.6.2"
     },
