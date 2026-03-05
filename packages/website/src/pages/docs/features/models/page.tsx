@@ -10,11 +10,11 @@ const BASELINE = new Set([
 	'gemini-3-flash',
 	'deepseek-3.2',
 	'qwen3.5-plus',
+	'qwen3.5-flash',
 ])
 
 // Models grouped by brand, newest first
 const MODEL_GROUPS: Record<string, string[]> = {
-	OpenAI: ['gpt-5.2', 'gpt-5.1', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'gpt-4.1-mini'],
 	Qwen: [
 		'qwen3.5-plus',
 		'qwen3.5-flash',
@@ -23,6 +23,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'qwen-3-plus',
 		'qwen3:14b (ollama)',
 	],
+	OpenAI: ['gpt-5.2', 'gpt-5.1', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'gpt-4.1-mini'],
 	DeepSeek: ['deepseek-3.2'],
 	Google: ['gemini-3-pro', 'gemini-3-flash', 'gemini-2.5'],
 	Anthropic: [
