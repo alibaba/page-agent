@@ -1,4 +1,14 @@
-import { Copy, CornerUpLeft, Eye, EyeOff, HatGlasses, Home, Loader2, Scale } from 'lucide-react'
+import {
+	ChevronDown,
+	Copy,
+	CornerUpLeft,
+	Eye,
+	EyeOff,
+	HatGlasses,
+	Home,
+	Loader2,
+	Scale,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
 
@@ -6,6 +16,7 @@ import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/ag
 import type { ExtConfig, LanguagePreference } from '@/agent/useAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 
 interface ConfigPanelProps {
 	config: ExtConfig | null
@@ -18,18 +29,26 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [baseURL, setBaseURL] = useState(config?.baseURL || DEMO_BASE_URL)
 	const [model, setModel] = useState(config?.model || DEMO_MODEL)
 	const [language, setLanguage] = useState<LanguagePreference>(config?.language)
+	const [maxSteps, setMaxSteps] = useState<number | undefined>(config?.maxSteps)
+	const [systemInstruction, setSystemInstruction] = useState(config?.systemInstruction ?? '')
+	const [experimentalLlmsTxt, setExperimentalLlmsTxt] = useState(
+		config?.experimentalLlmsTxt ?? false
+	)
+	const [advancedOpen, setAdvancedOpen] = useState(false)
 	const [saving, setSaving] = useState(false)
 	const [userAuthToken, setUserAuthToken] = useState<string>('')
 	const [copied, setCopied] = useState(false)
 	const [showToken, setShowToken] = useState(false)
 	const [showApiKey, setShowApiKey] = useState(false)
 
-	// Update local state when config prop changes
 	useEffect(() => {
 		setApiKey(config?.apiKey || DEMO_API_KEY)
 		setBaseURL(config?.baseURL || DEMO_BASE_URL)
 		setModel(config?.model || DEMO_MODEL)
 		setLanguage(config?.language)
+		setMaxSteps(config?.maxSteps)
+		setSystemInstruction(config?.systemInstruction ?? '')
+		setExperimentalLlmsTxt(config?.experimentalLlmsTxt ?? false)
 	}, [config])
 
 	// Poll for user auth token every second until found
@@ -67,7 +86,15 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const handleSave = async () => {
 		setSaving(true)
 		try {
-			await onSave({ apiKey, baseURL, model, language })
+			await onSave({
+				apiKey,
+				baseURL,
+				model,
+				language,
+				maxSteps: maxSteps || undefined,
+				systemInstruction: systemInstruction || undefined,
+				experimentalLlmsTxt,
+			})
 		} finally {
 			setSaving(false)
 		}
@@ -87,28 +114,11 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				</Button>
 			</div>
 
-			{/* Testing API notice */}
-			{isTestingEndpoint(baseURL) && (
-				<div className="p-2.5 rounded-md border border-amber-500/30 bg-amber-500/5 text-[10px] text-muted-foreground leading-relaxed">
-					<Scale className="size-3 inline-block mr-1 -mt-0.5 text-amber-600" />
-					You are using the free testing API. By using this service you agree to the{' '}
-					<a
-						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="underline hover:text-foreground"
-					>
-						Terms of Use & Privacy Policy
-					</a>
-					. No sensitive data. No guaranteed availability.
-				</div>
-			)}
-
 			{/* User Auth Token Section */}
 			<div className="flex flex-col gap-1.5 p-3 bg-muted/50 rounded-md border">
 				<label className="text-xs font-medium text-muted-foreground">User Auth Token</label>
 				<p className="text-[10px] text-muted-foreground mb-1">
-					Add this token to a website's localStorage to give it authorization to call this extension
+					Give a website the ability to call this extension.
 				</p>
 				<div className="flex gap-2 items-center">
 					<Input
@@ -153,6 +163,23 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				/>
 			</div>
 
+			{/* Testing API notice */}
+			{isTestingEndpoint(baseURL) && (
+				<div className="p-2.5 rounded-md border border-amber-500/30 bg-amber-500/5 text-[11px] text-muted-foreground leading-relaxed">
+					<Scale className="size-3 inline-block mr-1 -mt-0.5 text-amber-600" />
+					You are using the free testing API. By using this service you agree to the{' '}
+					<a
+						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="underline hover:text-foreground"
+					>
+						Terms of Use & Privacy Policy
+					</a>
+					. No sensitive data. No guaranteed availability.
+				</div>
+			)}
+
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Model</label>
 				<Input
@@ -196,6 +223,52 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					<option value="zh-CN">中文</option>
 				</select>
 			</div>
+
+			{/* Advanced Config */}
+			<button
+				type="button"
+				onClick={() => setAdvancedOpen(!advancedOpen)}
+				className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer mt-1 font-bold"
+			>
+				Advanced
+				<ChevronDown
+					className="size-3 transition-transform"
+					style={{ transform: advancedOpen ? 'rotate(0deg)' : 'rotate(90deg)' }}
+				/>
+			</button>
+
+			{advancedOpen && (
+				<>
+					<div className="flex flex-col gap-1.5">
+						<label className="text-xs text-muted-foreground">Max Steps</label>
+						<Input
+							type="number"
+							placeholder="40"
+							min={1}
+							max={200}
+							value={maxSteps ?? ''}
+							onChange={(e) => setMaxSteps(e.target.value ? Number(e.target.value) : undefined)}
+							className="text-xs h-8 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [-moz-appearance:textfield]"
+						/>
+					</div>
+
+					<div className="flex flex-col gap-1.5">
+						<label className="text-xs text-muted-foreground">System Instruction</label>
+						<textarea
+							placeholder="Additional instructions for the agent..."
+							value={systemInstruction}
+							onChange={(e) => setSystemInstruction(e.target.value)}
+							rows={3}
+							className="text-xs rounded-md border border-input bg-background px-3 py-2 resize-y min-h-[60px]"
+						/>
+					</div>
+
+					<label className="flex items-center justify-between cursor-pointer">
+						<span className="text-xs text-muted-foreground">Experimental llms.txt support</span>
+						<Switch checked={experimentalLlmsTxt} onCheckedChange={setExperimentalLlmsTxt} />
+					</label>
+				</>
+			)}
 
 			<div className="flex gap-2 mt-2">
 				<Button variant="outline" onClick={onClose} className="flex-1 h-8 text-xs cursor-pointer">

@@ -16,7 +16,13 @@ import { DEMO_CONFIG, migrateLegacyEndpoint } from './constants'
 /** Language preference: undefined means follow system */
 export type LanguagePreference = SupportedLanguage | undefined
 
-export interface ExtConfig extends LLMConfig {
+export interface AdvancedConfig {
+	maxSteps?: number
+	systemInstruction?: string
+	experimentalLlmsTxt?: boolean
+}
+
+export interface ExtConfig extends LLMConfig, AdvancedConfig {
 	language?: LanguagePreference
 }
 
@@ -40,9 +46,10 @@ export function useAgent(): UseAgentResult {
 	const [config, setConfig] = useState<ExtConfig | null>(null)
 
 	useEffect(() => {
-		chrome.storage.local.get(['llmConfig', 'language']).then((result) => {
+		chrome.storage.local.get(['llmConfig', 'language', 'advancedConfig']).then((result) => {
 			let llmConfig = (result.llmConfig as LLMConfig) ?? DEMO_CONFIG
 			const language = (result.language as SupportedLanguage) || undefined
+			const advancedConfig = (result.advancedConfig as AdvancedConfig) ?? {}
 
 			// Auto-migrate legacy testing endpoints
 			const migrated = migrateLegacyEndpoint(llmConfig)
@@ -53,14 +60,18 @@ export function useAgent(): UseAgentResult {
 				chrome.storage.local.set({ llmConfig: DEMO_CONFIG })
 			}
 
-			setConfig({ ...llmConfig, language })
+			setConfig({ ...llmConfig, ...advancedConfig, language })
 		})
 	}, [])
 
 	useEffect(() => {
 		if (!config) return
 
-		const agent = new MultiPageAgent(config)
+		const { systemInstruction, ...agentConfig } = config
+		const agent = new MultiPageAgent({
+			...agentConfig,
+			instructions: systemInstruction ? { system: systemInstruction } : undefined,
+		})
 		agentRef.current = agent
 
 		const handleStatusChange = (e: Event) => {
@@ -106,15 +117,26 @@ export function useAgent(): UseAgentResult {
 		agentRef.current?.stop()
 	}, [])
 
-	const configure = useCallback(async ({ language, ...llmConfig }: ExtConfig) => {
-		await chrome.storage.local.set({ llmConfig })
-		if (language) {
-			await chrome.storage.local.set({ language })
-		} else {
-			await chrome.storage.local.remove('language')
-		}
-		setConfig({ ...llmConfig, language })
-	}, [])
+	const configure = useCallback(
+		async ({
+			language,
+			maxSteps,
+			systemInstruction,
+			experimentalLlmsTxt,
+			...llmConfig
+		}: ExtConfig) => {
+			await chrome.storage.local.set({ llmConfig })
+			if (language) {
+				await chrome.storage.local.set({ language })
+			} else {
+				await chrome.storage.local.remove('language')
+			}
+			const advancedConfig: AdvancedConfig = { maxSteps, systemInstruction, experimentalLlmsTxt }
+			await chrome.storage.local.set({ advancedConfig })
+			setConfig({ ...llmConfig, ...advancedConfig, language })
+		},
+		[]
+	)
 
 	return {
 		status,
