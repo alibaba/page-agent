@@ -1,6 +1,6 @@
 import { InvokeError, InvokeErrorType } from '@page-agent/llms'
 import chalk from 'chalk'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import type { PageAgentTool } from '../tools'
 

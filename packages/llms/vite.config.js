@@ -25,7 +25,7 @@ export default defineConfig({
 		},
 		outDir: resolve(__dirname, 'dist', 'lib'),
 		rollupOptions: {
-			external: ['chalk', 'zod'],
+			external: ['chalk', 'zod', 'zod/v4'],
 		},
 		minify: false,
 		sourcemap: true,

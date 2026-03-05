@@ -1,7 +1,7 @@
 /**
  * OpenAI Client implementation
  */
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import { InvokeError, InvokeErrorType } from './errors'
 import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'

@@ -2,7 +2,7 @@
  * Utility functions for LLM integration
  */
 import chalk from 'chalk'
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import type { Tool } from './types'
 

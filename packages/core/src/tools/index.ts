@@ -2,7 +2,7 @@
  * Internal tools for PageAgent.
  * @note Adapted from browser-use
  */
-import * as z from 'zod'
+import * as z from 'zod/v4'
 
 import type { PageAgentCore } from '../PageAgentCore'
 import { waitFor } from '../utils'
