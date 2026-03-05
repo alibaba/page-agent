@@ -373,6 +373,7 @@ export class Panel {
 		wrapper.id = 'page-agent-runtime_agent-panel'
 		wrapper.className = styles.wrapper
 		wrapper.setAttribute('data-browser-use-ignore', 'true')
+		wrapper.setAttribute('data-page-agent-ignore', 'true')
 
 		wrapper.innerHTML = `
 			<div class="${styles.background}"></div>

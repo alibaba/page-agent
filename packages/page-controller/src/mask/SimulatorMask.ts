@@ -28,6 +28,7 @@ export class SimulatorMask {
 		this.wrapper.id = 'page-agent-runtime_simulator-mask'
 		this.wrapper.className = styles.wrapper
 		this.wrapper.setAttribute('data-browser-use-ignore', 'true')
+		this.wrapper.setAttribute('data-page-agent-ignore', 'true')
 
 		this.wrapper.appendChild(this.motion.element)
 		this.motion.autoResize(this.wrapper)
