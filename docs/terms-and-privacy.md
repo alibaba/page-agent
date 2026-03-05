@@ -36,7 +36,7 @@ This free testing API is provided **strictly for technical evaluation and R&D pu
 
 **Recommendation for Real Usage**: For secure and continuous usage, we strongly advise using the default BYOK mode with your own legally compliant commercial LLM API keys, or connecting to local, offline models (e.g., Ollama).
 
-**Note**: This service processes data via servers located in Mainland China. If you are located in a region with strict data localization laws (such as the EU/EEA), please do not use this demo.
+**Note**: This testing LLM api processes data via servers located in Mainland China. If you are located in a region with strict data localization laws (such as the EU/EEA), please do not use this demo.
 
 ---
 
