@@ -62,7 +62,7 @@ Located in `src/components/ui/`:
 src/
 ├── pages/
 │   ├── home/
-│   │   ├── HomeContent.tsx  # Homepage sections
+│   │   ├── index.tsx  # Homepage
 │   │   └── ...Section.tsx
 │   └── docs/
 │       ├── index.tsx    # Docs route switch

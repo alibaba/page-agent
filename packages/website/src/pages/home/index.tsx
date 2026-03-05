@@ -1,10 +1,10 @@
 import { Suspense, lazy } from 'react'
 
-import HeroSection from './home/HeroSection'
+import HeroSection from './HeroSection'
 
-const FeaturesSection = lazy(() => import('./home/FeaturesSection'))
-const ScenariosSection = lazy(() => import('./home/ScenariosSection'))
-const OneMoreThingSection = lazy(() => import('./home/OneMoreThingSection'))
+const FeaturesSection = lazy(() => import('./FeaturesSection'))
+const ScenariosSection = lazy(() => import('./ScenariosSection'))
+const OneMoreThingSection = lazy(() => import('./OneMoreThingSection'))
 
 export default function HomePage() {
 	return (
