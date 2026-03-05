@@ -6,9 +6,7 @@ import * as z from 'zod'
 
 import type { Tool } from './types'
 
-function debug(message: string) {
-	console.debug(chalk.gray('[LLM]'), message)
-}
+const debug = console.debug.bind(console, chalk.gray('[LLM]'))
 
 /**
  * Convert Zod schema to OpenAI tool format

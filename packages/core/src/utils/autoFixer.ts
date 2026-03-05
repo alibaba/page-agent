@@ -4,6 +4,8 @@ import * as z from 'zod'
 
 import type { PageAgentTool } from '../tools'
 
+const log = console.log.bind(console, chalk.yellow('[autoFixer]'))
+
 /**
  * Normalize LLM response and fix common format issues.
  *
@@ -34,7 +36,7 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
 
 		// case: sometimes the model only returns the action level
 		if (toolCall.function.name && toolCall.function.name !== 'AgentOutput') {
-			console.log(chalk.yellow(`[normalizeResponse] #1: fixing tool_call`))
+			log(`#1: fixing tool_call`)
 			resolvedArguments = { action: safeJsonParse(resolvedArguments) }
 		}
 	} else {
@@ -47,13 +49,13 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
 
 				// case: sometimes the content json includes upper level wrapper
 				if (resolvedArguments?.name === 'AgentOutput') {
-					console.log(chalk.yellow(`[normalizeResponse] #2: fixing tool_call`))
+					log(`#2: fixing tool_call`)
 					resolvedArguments = safeJsonParse(resolvedArguments.arguments)
 				}
 
 				// case: sometimes even 2-levels of wrapping
 				if (resolvedArguments?.type === 'function') {
-					console.log(chalk.yellow(`[normalizeResponse] #3: fixing tool_call`))
+					log(`#3: fixing tool_call`)
 					resolvedArguments = safeJsonParse(resolvedArguments.function.arguments)
 				}
 
@@ -66,7 +68,7 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
 					!resolvedArguments?.next_goal &&
 					!resolvedArguments?.thinking
 				) {
-					console.log(chalk.yellow(`[normalizeResponse] #4: fixing tool_call`))
+					log(`#4: fixing tool_call`)
 					resolvedArguments = { action: safeJsonParse(resolvedArguments) }
 				}
 			} else {
@@ -90,7 +92,7 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
 
 	// fix incomplete formats
 	if (!resolvedArguments.action) {
-		console.log(chalk.yellow(`[normalizeResponse] #5: fixing tool_call`))
+		log(`#5: fixing tool_call`)
 		resolvedArguments.action = { name: 'wait', input: { seconds: 1 } }
 	}
 
@@ -149,9 +151,7 @@ function validateAction(action: any, tools: Map<string, PageAgentTool>): any {
 			(k) => !(schema.shape as Record<string, z.ZodType>)[k].safeParse(undefined).success
 		)
 		if (requiredKey) {
-			console.log(
-				chalk.yellow(`[normalizeResponse] coercing primitive action input for "${toolName}"`)
-			)
+			log(`coercing primitive action input for "${toolName}"`)
 			value = { [requiredKey]: value }
 		}
 	}

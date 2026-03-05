@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 
-export { normalizeResponse } from './autoFixer'
+export * from './autoFixer'
 
 export async function waitFor(seconds: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
