@@ -72,11 +72,15 @@ export async function fetchLlmsTxt(url: string): Promise<string | null> {
 		if (res.ok) {
 			result = await res.text()
 			console.log(chalk.green(`[llms.txt] Found (${result.length} chars)`))
+			if (result.length > 1000) {
+				console.log(chalk.yellow(`[llms.txt] Truncating to 1000 chars`))
+				result = truncate(result, 1000)
+			}
 		} else {
-			console.log(chalk.gray(`[llms.txt] ${res.status} for ${endpoint}`))
+			console.debug(chalk.gray(`[llms.txt] ${res.status} for ${endpoint}`))
 		}
 	} catch (e) {
-		console.log(chalk.gray(`[llms.txt] Failed for ${endpoint}`), e)
+		console.debug(chalk.gray(`[llms.txt] not found for ${endpoint}`), e)
 	}
 	llmsTxtCache.set(origin, result)
 	return result
