@@ -17,6 +17,22 @@ export default function CustomTools() {
 
 			<div className="space-y-8">
 				<section>
+					<Heading id="zod-version" className="text-2xl font-bold mb-4">
+						{isZh ? 'Zod 版本' : 'Zod Version'}
+					</Heading>
+					<p className="text-gray-600 dark:text-gray-300 mb-4">
+						{isZh
+							? 'Page Agent 使用 Zod 定义工具的输入 schema。支持 Zod 3 (>=3.25.0) 和 Zod 4，请从 zod/v4 子路径导入。不支持 Zod Mini。'
+							: 'Page Agent uses Zod for tool input schemas. Both Zod 3 (>=3.25.0) and Zod 4 are supported. Always import from the zod/v4 subpath. Zod Mini is not supported.'}
+					</p>
+					<CodeEditor
+						code={`// Zod 3 (>=3.25.0) or Zod 4
+import { z } from 'zod/v4'`}
+						language="javascript"
+					/>
+				</section>
+
+				<section>
 					<Heading id="define-tools" className="text-2xl font-bold mb-4">
 						{isZh ? '定义工具' : 'Define Tools'}
 					</Heading>
@@ -27,7 +43,7 @@ export default function CustomTools() {
 					</p>
 
 					<CodeEditor
-						code={`import { z } from 'zod'
+						code={`import { z } from 'zod/v4'
 import { PageAgent, tool } from 'page-agent'
 
 const pageAgent = new PageAgent({

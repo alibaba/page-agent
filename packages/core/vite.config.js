@@ -30,6 +30,7 @@ export default defineConfig({
 			external: [
 				'chalk',
 				'zod',
+				'zod/v4',
 				// all the internal packages
 				/^@page-agent\//,
 			],
