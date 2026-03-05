@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2026-03-05
+
+### Breaking Changes
+
+- **`data-browser-use-ignore` → `data-page-agent-ignore`** - DOM ignore attribute renamed to match the project identity
+- **Config types restructured** - `PageAgentConfig` split into `AgentConfig` + `PageAgentCoreConfig`; config definitions moved from `config/index.ts` to `types.ts`
+- **Zod v3/v4 dual support** - Libraries now accept both `zod@^3.25` and `zod@^4.0` as peer dependencies
+
+### Features
+
+- **Experimental `llms.txt` support** - Agent can fetch and include a site's `llms.txt` in context. Enable via `experimentalLlmsTxt: true`
+
+### Improvements
+
+- Default `maxSteps` changed from 20 to 40 for better for complex tasks out of the box
+- Added 400ms wait between agent steps for page reactions
+- Increased click wait time (100ms → 200ms) for more reliable interactions
+- Removed debug `console.log` statements from scroll actions
+- Reset observations on new task start
+- Improved logging across packages
+
+### Extension v0.1.9
+
+> PageAgent 1.5.1
+
+- **Advanced config panel** - New collapsible section exposing Max Steps, System Instruction, and experimental `llms.txt` toggle
+- Streamlined User Auth Token description
+- Moved testing API notice below auth token section
+
+---
+
 ## [1.4.0] - 2026-02-27
 
 ### Features
