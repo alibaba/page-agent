@@ -45,7 +45,7 @@ are sent to the LLM API endpoint configured in **your settings**.
 
 **If you configure a third-party LLM provider** (e.g., OpenAI, Anthropic, or others), data is sent directly to that provider. Their privacy policies apply.
 
-**If you use the built-in testing API**, there is no built-in testing API. You must configure your own LLM provider in the extension settings.
+The extension requires you to configure your own LLM provider in the extension settings before it can be used.
 
 ### Data Storage
 

@@ -36,6 +36,12 @@ setTimeout(() => {
 	}
 
 	// Create agent
+	if (!config.model || !config.baseURL) {
+		console.error(
+			'🚀 page-agent.js: LLM not configured. Provide model and baseURL via URL params (?model=...&baseURL=...) or LLM_MODEL_NAME/LLM_BASE_URL env vars.'
+		)
+		return
+	}
 	window.pageAgent = new PageAgent(config)
 	window.pageAgent.panel.show()
 
