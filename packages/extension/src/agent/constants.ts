@@ -2,17 +2,24 @@ import type { LLMConfig } from '@page-agent/llms'
 
 export const DEMO_API_KEY = 'NA'
 
-/** Legacy testing endpoints that are no longer supported */
-export const LEGACY_TESTING_ENDPOINTS = [
-	'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy',
-	'https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run',
-]
-
-export function isTestingEndpoint(url: string): boolean {
-	const normalized = url.replace(/\/+$/, '')
-	return LEGACY_TESTING_ENDPOINTS.some((ep) => normalized === ep)
+/**
+ * Returns true if the URL points to a removed testing endpoint that should no
+ * longer be used. Checks are intentionally done on unique resource identifiers
+ * rather than full URLs so the source does not embed defunct server addresses.
+ */
+export function isLegacyEndpoint(url: string): boolean {
+	const normalized = url.replace(/\/+$/, '').toLowerCase()
+	// Matches the defunct Alibaba Cloud FC testing proxy and old Supabase proxy
+	return (
+		normalized.includes('page-ag-testing-ohftxirgbn') ||
+		normalized.includes('hwcxiuzfylggtcktqgij.supabase.co')
+	)
 }
 
-export function migrateLegacyEndpoint(config: LLMConfig): LLMConfig {
+/** Clear a legacy endpoint from stored config so the user is prompted to enter their own */
+export function migrateLegacyEndpoint(config: LLMConfig): LLMConfig | null {
+	if (isLegacyEndpoint(config.baseURL)) {
+		return null
+	}
 	return config
 }

@@ -56,10 +56,12 @@ export function useAgent(): UseAgentResult {
 				return
 			}
 
-			// Auto-migrate legacy testing endpoints
+			// Clear a legacy endpoint from stored config so the user is prompted to configure their own
 			const llmConfig = migrateLegacyEndpoint(savedLlmConfig)
-			if (llmConfig !== savedLlmConfig) {
-				chrome.storage.local.set({ llmConfig })
+			if (llmConfig === null) {
+				chrome.storage.local.remove('llmConfig')
+				setConfig(null)
+				return
 			}
 
 			setConfig({ ...llmConfig, ...advancedConfig, language })

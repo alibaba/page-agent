@@ -7,12 +7,11 @@ import {
 	HatGlasses,
 	Home,
 	Loader2,
-	Scale,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
 
-import { DEMO_API_KEY, isTestingEndpoint } from '@/agent/constants'
+import { DEMO_API_KEY } from '@/agent/constants'
 import type { ExtConfig, LanguagePreference } from '@/agent/useAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -162,23 +161,6 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					className="text-xs h-8"
 				/>
 			</div>
-
-			{/* Testing API notice */}
-			{isTestingEndpoint(baseURL) && (
-				<div className="p-2.5 rounded-md border border-amber-500/30 bg-amber-500/5 text-[11px] text-muted-foreground leading-relaxed">
-					<Scale className="size-3 inline-block mr-1 -mt-0.5 text-amber-600" />
-					You are using the free testing API. By using this service you agree to the{' '}
-					<a
-						href="https://github.com/zhulinchng/page-agent/blob/main/docs/terms-and-privacy.md"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="underline hover:text-foreground"
-					>
-						Terms of Use & Privacy Policy
-					</a>
-					. No sensitive data. No guaranteed availability.
-				</div>
-			)}
 
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Model</label>
