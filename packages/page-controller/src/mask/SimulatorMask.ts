@@ -8,13 +8,7 @@ import cursorStyles from './cursor.module.css'
 export class SimulatorMask {
 	shown: boolean = false
 	wrapper = document.createElement('div')
-	motion = new Motion({
-		mode: isPageDark() ? 'dark' : 'light',
-		styles: {
-			position: 'absolute',
-			inset: '0',
-		},
-	})
+	motion: Motion | null = null
 
 	#cursor = document.createElement('div')
 
@@ -30,8 +24,17 @@ export class SimulatorMask {
 		this.wrapper.setAttribute('data-browser-use-ignore', 'true')
 		this.wrapper.setAttribute('data-page-agent-ignore', 'true')
 
-		this.wrapper.appendChild(this.motion.element)
-		this.motion.autoResize(this.wrapper)
+		try {
+			const motion = new Motion({
+				mode: isPageDark() ? 'dark' : 'light',
+				styles: { position: 'absolute', inset: '0' },
+			})
+			this.motion = motion
+			this.wrapper.appendChild(motion.element)
+			motion.autoResize(this.wrapper)
+		} catch (e) {
+			console.warn('[SimulatorMask] Motion overlay unavailable:', e)
+		}
 
 		// Capture all mouse, keyboard, and wheel events
 		this.wrapper.addEventListener('click', (e) => {
@@ -145,8 +148,8 @@ export class SimulatorMask {
 		if (this.shown) return
 
 		this.shown = true
-		this.motion.start()
-		this.motion.fadeIn()
+		this.motion?.start()
+		this.motion?.fadeIn()
 
 		this.wrapper.style.display = 'block'
 
@@ -163,8 +166,8 @@ export class SimulatorMask {
 		if (!this.shown) return
 
 		this.shown = false
-		this.motion.fadeOut()
-		this.motion.pause()
+		this.motion?.fadeOut()
+		this.motion?.pause()
 
 		this.#cursor.classList.remove(cursorStyles.clicking)
 
@@ -174,7 +177,7 @@ export class SimulatorMask {
 	}
 
 	dispose() {
-		this.motion.dispose()
+		this.motion?.dispose()
 		this.wrapper.remove()
 	}
 }
