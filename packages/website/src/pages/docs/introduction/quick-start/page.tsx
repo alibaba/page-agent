@@ -1,6 +1,6 @@
 import CodeEditor from '@/components/CodeEditor'
 import { Heading } from '@/components/Heading'
-import { CDN_DEMO_CN_URL, CDN_DEMO_URL } from '@/constants'
+import { CDN_DEMO_URL } from '@/constants'
 import { useLanguage } from '@/i18n/context'
 
 export default function QuickStart() {
@@ -24,36 +24,6 @@ export default function QuickStart() {
 					<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
 						{isZh ? '🚀 快速体验（Demo CDN）' : '🚀 Quick Try (Demo CDN)'}
 					</h3>
-					<div className="bg-yellow-50 dark:bg-yellow-900/20 p-2 rounded mb-3 text-sm">
-						<span className="text-yellow-800 dark:text-yellow-200">
-							⚠️{' '}
-							{isZh ? (
-								<>
-									该 Demo CDN 使用了免费的测试 LLM API，使用即表示您同意其
-									<a
-										href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
-										target="_blank"
-										rel="noopener noreferrer"
-										className="underline"
-									>
-										使用条款
-									</a>
-								</>
-							) : (
-								<>
-									This demo CDN uses our free testing LLM API. By using it you agree to the{' '}
-									<a
-										href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
-										target="_blank"
-										rel="noopener noreferrer"
-										className="underline"
-									>
-										Terms of Use
-									</a>
-								</>
-							)}
-						</span>
-					</div>
 					<CodeEditor
 						code={`<script src="DEMO_CDN_URL" crossorigin="true"></script>`}
 						language="html"
@@ -62,19 +32,15 @@ export default function QuickStart() {
 						<thead>
 							<tr className="border-b border-gray-200 dark:border-gray-700">
 								<th className="text-left py-2 px-3 font-semibold w-28">
-									{isZh ? '镜像' : 'Mirrors'}
+									{isZh ? '镜像' : 'Mirror'}
 								</th>
 								<th className="text-left py-2 px-3 font-semibold">URL</th>
 							</tr>
 						</thead>
 						<tbody>
-							<tr className="border-b border-gray-100 dark:border-gray-800">
+							<tr>
 								<td className="py-2 px-3">{isZh ? '全球' : 'Global'}</td>
 								<td className="py-2 px-3 font-mono text-xs break-all">{CDN_DEMO_URL}</td>
-							</tr>
-							<tr>
-								<td className="py-2 px-3">{isZh ? '中国' : 'China'}</td>
-								<td className="py-2 px-3 font-mono text-xs break-all">{CDN_DEMO_CN_URL}</td>
 							</tr>
 						</tbody>
 					</table>
@@ -99,8 +65,8 @@ import { PageAgent } from 'page-agent'`}
 					</h3>
 					<CodeEditor
 						code={`const agent = new PageAgent({
-  model: 'qwen3.5-plus',
-  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  model: 'gpt-4.1-mini',
+  baseURL: 'https://api.openai.com/v1',
   apiKey: 'YOUR_API_KEY',
   language: '${isZh ? 'zh-CN' : 'en-US'}'
 })`}

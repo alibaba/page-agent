@@ -39,7 +39,11 @@ export default function Overview() {
 					>
 						<img src="https://img.shields.io/bundlephobia/minzip/page-agent" alt="Bundle Size" />
 					</a>
-					<a href="https://github.com/alibaba/page-agent" target="_blank" rel="noopener noreferrer">
+					<a
+						href="https://github.com/zhulinchng/page-agent"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
 						<img
 							src="https://img.shields.io/github/stars/alibaba/page-agent.svg"
 							alt="GitHub stars"

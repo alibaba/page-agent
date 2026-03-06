@@ -8,7 +8,7 @@ export default function ChromeExtension() {
 	const { isZh } = useLanguage()
 	const chromeWebStoreUrl =
 		'https://chromewebstore.google.com/detail/page-agent-ext/akldabonmimlicnjlflnapfeklbfemhj'
-	const githubReleasesUrl = 'https://github.com/alibaba/page-agent/releases'
+	const githubReleasesUrl = 'https://github.com/zhulinchng/page-agent/releases'
 
 	return (
 		<div>
@@ -166,7 +166,7 @@ localStorage.setItem('PageAgentExtUserAuthToken', '<your-token-from-extension>')
 						</p>
 						<div className="space-y-2">
 							<a
-								href="https://github.com/alibaba/page-agent/blob/main/packages/extension/docs/extension_api.md"
+								href="https://github.com/zhulinchng/page-agent/blob/main/packages/extension/docs/extension_api.md"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="block text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
@@ -325,7 +325,7 @@ window.PAGE_AGENT_EXT.stop()`
 							? '建议先阅读扩展 API 文档，再参考 background entry implementation。'
 							: 'Start with the extension API docs, then use the background entry implementation as a reference.'}
 						<a
-							href="https://github.com/alibaba/page-agent/blob/main/packages/extension/src/entrypoints/background.ts"
+							href="https://github.com/zhulinchng/page-agent/blob/main/packages/extension/src/entrypoints/background.ts"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"

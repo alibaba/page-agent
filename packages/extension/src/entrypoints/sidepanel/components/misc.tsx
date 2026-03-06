@@ -114,7 +114,7 @@ export function EmptyState() {
 			</div>
 			<div className="flex items-center gap-3 mt-1 text-muted-foreground">
 				<a
-					href="https://github.com/alibaba/page-agent"
+					href="https://github.com/zhulinchng/page-agent"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="hover:text-foreground transition-colors"
@@ -125,7 +125,7 @@ export function EmptyState() {
 					</svg>
 				</a>
 				<a
-					href="https://alibaba.github.io/page-agent/docs/features/chrome-extension"
+					href="https://zhulinchng.github.io/page-agent/docs/features/chrome-extension"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="hover:text-foreground transition-colors"
@@ -134,7 +134,7 @@ export function EmptyState() {
 					<BookOpen className="size-4" />
 				</a>
 				<a
-					href="https://alibaba.github.io/page-agent"
+					href="https://zhulinchng.github.io/page-agent"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="hover:text-foreground transition-colors"

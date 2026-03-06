@@ -63,7 +63,7 @@ export default function Header() {
 								<BookOpen className="w-5 h-5" />
 							</Link>
 							<a
-								href="https://github.com/alibaba/page-agent"
+								href="https://github.com/zhulinchng/page-agent"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 shrink-0"
@@ -97,7 +97,7 @@ export default function Header() {
 								{isZh ? '文档' : 'Docs'}
 							</Link>
 							<a
-								href="https://github.com/alibaba/page-agent"
+								href="https://github.com/zhulinchng/page-agent"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
@@ -146,7 +146,7 @@ export default function Header() {
 								{isZh ? '文档' : 'Docs'}
 							</Link>
 							<a
-								href="https://github.com/alibaba/page-agent"
+								href="https://github.com/zhulinchng/page-agent"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
