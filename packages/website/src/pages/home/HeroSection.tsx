@@ -7,22 +7,14 @@ import { AnimatedGradientText } from '../../components/ui/animated-gradient-text
 import { Highlighter } from '../../components/ui/highlighter'
 import { NeonGradientCard } from '../../components/ui/neon-gradient-card'
 import { Particles } from '../../components/ui/particles'
-import {
-	CDN_DEMO_CN_URL,
-	CDN_DEMO_URL,
-	DEMO_API_KEY,
-	DEMO_BASE_URL,
-	DEMO_MODEL,
-} from '../../constants'
+import { CDN_DEMO_URL } from '../../constants'
 import { useLanguage } from '../../i18n/context'
 
 let pageAgentModule: Promise<typeof import('page-agent')> | null = null
 
-function getInjection(useCN?: boolean) {
-	const cdn = useCN ? CDN_DEMO_CN_URL : CDN_DEMO_URL
-
+function getInjection() {
 	const injection = encodeURI(
-		`javascript:(function(){var s=document.createElement('script');s.src=\`${cdn}?t=\${Math.random()}\`;s.setAttribute('crossorigin', true);s.type="text/javascript";s.onload=()=>console.log('PageAgent script loaded!');document.body.appendChild(s);})();`
+		`javascript:(function(){var s=document.createElement('script');s.src=\`${CDN_DEMO_URL}?t=\${Math.random()}\`;s.setAttribute('crossorigin', true);s.type="text/javascript";s.onload=()=>console.log('PageAgent script loaded!');document.body.appendChild(s);})();`
 	)
 
 	return `
@@ -55,8 +47,6 @@ export default function HeroSection() {
 	const isOther = params.has('try_other')
 
 	const [activeTab, setActiveTab] = useState<'try' | 'other'>(isOther ? 'other' : 'try')
-	const [cdnSource, setCdnSource] = useState<'international' | 'china'>('international')
-
 	const [ready, setReady] = useState(false)
 	useEffect(() => {
 		pageAgentModule ??= import('page-agent')
@@ -70,6 +60,17 @@ export default function HeroSection() {
 		const win = window as any
 
 		if (!win.pageAgent || win.pageAgent.disposed) {
+			const model = import.meta.env.LLM_MODEL_NAME
+			const baseURL = import.meta.env.LLM_BASE_URL
+			const apiKey = import.meta.env.LLM_API_KEY || 'NA'
+
+			if (!model || !baseURL) {
+				console.warn(
+					'[PageAgent] No LLM configured. Set LLM_MODEL_NAME and LLM_BASE_URL env vars to enable the demo.'
+				)
+				return
+			}
+
 			win.pageAgent = new (PageAgent as typeof PageAgentType)({
 				interactiveBlacklist: [document.getElementById('root')!],
 				language: language,
@@ -83,18 +84,9 @@ export default function HeroSection() {
 					},
 				},
 
-				model:
-					import.meta.env.DEV && import.meta.env.LLM_MODEL_NAME
-						? import.meta.env.LLM_MODEL_NAME
-						: DEMO_MODEL,
-				baseURL:
-					import.meta.env.DEV && import.meta.env.LLM_BASE_URL
-						? import.meta.env.LLM_BASE_URL
-						: DEMO_BASE_URL,
-				apiKey:
-					import.meta.env.DEV && import.meta.env.LLM_API_KEY
-						? import.meta.env.LLM_API_KEY
-						: DEMO_API_KEY,
+				model,
+				baseURL,
+				apiKey,
 			})
 		}
 
@@ -235,31 +227,9 @@ export default function HeroSection() {
 												</button>
 											</div>
 											<p className="text-xs text-gray-500 dark:text-gray-400 text-left">
-												{isZh ? (
-													<>
-														使用免费测试 LLM API，点击执行即表示您同意
-														<a
-															href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
-															target="_blank"
-															rel="noopener noreferrer"
-															className="underline"
-														>
-															使用条款
-														</a>
-													</>
-												) : (
-													<>
-														Powered by free testing LLM API. By clicking Run you agree to the{' '}
-														<a
-															href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
-															target="_blank"
-															rel="noopener noreferrer"
-															className="underline"
-														>
-															Terms of Use
-														</a>
-													</>
-												)}
+												{isZh
+													? '需要配置 LLM_MODEL_NAME 和 LLM_BASE_URL 环境变量以启用 demo。'
+													: 'Configure LLM_MODEL_NAME and LLM_BASE_URL environment variables to enable the demo.'}
 											</p>
 										</div>
 									)}
@@ -292,19 +262,9 @@ export default function HeroSection() {
 														{isZh ? '拖拽下面按钮到收藏夹栏' : 'Drag this button to your bookmarks'}
 													</p>
 													<div className="flex items-center justify-center gap-3">
-														<select
-															value={cdnSource}
-															onChange={(e) =>
-																setCdnSource(e.target.value as 'international' | 'china')
-															}
-															className="px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200"
-														>
-															<option value="international">jsdelivr CDN</option>
-															<option value="china">npmmirror CDN</option>
-														</select>
 														<div
 															dangerouslySetInnerHTML={{
-																__html: getInjection(cdnSource === 'china'),
+																__html: getInjection(),
 															}}
 														></div>
 													</div>
@@ -326,40 +286,6 @@ export default function HeroSection() {
 													{isZh ? '⚠️ 注意' : '⚠️ Heads Up'}
 												</h4>
 												<ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-													<li className="flex items-start text-left">
-														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-														{isZh ? (
-															<span>
-																使用免费测试 LLM API，使用即表示同意
-																<a
-																	href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
-																	target="_blank"
-																	rel="noopener noreferrer"
-																	className="text-yellow-700 dark:text-yellow-300 underline"
-																>
-																	使用条款
-																</a>
-															</span>
-														) : (
-															<span>
-																Uses free testing LLM API. By using you agree to the{' '}
-																<a
-																	href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
-																	target="_blank"
-																	rel="noopener noreferrer"
-																	className="text-yellow-700 dark:text-yellow-300 underline"
-																>
-																	Terms of Use
-																</a>
-															</span>
-														)}
-													</li>
-													<li className="flex items-start text-left">
-														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
-														{isZh
-															? '数据通过中国大陆服务器处理'
-															: 'Data processed via servers in Mainland China'}
-													</li>
 													<li className="flex items-start text-left">
 														<span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-2 mr-2 shrink-0 "></span>
 														{isZh

@@ -80,7 +80,7 @@ src/
 
 ## Routing
 
-Uses wouter browser routing with base path for GitHub Pages deployment at `https://alibaba.github.io/page-agent/`.
+Uses wouter browser routing with base path for GitHub Pages deployment at `https://zhulinchng.github.io/page-agent/`.
 
 ```tsx
 // main.tsx

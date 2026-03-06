@@ -12,7 +12,7 @@ Primary channel:
 
 Latest updates are often published earlier on:
 
-- GitHub Releases: https://github.com/alibaba/page-agent/releases
+- GitHub Releases: https://github.com/zhulinchng/page-agent/releases
 
 ### 2. Install type definitions (recommended)
 

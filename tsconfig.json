@@ -9,6 +9,6 @@
         { "path": "./packages/page-agent" },
         { "path": "./packages/website" }
     ],
-    "include": ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx"],
+    "include": ["packages/*/src/**/*.ts", "packages/*/src/**/*.tsx", "vitest.config.ts"],
     "exclude": ["node_modules", "dist", "packages/*/dist"]
 }

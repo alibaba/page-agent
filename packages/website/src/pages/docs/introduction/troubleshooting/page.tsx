@@ -103,7 +103,7 @@ function FormatErrorsContent(isZh: boolean) {
 						<>
 							如果以上步骤无法解决问题，欢迎在{' '}
 							<a
-								href="https://github.com/alibaba/page-agent/discussions"
+								href="https://github.com/zhulinchng/page-agent/discussions"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-blue-600 dark:text-blue-400 underline underline-offset-2"
@@ -116,7 +116,7 @@ function FormatErrorsContent(isZh: boolean) {
 						<>
 							If the above steps don't help, join the{' '}
 							<a
-								href="https://github.com/alibaba/page-agent/discussions"
+								href="https://github.com/zhulinchng/page-agent/discussions"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-blue-600 dark:text-blue-400 underline underline-offset-2"

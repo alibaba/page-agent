@@ -1,4 +1,4 @@
-# Alibaba Open Source Code of Conduct
+# Contributor Covenant Code of Conduct
 
 [¶中文版](#我们的保证)
 
@@ -57,7 +57,7 @@ further defined and clarified by project maintainers.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported by contacting the project team at opensource@alibaba-inc.com. All
+reported by contacting the project team via https://github.com/zhulinchng/page-agent/issues. All
 complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
 obligated to maintain confidentiality with regard to the reporter of an incident.
@@ -115,7 +115,7 @@ available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.ht
 
 ## 强制执行
 
-可以通过 opensource@alibaba-inc.com 来联系项目团队来举报滥用、骚扰或其他不被接受的行为。
+可以通过 https://github.com/zhulinchng/page-agent/issues 联系项目团队来举报滥用、骚扰或其他不被接受的行为。
 
 任何维护团队认为有必要且适合的所有投诉都将进行审查及调查，并做出相对应的回应。项目小组有对事件回报者有保密的义务。具体执行的方针近一步细节可能会单独公布。
 

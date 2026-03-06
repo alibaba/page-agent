@@ -7,12 +7,11 @@ import {
 	HatGlasses,
 	Home,
 	Loader2,
-	Scale,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
 
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/agent/constants'
+import { DEMO_API_KEY } from '@/agent/constants'
 import type { ExtConfig, LanguagePreference } from '@/agent/useAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -26,8 +25,8 @@ interface ConfigPanelProps {
 
 export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [apiKey, setApiKey] = useState(config?.apiKey || DEMO_API_KEY)
-	const [baseURL, setBaseURL] = useState(config?.baseURL || DEMO_BASE_URL)
-	const [model, setModel] = useState(config?.model || DEMO_MODEL)
+	const [baseURL, setBaseURL] = useState(config?.baseURL || '')
+	const [model, setModel] = useState(config?.model || '')
 	const [language, setLanguage] = useState<LanguagePreference>(config?.language)
 	const [maxSteps, setMaxSteps] = useState<number | undefined>(config?.maxSteps)
 	const [systemInstruction, setSystemInstruction] = useState(config?.systemInstruction ?? '')
@@ -43,8 +42,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 
 	useEffect(() => {
 		setApiKey(config?.apiKey || DEMO_API_KEY)
-		setBaseURL(config?.baseURL || DEMO_BASE_URL)
-		setModel(config?.model || DEMO_MODEL)
+		setBaseURL(config?.baseURL || '')
+		setModel(config?.model || '')
 		setLanguage(config?.language)
 		setMaxSteps(config?.maxSteps)
 		setSystemInstruction(config?.systemInstruction ?? '')
@@ -163,23 +162,6 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				/>
 			</div>
 
-			{/* Testing API notice */}
-			{isTestingEndpoint(baseURL) && (
-				<div className="p-2.5 rounded-md border border-amber-500/30 bg-amber-500/5 text-[11px] text-muted-foreground leading-relaxed">
-					<Scale className="size-3 inline-block mr-1 -mt-0.5 text-amber-600" />
-					You are using the free testing API. By using this service you agree to the{' '}
-					<a
-						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="underline hover:text-foreground"
-					>
-						Terms of Use & Privacy Policy
-					</a>
-					. No sensitive data. No guaranteed availability.
-				</div>
-			)}
-
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Model</label>
 				<Input
@@ -287,7 +269,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			<div className="mt-4 mb-4 pt-4 border-t border-border/50 flex gap-2 justify-between text-[10px] text-muted-foreground">
 				<div className="flex flex-col justify-between">
 					<a
-						href="https://github.com/alibaba/page-agent"
+						href="https://github.com/zhulinchng/page-agent"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="flex items-center gap-1 hover:text-foreground"
@@ -299,7 +281,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					</a>
 
 					<a
-						href="https://alibaba.github.io/page-agent/"
+						href="https://zhulinchng.github.io/page-agent/"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="flex items-center gap-1 hover:text-foreground"
@@ -309,7 +291,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					</a>
 
 					<a
-						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
+						href="https://github.com/zhulinchng/page-agent/blob/main/docs/terms-and-privacy.md"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="flex items-center gap-1 hover:text-foreground"

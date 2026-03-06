@@ -1,17 +1,12 @@
 # Page Agent
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://img.alicdn.com/imgextra/i4/O1CN01qKig1P1FnhpFKNdi6_!!6000000000532-2-tps-1280-256.png">
-  <img alt="Page Agent Banner" src="https://img.alicdn.com/imgextra/i1/O1CN01NCMKXj1Gn4tkFTsxf_!!6000000000666-2-tps-1280-256.png">
-</picture>
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/zhulinchng/page-agent.svg)](https://github.com/zhulinchng/page-agent)
 
 纯 JS 实现的 GUI agent。使用自然语言操作你的 Web 应用。无须后端、客户端、浏览器插件。
 
 🌐 [English](../README.md) | **中文**
 
-👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
+👉 <a href="https://zhulinchng.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://zhulinchng.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
 
 <video id="demo-video" src="https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2" controls crossorigin muted></video>
 
@@ -28,31 +23,28 @@
     - 无需特殊权限。
 - **🧠 用你自己的 LLM**
 - **🎨 精美 UI，支持人机协同**
-- **🐙 可选的 [Chrome 扩展](https://alibaba.github.io/page-agent/docs/features/chrome-extension)，支持跨页面任务。**
+- **🐙 可选的 [Chrome 扩展](https://zhulinchng.github.io/page-agent/docs/features/chrome-extension)，支持跨页面任务。**
 
 ## 💡 应用场景
 
 - **SaaS AI 副驾驶** — 几行代码为你的产品加上 AI 副驾驶，不需要重写后端。
 - **智能表单填写** — 把 20 次点击变成一句话。ERP、CRM、管理后台的最佳拍档。
 - **无障碍增强** — 用自然语言让任何网页无障碍。语音指令、屏幕阅读器，零门槛。
-- **跨页面 Agent** — 通过可选的 [Chrome 扩展](https://alibaba.github.io/page-agent/docs/features/chrome-extension)，让你的 Agent 跨标签页工作。
+- **跨页面 Agent** — 通过可选的 [Chrome 扩展](https://zhulinchng.github.io/page-agent/docs/features/chrome-extension)，让你的 Agent 跨标签页工作。
 
 ## 🚀 快速开始
 
 ### 一行代码集成
 
-通过我们免费的 Demo LLM 快速体验 PageAgent：
+通过你自己的 LLM 快速体验 PageAgent：
 
 ```html
-<script src="{URL}" crossorigin="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.1/dist/iife/page-agent.demo.js?baseURL=YOUR_API_BASE_URL&model=YOUR_MODEL&apiKey=YOUR_KEY" crossorigin="true"></script>
 ```
 
-| Mirrors | URL                                                                                |
-| ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.5.1/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.5.1/files/dist/iife/page-agent.demo.js |
-
-> **⚠️ 仅用于技术评估。** 该 Demo CDN 使用了免费的[测试 LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api)，使用即表示您同意其[条款](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md)。
+| Mirror | URL                                                                        |
+| ------ | -------------------------------------------------------------------------- |
+| Global | https://cdn.jsdelivr.net/npm/page-agent@1.5.1/dist/iife/page-agent.demo.js |
 
 ### NPM 安装
 
@@ -64,8 +56,8 @@ npm install page-agent
 import { PageAgent } from 'page-agent'
 
 const agent = new PageAgent({
-    model: 'qwen3.5-plus',
-    baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    model: 'gpt-4.1-mini',
+    baseURL: 'https://api.openai.com/v1',
     apiKey: 'YOUR_API_KEY',
     language: 'zh-CN',
 })
@@ -73,7 +65,7 @@ const agent = new PageAgent({
 await agent.execute('点击登录按钮')
 ```
 
-更多编程用法，请参阅 [📖 文档](https://alibaba.github.io/page-agent/docs/introduction/overview)。
+更多编程用法，请参阅 [📖 文档](https://zhulinchng.github.io/page-agent/docs/introduction/overview)。
 
 ## 🤝 贡献
 

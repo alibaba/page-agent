@@ -11,7 +11,7 @@ import type { LLMConfig } from '@page-agent/llms'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { MultiPageAgent } from './MultiPageAgent'
-import { DEMO_CONFIG, migrateLegacyEndpoint } from './constants'
+import { migrateLegacyEndpoint } from './constants'
 
 /** Language preference: undefined means follow system */
 export type LanguagePreference = SupportedLanguage | undefined
@@ -47,17 +47,21 @@ export function useAgent(): UseAgentResult {
 
 	useEffect(() => {
 		chrome.storage.local.get(['llmConfig', 'language', 'advancedConfig']).then((result) => {
-			let llmConfig = (result.llmConfig as LLMConfig) ?? DEMO_CONFIG
+			const savedLlmConfig = result.llmConfig as LLMConfig | undefined
 			const language = (result.language as SupportedLanguage) || undefined
 			const advancedConfig = (result.advancedConfig as AdvancedConfig) ?? {}
 
-			// Auto-migrate legacy testing endpoints
-			const migrated = migrateLegacyEndpoint(llmConfig)
-			if (migrated !== llmConfig) {
-				llmConfig = migrated
-				chrome.storage.local.set({ llmConfig: migrated })
-			} else if (!result.llmConfig) {
-				chrome.storage.local.set({ llmConfig: DEMO_CONFIG })
+			if (!savedLlmConfig) {
+				// No config saved yet — user needs to configure their own LLM
+				return
+			}
+
+			// Clear a legacy endpoint from stored config so the user is prompted to configure their own
+			const llmConfig = migrateLegacyEndpoint(savedLlmConfig)
+			if (llmConfig === null) {
+				chrome.storage.local.remove('llmConfig')
+				setConfig(null)
+				return
 			}
 
 			setConfig({ ...llmConfig, ...advancedConfig, language })
