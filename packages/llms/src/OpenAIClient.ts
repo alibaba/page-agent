@@ -34,7 +34,7 @@ export class OpenAIClient implements LLMClient {
 			temperature: this.config.temperature,
 			messages,
 			tools: openaiTools,
-			parallel_tool_calls: false,
+			// parallel_tool_calls: false,
 			// Require tool call: specific tool if provided, otherwise any tool
 			tool_choice: options?.toolChoiceName
 				? { type: 'function', function: { name: options.toolChoiceName } }

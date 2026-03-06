@@ -8,5 +8,5 @@
         "outDir": "dist"
     },
     "include": ["**/*.ts", "**/*.js"],
-    "exclude": ["dist", "node_modules"]
+    "exclude": ["dist", "node_modules", "**/__tests__"]
 }

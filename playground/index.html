@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Page Agent Playground</title>
+	<style>
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: system-ui, sans-serif;
+			padding: 2rem;
+			max-width: 900px;
+			margin: 0 auto;
+			color: #333;
+		}
+
+		h1 {
+			margin-bottom: 0.5rem;
+		}
+
+		p.subtitle {
+			color: #666;
+			margin-bottom: 2rem;
+		}
+
+		section {
+			margin-bottom: 2rem;
+			padding: 1.5rem;
+			border: 1px solid #e0e0e0;
+			border-radius: 8px;
+		}
+
+		section h2 {
+			margin-bottom: 1rem;
+			font-size: 1.1rem;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+		}
+
+		input[type="text"],
+		input[type="email"],
+		input[type="password"],
+		textarea,
+		select {
+			width: 100%;
+			padding: 0.5rem;
+			margin-bottom: 1rem;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			font-size: 0.95rem;
+		}
+
+		textarea {
+			resize: vertical;
+			min-height: 80px;
+		}
+
+		button {
+			padding: 0.5rem 1.2rem;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 0.95rem;
+			margin-right: 0.5rem;
+			margin-bottom: 0.5rem;
+		}
+
+		button.primary {
+			background: #2563eb;
+			color: white;
+		}
+
+		button.secondary {
+			background: #e5e7eb;
+			color: #333;
+		}
+
+		button.danger {
+			background: #dc2626;
+			color: white;
+		}
+
+		.checkbox-group,
+		.radio-group {
+			display: flex;
+			gap: 1rem;
+			margin-bottom: 1rem;
+			flex-wrap: wrap;
+		}
+
+		.checkbox-group label,
+		.radio-group label {
+			display: flex;
+			align-items: center;
+			gap: 0.3rem;
+			font-weight: normal;
+		}
+
+		a {
+			color: #2563eb;
+		}
+
+		.scroll-box {
+			max-height: 150px;
+			overflow-y: auto;
+			border: 1px solid #ddd;
+			padding: 1rem;
+			border-radius: 4px;
+			margin-bottom: 1rem;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 1rem;
+		}
+
+		th,
+		td {
+			border: 1px solid #ddd;
+			padding: 0.5rem;
+			text-align: left;
+		}
+
+		th {
+			background: #f5f5f5;
+		}
+
+		#output {
+			padding: 1rem;
+			background: #f9fafb;
+			border-radius: 4px;
+			min-height: 2rem;
+			font-family: monospace;
+			white-space: pre-wrap;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Page Agent Playground</h1>
+	<p class="subtitle">A sample page with interactive elements for testing the Page Agent.</p>
+
+	<!-- Form Section -->
+	<section>
+		<h2>Form</h2>
+		<form id="sample-form"
+			onsubmit="event.preventDefault(); document.getElementById('output').textContent = 'Form submitted!'">
+			<label for="name">Name</label>
+			<input type="text" id="name" placeholder="Enter your name">
+
+			<label for="email">Email</label>
+			<input type="email" id="email" placeholder="you@example.com">
+
+			<label for="password">Password</label>
+			<input type="password" id="password" placeholder="••••••••">
+
+			<label for="bio">Bio</label>
+			<textarea id="bio" placeholder="Tell us about yourself..."></textarea>
+
+			<label for="role">Role</label>
+			<select id="role">
+				<option value="">-- Select --</option>
+				<option value="dev">Developer</option>
+				<option value="designer">Designer</option>
+				<option value="pm">Product Manager</option>
+				<option value="other">Other</option>
+			</select>
+
+			<label>Interests</label>
+			<div class="checkbox-group">
+				<label><input type="checkbox" name="interest" value="frontend"> Frontend</label>
+				<label><input type="checkbox" name="interest" value="backend"> Backend</label>
+				<label><input type="checkbox" name="interest" value="ai"> AI/ML</label>
+				<label><input type="checkbox" name="interest" value="devops"> DevOps</label>
+			</div>
+
+			<label>Experience Level</label>
+			<div class="radio-group">
+				<label><input type="radio" name="level" value="junior"> Junior</label>
+				<label><input type="radio" name="level" value="mid"> Mid</label>
+				<label><input type="radio" name="level" value="senior"> Senior</label>
+			</div>
+
+			<button type="submit" class="primary">Submit</button>
+			<button type="reset" class="secondary">Reset</button>
+		</form>
+	</section>
+
+	<!-- Buttons & Links -->
+	<section>
+		<h2>Buttons &amp; Links</h2>
+		<button class="primary" onclick="document.getElementById('output').textContent = 'Primary clicked!'">Primary
+			Action</button>
+		<button class="secondary"
+			onclick="document.getElementById('output').textContent = 'Secondary clicked!'">Secondary Action</button>
+		<button class="danger"
+			onclick="document.getElementById('output').textContent = 'Danger clicked!'">Delete</button>
+		<button disabled>Disabled</button>
+		<br><br>
+		<a href="#section-links">Internal Link</a> |
+		<a href="https://github.com/anthropics/page-agent" target="_blank" rel="noopener">External Link</a>
+	</section>
+
+	<!-- Scrollable Content -->
+	<section id="section-links">
+		<h2>Scrollable Content</h2>
+		<div class="scroll-box">
+			<p>Line 1: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+			<p>Line 2: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+			<p>Line 3: Ut enim ad minim veniam, quis nostrud exercitation.</p>
+			<p>Line 4: Duis aute irure dolor in reprehenderit in voluptate velit.</p>
+			<p>Line 5: Excepteur sint occaecat cupidatat non proident.</p>
+			<p>Line 6: Sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			<p>Line 7: Curabitur pretium tincidunt lacus.</p>
+			<p>Line 8: Nulla gravida orci a odio. Nullam varius, turpis et commodo.</p>
+			<p>Line 9: Fusce dui leo, imperdiet in, aliquam sit amet.</p>
+			<p>Line 10: Pellentesque habitant morbi tristique senectus et netus.</p>
+		</div>
+	</section>
+
+	<!-- Table -->
+	<section>
+		<h2>Data Table</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Status</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>1</td>
+					<td>Alice</td>
+					<td>Active</td>
+					<td><button class="secondary" onclick="this.textContent='Done'">Edit</button></td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td>Bob</td>
+					<td>Inactive</td>
+					<td><button class="secondary" onclick="this.textContent='Done'">Edit</button></td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td>Charlie</td>
+					<td>Active</td>
+					<td><button class="secondary" onclick="this.textContent='Done'">Edit</button></td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+	<!-- Output -->
+	<section>
+		<h2>Output</h2>
+		<div id="output">No actions yet.</div>
+	</section>
+
+	<!-- LLM config injected from playground/.env via server -->
+	<script src="/config.js"></script>
+	<!-- Load IIFE bundle (registers window.PageAgent constructor) -->
+	<script src="/packages/page-agent/dist/iife/page-agent.demo.js"></script>
+	<script>
+		// demo.js uses currentScript URL params, which won't work for static <script>.
+		// If the agent wasn't auto-created (missing env at build time), create it manually.
+		const cfg = window.__LLM_CONFIG__ || {};
+
+		if (!cfg.baseURL || !cfg.model) {
+			const info = document.createElement('div');
+			info.style.cssText = 'position:fixed;top:0;left:0;right:0;padding:12px;background:#fef3c7;color:#92400e;text-align:center;font-size:14px;z-index:9999;';
+			info.innerHTML = 'Configure LLM in <code>playground/.env</code> (copy <code>.env.example</code>)';
+			document.body.prepend(info);
+		} else if (!window.pageAgent && window.PageAgent) {
+			// Create agent manually with .env config
+			window.pageAgent = new window.PageAgent({
+				baseURL: cfg.baseURL,
+				apiKey: cfg.apiKey,
+				model: cfg.model,
+				language: cfg.lang || 'en-US',
+			});
+			window.pageAgent.panel.show();
+		}
+	</script>
+</body>
+
+</html>
