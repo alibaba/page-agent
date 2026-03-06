@@ -22,21 +22,21 @@ All data transmission occurs **only** between your browser and the LLM provider 
 
 To facilitate easy testing and technical evaluation, we provide a free testing LLM API. This API is used in the project homepage's live demo, the pre-built demo CDN bundles, and the browser extension's default configuration. Users may also use it independently for their own technical evaluation of page-agent.
 
-This free testing API is provided **strictly for technical evaluation and R&D purposes only**. It must not be used in any production environment. By using this service, you agree to the following terms:
+This free testing API is provided **strictly for technical evaluation and R&D purposes only**. It must not be used in any production environment. By using this API, you agree to the following terms:
 
-**No Sensitive Data**: You are strictly prohibited from inputting any Personal Identifiable Information (PII), confidential business data, financial/medical records, or using this agent on web pages containing such sensitive information.
+- **No Sensitive Data**: You are strictly prohibited from inputting any Personal Identifiable Information (PII), confidential business data, financial/medical records, or using this agent on web pages containing such sensitive information.
 
-**Zero Data Retention**: We do not store, log, or use your prompts or webpage data (DOM) for model training. All data is processed in-transit and immediately discarded. However, we do temporarily process necessary, identity-agnostic network data (such as IP addresses) solely for rate-limiting and anti-abuse purposes.
+- **No Data Retention**: We do not store, log, or use your prompts or webpage data (DOM) for model training. All data is processed in-transit and immediately discarded. We temporarily process IP addresses solely for rate-limiting and anti-abuse purposes. Data is processed through Alibaba Cloud infrastructure, which is subject to its own privacy policy.
 
-**Independent Infrastructure**: The `page-agent` open-source software is completely frontend-based with a "Bring Your Own Key" (BYOK) architecture and no built-in backend. To facilitate easy testing, the maintainers have independently purchased public cloud services from Alibaba Cloud China ([aliyun.com](https://www.aliyun.com) FC and BaiLian Qwen models). This project is not affiliated with, nor endorsed by, Alibaba Cloud.
+- **Independent Infrastructure**: The `page-agent` open-source software is completely frontend-based with a "Bring Your Own Key" (BYOK) architecture and **no built-in backend**. To facilitate easy testing, the maintainers have purchased public cloud services from Alibaba Cloud China ([aliyun.com](https://www.aliyun.com) Function Compute and BaiLian Qwen models). This project is not a product of, nor endorsed by, Alibaba Cloud.
 
-**No Guaranteed Availability**: This testing API may be rate-limited, degraded, or discontinued at any time without prior notice.
+- **No Guaranteed Availability**: This testing API may be rate-limited, degraded, or discontinued at any time without prior notice.
 
-**"AS IS" & Limitation of Liability**: This service is provided strictly on an "AS IS" and "AS AVAILABLE" basis, without any warranties. The maintainers bear no liability for any data loss, service interruption, or legal consequences arising from your use of this demo.
+- **"AS IS" & Limitation of Liability**: This service is provided strictly on an "AS IS" and "AS AVAILABLE" basis, without any warranties. The maintainers bear no liability for any data loss, service interruption, or legal consequences arising from your use of this demo.
 
-**Recommendation for Real Usage**: For secure and continuous usage, we strongly advise using the default BYOK mode with your own legally compliant commercial LLM API keys, or connecting to local, offline models (e.g., Ollama).
+- **Recommendation for Real Usage**: For secure and continuous usage, we strongly advise using the default BYOK mode with your own legally compliant commercial LLM API keys, or connecting to local, offline models (e.g., Ollama).
 
-**Note**: This testing LLM api processes data via servers located in Mainland China. If you are located in a region with strict data localization laws (such as the EU/EEA), please do not use this demo.
+**Note**: This free testing LLM API processes data via servers located in Mainland China. If you are located in a region with strict data localization laws (such as the EU/EEA), please do not use this API.
 
 ---
 
