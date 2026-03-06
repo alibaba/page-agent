@@ -1,4 +1,4 @@
-import { type PageAgentConfig, PageAgentCore } from '@page-agent/core'
+import { type AgentConfig, PageAgentCore } from '@page-agent/core'
 
 import { RemotePageController } from './RemotePageController'
 import { TabsController } from './TabsController'
@@ -17,7 +17,7 @@ function detectLanguage(): 'en-US' | 'zh-CN' {
  * - can be used from a side panel or a content script
  */
 export class MultiPageAgent extends PageAgentCore {
-	constructor(config: Omit<PageAgentConfig, 'pageController'> & { includeInitialTab?: boolean }) {
+	constructor(config: AgentConfig & { includeInitialTab?: boolean }) {
 		// multi page controller
 		const tabsController = new TabsController()
 		const pageController = new RemotePageController(tabsController)
