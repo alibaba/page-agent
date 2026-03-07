@@ -1,4 +1,4 @@
-import { AlertTriangle, RotateCcw } from 'lucide-react'
+import { AlertTriangle, Eraser, RotateCcw } from 'lucide-react'
 import { Component, type ErrorInfo, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -27,6 +27,11 @@ export class ErrorBoundary extends Component<Props, State> {
 		window.location.reload()
 	}
 
+	handleResetConfig = async () => {
+		await chrome.storage.local.remove(['llmConfig', 'language', 'advancedConfig'])
+		window.location.reload()
+	}
+
 	render() {
 		if (!this.state.hasError) {
 			return this.props.children
@@ -39,10 +44,16 @@ export class ErrorBoundary extends Component<Props, State> {
 				<p className="text-sm text-muted-foreground mb-4 max-w-xs">
 					{this.state.error?.message || 'An unexpected error occurred'}
 				</p>
-				<Button variant="outline" size="sm" onClick={this.handleReload}>
-					<RotateCcw className="size-3.5 mr-2" />
-					Reload Panel
-				</Button>
+				<div className="flex gap-2">
+					<Button variant="outline" size="sm" onClick={this.handleResetConfig}>
+						<Eraser className="size-3.5 mr-2" />
+						Reset Config
+					</Button>
+					<Button variant="outline" size="sm" onClick={this.handleReload}>
+						<RotateCcw className="size-3.5 mr-2" />
+						Reload Panel
+					</Button>
+				</div>
 			</div>
 		)
 	}
