@@ -11,7 +11,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 🌐 **English** | [中文](./docs/README-zh.md)
 
-👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
+👉 <a href="https://alibaba.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://alibaba.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a> | <a href="https://news.ycombinator.com/item?id=47264138" target="_blank">📢 Join HN Discussion</a>
 
 <video id="demo-video" src="https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2" controls crossorigin muted></video>
 
@@ -111,3 +111,11 @@ file and in the node_modules directory after installation.
 ---
 
 **⭐ Star this repo if you find PageAgent helpful!**
+
+<a href="https://www.star-history.com/?repos=alibaba%2Fpage-agent&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left" />
+ </picture>
+</a>
