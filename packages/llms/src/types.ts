@@ -25,7 +25,7 @@ export interface Message {
  * Tool definition - uses Zod schema (LLM-agnostic)
  * Supports generics for type-safe parameters and return values
  */
-export interface Tool<TParams = any, TResult = any> {
+export interface Tool<TParams = unknown, TResult = unknown> {
 	// name: string
 	description?: string
 	inputSchema: z.ZodType<TParams>
@@ -47,7 +47,7 @@ export interface InvokeOptions {
 	 * Called before parsing the response.
 	 * Used to fix various response format errors from the model.
 	 */
-	normalizeResponse?: (response: any) => any
+	normalizeResponse?: (response: unknown) => unknown
 }
 
 /**

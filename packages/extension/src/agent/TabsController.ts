@@ -1,15 +1,28 @@
 const PREFIX = '[TabsController]'
 
-function debug(...messages: any[]) {
+function debug(...messages: unknown[]): void {
 	console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
 }
 
-function sendMessage(message: {
+interface TabControlMessage {
 	type: 'TAB_CONTROL'
 	action: TabAction
-	payload?: any
-}): Promise<any> {
-	return chrome.runtime.sendMessage(message).catch((error) => {
+	payload?: unknown
+}
+
+interface TabControlResponse {
+	success?: boolean
+	tabId?: number | null
+	windowId?: number
+	error?: string
+	url?: string
+	title?: string
+	status?: string
+	tab?: chrome.tabs.Tab
+}
+
+function sendMessage(message: TabControlMessage): Promise<TabControlResponse | null> {
+	return chrome.runtime.sendMessage(message).catch((error: unknown) => {
 		console.error(PREFIX, message.action, error)
 		return null
 	})
@@ -71,42 +84,55 @@ export class TabsController extends EventTarget {
 
 		await this.updateCurrentTabId(this.currentTabId)
 
-		const tabChangeHandler = (message: any): void => {
-			if (message.type !== 'TAB_CHANGE') {
-				// throw new Error(`[TabsController]: Invalid message type: ${message.type}`)
+		const tabChangeHandler = (message: unknown): void => {
+			if (typeof message !== 'object' || message === null || !('type' in message)) {
 				return
 			}
 
-			if (message.action === 'created') {
-				const tab = message.payload.tab as chrome.tabs.Tab
-				if (tab.groupId === this.tabGroupId && tab.id != null) {
+			const msg = message as { type: string; action?: string; payload?: unknown }
+			if (msg.type !== 'TAB_CHANGE') {
+				// throw new Error(`[TabsController]: Invalid message type: ${msg.type}`)
+				return
+			}
+
+			const action = msg.action
+			const payload = msg.payload as Record<string, unknown> | undefined
+
+			if (action === 'created') {
+				const tab = (payload?.tab as chrome.tabs.Tab) || null
+				if (tab && tab.groupId === this.tabGroupId && tab.id != null) {
 					// Tab created in our controlled group
 					if (!this.tabs.find((t) => t.id === tab.id)) {
 						this.tabs.push({ id: tab.id, isInitial: false })
 					}
 					this.switchToTab(tab.id)
 				}
-			} else if (message.action === 'removed') {
-				const { tabId } = message.payload as { tabId: number }
-				const targetTab = this.tabs.find((t) => t.id === tabId)
-				if (targetTab) {
-					this.tabs = this.tabs.filter((t) => t.id !== tabId)
-					if (this.currentTabId === tabId) {
-						const newCurrentTab = this.tabs[this.tabs.length - 1] || null
-						if (newCurrentTab) {
-							this.switchToTab(newCurrentTab.id)
-						} else {
-							this.updateCurrentTabId(null)
+			} else if (action === 'removed') {
+				const tabId = (payload?.tabId as number) || null
+				if (tabId) {
+					const targetTab = this.tabs.find((t) => t.id === tabId)
+					if (targetTab) {
+						this.tabs = this.tabs.filter((t) => t.id !== tabId)
+						if (this.currentTabId === tabId) {
+							const newCurrentTab = this.tabs[this.tabs.length - 1] || null
+							if (newCurrentTab) {
+								this.switchToTab(newCurrentTab.id)
+							} else {
+								this.updateCurrentTabId(null)
+							}
 						}
 					}
 				}
-			} else if (message.action === 'updated') {
-				const { tabId, tab } = message.payload as { tabId: number; tab: chrome.tabs.Tab }
-				const targetTab = this.tabs.find((t) => t.id === tabId)
-				if (targetTab) {
-					targetTab.url = tab.url
-					targetTab.title = tab.title
-					targetTab.status = tab.status
+			} else if (action === 'updated') {
+				const tabId = (payload?.tabId as number) || null
+				const tab = (payload?.tab as chrome.tabs.Tab) || null
+				if (tabId && tab) {
+					const targetTab = this.tabs.find((t) => t.id === tabId)
+					if (targetTab) {
+						targetTab.url = tab.url
+						targetTab.title = tab.title
+						targetTab.status = tab.status as 'loading' | 'unloaded' | 'complete'
+					}
 				}
 			}
 		}

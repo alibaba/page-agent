@@ -4,7 +4,12 @@ import type { TabsController } from './TabsController'
 
 const PREFIX = '[RemotePageController]'
 
-function debug(...messages: any[]) {
+interface DomActionReturn {
+	success: boolean
+	message: string
+}
+
+function debug(...messages: unknown[]): void {
 	console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
 }
 
@@ -12,9 +17,9 @@ function sendMessage(message: {
 	type: 'PAGE_CONTROL'
 	action: string
 	targetTabId: number
-	payload?: any
-}): Promise<any> {
-	return chrome.runtime.sendMessage(message).catch((error) => {
+	payload?: unknown
+}): Promise<DomActionReturn | null> {
+	return chrome.runtime.sendMessage(message).catch((error: unknown) => {
 		console.error(PREFIX, message.action, error)
 		return null
 	})
@@ -114,31 +119,40 @@ export class RemotePageController {
 		})
 	}
 
-	async clickElement(...args: any[]): Promise<DomActionReturn> {
-		const res = await this.remoteCallDomAction('click_element', args)
+	async clickElement(index: number): Promise<DomActionReturn> {
+		const res = await this.remoteCallDomAction('click_element', [index])
 		// @note may cause page navigation, wait for 1 second to ensure the page loading started
 		await new Promise((resolve) => setTimeout(resolve, 1000))
 		return res
 	}
 
-	async inputText(...args: any[]): Promise<DomActionReturn> {
-		return this.remoteCallDomAction('input_text', args)
+	async inputText(index: number, text: string): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('input_text', [index, text])
 	}
 
-	async selectOption(...args: any[]): Promise<DomActionReturn> {
-		return this.remoteCallDomAction('select_option', args)
+	async selectOption(index: number, optionText: string): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('select_option', [index, optionText])
 	}
 
-	async scroll(...args: any[]): Promise<DomActionReturn> {
-		return this.remoteCallDomAction('scroll', args)
+	async scroll(options: {
+		down: boolean
+		numPages: number
+		pixels?: number
+		index?: number
+	}): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('scroll', [options])
 	}
 
-	async scrollHorizontally(...args: any[]): Promise<DomActionReturn> {
-		return this.remoteCallDomAction('scroll_horizontally', args)
+	async scrollHorizontally(options: {
+		right: boolean
+		pixels: number
+		index?: number
+	}): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('scroll_horizontally', [options])
 	}
 
-	async executeJavascript(...args: any[]): Promise<DomActionReturn> {
-		return this.remoteCallDomAction('execute_javascript', args)
+	async executeJavascript(script: string): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('execute_javascript', [script])
 	}
 
 	/** @note Managed by content script via storage polling. */
@@ -148,7 +162,10 @@ export class RemotePageController {
 	/** @note Managed by content script via storage polling. */
 	dispose(): void {}
 
-	private async remoteCallDomAction(action: string, payload: any[]): Promise<DomActionReturn> {
+	private async remoteCallDomAction(
+		action: string,
+		payload: unknown[]
+	): Promise<DomActionReturn> {
 		if (!this.currentTabId) {
 			return { success: false, message: 'RemotePageController not initialized.' }
 		}
@@ -161,19 +178,19 @@ export class RemotePageController {
 			}
 		}
 
-		return sendMessage({
+		const response = await sendMessage({
 			type: 'PAGE_CONTROL',
 			action: action,
-			targetTabId: this.currentTabId!,
+			targetTabId: this.currentTabId,
 			payload,
 		})
-	}
-}
 
-interface DomActionReturn {
-	success: boolean
-	message: string
-}
+		if (!response) {
+			return { success: false, message: 'No response from content script' }
+		}
+
+		return response
+	}
 
 /**
  * Check if a URL can run content scripts.

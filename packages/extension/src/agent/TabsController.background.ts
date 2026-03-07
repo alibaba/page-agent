@@ -5,12 +5,12 @@ import type { TabAction } from './TabsController'
 
 const PREFIX = '[TabsController.background]'
 
-function debug(...messages: any[]) {
+function debug(...messages: unknown[]): void {
 	console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
 }
 
 export function handleTabControlMessage(
-	message: { type: 'TAB_CONTROL'; action: TabAction; payload: any },
+	message: { type: 'TAB_CONTROL'; action: TabAction; payload: unknown },
 	sender: chrome.runtime.MessageSender,
 	sendResponse: (response: unknown) => void
 ): true | undefined {
@@ -26,7 +26,7 @@ export function handleTabControlMessage(
 					debug('get_active_tab: success', tabId)
 					sendResponse({ success: true, tabId })
 				})
-				.catch((error) => {
+				.catch((error: unknown) => {
 					sendResponse({ error: error instanceof Error ? error.message : String(error) })
 				})
 			return true // async response

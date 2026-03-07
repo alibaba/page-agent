@@ -144,8 +144,14 @@ function JSConsole({
 		const handleGlobalConsole = (type: string, args: unknown[]) => {
 			const content = args.map((arg) => formatResult(arg)).join(' ')
 
+			// Type validation to ensure type is valid for OutputItem
+			let outputType: 'log' | 'warn' | 'error' | 'info' = 'log'
+			if (['warn', 'error', 'info'].includes(type)) {
+				outputType = type as 'log' | 'warn' | 'error' | 'info'
+			}
+
 			const outputItem: OutputItem = {
-				type: type as any,
+				type: outputType,
 				content: content,
 				timestamp: Date.now(),
 			}

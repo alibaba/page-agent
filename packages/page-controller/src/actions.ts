@@ -162,7 +162,8 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 }
 
 export async function scrollIntoViewIfNeeded(element: HTMLElement) {
-	const el = element as any
+	// scrollIntoViewIfNeeded is not standard, but available in some browsers
+	const el = element as HTMLElement & { scrollIntoViewIfNeeded?: () => void }
 	if (el.scrollIntoViewIfNeeded) {
 		el.scrollIntoViewIfNeeded()
 		// await waitFor(0.5) // Animation playback

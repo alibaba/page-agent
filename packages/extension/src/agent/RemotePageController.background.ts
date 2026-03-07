@@ -4,13 +4,13 @@
  */
 
 export function handlePageControlMessage(
-	message: { type: 'PAGE_CONTROL'; action: string; payload: any; targetTabId: number },
+	message: { type: 'PAGE_CONTROL'; action: string; payload: unknown; targetTabId: number },
 	sender: chrome.runtime.MessageSender,
 	sendResponse: (response: unknown) => void
 ): true | undefined {
 	const PREFIX = '[RemotePageController.background]'
 
-	function debug(...messages: any[]) {
+	function debug(...messages: unknown[]): void {
 		console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
 	}
 
@@ -29,10 +29,10 @@ export function handlePageControlMessage(
 			action,
 			payload,
 		})
-		.then((result) => {
+		.then((result: unknown) => {
 			sendResponse(result)
 		})
-		.catch((error) => {
+		.catch((error: unknown) => {
 			console.error(PREFIX, error)
 			sendResponse({
 				success: false,
