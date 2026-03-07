@@ -37,6 +37,9 @@ export default defineConfig({
 			},
 		},
 	}),
+	zip: {
+		artifactTemplate: 'page-agent-ext-{{version}}-{{browser}}.zip',
+	},
 	manifest: {
 		default_locale: 'en',
 		name: '__MSG_extName__',
