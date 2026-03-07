@@ -432,14 +432,19 @@ export function getElementTextMap(simplifiedHTML: string) {
 }
 
 export function cleanUpHighlights() {
-	const cleanupFunctions = (window as any)._highlightCleanupFunctions || []
+	interface WindowWithHighlights {
+		_highlightCleanupFunctions?: Array<() => void>
+	}
+
+	const winWithHighlights = window as unknown as WindowWithHighlights
+	const cleanupFunctions = winWithHighlights._highlightCleanupFunctions || []
 	for (const cleanup of cleanupFunctions) {
 		if (typeof cleanup === 'function') {
 			cleanup()
 		}
 	}
 
-	;(window as any)._highlightCleanupFunctions = []
+	winWithHighlights._highlightCleanupFunctions = []
 }
 
 // 监听 URL 的任何变化，立刻清空 highLights
@@ -456,7 +461,14 @@ window.addEventListener('beforeunload', () => {
 	cleanUpHighlights()
 })
 
-const navigation = (window as any).navigation
+interface NavigationAPI {
+	addEventListener(
+		event: string,
+		listener: (this: NavigationAPI, ev: Event) => unknown
+	): void
+}
+
+const navigation = (window as unknown as { navigation?: NavigationAPI }).navigation
 if (navigation && typeof navigation.addEventListener === 'function') {
 	navigation.addEventListener('navigate', () => {
 		// console.log('Navigation event detected, highlights cleaned up.')

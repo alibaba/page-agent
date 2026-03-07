@@ -39,13 +39,17 @@ export function randomID(existingIDs?: string[]): string {
 }
 
 //
-const _global = globalThis as any
+const _global = globalThis as unknown
 
-if (!_global.__PAGE_AGENT_IDS__) {
-	_global.__PAGE_AGENT_IDS__ = []
+interface GlobalWithPageAgentIDs {
+	__PAGE_AGENT_IDS__?: string[]
 }
 
-const ids = _global.__PAGE_AGENT_IDS__
+if (!((_global as GlobalWithPageAgentIDs).__PAGE_AGENT_IDS__)) {
+	;((_global as GlobalWithPageAgentIDs).__PAGE_AGENT_IDS__) = []
+}
+
+const ids = ((_global as GlobalWithPageAgentIDs).__PAGE_AGENT_IDS__)!
 
 /**
  * Generate a random ID.

@@ -93,7 +93,15 @@ async function withRetry<T>(
 			return await fn()
 		} catch (error: unknown) {
 			// do not retry if aborted by user
-			if ((error as any)?.rawError?.name === 'AbortError') throw error
+			if (
+				error instanceof InvokeError &&
+				typeof error.rawError === 'object' &&
+				error.rawError !== null &&
+				'name' in error.rawError &&
+				(error.rawError as Record<string, unknown>).name === 'AbortError'
+			) {
+				throw error
+			}
 
 			console.error(error)
 			settings.onError(error as Error)

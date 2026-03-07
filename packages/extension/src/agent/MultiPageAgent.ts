@@ -45,7 +45,7 @@ export class MultiPageAgent extends PageAgentCore {
 
 		super({
 			...config,
-			pageController: pageController as any,
+			pageController: pageController as any, // TODO: Fix type compatibility between RemotePageController and PageController
 			customTools: customTools,
 			customSystemPrompt: systemPrompt,
 

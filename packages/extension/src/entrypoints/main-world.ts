@@ -97,7 +97,7 @@ export default defineUnlistedScript(() => {
 		return promise
 	}
 
-	const stop = () => {
+	const stop = (): void => {
 		const id = getId()
 
 		window.postMessage(
@@ -110,10 +110,27 @@ export default defineUnlistedScript(() => {
 		)
 	}
 
-	;(window as any).PAGE_AGENT_EXT_VERSION = __EXT_VERSION__
-	;(window as any).PAGE_AGENT_EXT = {
+	// Type the extension API object
+	interface PageAgentExtAPI {
+		version: string
+		execute: Execute
+		stop: () => void
+	}
+
+	const pageAgentExtAPI: PageAgentExtAPI = {
 		version: __EXT_VERSION__,
 		execute,
 		stop,
 	}
+
+	// Safely attach to window with type assertion only at assignment point
+	declare global {
+		interface Window {
+			PAGE_AGENT_EXT_VERSION: string
+			PAGE_AGENT_EXT: PageAgentExtAPI
+		}
+	}
+
+	window.PAGE_AGENT_EXT_VERSION = __EXT_VERSION__
+	window.PAGE_AGENT_EXT = pageAgentExtAPI
 })

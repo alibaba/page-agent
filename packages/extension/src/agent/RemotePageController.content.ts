@@ -54,19 +54,28 @@ export function initPageController() {
 		}
 	}, 500)
 
-	chrome.runtime.onMessage.addListener((message, sender, sendResponse): true | undefined => {
-		if (message.type !== 'PAGE_CONTROL') {
-			// sendResponse({
-			// 	success: false,
-			// 	error: `[RemotePageController.ContentScript]: Invalid message type: ${message.type}`,
-			// })
+	chrome.runtime.onMessage.addListener((message: unknown, sender: unknown, sendResponse): true | undefined => {
+		if (typeof message !== 'object' || message === null || !('type' in message)) {
 			return
 		}
 
-		const { action, payload } = message
+		const msg = message as { type: string; action?: string; payload?: unknown }
+		if (msg.type !== 'PAGE_CONTROL') {
+			return
+		}
+
+		const { action, payload } = msg
 		const methodName = getMethodName(action)
 
-		const pc = getPC() as any
+		const pc = getPC()
+
+		if (!action) {
+			sendResponse({
+				success: false,
+				error: 'PAGE_CONTROL action is required',
+			})
+			return true
+		}
 
 		switch (action) {
 			case 'get_last_update_time':
@@ -78,16 +87,19 @@ export function initPageController() {
 			case 'select_option':
 			case 'scroll':
 			case 'scroll_horizontally':
-			case 'execute_javascript':
-				pc[methodName](...(payload || []))
-					.then((result: any) => sendResponse(result))
-					.catch((error: any) =>
+			case 'execute_javascript': {
+				const args = Array.isArray(payload) ? payload : []
+				// eslint-disable-next-line @typescript-eslint/no-explicit-any
+				;(pc as any)[methodName](...args)
+					.then((result: unknown) => sendResponse(result))
+					.catch((error: unknown) =>
 						sendResponse({
 							success: false,
 							error: error instanceof Error ? error.message : String(error),
 						})
 					)
 				break
+			}
 
 			default:
 				sendResponse({

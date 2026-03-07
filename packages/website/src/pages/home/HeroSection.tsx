@@ -67,7 +67,7 @@ export default function HeroSection() {
 		if (!task.trim() || !ready || !pageAgentModule) return
 
 		const { PageAgent } = await pageAgentModule
-		const win = window as any
+		const win = window as unknown as { pageAgent?: { disposed?: boolean } }
 
 		if (!win.pageAgent || win.pageAgent.disposed) {
 			win.pageAgent = new (PageAgent as typeof PageAgentType)({
