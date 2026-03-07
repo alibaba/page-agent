@@ -49,15 +49,15 @@ The extension performs DOM analysis and automation actions **locally in your bro
 Data is transmitted to external servers **only when you initiate an automation task**. When this occurs:
 
 - Your task instructions (natural language commands)
-- Simplified page structure (cleaned DOM) of all pages under the extension's control
+- Simplified page structure (cleaned HTML) of all pages under the extension's control
 
 are sent to the LLM API endpoint configured in **your settings**.
 
-> **Note:** The DOM cleaning process simplifies page structure for AI readability but **does not guarantee removal of sensitive information** (e.g., visible text, form values, or personal data on the page). Please be mindful of the page content when initiating tasks.
+> **Note:** The HTML cleaning process simplifies page structure for AI readability but **does not guarantee removal of sensitive information** (e.g., visible text, form values, or personal data on the page). Please be mindful of the page content when initiating tasks.
 
 **If you configure a third-party LLM provider** (e.g., OpenAI, Anthropic, or others), data is sent directly to that provider. Their privacy policies apply.
 
-**If you use the built-in testing API**, the terms in [Section 2](#2-testing-api-and-demo-disclaimer--terms-of-use) apply. By using the extension with the default testing API, you agree to those terms.
+**If you use the default testing API**, the terms in [Section 2](#2-testing-api-and-demo-disclaimer--terms-of-use) apply. By using the extension with the default testing API, you agree to those terms.
 
 ### Data Storage
 
