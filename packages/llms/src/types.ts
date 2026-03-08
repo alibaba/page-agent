@@ -104,16 +104,25 @@ export interface LLMConfig {
 }
 
 /**
- * Chrome Built-in AI session interface
- * Represents a session created via ai.languageModel.create()
+ * Chrome Built-in AI session interface.
+ * Supports both old and new API shapes:
+ * - New (2025+): self.LanguageModel.create() -> session with inputQuota/inputUsage
+ * - Legacy (2024): self.ai.languageModel.create() -> session with maxTokens/tokensSoFar
  */
 export interface ChromeAISession {
 	prompt(text: string, options?: { signal?: AbortSignal }): Promise<string>
 	promptStreaming(text: string, options?: { signal?: AbortSignal }): ReadableStream<string>
 	destroy(): void
+	// New API token properties
+	readonly inputQuota?: number
+	readonly inputUsage?: number
+	// Legacy API token properties
 	readonly maxTokens?: number
 	readonly tokensSoFar?: number
 	readonly tokensLeft?: number
+	// Token counting methods
+	measureInputUsage?: (text: string) => Promise<number>
+	countPromptTokens?: (text: string) => Promise<number>
 }
 
 /**
@@ -132,6 +141,18 @@ export interface ChromeAIConfig {
 	maxCacheSize?: number
 	/** Initial prompts for session context (Chrome AI specific) */
 	initialPrompts?: { role: 'system' | 'user' | 'assistant'; content: string }[]
+	/**
+	 * Expected input languages for session creation (new API).
+	 * Passed as expectedInputs: [{ type: 'text', languages: [...] }]
+	 * @example ['en', 'zh']
+	 */
+	expectedInputLanguages?: string[]
+	/**
+	 * Expected output languages for session creation (new API).
+	 * Passed as expectedOutputs: [{ type: 'text', languages: [...] }]
+	 * @example ['en']
+	 */
+	expectedOutputLanguages?: string[]
 }
 
 /**
