@@ -1,10 +1,55 @@
+import { ChromeBuiltInAIClient } from './ChromeBuiltInAIClient'
+import { LLMRouter } from './LLMRouter'
 import { OpenAIClient } from './OpenAIClient'
+import { WebMCPClient } from './WebMCPClient'
+import type {
+	WebMCPClientConfig,
+	WebMCPResourceDefinition,
+	WebMCPServer as WebMCPServerInfo,
+	WebMCPToolDefinition,
+} from './WebMCPClient'
+import { WebMCPServer } from './WebMCPServer'
+import type { WebMCPResourceProvider, WebMCPServerConfig } from './WebMCPServer'
 import { DEFAULT_TEMPERATURE, LLM_MAX_RETRIES } from './constants'
 import { InvokeError, InvokeErrorType } from './errors'
-import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
+import type {
+	ChromeAIConfig,
+	ChromeAISession,
+	InvokeOptions,
+	InvokeResult,
+	LLMClient,
+	LLMConfig,
+	LLMProvider,
+	LLMRouterConfig,
+	Message,
+	RoutingStrategy,
+	Tool,
+} from './types'
 
+export { ChromeBuiltInAIClient }
 export { InvokeError, InvokeErrorType }
-export type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
+export { LLMRouter }
+export { WebMCPClient }
+export { WebMCPServer }
+export type {
+	ChromeAIConfig,
+	ChromeAISession,
+	InvokeOptions,
+	InvokeResult,
+	LLMClient,
+	LLMConfig,
+	LLMProvider,
+	LLMRouterConfig,
+	Message,
+	RoutingStrategy,
+	Tool,
+	WebMCPClientConfig,
+	WebMCPResourceDefinition,
+	WebMCPResourceProvider,
+	WebMCPServerConfig,
+	WebMCPServerInfo,
+	WebMCPToolDefinition,
+}
 
 export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 	// Runtime validation as defensive programming (types already guarantee these)
@@ -35,6 +80,33 @@ export class LLM extends EventTarget {
 
 		// Default to OpenAI client
 		this.client = new OpenAIClient(this.config)
+	}
+
+	/**
+	 * Create an LLM instance with routing support.
+	 * Enables multiple providers (OpenAI, Chrome AI) with fallback strategies.
+	 *
+	 * @example
+	 * ```ts
+	 * const llm = LLM.withRouter({
+	 *   strategy: 'prefer-local',
+	 *   openai: { baseURL: '...', apiKey: '...', model: 'gpt-4' },
+	 *   chromeAI: { temperature: 0.7 },
+	 * })
+	 * ```
+	 */
+	static withRouter(routerConfig: LLMRouterConfig): LLM {
+		// Create a minimal LLMConfig for the base LLM class
+		const openaiConfig = routerConfig.openai || {
+			baseURL: 'chrome-ai://local',
+			apiKey: 'local',
+			model: 'chrome-built-in',
+		}
+
+		const llm = new LLM(openaiConfig)
+		// Replace the default OpenAI client with the router
+		llm.client = new LLMRouter(routerConfig)
+		return llm
 	}
 
 	/**
