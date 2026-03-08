@@ -1,25 +1,57 @@
 /**
  * WebMCP Client - Consumes tools/resources from pages that implement WebMCP
  *
- * WebMCP (Web Model Context Protocol) allows web pages to expose tools and
- * resources that can be consumed by AI agents. This client discovers and
- * invokes those tools through the browser's messaging infrastructure.
+ * Supports both:
+ * 1. W3C WebMCP native API (navigator.modelContext) - Chrome 146+ with flag
+ * 2. postMessage-based fallback for non-native environments
  *
- * Communication is done via:
- * - window.postMessage for same-origin pages
- * - MessageChannel for cross-origin iframes
- * - BroadcastChannel for same-origin cross-tab communication
+ * The W3C WebMCP spec (https://webmachinelearning.github.io/webmcp/) defines
+ * how web pages expose tools via `navigator.modelContext.registerTool()`.
+ * This client can discover and invoke those tools whether exposed natively
+ * or via the postMessage transport.
  *
- * @see https://github.com/nicolo-ribaudo/nicolo-ribaudo/
+ * @see https://webmachinelearning.github.io/webmcp/
+ * @see https://github.com/webmachinelearning/webmcp
  */
 
+// ─── W3C WebMCP Native Types ────────────────────────────────────────────────
+
 /**
- * WebMCP tool definition as exposed by a page
+ * W3C WebMCP ToolAnnotations
+ */
+export interface WebMCPToolAnnotations {
+	readOnlyHint?: boolean
+}
+
+/**
+ * W3C WebMCP ModelContextTool (as registered via navigator.modelContext)
+ */
+export interface WebMCPNativeTool {
+	name: string
+	description: string
+	inputSchema?: Record<string, unknown> // JSON Schema
+	execute: (input: Record<string, unknown>, client?: unknown) => Promise<unknown>
+	annotations?: WebMCPToolAnnotations
+}
+
+/**
+ * W3C navigator.modelContext interface
+ */
+export interface ModelContextAPI {
+	registerTool(tool: WebMCPNativeTool): void
+	unregisterTool(name: string): void
+}
+
+// ─── Transport-agnostic types ───────────────────────────────────────────────
+
+/**
+ * WebMCP tool definition as exposed by a page (transport-agnostic)
  */
 export interface WebMCPToolDefinition {
 	name: string
 	description: string
 	inputSchema: Record<string, unknown> // JSON Schema
+	annotations?: WebMCPToolAnnotations
 }
 
 /**
@@ -32,8 +64,10 @@ export interface WebMCPResourceDefinition {
 	mimeType?: string
 }
 
+// ─── postMessage transport types ────────────────────────────────────────────
+
 /**
- * WebMCP message types following the MCP protocol adapted for web
+ * WebMCP message types for postMessage transport
  */
 export type WebMCPMessageType =
 	| 'webmcp:discover'
@@ -46,25 +80,16 @@ export type WebMCPMessageType =
 	| 'webmcp:ping'
 	| 'webmcp:pong'
 
-/**
- * Base WebMCP message
- */
 export interface WebMCPMessage {
 	type: WebMCPMessageType
 	id: string
 	source?: string
 }
 
-/**
- * Discovery request
- */
 export interface WebMCPDiscoverMessage extends WebMCPMessage {
 	type: 'webmcp:discover'
 }
 
-/**
- * Discovery response from a WebMCP server page
- */
 export interface WebMCPDiscoverResponse extends WebMCPMessage {
 	type: 'webmcp:discover_response'
 	serverName: string
@@ -73,18 +98,12 @@ export interface WebMCPDiscoverResponse extends WebMCPMessage {
 	resources?: WebMCPResourceDefinition[]
 }
 
-/**
- * Tool call request
- */
 export interface WebMCPToolCallMessage extends WebMCPMessage {
 	type: 'webmcp:tool_call'
 	toolName: string
 	arguments: Record<string, unknown>
 }
 
-/**
- * Tool call result
- */
 export interface WebMCPToolResultMessage extends WebMCPMessage {
 	type: 'webmcp:tool_result'
 	requestId: string
@@ -92,17 +111,11 @@ export interface WebMCPToolResultMessage extends WebMCPMessage {
 	error?: string
 }
 
-/**
- * Resource read request
- */
 export interface WebMCPResourceReadMessage extends WebMCPMessage {
 	type: 'webmcp:resource_read'
 	uri: string
 }
 
-/**
- * Resource read response
- */
 export interface WebMCPResourceResponse extends WebMCPMessage {
 	type: 'webmcp:resource_response'
 	requestId: string
@@ -114,15 +127,14 @@ export interface WebMCPResourceResponse extends WebMCPMessage {
 	}[]
 }
 
-/**
- * Error response
- */
 export interface WebMCPErrorMessage extends WebMCPMessage {
 	type: 'webmcp:error'
 	requestId: string
 	code: string
 	message: string
 }
+
+// ─── Server / Tool representations ──────────────────────────────────────────
 
 /**
  * A discovered WebMCP server with its capabilities
@@ -133,7 +145,10 @@ export interface WebMCPServer {
 	tools: WebMCPToolDefinition[]
 	resources: WebMCPResourceDefinition[]
 	origin: string
+	/** For postMessage transport: port for direct communication */
 	port?: MessagePort
+	/** For native transport: direct tool execute functions */
+	nativeTools?: Map<string, WebMCPNativeTool>
 }
 
 /**
@@ -146,6 +161,12 @@ export interface WebMCPClientConfig {
 	allowedOrigins?: string[]
 	/** Name of this client for identification */
 	clientName?: string
+	/**
+	 * Prefer native W3C API when available (default: true).
+	 * When true and navigator.modelContext is available, tools registered
+	 * natively will be discovered first.
+	 */
+	preferNative?: boolean
 }
 
 let messageIdCounter = 0
@@ -157,11 +178,21 @@ function generateMessageId(): string {
 /**
  * WebMCP Client that discovers and invokes tools from WebMCP-enabled pages.
  *
- * Usage:
+ * Supports both the W3C native API (navigator.modelContext) and the
+ * postMessage-based transport for broader compatibility.
+ *
+ * @example
  * ```ts
  * const client = new WebMCPClient({ clientName: 'page-agent' })
+ *
+ * // Discover tools (checks native API first, then postMessage)
  * const servers = await client.discover()
- * const result = await client.callTool('pizza-maker', 'order_pizza', { size: 'large', toppings: ['cheese'] })
+ *
+ * // Call a tool
+ * const result = await client.callTool('pizza-maker', 'order_pizza', {
+ *   size: 'large',
+ *   toppings: ['cheese']
+ * })
  * ```
  */
 export class WebMCPClient {
@@ -184,17 +215,37 @@ export class WebMCPClient {
 			timeout: config?.timeout ?? 5000,
 			allowedOrigins: config?.allowedOrigins ?? [],
 			clientName: config?.clientName ?? 'page-agent-webmcp-client',
+			preferNative: config?.preferNative ?? true,
 		}
 
 		this.setupMessageListener()
 	}
 
 	/**
-	 * Set up the message listener for incoming WebMCP messages
+	 * Check if the W3C native WebMCP API is available
 	 */
+	static isNativeAvailable(): boolean {
+		return (
+			typeof navigator !== 'undefined' &&
+			'modelContext' in navigator &&
+			typeof (navigator as any).modelContext?.registerTool === 'function'
+		)
+	}
+
+	/**
+	 * Get the native ModelContext API if available
+	 */
+	private static getModelContext(): ModelContextAPI | null {
+		if (WebMCPClient.isNativeAvailable()) {
+			return (navigator as any).modelContext as ModelContextAPI
+		}
+		return null
+	}
+
+	// ─── Message transport setup ──────────────────────────────────────────────
+
 	private setupMessageListener(): void {
 		this.messageHandler = (event: MessageEvent) => {
-			// Origin check
 			if (
 				this.config.allowedOrigins.length > 0 &&
 				!this.config.allowedOrigins.includes(event.origin) &&
@@ -215,7 +266,6 @@ export class WebMCPClient {
 			window.addEventListener('message', this.messageHandler)
 		}
 
-		// Also set up BroadcastChannel for same-origin cross-tab
 		try {
 			if (typeof BroadcastChannel !== 'undefined') {
 				this.broadcastChannel = new BroadcastChannel('webmcp')
@@ -232,9 +282,6 @@ export class WebMCPClient {
 		}
 	}
 
-	/**
-	 * Handle an incoming WebMCP message
-	 */
 	private handleMessage(message: WebMCPMessage, event: MessageEvent): void {
 		switch (message.type) {
 			case 'webmcp:discover_response': {
@@ -249,7 +296,6 @@ export class WebMCPClient {
 				}
 				this.servers.set(server.name, server)
 
-				// Resolve pending discovery request
 				const pending = this.pendingRequests.get(message.id)
 				if (pending) {
 					clearTimeout(pending.timeout)
@@ -308,9 +354,6 @@ export class WebMCPClient {
 		}
 	}
 
-	/**
-	 * Send a WebMCP message to a target
-	 */
 	private sendMessage(
 		message: WebMCPMessage,
 		target?: Window | MessagePort,
@@ -325,11 +368,9 @@ export class WebMCPClient {
 				;(target as Window).postMessage(fullMessage, targetOrigin || '*')
 			}
 		} else if (typeof window !== 'undefined') {
-			// Broadcast to current window (for same-page WebMCP servers)
 			window.postMessage(fullMessage, '*')
 		}
 
-		// Also broadcast via BroadcastChannel
 		if (this.broadcastChannel) {
 			try {
 				this.broadcastChannel.postMessage(fullMessage)
@@ -339,9 +380,6 @@ export class WebMCPClient {
 		}
 	}
 
-	/**
-	 * Create a promise that resolves when a response is received
-	 */
 	private waitForResponse<T>(requestId: string, timeoutMs?: number): Promise<T> {
 		return new Promise<T>((resolve, reject) => {
 			const timeout = setTimeout(() => {
@@ -357,26 +395,215 @@ export class WebMCPClient {
 		})
 	}
 
+	// ─── Discovery ────────────────────────────────────────────────────────────
+
 	/**
-	 * Discover WebMCP servers in the current page and iframes
+	 * Discover WebMCP tools from the current page.
+	 *
+	 * Discovery order:
+	 * 1. Native W3C API (navigator.modelContext) - if available and preferNative=true
+	 * 2. postMessage transport - broadcasts to page, iframes, and BroadcastChannel
+	 * 3. DOM declarative tools - scans for `<form toolname="...">` elements
 	 */
 	async discover(target?: Window | MessagePort, targetOrigin?: string): Promise<WebMCPServer[]> {
 		if (this.disposed) throw new Error('WebMCPClient has been disposed')
 
+		const allServers: WebMCPServer[] = []
+
+		// 1. Discover native W3C WebMCP tools (via DOM inspection)
+		if (this.config.preferNative) {
+			const nativeServers = this.discoverNativeTools()
+			allServers.push(...nativeServers)
+		}
+
+		// 2. Discover declarative tools (HTML forms with toolname attribute)
+		const declarativeServers = this.discoverDeclarativeTools()
+		allServers.push(...declarativeServers)
+
+		// 3. Discover via postMessage transport
+		const messageServers = await this.discoverViaMessages(target, targetOrigin)
+		allServers.push(...messageServers)
+
+		return allServers
+	}
+
+	/**
+	 * Discover tools registered via the native navigator.modelContext API.
+	 * Since the native API doesn't expose a listing method, we check for
+	 * tools that page-agent knows about via toolactivated events.
+	 */
+	private discoverNativeTools(): WebMCPServer[] {
+		if (!WebMCPClient.isNativeAvailable()) return []
+
+		// The native API is present but doesn't provide a listing method.
+		// Tools registered via navigator.modelContext.registerTool() are
+		// consumed directly by the browser's AI (e.g. Gemini).
+		// We register this as a known "native" server so the client
+		// knows the native transport is available.
+		const server: WebMCPServer = {
+			name: '__native_webmcp__',
+			version: '1.0.0',
+			tools: [],
+			resources: [],
+			origin: typeof location !== 'undefined' ? location.origin : 'native',
+		}
+
+		this.servers.set(server.name, server)
+		return [server]
+	}
+
+	/**
+	 * Discover tools declared via HTML `<form toolname="...">` elements.
+	 * This is the declarative W3C WebMCP approach.
+	 */
+	private discoverDeclarativeTools(): WebMCPServer[] {
+		if (typeof document === 'undefined') return []
+
+		const forms = document.querySelectorAll('form[toolname]')
+		if (forms.length === 0) return []
+
+		const tools: WebMCPToolDefinition[] = []
+		const nativeTools = new Map<string, WebMCPNativeTool>()
+
+		for (const form of forms) {
+			const name = form.getAttribute('toolname')
+			const description = form.getAttribute('tooldescription') || ''
+			if (!name) continue
+
+			// Build input schema from form elements
+			const properties: Record<string, Record<string, unknown>> = {}
+			const required: string[] = []
+
+			const inputs = form.querySelectorAll('input[name], select[name], textarea[name]')
+			for (const input of inputs) {
+				const inputName = input.getAttribute('name')
+				if (!inputName) continue
+
+				const paramDesc = input.getAttribute('toolparamdescription') || ''
+				const inputType = input.getAttribute('type') || 'text'
+				const isRequired = input.hasAttribute('required')
+
+				const prop: Record<string, unknown> = { description: paramDesc }
+
+				if (inputType === 'number') {
+					prop.type = 'number'
+				} else if (inputType === 'checkbox') {
+					prop.type = 'boolean'
+				} else {
+					prop.type = 'string'
+				}
+
+				// For select elements, extract enum values
+				if (input.tagName === 'SELECT') {
+					const options = input.querySelectorAll('option')
+					prop.enum = Array.from(options).map((o) => o.getAttribute('value') || o.textContent)
+				}
+
+				properties[inputName] = prop
+				if (isRequired) required.push(inputName)
+			}
+
+			const inputSchema: Record<string, unknown> = {
+				type: 'object',
+				properties,
+			}
+			if (required.length > 0) inputSchema.required = required
+
+			tools.push({ name, description, inputSchema })
+
+			// Create a native tool executor that fills and submits the form
+			const formRef = form as HTMLFormElement
+			nativeTools.set(name, {
+				name,
+				description,
+				inputSchema,
+				execute: async (input: Record<string, unknown>) => {
+					// Fill form fields
+					for (const [key, value] of Object.entries(input)) {
+						const field = formRef.querySelector(`[name="${key}"]`) as
+							| HTMLInputElement
+							| HTMLSelectElement
+							| null
+						if (field) {
+							field.value = String(value)
+							field.dispatchEvent(new Event('input', { bubbles: true }))
+							field.dispatchEvent(new Event('change', { bubbles: true }))
+						}
+					}
+
+					// Submit the form via a synthetic submit event with agentInvoked flag
+					return new Promise((resolve, reject) => {
+						const submitHandler = (e: Event) => {
+							e.preventDefault()
+							formRef.removeEventListener('submit', submitHandler)
+
+							// Check if the page responds via e.respondWith (W3C spec)
+							const submitEvent = e as any
+							if (typeof submitEvent.respondWith === 'function') {
+								// The page will call e.respondWith(promise)
+								// We can't intercept that directly, so resolve with form data
+								const formData = Object.fromEntries(new FormData(formRef))
+								resolve({ submitted: true, data: formData })
+							} else {
+								const formData = Object.fromEntries(new FormData(formRef))
+								resolve({ submitted: true, data: formData })
+							}
+						}
+
+						formRef.addEventListener('submit', submitHandler)
+
+						// Create a SubmitEvent with agentInvoked flag
+						const event = new SubmitEvent('submit', {
+							bubbles: true,
+							cancelable: true,
+						})
+						Object.defineProperty(event, 'agentInvoked', { value: true })
+
+						const dispatched = formRef.dispatchEvent(event)
+						if (dispatched) {
+							// Form wasn't prevented, reject after timeout
+							formRef.removeEventListener('submit', submitHandler)
+							reject(new Error('Form submission was not handled'))
+						}
+					})
+				},
+			})
+		}
+
+		if (tools.length === 0) return []
+
+		const server: WebMCPServer = {
+			name: '__declarative_webmcp__',
+			version: '1.0.0',
+			tools,
+			resources: [],
+			origin: typeof location !== 'undefined' ? location.origin : 'declarative',
+			nativeTools,
+		}
+
+		this.servers.set(server.name, server)
+		return [server]
+	}
+
+	/**
+	 * Discover servers via postMessage transport
+	 */
+	private async discoverViaMessages(
+		target?: Window | MessagePort,
+		targetOrigin?: string
+	): Promise<WebMCPServer[]> {
 		const id = generateMessageId()
 		const message: WebMCPDiscoverMessage = {
 			type: 'webmcp:discover',
 			id,
 		}
 
-		// Collect responses over a timeout period
 		const servers: WebMCPServer[] = []
 
 		const collectPromise = new Promise<void>((resolve) => {
 			setTimeout(() => resolve(), this.config.timeout)
 		})
 
-		// Set up a temporary handler to collect multiple responses
 		const originalHandler = this.messageHandler
 		const discoveryHandler = (event: MessageEvent) => {
 			originalHandler?.(event)
@@ -400,7 +627,6 @@ export class WebMCPClient {
 			window.addEventListener('message', discoveryHandler)
 		}
 
-		// Send discovery message
 		this.sendMessage(message, target, targetOrigin)
 
 		// Also send to all iframes
@@ -419,7 +645,6 @@ export class WebMCPClient {
 
 		await collectPromise
 
-		// Restore original handler
 		if (typeof window !== 'undefined') {
 			window.removeEventListener('message', discoveryHandler)
 			window.addEventListener('message', originalHandler!)
@@ -428,8 +653,13 @@ export class WebMCPClient {
 		return servers
 	}
 
+	// ─── Tool execution ───────────────────────────────────────────────────────
+
 	/**
-	 * Call a tool on a specific WebMCP server
+	 * Call a tool on a specific WebMCP server.
+	 *
+	 * For declarative tools (HTML forms), this fills the form and triggers submit.
+	 * For postMessage servers, this sends a tool_call message.
 	 */
 	async callTool(
 		serverName: string,
@@ -448,6 +678,13 @@ export class WebMCPClient {
 			throw new Error(`Tool "${toolName}" not found on server "${serverName}"`)
 		}
 
+		// Use native tool executor if available (declarative forms)
+		if (server.nativeTools?.has(toolName)) {
+			const nativeTool = server.nativeTools.get(toolName)!
+			return nativeTool.execute(args)
+		}
+
+		// Fall back to postMessage transport
 		const requestId = generateMessageId()
 		const message: WebMCPToolCallMessage = {
 			type: 'webmcp:tool_call',
@@ -458,7 +695,6 @@ export class WebMCPClient {
 
 		const responsePromise = this.waitForResponse<unknown>(requestId)
 
-		// Send to the server's port if available, otherwise broadcast
 		if (server.port) {
 			this.sendMessage(message, server.port)
 		} else {
@@ -512,6 +748,11 @@ export class WebMCPClient {
 		const server = this.servers.get(serverName)
 		if (!server) return false
 
+		// Native and declarative servers are always "alive"
+		if (server.name === '__native_webmcp__' || server.name === '__declarative_webmcp__') {
+			return true
+		}
+
 		const id = generateMessageId()
 		const message: WebMCPMessage = { type: 'webmcp:ping', id }
 
@@ -527,6 +768,8 @@ export class WebMCPClient {
 			return false
 		}
 	}
+
+	// ─── Accessors ────────────────────────────────────────────────────────────
 
 	/**
 	 * Get all discovered servers
@@ -563,7 +806,6 @@ export class WebMCPClient {
 			this.broadcastChannel = null
 		}
 
-		// Reject all pending requests
 		for (const [id, pending] of this.pendingRequests) {
 			clearTimeout(pending.timeout)
 			pending.reject(new Error('WebMCPClient disposed'))

@@ -2,22 +2,27 @@
  * WebMCP Server/Gateway - Exposes tools to WebMCP clients
  *
  * This server makes page-agent's tools available to external WebMCP clients
- * (such as Chrome's built-in AI assistant or other agents using the WebMCP
- * client interface). It acts as a "gateway" that:
+ * (such as Chrome's built-in AI assistant, the WebMCP browser extension,
+ * or other agents using the WebMCP client interface).
  *
- * 1. Listens for WebMCP discovery and tool call messages
- * 2. Converts between WebMCP protocol and page-agent's tool format
- * 3. Executes tools and returns results
+ * Supports both:
+ * 1. W3C native API (navigator.modelContext.registerTool) - Chrome 146+
+ * 2. postMessage-based transport for broader compatibility
  *
- * For pages that don't natively expose WebMCP, this server can be injected
- * to make the page's capabilities available through the WebMCP protocol.
+ * Acts as a "gateway" for pages that don't natively expose WebMCP,
+ * making page capabilities available through the WebMCP protocol.
+ *
+ * @see https://webmachinelearning.github.io/webmcp/
+ * @see https://github.com/webmachinelearning/webmcp
  */
 import * as z from 'zod/v4'
 
 import type {
+	ModelContextAPI,
 	WebMCPDiscoverResponse,
 	WebMCPErrorMessage,
 	WebMCPMessage,
+	WebMCPNativeTool,
 	WebMCPResourceDefinition,
 	WebMCPResourceReadMessage,
 	WebMCPResourceResponse,
@@ -41,6 +46,12 @@ export interface WebMCPServerConfig {
 	discoverable?: boolean
 	/** Custom resource providers */
 	resources?: WebMCPResourceProvider[]
+	/**
+	 * Register tools via the native W3C navigator.modelContext API
+	 * in addition to the postMessage transport (default: true).
+	 * When enabled, tools are accessible to Chrome's built-in AI.
+	 */
+	registerNative?: boolean
 }
 
 /**
@@ -60,7 +71,10 @@ export interface WebMCPResourceProvider {
 /**
  * WebMCP Server that exposes tools and resources via the WebMCP protocol.
  *
- * Usage:
+ * Automatically uses the W3C native API (navigator.modelContext) when
+ * available, with postMessage as a fallback transport.
+ *
+ * @example
  * ```ts
  * const server = new WebMCPServer({
  *   name: 'page-agent-gateway',
@@ -78,6 +92,7 @@ export interface WebMCPResourceProvider {
 export class WebMCPServer {
 	private config: Required<WebMCPServerConfig>
 	private tools = new Map<string, Tool>()
+	private nativeToolNames = new Set<string>()
 	private resourceProviders: WebMCPResourceProvider[] = []
 	private messageHandler: ((event: MessageEvent) => void) | null = null
 	private broadcastChannel: BroadcastChannel | null = null
@@ -91,15 +106,37 @@ export class WebMCPServer {
 			allowedOrigins: config.allowedOrigins ?? [],
 			discoverable: config.discoverable ?? true,
 			resources: config.resources ?? [],
+			registerNative: config.registerNative ?? true,
 		}
 		this.resourceProviders = [...this.config.resources]
 	}
 
 	/**
-	 * Register a tool to be exposed via WebMCP
+	 * Check if the W3C native WebMCP API is available
+	 */
+	private static getModelContext(): ModelContextAPI | null {
+		if (
+			typeof navigator !== 'undefined' &&
+			'modelContext' in navigator &&
+			typeof (navigator as any).modelContext?.registerTool === 'function'
+		) {
+			return (navigator as any).modelContext as ModelContextAPI
+		}
+		return null
+	}
+
+	/**
+	 * Register a tool to be exposed via WebMCP.
+	 * If the native API is available and registerNative is enabled,
+	 * the tool is also registered via navigator.modelContext.registerTool().
 	 */
 	registerTool(name: string, tool: Tool): void {
 		this.tools.set(name, tool)
+
+		// Also register via native API if available and server is running
+		if (this.running && this.config.registerNative) {
+			this.registerToolNative(name, tool)
+		}
 	}
 
 	/**
@@ -108,15 +145,28 @@ export class WebMCPServer {
 	registerTools(tools: Record<string, Tool> | Map<string, Tool>): void {
 		const entries = tools instanceof Map ? tools.entries() : Object.entries(tools)
 		for (const [name, tool] of entries) {
-			this.tools.set(name, tool)
+			this.registerTool(name, tool)
 		}
 	}
 
 	/**
-	 * Unregister a tool
+	 * Unregister a tool from both native and postMessage transports
 	 */
 	unregisterTool(name: string): void {
 		this.tools.delete(name)
+
+		// Also unregister from native API
+		if (this.nativeToolNames.has(name)) {
+			const modelContext = WebMCPServer.getModelContext()
+			if (modelContext) {
+				try {
+					modelContext.unregisterTool(name)
+				} catch {
+					// May fail if tool was already unregistered
+				}
+			}
+			this.nativeToolNames.delete(name)
+		}
 	}
 
 	/**
@@ -127,22 +177,100 @@ export class WebMCPServer {
 	}
 
 	/**
-	 * Set the execution context for tool calls (e.g., the PageAgent instance)
-	 * Tools' execute functions will be called with this context as `this`
+	 * Set the execution context for tool calls (e.g., the PageAgent instance).
+	 * Tools' execute functions will be called with this context as `this`.
 	 */
 	setExecutionContext(context: unknown): void {
 		this.executionContext = context
 	}
 
 	/**
-	 * Start the WebMCP server (listen for messages)
+	 * Register a single tool via the native W3C API
+	 */
+	private registerToolNative(name: string, tool: Tool): void {
+		const modelContext = WebMCPServer.getModelContext()
+		if (!modelContext) return
+
+		const openaiTool = zodToOpenAITool(name, tool)
+		const ctx = this.executionContext
+
+		const nativeTool: WebMCPNativeTool = {
+			name,
+			description: openaiTool.function.description || '',
+			inputSchema: openaiTool.function.parameters,
+			execute: async (input: Record<string, unknown>) => {
+				// Validate input
+				const validation = tool.inputSchema.safeParse(input)
+				if (!validation.success) {
+					return {
+						content: [
+							{
+								type: 'text',
+								text: JSON.stringify({
+									error: true,
+									message: `Invalid arguments: ${z.prettifyError(validation.error)}`,
+								}),
+							},
+						],
+					}
+				}
+
+				try {
+					const result = ctx
+						? await tool.execute.call(ctx, validation.data)
+						: await tool.execute(validation.data)
+
+					// Return in MCP-compatible content format
+					return {
+						content: [
+							{
+								type: 'text',
+								text: typeof result === 'string' ? result : JSON.stringify(result),
+							},
+						],
+					}
+				} catch (error: unknown) {
+					return {
+						content: [
+							{
+								type: 'text',
+								text: JSON.stringify({
+									error: true,
+									message: `Tool execution failed: ${(error as Error).message}`,
+								}),
+							},
+						],
+					}
+				}
+			},
+		}
+
+		try {
+			modelContext.registerTool(nativeTool)
+			this.nativeToolNames.add(name)
+		} catch {
+			// Registration may fail if name is already taken or API is restricted
+		}
+	}
+
+	/**
+	 * Start the WebMCP server.
+	 * Begins listening for postMessage requests and registers tools
+	 * via the native API if available.
 	 */
 	start(): void {
 		if (this.running) return
 		this.running = true
 
+		// Register existing tools via native API
+		if (this.config.registerNative) {
+			for (const [name, tool] of this.tools) {
+				this.registerToolNative(name, tool)
+			}
+		}
+
+		// Set up postMessage listener
 		this.messageHandler = (event: MessageEvent) => {
-			// Origin check
 			if (
 				this.config.allowedOrigins.length > 0 &&
 				!this.config.allowedOrigins.includes(event.origin)
@@ -186,10 +314,24 @@ export class WebMCPServer {
 	}
 
 	/**
-	 * Stop the WebMCP server
+	 * Stop the WebMCP server.
+	 * Unregisters native tools and removes message listeners.
 	 */
 	stop(): void {
 		this.running = false
+
+		// Unregister native tools
+		const modelContext = WebMCPServer.getModelContext()
+		if (modelContext) {
+			for (const name of this.nativeToolNames) {
+				try {
+					modelContext.unregisterTool(name)
+				} catch {
+					// May fail
+				}
+			}
+		}
+		this.nativeToolNames.clear()
 
 		if (this.messageHandler && typeof window !== 'undefined') {
 			window.removeEventListener('message', this.messageHandler)
@@ -202,9 +344,8 @@ export class WebMCPServer {
 		}
 	}
 
-	/**
-	 * Handle an incoming WebMCP message
-	 */
+	// ─── Message handling ─────────────────────────────────────────────────────
+
 	private handleMessage(message: WebMCPMessage, event: MessageEvent): void {
 		switch (message.type) {
 			case 'webmcp:discover':
@@ -227,9 +368,6 @@ export class WebMCPServer {
 		}
 	}
 
-	/**
-	 * Handle a discovery request
-	 */
 	private handleDiscover(message: WebMCPMessage, event: MessageEvent): void {
 		const toolDefs: WebMCPToolDefinition[] = []
 
@@ -262,9 +400,6 @@ export class WebMCPServer {
 		this.sendResponse(response, event)
 	}
 
-	/**
-	 * Handle a tool call request
-	 */
 	private async handleToolCall(message: WebMCPToolCallMessage, event: MessageEvent): Promise<void> {
 		const tool = this.tools.get(message.toolName)
 		if (!tool) {
@@ -283,7 +418,6 @@ export class WebMCPServer {
 		}
 
 		try {
-			// Validate input
 			const validation = tool.inputSchema.safeParse(message.arguments)
 			if (!validation.success) {
 				this.sendResponse(
@@ -300,7 +434,6 @@ export class WebMCPServer {
 				return
 			}
 
-			// Execute tool with the execution context
 			const result = this.executionContext
 				? await tool.execute.call(this.executionContext, validation.data)
 				: await tool.execute(validation.data)
@@ -330,14 +463,10 @@ export class WebMCPServer {
 		}
 	}
 
-	/**
-	 * Handle a resource read request
-	 */
 	private async handleResourceRead(
 		message: WebMCPResourceReadMessage,
 		event: MessageEvent
 	): Promise<void> {
-		// Find matching resource provider
 		const provider = this.resourceProviders.find((p) => this.matchUri(p.uriPattern, message.uri))
 
 		if (!provider) {
@@ -387,28 +516,22 @@ export class WebMCPServer {
 		}
 	}
 
-	/**
-	 * Send a response message back to the requester
-	 */
 	private sendResponse(
 		message: WebMCPMessage | Record<string, unknown>,
 		event: MessageEvent
 	): void {
 		const responseMsg = { ...message, source: this.config.name }
 
-		// If the request came through a MessagePort, respond via the port
 		if (event.ports?.[0]) {
 			event.ports[0].postMessage(responseMsg)
 			return
 		}
 
-		// If the request came from a window (postMessage), respond to that window
 		if (event.source && typeof (event.source as Window).postMessage === 'function') {
 			;(event.source as Window).postMessage(responseMsg, event.origin || '*')
 			return
 		}
 
-		// Otherwise broadcast
 		if (typeof window !== 'undefined') {
 			window.postMessage(responseMsg, '*')
 		}
@@ -422,9 +545,6 @@ export class WebMCPServer {
 		}
 	}
 
-	/**
-	 * Simple URI pattern matching (supports * wildcards)
-	 */
 	private matchUri(pattern: string, uri: string): boolean {
 		if (pattern === uri) return true
 		if (pattern === '*') return true
@@ -433,23 +553,23 @@ export class WebMCPServer {
 		return new RegExp(`^${regexStr}$`).test(uri)
 	}
 
-	/**
-	 * Get the list of registered tools
-	 */
+	// ─── Accessors ────────────────────────────────────────────────────────────
+
 	getTools(): Map<string, Tool> {
 		return new Map(this.tools)
 	}
 
-	/**
-	 * Check if the server is running
-	 */
 	isRunning(): boolean {
 		return this.running
 	}
 
 	/**
-	 * Dispose the server
+	 * Check if native W3C WebMCP API is being used
 	 */
+	isNativeRegistered(): boolean {
+		return this.nativeToolNames.size > 0
+	}
+
 	dispose(): void {
 		this.stop()
 		this.tools.clear()
