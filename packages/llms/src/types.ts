@@ -102,3 +102,90 @@ export interface LLMConfig {
 	 */
 	customFetch?: typeof globalThis.fetch
 }
+
+/**
+ * Chrome Built-in AI session interface.
+ * Supports both old and new API shapes:
+ * - New (2025+): self.LanguageModel.create() -> session with inputQuota/inputUsage
+ * - Legacy (2024): self.ai.languageModel.create() -> session with maxTokens/tokensSoFar
+ */
+export interface ChromeAISession {
+	prompt(text: string, options?: { signal?: AbortSignal }): Promise<string>
+	promptStreaming(text: string, options?: { signal?: AbortSignal }): ReadableStream<string>
+	destroy(): void
+	// New API token properties
+	readonly inputQuota?: number
+	readonly inputUsage?: number
+	// Legacy API token properties
+	readonly maxTokens?: number
+	readonly tokensSoFar?: number
+	readonly tokensLeft?: number
+	// Token counting methods
+	measureInputUsage?: (text: string) => Promise<number>
+	countPromptTokens?: (text: string) => Promise<number>
+}
+
+/**
+ * Configuration for Chrome Built-in AI client
+ */
+export interface ChromeAIConfig {
+	/** Temperature for generation */
+	temperature?: number
+	/** Top-K sampling parameter */
+	topK?: number
+	/** Enable response caching */
+	enableCache?: boolean
+	/** Cache TTL in milliseconds (default: 5 minutes) */
+	cacheTTL?: number
+	/** Maximum cache entries (default: 100) */
+	maxCacheSize?: number
+	/** Initial prompts for session context (Chrome AI specific) */
+	initialPrompts?: { role: 'system' | 'user' | 'assistant'; content: string }[]
+	/**
+	 * Expected input languages for session creation (new API).
+	 * Passed as expectedInputs: [{ type: 'text', languages: [...] }]
+	 * @example ['en', 'zh']
+	 */
+	expectedInputLanguages?: string[]
+	/**
+	 * Expected output languages for session creation (new API).
+	 * Passed as expectedOutputs: [{ type: 'text', languages: [...] }]
+	 * @example ['en']
+	 */
+	expectedOutputLanguages?: string[]
+}
+
+/**
+ * Provider type for the LLM router
+ */
+export type LLMProvider = 'openai' | 'chrome-ai'
+
+/**
+ * Routing strategy for the LLM router
+ */
+export type RoutingStrategy =
+	| 'fallback' // Try providers in order, fall back on failure
+	| 'prefer-local' // Prefer Chrome AI, fall back to OpenAI
+	| 'prefer-remote' // Prefer OpenAI, fall back to Chrome AI
+	| 'local-only' // Only use Chrome AI
+	| 'remote-only' // Only use OpenAI (default, equivalent to current behavior)
+
+/**
+ * Configuration for the LLM Router
+ */
+export interface LLMRouterConfig {
+	/** Strategy for choosing a provider */
+	strategy?: RoutingStrategy
+	/** OpenAI-compatible API configuration (for remote providers) */
+	openai?: LLMConfig
+	/** Chrome Built-in AI configuration (for local/on-device models) */
+	chromeAI?: ChromeAIConfig
+	/** Maximum retries per provider before falling back */
+	maxRetries?: number
+	/** Custom routing function for advanced use cases */
+	customRouter?: (
+		messages: Message[],
+		tools: Record<string, Tool>,
+		availableProviders: LLMProvider[]
+	) => LLMProvider
+}
