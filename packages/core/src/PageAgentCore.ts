@@ -8,6 +8,7 @@ import chalk from 'chalk'
 import * as z from 'zod/v4'
 
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
+import { sanitizePageContent } from './sanitize'
 import { tools } from './tools'
 import type {
 	AgentActivity,
@@ -23,6 +24,7 @@ import type {
 import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
 
 export { tool, type PageAgentTool } from './tools'
+export { sanitizePageContent, sanitizeHTML } from './sanitize'
 export type * from './types'
 
 export type PageAgentCoreConfig = AgentConfig & { pageController: PageController }
@@ -602,7 +604,7 @@ export class PageAgentCore extends EventTarget {
 
 		// <browser_state>
 
-		let pageContent = browserState.content
+		let pageContent = sanitizePageContent(browserState.content)
 		if (this.config.transformPageContent) {
 			pageContent = await this.config.transformPageContent(pageContent)
 		}

@@ -1,1 +1,2 @@
+node scripts/scan-secrets.js
 npx lint-staged --allow-empty
