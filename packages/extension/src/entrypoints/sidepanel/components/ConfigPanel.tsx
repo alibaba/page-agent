@@ -86,10 +86,18 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const handleSave = async () => {
 		setSaving(true)
 		try {
+			const normalizedBaseURL = baseURL.trim()
+			const normalizedApiKey = apiKey.trim()
+			const normalizedModel = model.trim()
+			const resetToDemoDefaults =
+				normalizedBaseURL.length === 0 &&
+				normalizedApiKey.length === 0 &&
+				normalizedModel.length === 0
+
 			await onSave({
-				apiKey,
-				baseURL,
-				model,
+				apiKey: resetToDemoDefaults ? DEMO_API_KEY : normalizedApiKey,
+				baseURL: resetToDemoDefaults ? DEMO_BASE_URL : normalizedBaseURL,
+				model: resetToDemoDefaults ? DEMO_MODEL : normalizedModel,
 				language,
 				maxSteps: maxSteps || undefined,
 				systemInstruction: systemInstruction || undefined,
