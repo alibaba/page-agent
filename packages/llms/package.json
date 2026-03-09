@@ -1,6 +1,6 @@
 {
     "name": "@page-agent/llms",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "type": "module",
     "main": "./dist/lib/page-agent-llms.js",
     "module": "./dist/lib/page-agent-llms.js",

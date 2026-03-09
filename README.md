@@ -49,8 +49,8 @@ Fastest way to try PageAgent with our free Demo LLM:
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.5.2/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.5.2/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.5.3/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.5.3/files/dist/iife/page-agent.demo.js |
 
 > **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api). By using it, you agree to its [terms](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md).
 
