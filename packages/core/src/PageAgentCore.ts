@@ -450,10 +450,20 @@ export class PageAgentCore extends EventTarget {
 		}
 
 		const targetLanguage = this.config.language === 'zh-CN' ? '中文' : 'English'
+		// Use more specific regex to avoid potential issues with similar patterns
+		const languagePattern = /Default working language: \*\*([^*]+)\*\*/
 		const systemPrompt = SYSTEM_PROMPT.replace(
-			/Default working language: \*\*.*?\*\*/,
+			languagePattern,
 			`Default working language: **${targetLanguage}**`
 		)
+
+		// Fallback: if no match found, append language setting
+		if (!languagePattern.test(SYSTEM_PROMPT)) {
+			console.warn(
+				chalk.yellow('[PageAgent] Could not find language pattern in system prompt, appending language setting.')
+			)
+			return systemPrompt + `\n\nDefault working language: **${targetLanguage}**\n`
+		}
 
 		return systemPrompt
 	}
