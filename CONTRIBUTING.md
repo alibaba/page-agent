@@ -16,6 +16,7 @@ Thank you for your interest in contributing to PageAgent! We welcome contributio
     ```bash
     npm ci
     npm start          # Start demo and documentation site
+    npm run build      # Build libs and website
     ```
 
 ### Project Structure
