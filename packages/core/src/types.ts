@@ -281,3 +281,75 @@ export interface ExecutionResult {
 	data: string
 	history: HistoricalEvent[]
 }
+
+/**
+ * Utility type for making properties optional.
+ * Useful for partial updates and configuration objects.
+ */
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+
+/**
+ * Utility type for making properties required.
+ * Useful for ensuring configuration completeness.
+ */
+export type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
+
+/**
+ * Result of a tool execution.
+ */
+export interface ToolExecutionResult {
+	/** Whether the tool execution was successful */
+	success: boolean
+	/** Output message or data from the tool */
+	output: string
+	/** Duration of execution in milliseconds */
+	duration?: number
+	/** Optional error information if execution failed */
+	error?: string
+}
+
+/**
+ * Configuration for agent reflection.
+ */
+export interface ReflectionConfig {
+	/** Enable reflection before each step */
+	enabled?: boolean
+	/** Maximum reflection depth (default: 1) */
+	maxDepth?: number
+	/** Include reflection in history */
+	includeInHistory?: boolean
+}
+
+/**
+ * Agent performance metrics.
+ */
+export interface AgentMetrics {
+	/** Total number of steps executed */
+	totalSteps: number
+	/** Total execution time in milliseconds */
+	totalTime: number
+	/** Average step duration in milliseconds */
+	avgStepTime: number
+	/** Number of successful tool executions */
+	successfulTools: number
+	/** Number of failed tool executions */
+	failedTools: number
+	/** Number of LLM retries */
+	llmRetries: number
+	/** Total wait time in seconds */
+	totalWaitTime: number
+}
+
+/**
+ * Options for agent execution.
+ */
+export interface ExecutionOptions {
+	/** Timeout in milliseconds (0 = no timeout) */
+	timeout?: number
+	/** Maximum number of steps (overrides config) */
+	maxSteps?: number
+	/** Enable verbose logging */
+	verbose?: boolean
+	/** Custom signal for aborting execution */
+	signal?: AbortSignal
+}
