@@ -33,8 +33,9 @@ console.log(
 
 const tagName = `EXT_v${newVersion}`
 console.log(chalk.cyan.bold('📋 Next steps:\n'))
+console.log(chalk.blueBright(`npm i`))
 console.log(
-	chalk.blueBright(`git add . && git commit -m "chore(extension): bump version to ${newVersion}"`)
+	chalk.blueBright(`git add . && git commit -m "chore(ext): bump version to ${newVersion}"`)
 )
 console.log(chalk.blueBright(`git tag -a ${tagName} -m "${tagName}"`))
 console.log(chalk.blueBright(`git push && git push origin ${tagName}\n`))
