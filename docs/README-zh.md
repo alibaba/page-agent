@@ -111,3 +111,11 @@ file and in the node_modules directory after installation.
 ---
 
 **⭐ 如果觉得 PageAgent 有用或有趣，请给项目点个星！**
+
+<a href="https://www.star-history.com/?repos=alibaba%2Fpage-agent&type=date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left" />
+ </picture>
+</a>
