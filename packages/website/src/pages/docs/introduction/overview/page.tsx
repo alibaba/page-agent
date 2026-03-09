@@ -45,7 +45,7 @@ export default function Overview() {
 						rel="noopener noreferrer"
 					>
 						<img
-							src="https://img.shields.io/github/stars/alibaba/page-agent.svg"
+							src="https://img.shields.io/github/stars/zhulinchng/page-agent.svg"
 							alt="GitHub stars"
 						/>
 					</a>

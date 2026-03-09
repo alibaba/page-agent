@@ -1,7 +1,7 @@
 {
     "name": "root",
     "private": true,
-    "version": "1.5.1",
+    "version": "1.5.3",
     "type": "module",
     "workspaces": [
         "packages/page-controller",
@@ -17,23 +17,26 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git"
+        "url": "https://github.com/zhulinchng/page-agent.git"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://zhulinchng.github.io/page-agent/",
     "engines": {
         "node": "^20.19.0 || ^22.13.0 || >=24"
     },
     "scripts": {
-        "cleanup": "rm -rf packages/*/dist",
         "start": "npm run dev --workspace=@page-agent/website",
-        "build:website": "npm run build:website --workspace=@page-agent/website",
-        "build:libs": "npm run build --workspaces --if-present",
-        "build": "npm run build:libs && npm run build:website",
+        "dev:ext": "npm run dev -w @page-agent/ext",
         "dev:demo": "npm run dev:demo --workspace=page-agent",
+        "build": "npm run build:libs && npm run build:website",
+        "build:libs": "npm run build --workspaces --if-present",
+        "build:website": "npm run build:website --workspace=@page-agent/website",
+        "build:ext": "npm run build:libs && npm run zip -w @page-agent/ext",
         "test": "vitest run",
         "playground": "npm run build:libs && node playground/serve.js",
         "version": "node scripts/sync-version.js",
+        "version:ext": "node scripts/ext-version.js",
         "lint": "eslint .",
+        "cleanup": "rm -rf packages/*/dist",
         "prepare": "husky"
     },
     "devDependencies": {

@@ -43,20 +43,24 @@ export function MotionOverlay({ active }: { active: boolean }) {
 	const motionRef = useRef<Motion | null>(null)
 
 	useEffect(() => {
-		const mode = document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-		const motion = new Motion({
-			mode,
-			borderWidth: 4,
-			borderRadius: 14,
-			glowWidth: mode === 'dark' ? 120 : 60,
-			styles: { position: 'absolute', inset: '0' },
-		})
-		motionRef.current = motion
-		containerRef.current!.appendChild(motion.element)
-		motion.autoResize(containerRef.current!)
+		try {
+			const mode = document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+			const motion = new Motion({
+				mode,
+				borderWidth: 4,
+				borderRadius: 14,
+				glowWidth: mode === 'dark' ? 120 : 60,
+				styles: { position: 'absolute', inset: '0' },
+			})
+			motionRef.current = motion
+			containerRef.current!.appendChild(motion.element)
+			motion.autoResize(containerRef.current!)
+		} catch (e) {
+			console.warn('[MotionOverlay] Motion unavailable:', e)
+		}
 
 		return () => {
-			motion.dispose()
+			motionRef.current?.dispose()
 			motionRef.current = null
 		}
 	}, [])

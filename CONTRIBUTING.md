@@ -1,6 +1,6 @@
-# Contributing to Page-Agent
+# Contributing to PageAgent
 
-Thank you for your interest in contributing to Page-Agent! We welcome contributions from everyone.
+Thank you for your interest in contributing to PageAgent! We welcome contributions from everyone.
 
 ## 🚀 Quick Start
 
@@ -16,6 +16,7 @@ Thank you for your interest in contributing to Page-Agent! We welcome contributi
     ```bash
     npm ci
     npm start          # Start demo and documentation site
+    npm run build      # Build libs and website
     ```
 
 ### Project Structure
@@ -27,11 +28,11 @@ This is a **monorepo** with npm workspaces containing **4 main packages**:
 - **Extension** (`packages/extension/`) - Chrome extension for multi-page tasks and browser-level automation
 - **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
 
-We use a simplified monorepo solution with `native npm-workspace + ts reference + vite alias`. No fancy tooling. Hoisting is required.
-
-- When developing. Use alias so that we don't have to pre-build.
-- When bundling. Use external and disable ts `paths` alias to leave deps out.
-- When bundling `IIFE` and `Website`. Bundle everything including local packages.
+> We use a simplified monorepo solution with `native npm-workspace + ts reference + vite alias`. No fancy tooling. Hoisting is required.
+> 
+> - When developing. Use alias so that we don't have to pre-build.
+> - When bundling. Use external and disable ts `paths` alias to leave deps out.
+> - When bundling `IIFE` and `Website`. Bundle everything including local packages.
 
 ## 🤝 How to Contribute
 
@@ -90,14 +91,17 @@ We use a simplified monorepo solution with `native npm-workspace + ts reference 
 - Keep functions small and focused
 - Add JSDoc for public APIs
 
-### Vibe coding with AI
+### Vibe Coding with AI
 
-- It's **recommended** to heavily rely on AI (aka "vibe coding") when maintaining **demo pages and tests**.
-- Be very careful if AI ever touched the core lib!!!
+> [Vibe coding](https://en.wikipedia.org/wiki/Vibe_coding) = describe what you want in natural language, let AI write the code, and you review the result.
+
+- Vibe coding is **RECOMMENDED** when maintaining **the demo, the website, the UI and tests**.
+    - We have a [website/AGENTS.md](packages/website/AGENTS.md) for that.
+- Vibe coding is **NOT** allowed for the core lib!!!
+- NEVER try to vibe coding the MV3 extension!!! It is HELL.
 - Review anything AI wrote before make a commit. You are the author of anything you commit. NOT AI.
-- Update the [AI instructions](AGENTS.md) when structure changed.
 
-If your lame AI assistant does not support [AGENTS.md](https://agents.md/). Add an alias for it:
+If your AI assistant does not support [AGENTS.md](https://agents.md/). Add an alias for it:
 
 - claude-code (`CLAUDE.md`)
 
@@ -127,17 +131,17 @@ If your lame AI assistant does not support [AGENTS.md](https://agents.md/). Add 
     LLM_BASE_URL=https://api.your-llm-provider.com/v1
     ```
 
-- **Ollama example**:
+- **Ollama example** (tested on 0.15 + qwen3:14b, RTX3090 24GB):
 
     ```env
     LLM_BASE_URL="http://localhost:11434/v1"
     LLM_API_KEY="NA"
-    LLM_MODEL_NAME="llama3.2"
+    LLM_MODEL_NAME="qwen3:14b"
     ```
 
-    > ⚠️ Add `*` to `OLLAMA_ORIGINS` (403). Models < 10B unlikely strong enough. Requires tool_call support. Set context length > 15k (default 4k will NOT work): `$env:OLLAMA_CONTEXT_LENGTH=64000; ollama serve`
+    > @see https://zhulinchng.github.io/page-agent/docs/features/models#ollama for configuration
 
-- Restart the dev server to load new env vars
+- **Restart the dev server** to load new env vars
 - LLM_MODEL_NAME and LLM_BASE_URL must be set to use the demo
 
 ### Website Development
@@ -149,12 +153,13 @@ npm start
 ### Extension Development
 
 ```bash
+# make sure you ran `npm run build:libs` first
+# and every time you changed the core libs
 npm run dev -w @page-agent/ext
 npm run zip -w @page-agent/ext
 ```
 
-- Load extension in Chrome via `chrome://extensions` -> **Load unpacked**
-- Use `packages/extension/docs/extension_api.md` (EN) or `packages/extension/docs/extension_api_zh.md` (ZH) for API integration details
+- Update `packages/extension/docs/extension_api.md` for API integration details
 
 ### Testing on Other Websites
 
@@ -172,7 +177,7 @@ npm run zip -w @page-agent/ext
 
 - Click the bookmark on any page to load Page-Agent
 
-> Warning: AK in your local `.env` will be inlined in the iife script.
+> Warning: AK in your local `.env` will be inlined in the iife script. Be very careful when you distribute the script.
 
 ### Adding Documentation
 
@@ -193,16 +198,17 @@ We especially welcome contributions in:
 
 ## 🚫 What We Don't Accept
 
-- Changes that break existing API compatibility (Discuss first)
-- Heavy dependencies to core library
+- Breaking changes and large PRs without prior discussion
+- Heavy dependencies to core libs
 - Contributions without proper testing
 - Code that doesn't follow project conventions
+- Dependencies or code with licenses incompatible with MIT
 
 ## 📄 Legal
 
 By contributing to this project, you agree that your contributions will be licensed under the MIT License.
 
-> You may need to sign a github CLA before you create a PR.
+> You need to sign a github CLA when you create a PR.
 
 ## 💬 Questions?
 
@@ -210,4 +216,4 @@ By contributing to this project, you agree that your contributions will be licen
 - Check existing documentation and issues first
 - Be respectful and constructive in discussions
 
-Thank you for helping make Page-Agent better! 🎉
+Thank you for helping make PageAgent better! 🎉

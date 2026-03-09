@@ -39,12 +39,12 @@
 通过你自己的 LLM 快速体验 PageAgent：
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.1/dist/iife/page-agent.demo.js?baseURL=YOUR_API_BASE_URL&model=YOUR_MODEL&apiKey=YOUR_KEY" crossorigin="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.3/dist/iife/page-agent.demo.js?baseURL=YOUR_API_BASE_URL&model=YOUR_MODEL&apiKey=YOUR_KEY" crossorigin="true"></script>
 ```
 
 | Mirror | URL                                                                        |
 | ------ | -------------------------------------------------------------------------- |
-| Global | https://cdn.jsdelivr.net/npm/page-agent@1.5.1/dist/iife/page-agent.demo.js |
+| Global | https://cdn.jsdelivr.net/npm/page-agent@1.5.3/dist/iife/page-agent.demo.js |
 
 ### NPM 安装
 

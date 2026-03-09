@@ -6,7 +6,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 🌐 **English** | [中文](./docs/README-zh.md)
 
-👉 <a href="https://zhulinchng.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://zhulinchng.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a>
+👉 <a href="https://zhulinchng.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://zhulinchng.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a> | <a href="https://news.ycombinator.com/item?id=47264138" target="_blank">📢 Join HN Discussion</a>
 
 <video id="demo-video" src="https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2" controls crossorigin muted></video>
 
@@ -39,12 +39,12 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 Fastest way to try PageAgent with your own LLM key:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.1/dist/iife/page-agent.demo.js?baseURL=YOUR_API_BASE_URL&model=YOUR_MODEL&apiKey=YOUR_KEY" crossorigin="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.3/dist/iife/page-agent.demo.js?baseURL=YOUR_API_BASE_URL&model=YOUR_MODEL&apiKey=YOUR_KEY" crossorigin="true"></script>
 ```
 
 | Mirror | URL                                                                        |
 | ------ | -------------------------------------------------------------------------- |
-| Global | https://cdn.jsdelivr.net/npm/page-agent@1.5.1/dist/iife/page-agent.demo.js |
+| Global | https://cdn.jsdelivr.net/npm/page-agent@1.5.3/dist/iife/page-agent.demo.js |
 
 ### NPM Installation
 
@@ -103,3 +103,11 @@ file and in the node_modules directory after installation.
 ---
 
 **⭐ Star this repo if you find PageAgent helpful!**
+
+<a href="https://www.star-history.com/?repos=zhulinchng%2Fpage-agent&type=date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=zhulinchng/page-agent&type=date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=zhulinchng/page-agent&type=date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=zhulinchng/page-agent&type=date" />
+ </picture>
+</a>
