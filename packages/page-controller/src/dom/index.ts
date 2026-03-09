@@ -80,7 +80,7 @@ function globToRegex(pattern: string): RegExp {
 }
 
 function matchAttributes(
-	attrs: Record<string, string>,
+	attrs: Record<string, string | null>,
 	patterns: string[]
 ): Record<string, string> {
 	const result: Record<string, string> = {}
@@ -89,13 +89,14 @@ function matchAttributes(
 		if (pattern.includes('*')) {
 			const regex = globToRegex(pattern)
 			for (const key in attrs) {
-				if (regex.test(key) && attrs[key].trim()) {
-					result[key] = attrs[key].trim()
+				const value = attrs[key]
+				if (regex.test(key) && typeof value === 'string' && value.trim()) {
+					result[key] = value.trim()
 				}
 			}
 		} else {
 			const value = attrs[pattern]
-			if (value && value.trim()) {
+			if (typeof value === 'string' && value.trim()) {
 				result[pattern] = value.trim()
 			}
 		}
@@ -116,7 +117,7 @@ interface TreeNode {
 	text?: string
 	// Element node properties
 	tagName?: string
-	attributes?: Record<string, string>
+	attributes?: Record<string, string | null>
 	isInteractive?: boolean
 	isTopElement?: boolean
 	isNew?: boolean
