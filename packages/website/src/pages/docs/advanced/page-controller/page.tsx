@@ -105,8 +105,8 @@ const agent = new PageAgentCore({
 							name: 'includeAttributes',
 							type: 'string[]',
 							description: isZh
-								? '在 DOM 提取中包含的额外 HTML 属性（如 data-testid）。默认已包含常见属性如 role, aria-label 等。'
-								: 'Additional HTML attributes to include in DOM extraction (e.g. data-testid). Common attributes like role, aria-label are included by default.',
+								? '在 DOM 提取中包含的额外 HTML 属性。支持通配符 *（如 data-* 匹配所有 data- 开头的属性）。默认已包含常见属性如 role, aria-label 等。'
+								: 'Additional HTML attributes to include in DOM extraction. Supports wildcard * (e.g. data-* matches all data- prefixed attributes). Common attributes like role, aria-label are included by default.',
 						},
 					]}
 				/>
