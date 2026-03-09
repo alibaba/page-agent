@@ -140,10 +140,13 @@ export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: stri
 		// for jump check
 		'target',
 
-		// absolute 定位的下拉菜单
+		// absolute position dropdown menu
 		'aria-haspopup',
 		'aria-controls',
 		'aria-owns',
+
+		// content editable
+		'contenteditable',
 	]
 
 	const includeAttrs = [...(includeAttributes || []), ...DEFAULT_INCLUDE_ATTRIBUTES]

@@ -1,6 +1,6 @@
 {
     "name": "@page-agent/page-controller",
-    "version": "1.5.1",
+    "version": "1.5.3",
     "type": "module",
     "main": "./dist/lib/page-controller.js",
     "module": "./dist/lib/page-controller.js",
@@ -26,10 +26,10 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git",
+        "url": "https://github.com/zhulinchng/page-agent.git",
         "directory": "packages/page-controller"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://zhulinchng.github.io/page-agent/",
     "scripts": {
         "build": "vite build",
         "prepublishOnly": "node -e \"const fs=require('fs');['LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
