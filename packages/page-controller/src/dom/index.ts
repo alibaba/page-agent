@@ -74,9 +74,16 @@ export function getFlatTree(config: DomConfig): FlatDomTree {
 	return elements
 }
 
+const globRegexCache = new Map<string, RegExp>()
+
 function globToRegex(pattern: string): RegExp {
-	const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&')
-	return new RegExp(`^${escaped.replace(/\*/g, '.*')}$`)
+	let regex = globRegexCache.get(pattern)
+	if (!regex) {
+		const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+		regex = new RegExp(`^${escaped.replace(/\*/g, '.*')}$`)
+		globRegexCache.set(pattern, regex)
+	}
+	return regex
 }
 
 function matchAttributes(
