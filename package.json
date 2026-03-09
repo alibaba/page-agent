@@ -30,7 +30,7 @@
         "build": "npm run build:libs && npm run build:website",
         "build:libs": "npm run build --workspaces --if-present",
         "build:website": "npm run build:website --workspace=@page-agent/website",
-        "build:ext": "npm run build:libs && npm run build:ext -w @page-agent/ext",
+        "build:ext": "npm run build:libs && npm run zip -w @page-agent/ext",
         "version": "node scripts/sync-version.js",
         "version:ext": "node scripts/ext-version.js",
         "lint": "eslint .",
