@@ -140,20 +140,23 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// Dispatch input event (standard)
 		editableElement.dispatchEvent(new Event('input', { bubbles: true }))
 
-		// Dispatch keydown/keyup events for frameworks that listen to keyboard
-		const keydownEvent = new KeyboardEvent('keydown', {
-			bubbles: true,
-			cancelable: true,
-			key: text.slice(-1), // Last character
-		})
-		editableElement.dispatchEvent(keydownEvent)
+		// Dispatch keydown/keyup events for frameworks that listen to keyboard.
+		// To avoid inconsistent semantics, only do this for single-character input.
+		if (text.length === 1) {
+			const keydownEvent = new KeyboardEvent('keydown', {
+				bubbles: true,
+				cancelable: true,
+				key: text,
+			})
+			editableElement.dispatchEvent(keydownEvent)
 
-		const keyupEvent = new KeyboardEvent('keyup', {
-			bubbles: true,
-			cancelable: true,
-			key: text.slice(-1),
-		})
-		editableElement.dispatchEvent(keyupEvent)
+			const keyupEvent = new KeyboardEvent('keyup', {
+				bubbles: true,
+				cancelable: true,
+				key: text,
+			})
+			editableElement.dispatchEvent(keyupEvent)
+		}
 
 		// Dispatch change event (for good measure)
 		editableElement.dispatchEvent(new Event('change', { bubbles: true }))
