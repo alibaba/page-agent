@@ -114,15 +114,15 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 	await clickElement(element)
 
 	if (isContentEditable) {
-		// For contenteditable elements, dispatch proper events to trigger framework listeners.
+		// Contenteditable support (partial)
+		// Not supported:
+		// - Monaco/CodeMirror: Require direct JS instance access. No universal way to obtain.
+		// - Draft.js: Not responsive to synthetic/execCommand/Range/DataTransfer. Unmaintained.
 		//
-		// IMPORTANT: This approach works for Quill, LinkedIn, and simple contenteditable editors,
-		// but does NOT work for Slate.js or Draft.js which require framework-specific handling.
-		// - Draft.js: Cannot be supported via DOM manipulation (by design, unmaintained)
-		// - Slate.js: Uses internal state that doesn't sync with DOM changes
-		// - Monaco/CodeMirror: Require direct JS instance access, not contenteditable path
-		//
-		// Event sequence: beforeinput -> mutation -> input -> change -> blur
+		// Plan A: Dispatch synthetic events
+		// Works: LinkedIn, React contenteditable, Quill.
+		// Fails: Slate.js
+		// Sequence: beforeinput -> mutation -> input -> change -> blur
 
 		// Dispatch beforeinput + mutation + input for clearing
 		if (
@@ -167,19 +167,14 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// Dispatch change event (for good measure)
 		element.dispatchEvent(new Event('change', { bubbles: true }))
 
-		// Trigger blur for validation, then refocus
-		// blur() dispatches its own focusout event, so we don't need a duplicate
+		// Trigger blur for validation
 		element.blur()
 
 		// Plan B: execCommand (deprecated but works better for some editors)
-		// Uncomment if synthetic events don't work for your use case.
-		// Tested to work with: LinkedIn, Quill, Draft.js
-		// Note: execCommand is deprecated and may be removed in future browsers.
+		// Works: LinkedIn, Quill, Slate.js, react contenteditable components
 		//
-		// element.focus()
 		// document.execCommand('selectAll')
 		// document.execCommand('delete')
-		// document.execCommand('insertText', false, text)
 		// document.execCommand('insertText', false, text)
 	} else if (element instanceof HTMLTextAreaElement) {
 		nativeTextAreaValueSetter.call(element, text)
