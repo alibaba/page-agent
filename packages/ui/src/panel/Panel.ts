@@ -237,6 +237,7 @@ export class Panel {
 	 * Dispose panel and clean up event listeners
 	 */
 	dispose(): void {
+		this.#cancelPendingUserAnswer()
 		// Remove agent event listeners
 		this.#agent.removeEventListener('statuschange', this.#onStatusChange)
 		this.#agent.removeEventListener('historychange', this.#onHistoryChange)
@@ -278,6 +279,9 @@ export class Panel {
 	 */
 	#handleActionButton(): void {
 		if (this.#agent.status === 'running') {
+			if (this.#isWaitingForUserAnswer) {
+				this.#cancelPendingUserAnswer()
+			}
 			this.#agent.stop()
 		} else {
 			this.#agent.dispose()
@@ -322,6 +326,19 @@ export class Panel {
 			this.#userAnswerResolver(input)
 			this.#userAnswerResolver = null
 		}
+	}
+
+	#cancelPendingUserAnswer(): void {
+		if (!this.#isWaitingForUserAnswer) return
+
+		this.#isWaitingForUserAnswer = false
+
+		if (this.#userAnswerResolver) {
+			this.#userAnswerResolver('')
+			this.#userAnswerResolver = null
+		}
+
+		this.#hideInputArea()
 	}
 
 	/**
