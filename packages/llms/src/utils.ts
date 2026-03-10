@@ -111,7 +111,11 @@ export function modelPatch(body: Record<string, any>) {
  * They should be treated as the same model.
  * Normalize them to `gpt-52`
  */
-function normalizeModelName(modelName: string): string {
+export function shouldUseResponsesApi(modelName: string): boolean {
+	return normalizeModelName(modelName).startsWith('gpt-54')
+}
+
+export function normalizeModelName(modelName: string): string {
 	let normalizedName = modelName.toLowerCase()
 
 	// remove prefix before '/'

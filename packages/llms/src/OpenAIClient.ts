@@ -5,7 +5,7 @@ import * as z from 'zod/v4'
 
 import { InvokeError, InvokeErrorType } from './errors'
 import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
-import { modelPatch, zodToOpenAITool } from './utils'
+import { modelPatch, shouldUseResponsesApi, zodToOpenAITool } from './utils'
 
 /**
  * Client for OpenAI compatible APIs
@@ -27,34 +27,28 @@ export class OpenAIClient implements LLMClient {
 	): Promise<InvokeResult> {
 		// 1. Convert tools to OpenAI format
 		const openaiTools = Object.entries(tools).map(([name, t]) => zodToOpenAITool(name, t))
+		const useResponsesApi = shouldUseResponsesApi(this.config.model)
 
 		// Build request body
-		const requestBody: Record<string, unknown> = {
-			model: this.config.model,
-			temperature: this.config.temperature,
-			messages,
-			tools: openaiTools,
-			parallel_tool_calls: false,
-			// Require tool call: specific tool if provided, otherwise any tool
-			tool_choice: options?.toolChoiceName
-				? { type: 'function', function: { name: options.toolChoiceName } }
-				: 'required',
-		}
-
-		modelPatch(requestBody)
+		const requestBody = useResponsesApi
+			? this.buildResponsesRequestBody(messages, openaiTools, options)
+			: this.buildChatCompletionsRequestBody(messages, openaiTools, options)
 
 		// 2. Call API
 		let response: Response
 		try {
-			response = await this.fetch(`${this.config.baseURL}/chat/completions`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${this.config.apiKey}`,
-				},
-				body: JSON.stringify(requestBody),
-				signal: abortSignal,
-			})
+			response = await this.fetch(
+				`${this.config.baseURL}/${useResponsesApi ? 'responses' : 'chat/completions'}`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${this.config.apiKey}`,
+					},
+					body: JSON.stringify(requestBody),
+					signal: abortSignal,
+				}
+			)
 		} catch (error: unknown) {
 			const isAbortError = (error as any)?.name === 'AbortError'
 			const errorMessage = isAbortError ? 'Network request aborted' : 'Network request failed'
@@ -97,7 +91,9 @@ export class OpenAIClient implements LLMClient {
 		}
 
 		// 4. Parse and validate response
-		const data = await response.json()
+		const data = useResponsesApi
+			? this.normalizeResponsesApiResponse(await response.json())
+			: await response.json()
 
 		const choice = data.choices?.[0]
 		if (!choice) {
@@ -223,6 +219,118 @@ export class OpenAIClient implements LLMClient {
 			},
 			rawResponse: data,
 			rawRequest: requestBody,
+		}
+	}
+
+	private buildChatCompletionsRequestBody(
+		messages: Message[],
+		openaiTools: ReturnType<typeof zodToOpenAITool>[],
+		options?: InvokeOptions
+	): Record<string, unknown> {
+		const requestBody: Record<string, unknown> = {
+			model: this.config.model,
+			temperature: this.config.temperature,
+			messages,
+			tools: openaiTools,
+			parallel_tool_calls: false,
+			// Require tool call: specific tool if provided, otherwise any tool
+			tool_choice: options?.toolChoiceName
+				? { type: 'function', function: { name: options.toolChoiceName } }
+				: 'required',
+		}
+
+		modelPatch(requestBody)
+		return requestBody
+	}
+
+	private buildResponsesRequestBody(
+		messages: Message[],
+		openaiTools: ReturnType<typeof zodToOpenAITool>[],
+		options?: InvokeOptions
+	): Record<string, unknown> {
+		const instructions = messages
+			.filter((message) => message.role === 'system' && typeof message.content === 'string')
+			.map((message) => message.content?.trim())
+			.filter(Boolean)
+			.join('\n\n')
+
+		const input = messages
+			.filter((message) => message.role !== 'system')
+			.map((message) => this.toResponsesInputItem(message))
+			.filter(Boolean)
+
+		return {
+			model: this.config.model,
+			temperature: this.config.temperature,
+			...(instructions ? { instructions } : {}),
+			input,
+			tools: openaiTools,
+			tool_choice: options?.toolChoiceName
+				? { type: 'function', function: { name: options.toolChoiceName } }
+				: 'required',
+		}
+	}
+
+	private toResponsesInputItem(message: Message): Record<string, unknown> | null {
+		if (message.role === 'tool') {
+			if (!message.tool_call_id || typeof message.content !== 'string') return null
+			return {
+				type: 'function_call_output',
+				call_id: message.tool_call_id,
+				output: message.content,
+			}
+		}
+
+		if (typeof message.content !== 'string' || !message.content.trim()) return null
+
+		return {
+			type: 'message',
+			role: message.role,
+			content: message.content,
+		}
+	}
+
+	private normalizeResponsesApiResponse(responseData: any) {
+		const output: any[] = Array.isArray(responseData?.output) ? responseData.output : []
+		const functionCall = output.find((item: any) => item?.type === 'function_call')
+		const assistantMessage = output.find(
+			(item: any) => item?.type === 'message' && item?.role === 'assistant'
+		)
+		const content = Array.isArray(assistantMessage?.content)
+			? assistantMessage.content
+					.filter((part: any) => part?.type === 'output_text' && typeof part?.text === 'string')
+					.map((part: any) => part.text)
+					.join('')
+			: null
+
+		return {
+			...responseData,
+			choices: [
+				{
+					finish_reason: functionCall ? 'tool_calls' : 'stop',
+					message: {
+						role: 'assistant',
+						content,
+						tool_calls: functionCall
+							? [
+									{
+										id: functionCall.call_id || functionCall.id || 'call_0',
+										type: 'function',
+										function: {
+											name: functionCall.name,
+											arguments: functionCall.arguments,
+										},
+									},
+								]
+							: undefined,
+					},
+				},
+			],
+			usage: {
+				prompt_tokens: responseData?.usage?.input_tokens ?? 0,
+				completion_tokens: responseData?.usage?.output_tokens ?? 0,
+				total_tokens: responseData?.usage?.total_tokens ?? 0,
+			},
 		}
 	}
 }
