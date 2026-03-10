@@ -187,7 +187,6 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 	blurLastClickedElement()
 }
 
-
 /**
  * @todo browser-use version is very complex and supports menu tags, need to follow up
  */
