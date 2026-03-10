@@ -114,14 +114,78 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 	await clickElement(element)
 
 	if (isContentEditable) {
-		element.innerText = text
+		// Contenteditable support (partial)
+		// Not supported:
+		// - Monaco/CodeMirror: Require direct JS instance access. No universal way to obtain.
+		// - Draft.js: Not responsive to synthetic/execCommand/Range/DataTransfer. Unmaintained.
+		//
+		// Plan A: Dispatch synthetic events
+		// Works: LinkedIn, React contenteditable, Quill.
+		// Fails: Slate.js
+		// Sequence: beforeinput -> mutation -> input -> change -> blur
+
+		// Dispatch beforeinput + mutation + input for clearing
+		if (
+			element.dispatchEvent(
+				new InputEvent('beforeinput', {
+					bubbles: true,
+					cancelable: true,
+					inputType: 'deleteContent',
+				})
+			)
+		) {
+			element.innerText = ''
+			element.dispatchEvent(
+				new InputEvent('input', {
+					bubbles: true,
+					inputType: 'deleteContent',
+				})
+			)
+		}
+
+		// Dispatch beforeinput + mutation + input for insertion (important for React apps)
+		if (
+			element.dispatchEvent(
+				new InputEvent('beforeinput', {
+					bubbles: true,
+					cancelable: true,
+					inputType: 'insertText',
+					data: text,
+				})
+			)
+		) {
+			element.innerText = text
+			element.dispatchEvent(
+				new InputEvent('input', {
+					bubbles: true,
+					inputType: 'insertText',
+					data: text,
+				})
+			)
+		}
+
+		// Dispatch change event (for good measure)
+		element.dispatchEvent(new Event('change', { bubbles: true }))
+
+		// Trigger blur for validation
+		element.blur()
+
+		// Plan B: execCommand (deprecated but works better for some editors)
+		// Works: LinkedIn, Quill, Slate.js, react contenteditable components
+		//
+		// document.execCommand('selectAll')
+		// document.execCommand('delete')
+		// document.execCommand('insertText', false, text)
 	} else if (element instanceof HTMLTextAreaElement) {
 		nativeTextAreaValueSetter.call(element, text)
 	} else {
 		nativeInputValueSetter.call(element, text)
 	}
 
-	element.dispatchEvent(new Event('input', { bubbles: true }))
+	// Only dispatch shared input event for non-contenteditable (contenteditable has its own)
+	if (!isContentEditable) {
+		element.dispatchEvent(new Event('input', { bubbles: true }))
+	}
 
 	await waitFor(0.1)
 
