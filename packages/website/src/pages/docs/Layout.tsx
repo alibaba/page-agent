@@ -88,7 +88,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 														className={`block px-3 py-2 rounded-lg transition-colors duration-200 ${
 															isActive
 																? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
-																: 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+																: 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800!'
 														}`}
 														aria-current={isActive ? 'page' : undefined}
 													>
