@@ -1,4 +1,3 @@
-import { resolveViewportExpansion } from '../constants'
 import domTree from './dom_tree/index.js'
 import {
 	ElementDomNode,
@@ -6,6 +5,21 @@ import {
 	InteractiveElementDomNode,
 	TextDomNode,
 } from './dom_tree/type'
+
+/**
+ * Viewport expansion for DOM tree extraction.
+ * -1 means full page (no viewport restriction)
+ * 0 means viewport only
+ * positive values expand the viewport by that many pixels
+ *
+ * @note Since isTopElement depends on elementFromPoint,
+ * it returns null when out of viewport, this feature has no practical use, only differ between -1 and 0
+ */
+const DEFAULT_VIEWPORT_EXPANSION = -1
+
+export function resolveViewportExpansion(viewportExpansion?: number): number {
+	return viewportExpansion ?? DEFAULT_VIEWPORT_EXPANSION
+}
 
 export interface DomConfig {
 	viewportExpansion?: number

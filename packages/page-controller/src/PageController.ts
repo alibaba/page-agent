@@ -14,7 +14,6 @@ import {
 	scrollVertically,
 	selectOptionElement,
 } from './actions'
-import { resolveViewportExpansion } from './constants'
 import * as dom from './dom'
 import type { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
 import { getPageInfo } from './dom/getPageInfo'
@@ -130,7 +129,7 @@ export class PageController extends EventTarget {
 		const url = window.location.href
 		const title = document.title
 		const pi = getPageInfo()
-		const viewportExpansion = resolveViewportExpansion(this.config.viewportExpansion)
+		const viewportExpansion = dom.resolveViewportExpansion(this.config.viewportExpansion)
 
 		await this.updateTree()
 
