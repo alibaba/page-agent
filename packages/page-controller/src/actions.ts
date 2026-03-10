@@ -114,91 +114,60 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 	await clickElement(element)
 
 	if (isContentEditable) {
-		// For contenteditable elements (like LinkedIn editor, rich text editors),
-		// we need to dispatch proper events to trigger framework listeners.
-		// Many frameworks (React, Vue, etc.) listen to specific events.
-		const editableElement = element as HTMLElement & { innerText: string }
+		// (keydown) -> beforeinput -> mutation -> input -> (keyup) -> change
 
-		try {
-			// Focus the element first
-			editableElement.focus()
-
-			// Dispatch keydown first (typical event order: keydown -> beforeinput -> mutation -> input -> keyup)
-			// Only for single-character input to maintain semantic consistency
-			if (text.length === 1) {
-				const keydownEvent = new KeyboardEvent('keydown', {
+		// Dispatch beforeinput + mutation + input for clearing
+		if (
+			element.dispatchEvent(
+				new InputEvent('beforeinput', {
 					bubbles: true,
 					cancelable: true,
-					key: text,
+					inputType: 'deleteContent',
 				})
-				editableElement.dispatchEvent(keydownEvent)
-			}
-
-			// Dispatch beforeinput for clearing (deleteContent)
-			const deleteEvent = new InputEvent('beforeinput', {
-				bubbles: true,
-				cancelable: true,
-				inputType: 'deleteContent',
-			})
-			editableElement.dispatchEvent(deleteEvent)
-
-			// Clear existing content (first mutation)
-			editableElement.innerText = ''
-
-			// Dispatch input event for the deletion
-			editableElement.dispatchEvent(
+			)
+		) {
+			element.innerText = ''
+			element.dispatchEvent(
 				new InputEvent('input', {
 					bubbles: true,
 					inputType: 'deleteContent',
 				})
 			)
+		}
 
-			// Dispatch beforeinput event for insertion (important for React apps)
-			// Check if canceled - if so, skip the mutation but continue cleanup
-			const beforeInputEvent = new InputEvent('beforeinput', {
-				bubbles: true,
-				cancelable: true,
-				inputType: 'insertText',
-				data: text,
-			})
-			const notCanceled = editableElement.dispatchEvent(beforeInputEvent)
-			const shouldInsert = notCanceled && !beforeInputEvent.defaultPrevented
-
-			// Set the text content (DOM mutation) - only if not canceled
-			if (shouldInsert) {
-				editableElement.innerText = text
-
-				// Dispatch input event for the insertion
-				editableElement.dispatchEvent(
-					new InputEvent('input', {
-						bubbles: true,
-						inputType: 'insertText',
-						data: text,
-					})
-				)
-			}
-
-			// Dispatch keyup after input (completing the typical event sequence)
-			if (text.length === 1) {
-				const keyupEvent = new KeyboardEvent('keyup', {
+		// Dispatch beforeinput + mutation + input for insertion (important for React apps)
+		if (
+			element.dispatchEvent(
+				new InputEvent('beforeinput', {
 					bubbles: true,
 					cancelable: true,
-					key: text,
+					inputType: 'insertText',
+					data: text,
 				})
-				editableElement.dispatchEvent(keyupEvent)
-			}
-
-			// Dispatch change event (for good measure)
-			editableElement.dispatchEvent(new Event('change', { bubbles: true }))
-
-			// Trigger blur for validation, then refocus
-			// blur() dispatches its own focusout event, so we don't need a duplicate
-			editableElement.blur()
-			editableElement.focus()
-		} finally {
-			// Ensure cleanup always runs, even if early return above
-			// This is handled by the common cleanup below
+			)
+		) {
+			element.innerText = text
+			element.dispatchEvent(
+				new InputEvent('input', {
+					bubbles: true,
+					inputType: 'insertText',
+					data: text,
+				})
+			)
 		}
+
+		// Dispatch change event (for good measure)
+		element.dispatchEvent(new Event('change', { bubbles: true }))
+
+		// Trigger blur for validation, then refocus
+		// blur() dispatches its own focusout event, so we don't need a duplicate
+		element.blur()
+
+		// // Plan B: execCommand — triggers trusted native events for rich text editors
+		// element.focus()
+		// document.execCommand('selectAll')
+		// document.execCommand('delete')
+		// document.execCommand('insertText', false, text)
 	} else if (element instanceof HTMLTextAreaElement) {
 		nativeTextAreaValueSetter.call(element, text)
 	} else {
