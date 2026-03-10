@@ -119,68 +119,96 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// Many frameworks (React, Vue, etc.) listen to specific events.
 		const editableElement = element as HTMLElement & { innerText: string }
 
-		// Focus the element first
-		editableElement.focus()
+		try {
+			// Focus the element first
+			editableElement.focus()
 
-		// Clear existing content
-		editableElement.innerText = ''
+			// Dispatch keydown first (typical event order: keydown -> beforeinput -> mutation -> input -> keyup)
+			// Only for single-character input to maintain semantic consistency
+			if (text.length === 1) {
+				const keydownEvent = new KeyboardEvent('keydown', {
+					bubbles: true,
+					cancelable: true,
+					key: text,
+				})
+				editableElement.dispatchEvent(keydownEvent)
+			}
 
-		// Dispatch keydown first (typical event order: keydown -> beforeinput -> mutation -> input -> keyup)
-		// Only for single-character input to maintain semantic consistency
-		if (text.length === 1) {
-			const keydownEvent = new KeyboardEvent('keydown', {
+			// Dispatch beforeinput for clearing (deleteContent)
+			const deleteEvent = new InputEvent('beforeinput', {
 				bubbles: true,
 				cancelable: true,
-				key: text,
+				inputType: 'deleteContent',
 			})
-			editableElement.dispatchEvent(keydownEvent)
-		}
+			editableElement.dispatchEvent(deleteEvent)
 
-		// Dispatch beforeinput event (important for React apps)
-		// Check if canceled - if so, abort the mutation
-		const beforeInputEvent = new InputEvent('beforeinput', {
-			bubbles: true,
-			cancelable: true,
-			inputType: 'insertText',
-			data: text,
-		})
-		const notCanceled = editableElement.dispatchEvent(beforeInputEvent)
-		if (!notCanceled || beforeInputEvent.defaultPrevented) {
-			// Listener canceled the input, abort
-			return
-		}
+			// Clear existing content (first mutation)
+			editableElement.innerText = ''
 
-		// Set the text content (DOM mutation)
-		editableElement.innerText = text
+			// Dispatch input event for the deletion
+			editableElement.dispatchEvent(
+				new InputEvent('input', {
+					bubbles: true,
+					inputType: 'deleteContent',
+				})
+			)
 
-		// Dispatch input event (standard)
-		editableElement.dispatchEvent(new Event('input', { bubbles: true }))
-
-		// Dispatch keyup after input (completing the typical event sequence)
-		if (text.length === 1) {
-			const keyupEvent = new KeyboardEvent('keyup', {
+			// Dispatch beforeinput event for insertion (important for React apps)
+			// Check if canceled - if so, skip the mutation but continue cleanup
+			const beforeInputEvent = new InputEvent('beforeinput', {
 				bubbles: true,
 				cancelable: true,
-				key: text,
+				inputType: 'insertText',
+				data: text,
 			})
-			editableElement.dispatchEvent(keyupEvent)
+			const notCanceled = editableElement.dispatchEvent(beforeInputEvent)
+			const shouldInsert = notCanceled && !beforeInputEvent.defaultPrevented
+
+			// Set the text content (DOM mutation) - only if not canceled
+			if (shouldInsert) {
+				editableElement.innerText = text
+
+				// Dispatch input event for the insertion
+				editableElement.dispatchEvent(
+					new InputEvent('input', {
+						bubbles: true,
+						inputType: 'insertText',
+						data: text,
+					})
+				)
+			}
+
+			// Dispatch keyup after input (completing the typical event sequence)
+			if (text.length === 1) {
+				const keyupEvent = new KeyboardEvent('keyup', {
+					bubbles: true,
+					cancelable: true,
+					key: text,
+				})
+				editableElement.dispatchEvent(keyupEvent)
+			}
+
+			// Dispatch change event (for good measure)
+			editableElement.dispatchEvent(new Event('change', { bubbles: true }))
+
+			// Trigger blur for validation, then refocus
+			// blur() dispatches its own focusout event, so we don't need a duplicate
+			editableElement.blur()
+			editableElement.focus()
+		} finally {
+			// Ensure cleanup always runs, even if early return above
+			// This is handled by the common cleanup below
 		}
-
-		// Dispatch change event (for good measure)
-		editableElement.dispatchEvent(new Event('change', { bubbles: true }))
-
-		// Trigger a real blur and a bubbling focusout to run any validation, then refocus
-		// Note: blur doesn't bubble, focusout does
-		editableElement.blur()
-		editableElement.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
-		editableElement.focus()
 	} else if (element instanceof HTMLTextAreaElement) {
 		nativeTextAreaValueSetter.call(element, text)
 	} else {
 		nativeInputValueSetter.call(element, text)
 	}
 
-	element.dispatchEvent(new Event('input', { bubbles: true }))
+	// Only dispatch shared input event for non-contenteditable (contenteditable has its own)
+	if (!isContentEditable) {
+		element.dispatchEvent(new Event('input', { bubbles: true }))
+	}
 
 	await waitFor(0.1)
 
