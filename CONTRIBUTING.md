@@ -188,6 +188,7 @@ Ask an AI to help you add documentation to the `website/` package. Follow the ex
 - Contributions without proper testing
 - Code that doesn't follow project conventions
 - Dependencies or code with licenses incompatible with MIT
+- Bot or AI-generated pull requests without meaningful human involvement
 
 ## 📄 Legal
 
