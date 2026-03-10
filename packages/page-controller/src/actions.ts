@@ -125,23 +125,8 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// Clear existing content
 		editableElement.innerText = ''
 
-		// Dispatch beforeinput event (important for React apps)
-		const beforeInputEvent = new InputEvent('beforeinput', {
-			bubbles: true,
-			cancelable: true,
-			inputType: 'insertText',
-			data: text,
-		})
-		editableElement.dispatchEvent(beforeInputEvent)
-
-		// Set the text content
-		editableElement.innerText = text
-
-		// Dispatch input event (standard)
-		editableElement.dispatchEvent(new Event('input', { bubbles: true }))
-
-		// Dispatch keydown/keyup events for frameworks that listen to keyboard.
-		// To avoid inconsistent semantics, only do this for single-character input.
+		// Dispatch keydown first (typical event order: keydown -> beforeinput -> mutation -> input -> keyup)
+		// Only for single-character input to maintain semantic consistency
 		if (text.length === 1) {
 			const keydownEvent = new KeyboardEvent('keydown', {
 				bubbles: true,
@@ -149,7 +134,30 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 				key: text,
 			})
 			editableElement.dispatchEvent(keydownEvent)
+		}
 
+		// Dispatch beforeinput event (important for React apps)
+		// Check if canceled - if so, abort the mutation
+		const beforeInputEvent = new InputEvent('beforeinput', {
+			bubbles: true,
+			cancelable: true,
+			inputType: 'insertText',
+			data: text,
+		})
+		const notCanceled = editableElement.dispatchEvent(beforeInputEvent)
+		if (!notCanceled || beforeInputEvent.defaultPrevented) {
+			// Listener canceled the input, abort
+			return
+		}
+
+		// Set the text content (DOM mutation)
+		editableElement.innerText = text
+
+		// Dispatch input event (standard)
+		editableElement.dispatchEvent(new Event('input', { bubbles: true }))
+
+		// Dispatch keyup after input (completing the typical event sequence)
+		if (text.length === 1) {
 			const keyupEvent = new KeyboardEvent('keyup', {
 				bubbles: true,
 				cancelable: true,
@@ -161,8 +169,10 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// Dispatch change event (for good measure)
 		editableElement.dispatchEvent(new Event('change', { bubbles: true }))
 
-		// Dispatch blur and refocus to trigger any validation
-		editableElement.dispatchEvent(new FocusEvent('blur', { bubbles: true }))
+		// Trigger a real blur and a bubbling focusout to run any validation, then refocus
+		// Note: blur doesn't bubble, focusout does
+		editableElement.blur()
+		editableElement.dispatchEvent(new FocusEvent('focusout', { bubbles: true }))
 		editableElement.focus()
 	} else if (element instanceof HTMLTextAreaElement) {
 		nativeTextAreaValueSetter.call(element, text)
