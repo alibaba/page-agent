@@ -101,41 +101,29 @@ const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
 	'value'
 )!.set!
 
-/**
- * create a synthetic keyboard event
- * with key keycode code
- */
-export async function createSyntheticInputEvent(elem: HTMLElement, key: string) {
-	elem.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key }))
-	await waitFor(0.01)
-
-	if (elem instanceof HTMLInputElement || elem instanceof HTMLTextAreaElement) {
-		elem.dispatchEvent(new Event('beforeinput', { bubbles: true }))
-		await waitFor(0.01)
-		elem.dispatchEvent(new Event('input', { bubbles: true }))
-		await waitFor(0.01)
-	}
-
-	elem.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, cancelable: true, key }))
-}
-
 export async function inputTextElement(element: HTMLElement, text: string) {
-	if (!(element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement)) {
-		throw new Error('Element is not an input or textarea')
+	const isContentEditable = element.isContentEditable
+	if (
+		!(element instanceof HTMLInputElement) &&
+		!(element instanceof HTMLTextAreaElement) &&
+		!isContentEditable
+	) {
+		throw new Error('Element is not an input, textarea, or contenteditable')
 	}
 
 	await clickElement(element)
 
-	if (element instanceof HTMLTextAreaElement) {
+	if (isContentEditable) {
+		element.innerText = text
+	} else if (element instanceof HTMLTextAreaElement) {
 		nativeTextAreaValueSetter.call(element, text)
 	} else {
 		nativeInputValueSetter.call(element, text)
 	}
 
-	const inputEvent = new Event('input', { bubbles: true })
-	element.dispatchEvent(inputEvent)
+	element.dispatchEvent(new Event('input', { bubbles: true }))
 
-	await waitFor(0.1) // Wait to ensure input event processing completes
+	await waitFor(0.1)
 
 	blurLastClickedElement()
 }

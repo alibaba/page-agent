@@ -14,7 +14,6 @@ import {
 	scrollVertically,
 	selectOptionElement,
 } from './actions'
-import { VIEWPORT_EXPANSION } from './constants'
 import * as dom from './dom'
 import type { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
 import { getPageInfo } from './dom/getPageInfo'
@@ -24,7 +23,6 @@ import { patchReact } from './patches/react'
  * Configuration for PageController
  */
 export interface PageControllerConfig extends dom.DomConfig {
-	viewportExpansion?: number
 	/** Enable visual mask overlay during operations (default: false) */
 	enableMask?: boolean
 }
@@ -131,7 +129,7 @@ export class PageController extends EventTarget {
 		const url = window.location.href
 		const title = document.title
 		const pi = getPageInfo()
-		const viewportExpansion = this.config.viewportExpansion ?? VIEWPORT_EXPANSION
+		const viewportExpansion = dom.resolveViewportExpansion(this.config.viewportExpansion)
 
 		await this.updateTree()
 

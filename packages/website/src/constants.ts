@@ -1,8 +1,8 @@
 // Demo build (auto-init with demo LLM, for quick testing)
 export const CDN_DEMO_URL =
-	'https://cdn.jsdelivr.net/npm/page-agent@1.5.2/dist/iife/page-agent.demo.js'
+	'https://cdn.jsdelivr.net/npm/page-agent@1.5.4/dist/iife/page-agent.demo.js'
 export const CDN_DEMO_CN_URL =
-	'https://registry.npmmirror.com/page-agent/1.5.2/files/dist/iife/page-agent.demo.js'
+	'https://registry.npmmirror.com/page-agent/1.5.4/files/dist/iife/page-agent.demo.js'
 
 // Demo LLM for website testing (homepage quick trial uses flash)
 export const DEMO_MODEL = 'qwen3.5-flash'

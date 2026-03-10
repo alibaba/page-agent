@@ -1,6 +1,6 @@
 {
     "name": "@page-agent/ui",
-    "version": "1.5.2",
+    "version": "1.5.4",
     "type": "module",
     "main": "./dist/lib/page-agent-ui.js",
     "module": "./dist/lib/page-agent-ui.js",
