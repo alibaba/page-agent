@@ -18,7 +18,7 @@ interface CardOptions {
 export function createCard({ icon, content, meta, type }: CardOptions): string {
 	const typeClass = type ? styles[type] : ''
 	const contentHtml = Array.isArray(content)
-		? `<div class="${styles.reflectionLines}">${content.join('')}</div>`
+		? `<div class="${styles.reflectionLines}">${content.map((line) => `<span>${escapeHtml(line)}</span>`).join('')}</div>`
 		: `<span>${escapeHtml(content)}</span>`
 
 	return `
@@ -40,13 +40,13 @@ export function createReflectionLines(reflection: {
 }): string[] {
 	const lines: string[] = []
 	if (reflection.evaluation_previous_goal) {
-		lines.push(`<div>🔍 ${escapeHtml(reflection.evaluation_previous_goal)}</div>`)
+		lines.push(`<div>🔍 ${reflection.evaluation_previous_goal}</div>`)
 	}
 	if (reflection.memory) {
-		lines.push(`<div>💾 ${escapeHtml(reflection.memory)}</div>`)
+		lines.push(`<div>💾 ${reflection.memory}</div>`)
 	}
 	if (reflection.next_goal) {
-		lines.push(`<div>🎯 ${escapeHtml(reflection.next_goal)}</div>`)
+		lines.push(`<div>🎯 ${reflection.next_goal}</div>`)
 	}
 	return lines
 }
