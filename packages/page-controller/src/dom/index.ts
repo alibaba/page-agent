@@ -1,4 +1,4 @@
-import { VIEWPORT_EXPANSION } from '../constants'
+import { resolveViewportExpansion } from '../constants'
 import domTree from './dom_tree/index.js'
 import {
 	ElementDomNode,
@@ -8,6 +8,7 @@ import {
 } from './dom_tree/type'
 
 export interface DomConfig {
+	viewportExpansion?: number
 	interactiveBlacklist?: (Element | (() => Element))[]
 	interactiveWhitelist?: (Element | (() => Element))[]
 	includeAttributes?: string[]
@@ -21,6 +22,8 @@ export interface DomConfig {
 const newElementsCache = new WeakMap<HTMLElement, string>()
 
 export function getFlatTree(config: DomConfig): FlatDomTree {
+	const viewportExpansion = resolveViewportExpansion(config.viewportExpansion)
+
 	const interactiveBlacklist = [] as Element[]
 	for (const item of config.interactiveBlacklist || []) {
 		if (typeof item === 'function') {
@@ -43,7 +46,7 @@ export function getFlatTree(config: DomConfig): FlatDomTree {
 		doHighlightElements: true,
 		debugMode: true,
 		focusHighlightIndex: -1,
-		viewportExpansion: VIEWPORT_EXPANSION,
+		viewportExpansion,
 		interactiveBlacklist,
 		interactiveWhitelist,
 		highlightOpacity: config.highlightOpacity ?? 0.0,

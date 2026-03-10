@@ -14,3 +14,7 @@
  */
 // export const VIEWPORT_EXPANSION = 100
 export const VIEWPORT_EXPANSION = -1
+
+export function resolveViewportExpansion(viewportExpansion?: number): number {
+	return viewportExpansion ?? VIEWPORT_EXPANSION
+}
