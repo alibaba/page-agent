@@ -1,4 +1,3 @@
-import { VIEWPORT_EXPANSION } from '../constants'
 import domTree from './dom_tree/index.js'
 import {
 	ElementDomNode,
@@ -7,7 +6,23 @@ import {
 	TextDomNode,
 } from './dom_tree/type'
 
+/**
+ * Viewport expansion for DOM tree extraction.
+ * -1 means full page (no viewport restriction)
+ * 0 means viewport only
+ * positive values expand the viewport by that many pixels
+ *
+ * @note Since isTopElement depends on elementFromPoint,
+ * it returns null when out of viewport, this feature has no practical use, only differ between -1 and 0
+ */
+const DEFAULT_VIEWPORT_EXPANSION = -1
+
+export function resolveViewportExpansion(viewportExpansion?: number): number {
+	return viewportExpansion ?? DEFAULT_VIEWPORT_EXPANSION
+}
+
 export interface DomConfig {
+	viewportExpansion?: number
 	interactiveBlacklist?: (Element | (() => Element))[]
 	interactiveWhitelist?: (Element | (() => Element))[]
 	includeAttributes?: string[]
@@ -21,6 +36,8 @@ export interface DomConfig {
 const newElementsCache = new WeakMap<HTMLElement, string>()
 
 export function getFlatTree(config: DomConfig): FlatDomTree {
+	const viewportExpansion = resolveViewportExpansion(config.viewportExpansion)
+
 	const interactiveBlacklist = [] as Element[]
 	for (const item of config.interactiveBlacklist || []) {
 		if (typeof item === 'function') {
@@ -43,7 +60,7 @@ export function getFlatTree(config: DomConfig): FlatDomTree {
 		doHighlightElements: true,
 		debugMode: true,
 		focusHighlightIndex: -1,
-		viewportExpansion: VIEWPORT_EXPANSION,
+		viewportExpansion,
 		interactiveBlacklist,
 		interactiveWhitelist,
 		highlightOpacity: config.highlightOpacity ?? 0.0,
