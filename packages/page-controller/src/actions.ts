@@ -114,7 +114,15 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 	await clickElement(element)
 
 	if (isContentEditable) {
-		// (keydown) -> beforeinput -> mutation -> input -> (keyup) -> change
+		// For contenteditable elements, dispatch proper events to trigger framework listeners.
+		//
+		// IMPORTANT: This approach works for Quill, LinkedIn, and simple contenteditable editors,
+		// but does NOT work for Slate.js or Draft.js which require framework-specific handling.
+		// - Draft.js: Cannot be supported via DOM manipulation (by design, unmaintained)
+		// - Slate.js: Uses internal state that doesn't sync with DOM changes
+		// - Monaco/CodeMirror: Require direct JS instance access, not contenteditable path
+		//
+		// Event sequence: beforeinput -> mutation -> input -> change -> blur
 
 		// Dispatch beforeinput + mutation + input for clearing
 		if (
@@ -163,10 +171,15 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// blur() dispatches its own focusout event, so we don't need a duplicate
 		element.blur()
 
-		// // Plan B: execCommand — triggers trusted native events for rich text editors
+		// Plan B: execCommand (deprecated but works better for some editors)
+		// Uncomment if synthetic events don't work for your use case.
+		// Tested to work with: LinkedIn, Quill, Draft.js
+		// Note: execCommand is deprecated and may be removed in future browsers.
+		//
 		// element.focus()
 		// document.execCommand('selectAll')
 		// document.execCommand('delete')
+		// document.execCommand('insertText', false, text)
 		// document.execCommand('insertText', false, text)
 	} else if (element instanceof HTMLTextAreaElement) {
 		nativeTextAreaValueSetter.call(element, text)
