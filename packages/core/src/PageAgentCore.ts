@@ -7,6 +7,7 @@ import type { BrowserState, PageController } from '@page-agent/page-controller'
 import chalk from 'chalk'
 import * as z from 'zod/v4'
 
+import { type Language, createTranslator } from './i18n'
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
 import { tools } from './tools'
 import type {
@@ -26,6 +27,9 @@ export { tool, type PageAgentTool } from './tools'
 export type * from './types'
 
 export type PageAgentCoreConfig = AgentConfig & { pageController: PageController }
+
+/** Default language */
+const DEFAULT_LANGUAGE: Language = 'en'
 
 /**
  * AI agent for browser automation.
@@ -82,6 +86,8 @@ export class PageAgentCore extends EventTarget {
 	#llm: LLM
 	#abortController = new AbortController()
 	#observations: string[] = []
+	/** Translator function for i18n */
+	#t: ReturnType<typeof createTranslator>
 
 	/** internal states during a single task execution */
 	#states = {
@@ -97,6 +103,11 @@ export class PageAgentCore extends EventTarget {
 		super()
 
 		this.config = { ...config, maxSteps: config.maxSteps ?? 40 }
+
+		// Initialize translator based on language config
+		const configLang = config.language || 'en-US'
+		const language: Language = configLang === 'zh-CN' ? 'zh-CN' : 'en'
+		this.#t = createTranslator(language)
 
 		this.#llm = new LLM(this.config)
 		this.tools = new Map(tools)
@@ -236,7 +247,7 @@ export class PageAgentCore extends EventTarget {
 
 				// observe
 
-				console.log(chalk.blue.bold('👀 Observing...'))
+				console.log(chalk.blue.bold(this.#t('observing')))
 
 				this.#states.browserState = await this.pageController.getBrowserState()
 				await this.#handleObservations(step)
@@ -252,7 +263,7 @@ export class PageAgentCore extends EventTarget {
 
 				// invoke LLM
 
-				console.log(chalk.blue.bold('🧠 Thinking...'))
+				console.log(chalk.blue.bold(this.#t('thinking')))
 				this.#emitActivity({ type: 'thinking' })
 
 				const result = await this.#llm.invoke(messages, macroTool, this.#abortController.signal, {
@@ -299,7 +310,7 @@ export class PageAgentCore extends EventTarget {
 				if (actionName === 'done') {
 					const success = action.input?.success ?? false
 					const text = action.input?.text || 'no text provided'
-					console.log(chalk.green.bold('Task completed'), success, text)
+					console.log(chalk.green.bold(this.#t('taskCompleted')), success, text)
 					this.#onDone(success)
 					const result: ExecutionResult = {
 						success,
@@ -313,8 +324,8 @@ export class PageAgentCore extends EventTarget {
 				console.groupEnd() // to prevent nested groups
 				const isAbortError = (error as any)?.rawError?.name === 'AbortError'
 
-				console.error('Task failed', error)
-				const errorMessage = isAbortError ? 'Task stopped' : String(error)
+				console.error(this.#t('taskFailed'), error)
+				const errorMessage = isAbortError ? this.#t('taskStopped') : String(error)
 				this.#emitActivity({ type: 'error', message: errorMessage })
 				this.history.push({ type: 'error', message: errorMessage, rawResponse: error })
 				this.#emitHistoryChange()
@@ -330,7 +341,7 @@ export class PageAgentCore extends EventTarget {
 
 			step++
 			if (step > this.config.maxSteps) {
-				const errorMessage = 'Step count exceeded maximum limit'
+				const errorMessage = this.#t('stepExceeded')
 				this.history.push({ type: 'error', message: errorMessage })
 				this.#emitHistoryChange()
 				this.#onDone(false)
@@ -380,7 +391,7 @@ export class PageAgentCore extends EventTarget {
 				// abort
 				if (this.#abortController.signal.aborted) throw new Error('AbortError')
 
-				console.log(chalk.blue.bold('MacroTool input'), input)
+				console.log(chalk.blue.bold(this.#t('macroToolInput')), input)
 				const action = input.action
 
 				const toolName = Object.keys(action)[0]
@@ -401,9 +412,9 @@ export class PageAgentCore extends EventTarget {
 
 				// Find the corresponding tool
 				const tool = tools.get(toolName)
-				assert(tool, `Tool ${toolName} not found`)
+				assert(tool, this.#t('toolNotFound', { toolName }))
 
-				console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput)
+				console.log(chalk.blue.bold(`${this.#t('executingTool')}: ${toolName}`), toolInput)
 
 				// Emit executing activity
 				this.#emitActivity({ type: 'executing', tool: toolName, input: toolInput })
@@ -414,7 +425,7 @@ export class PageAgentCore extends EventTarget {
 				const result = await tool.execute.bind(this)(toolInput)
 
 				const duration = Date.now() - startTime
-				console.log(chalk.green.bold(`Tool (${toolName}) executed for ${duration}ms`), result)
+				console.log(chalk.green.bold(`${this.#t('toolExecuted')} ${duration}ms`), result)
 
 				// Emit executed activity
 				this.#emitActivity({
@@ -472,10 +483,7 @@ export class PageAgentCore extends EventTarget {
 			try {
 				pageInstructions = instructions.getPageInstructions(url)?.trim()
 			} catch (error) {
-				console.error(
-					chalk.red('[PageAgent] Failed to execute getPageInstructions callback:'),
-					error
-				)
+				console.error(chalk.red(this.#t('pageInstructionsError')), error)
 			}
 		}
 
@@ -510,15 +518,13 @@ export class PageAgentCore extends EventTarget {
 	async #handleObservations(step: number): Promise<void> {
 		// Accumulated wait time warning
 		if (this.#states.totalWaitTime >= 3) {
-			this.pushObservation(
-				`You have waited ${this.#states.totalWaitTime} seconds accumulatively. DO NOT wait any longer unless you have a good reason.`
-			)
+			this.pushObservation(this.#t('waitTimeWarning', { seconds: this.#states.totalWaitTime }))
 		}
 
 		// Detect URL change
 		const currentURL = this.#states.browserState?.url || ''
 		if (currentURL !== this.#states.lastURL) {
-			this.pushObservation(`Page navigated to → ${currentURL}`)
+			this.pushObservation(this.#t('pageNavigated', { url: currentURL }))
 			this.#states.lastURL = currentURL
 			await waitFor(0.5) // wait for page to stabilize
 		}
@@ -526,20 +532,16 @@ export class PageAgentCore extends EventTarget {
 		// Remaining steps warning
 		const remaining = this.config.maxSteps - step
 		if (remaining === 5) {
-			this.pushObservation(
-				`⚠️ Only ${remaining} steps remaining. Consider wrapping up or calling done with partial results.`
-			)
+			this.pushObservation(this.#t('remainingStepsWarning', { remaining }))
 		} else if (remaining === 2) {
-			this.pushObservation(
-				`⚠️ Critical: Only ${remaining} steps left! You must finish the task or call done immediately.`
-			)
+			this.pushObservation(this.#t('criticalStepsWarning', { remaining }))
 		}
 
 		// Push observations to history and emit
 		if (this.#observations.length > 0) {
 			for (const content of this.#observations) {
 				this.history.push({ type: 'observation', content })
-				console.log(chalk.cyan('Observation:'), content)
+				console.log(chalk.cyan(this.#t('observation')), content)
 			}
 			this.#observations = []
 			this.#emitHistoryChange()
@@ -624,7 +626,7 @@ export class PageAgentCore extends EventTarget {
 	}
 
 	dispose() {
-		console.log('Disposing PageAgent...')
+		console.log(this.#t('disposing'))
 		this.disposed = true
 		this.pageController.dispose()
 		// this.history = []
