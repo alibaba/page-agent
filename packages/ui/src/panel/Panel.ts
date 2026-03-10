@@ -46,6 +46,7 @@ export class Panel {
 	#headerUpdateTimer: ReturnType<typeof setInterval> | null = null
 	#pendingHeaderText: string | null = null
 	#isAnimating = false
+	#stopRequested = false
 
 	// Event handlers (bound for removal)
 	#onStatusChange = () => this.#handleStatusChange()
@@ -100,19 +101,15 @@ export class Panel {
 	#handleStatusChange(): void {
 		const status = this.#agent.status
 
+		if (status !== 'running') {
+			this.#stopRequested = false
+		}
+
 		// Map agent status to UI indicator type
 		const indicatorType =
 			status === 'running' ? 'thinking' : status === 'idle' ? 'thinking' : status
 		this.#updateStatusIndicator(indicatorType)
-
-		// Morph action button: running = stop (■), not running = close (X)
-		if (status === 'running') {
-			this.#actionButton.textContent = '■'
-			this.#actionButton.title = this.#i18n.t('ui.panel.stop')
-		} else {
-			this.#actionButton.textContent = 'X'
-			this.#actionButton.title = this.#i18n.t('ui.panel.close')
-		}
+		this.#syncActionButton()
 
 		// Show/hide based on status
 		if (status === 'running') {
@@ -221,6 +218,8 @@ export class Panel {
 		// Reset user input state
 		this.#isWaitingForUserAnswer = false
 		this.#userAnswerResolver = null
+		this.#stopRequested = false
+		this.#syncActionButton()
 		// Show input area
 		this.#showInputArea()
 	}
@@ -245,6 +244,7 @@ export class Panel {
 
 		// Clean up UI
 		this.#isWaitingForUserAnswer = false
+		this.#stopRequested = false
 		this.#stopHeaderUpdateLoop()
 		this.wrapper.remove()
 	}
@@ -277,7 +277,12 @@ export class Panel {
 	 * Action button handler: stop when running, close (dispose) when idle
 	 */
 	#handleActionButton(): void {
-		if (this.#agent.status === 'running') {
+		if (this.#getActionButtonMode() === 'stop') {
+			if (this.#isWaitingForUserAnswer) {
+				this.#cancelPendingUserAnswer()
+			}
+			this.#stopRequested = true
+			this.#syncActionButton()
 			this.#agent.stop()
 		} else {
 			this.#agent.dispose()
@@ -321,6 +326,32 @@ export class Panel {
 		if (this.#userAnswerResolver) {
 			this.#userAnswerResolver(input)
 			this.#userAnswerResolver = null
+		}
+	}
+
+	#cancelPendingUserAnswer(): void {
+		if (!this.#isWaitingForUserAnswer) return
+
+		this.#isWaitingForUserAnswer = false
+		this.#hideInputArea()
+
+		if (this.#userAnswerResolver) {
+			this.#userAnswerResolver('')
+			this.#userAnswerResolver = null
+		}
+	}
+
+	#getActionButtonMode(): 'stop' | 'close' {
+		return this.#agent.status === 'running' && !this.#stopRequested ? 'stop' : 'close'
+	}
+
+	#syncActionButton(): void {
+		if (this.#getActionButtonMode() === 'stop') {
+			this.#actionButton.textContent = '■'
+			this.#actionButton.title = this.#i18n.t('ui.panel.stop')
+		} else {
+			this.#actionButton.textContent = 'X'
+			this.#actionButton.title = this.#i18n.t('ui.panel.close')
 		}
 	}
 
