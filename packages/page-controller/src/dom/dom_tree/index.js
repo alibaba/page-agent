@@ -866,8 +866,7 @@ export default (
 		const interactiveRoles = new Set([
 			'button', // Directly clickable element
 			// 'link',            // Clickable link
-			'menu', // Menu container (ARIA menus)
-			'menubar', // Menu bar container
+			// Composite container roles like menu/menubar/listbox should defer to their child items.
 			'menuitem', // Clickable menu item
 			'menuitemradio', // Radio-style menu item (selectable)
 			'menuitemcheckbox', // Checkbox-style menu item (toggleable)
@@ -880,7 +879,6 @@ export default (
 			'combobox', // Dropdown with text input
 			'searchbox', // Search input field
 			'textbox', // Text input field
-			'listbox', // Selectable list
 			'option', // Selectable option in a list
 			'scrollbar', // Scrollable control
 		])
