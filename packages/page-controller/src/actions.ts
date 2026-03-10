@@ -114,7 +114,53 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 	await clickElement(element)
 
 	if (isContentEditable) {
-		element.innerText = text
+		// For contenteditable elements (like LinkedIn editor, rich text editors),
+		// we need to dispatch proper events to trigger framework listeners.
+		// Many frameworks (React, Vue, etc.) listen to specific events.
+		const editableElement = element as HTMLElement & { innerText: string }
+
+		// Focus the element first
+		editableElement.focus()
+
+		// Clear existing content
+		editableElement.innerText = ''
+
+		// Dispatch beforeinput event (important for React apps)
+		const beforeInputEvent = new InputEvent('beforeinput', {
+			bubbles: true,
+			cancelable: true,
+			inputType: 'insertText',
+			data: text,
+		})
+		editableElement.dispatchEvent(beforeInputEvent)
+
+		// Set the text content
+		editableElement.innerText = text
+
+		// Dispatch input event (standard)
+		editableElement.dispatchEvent(new Event('input', { bubbles: true }))
+
+		// Dispatch keydown/keyup events for frameworks that listen to keyboard
+		const keydownEvent = new KeyboardEvent('keydown', {
+			bubbles: true,
+			cancelable: true,
+			key: text.slice(-1), // Last character
+		})
+		editableElement.dispatchEvent(keydownEvent)
+
+		const keyupEvent = new KeyboardEvent('keyup', {
+			bubbles: true,
+			cancelable: true,
+			key: text.slice(-1),
+		})
+		editableElement.dispatchEvent(keyupEvent)
+
+		// Dispatch change event (for good measure)
+		editableElement.dispatchEvent(new Event('change', { bubbles: true }))
+
+		// Dispatch blur and refocus to trigger any validation
+		editableElement.dispatchEvent(new FocusEvent('blur', { bubbles: true }))
+		editableElement.focus()
 	} else if (element instanceof HTMLTextAreaElement) {
 		nativeTextAreaValueSetter.call(element, text)
 	} else {
@@ -127,6 +173,7 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 
 	blurLastClickedElement()
 }
+
 
 /**
  * @todo browser-use version is very complex and supports menu tags, need to follow up
