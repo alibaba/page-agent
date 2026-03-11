@@ -74,7 +74,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 						<nav className="space-y-8" role="navigation" aria-label="文档章节">
 							{navigationSections.map((section) => (
 								<section key={section.title}>
-									<h3 className="font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-3">
+									<h3 className="font-semibold text-muted-foreground uppercase tracking-wider mb-3">
 										{section.title}
 									</h3>
 									<ul className="space-y-2" role="list">
@@ -88,7 +88,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 														className={`block px-3 py-2 rounded-lg transition-colors duration-200 ${
 															isActive
 																? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
-																: 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800!'
+																: 'text-muted-foreground hover:text-foreground hover:bg-accent'
 														}`}
 														aria-current={isActive ? 'page' : undefined}
 													>

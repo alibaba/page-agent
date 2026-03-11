@@ -54,32 +54,26 @@ export function APIReference({
 	const isMethodsVariant = variant === 'methods'
 	return (
 		<div className={cn('my-6', className)}>
-			{title && (
-				<h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{title}</h3>
-			)}
-			{description && (
-				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{description}</p>
-			)}
+			{title && <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>}
+			{description && <p className="text-sm text-muted-foreground mb-4">{description}</p>}
 
-			<div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+			<div className="overflow-hidden rounded-lg border border-border">
 				<table className="w-full text-sm">
 					<thead>
-						<tr className="bg-gray-50 dark:bg-gray-800/50">
-							<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300">
+						<tr className="bg-muted/50">
+							<th className="px-4 py-3 text-left font-medium text-muted-foreground">
 								{isMethodsVariant ? 'Method' : 'Property'}
 							</th>
-							<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300">
+							<th className="px-4 py-3 text-left font-medium text-muted-foreground">
 								{isMethodsVariant ? 'Return Type' : 'Type'}
 							</th>
-							<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300 hidden md:table-cell">
+							<th className="px-4 py-3 text-left font-medium text-muted-foreground hidden md:table-cell">
 								Default
 							</th>
-							<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300">
-								Description
-							</th>
+							<th className="px-4 py-3 text-left font-medium text-muted-foreground">Description</th>
 						</tr>
 					</thead>
-					<tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+					<tbody className="divide-y divide-border">
 						{properties.map((prop) => (
 							<PropRow key={prop.name} {...prop} />
 						))}
@@ -92,7 +86,7 @@ export function APIReference({
 
 function PropRow({ name, type, required, defaultValue, description, status }: PropDefinition) {
 	return (
-		<tr className="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+		<tr className="bg-background hover:bg-accent/50 transition-colors">
 			{/* Property name */}
 			<td className="px-4 py-3 align-top">
 				<div className="flex items-center gap-2 flex-wrap">
@@ -128,7 +122,7 @@ function PropRow({ name, type, required, defaultValue, description, status }: Pr
 
 			{/* Type */}
 			<td className="px-4 py-3 align-top">
-				<code className="font-mono text-xs text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded wrap-break-word">
+				<code className="font-mono text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded wrap-break-word">
 					{type}
 				</code>
 			</td>
@@ -136,14 +130,14 @@ function PropRow({ name, type, required, defaultValue, description, status }: Pr
 			{/* Default value */}
 			<td className="px-4 py-3 align-top hidden md:table-cell">
 				{defaultValue ? (
-					<code className="font-mono text-xs text-gray-600 dark:text-gray-400">{defaultValue}</code>
+					<code className="font-mono text-xs text-muted-foreground">{defaultValue}</code>
 				) : (
 					<span className="text-gray-400 dark:text-gray-600">-</span>
 				)}
 			</td>
 
 			{/* Description */}
-			<td className="px-4 py-3 align-top text-gray-600 dark:text-gray-400">{description}</td>
+			<td className="px-4 py-3 align-top text-muted-foreground">{description}</td>
 		</tr>
 	)
 }

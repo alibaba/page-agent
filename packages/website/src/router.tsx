@@ -40,7 +40,7 @@ export default function Router() {
 					</Route>
 
 					<Route path="/docs" nest>
-						<div className="flex-1 bg-white dark:bg-gray-900!">
+						<div className="flex-1 bg-background">
 							<Suspense
 								fallback={
 									<div className="flex items-center justify-center gap-3 py-20 text-gray-400">
@@ -55,10 +55,10 @@ export default function Router() {
 					</Route>
 
 					<Route>
-						<div className="flex-1 bg-white dark:bg-gray-900! flex items-center justify-center">
+						<div className="flex-1 bg-background flex items-center justify-center">
 							<div className="text-center">
-								<h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">404</h1>
-								<p className="text-xl text-gray-600 dark:text-gray-300">Page not found</p>
+								<h1 className="text-4xl font-bold mb-4 text-foreground">404</h1>
+								<p className="text-xl text-muted-foreground">Page not found</p>
 							</div>
 						</div>
 					</Route>

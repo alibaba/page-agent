@@ -19,12 +19,12 @@ export default function OneMoreThingSection() {
 					>
 						One More Thing
 					</h2>
-					<p className="text-xl text-gray-600 dark:text-gray-300 mb-4 max-w-2xl mx-auto">
+					<p className="text-xl text-muted-foreground mb-4 max-w-2xl mx-auto">
 						{isZh
 							? '想要多页面控制？试试可选的浏览器扩展。'
 							: 'Need multi-page control? Try the optional browser extension.'}
 					</p>
-					<p className="text-sm text-gray-500 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
+					<p className="text-sm text-muted-foreground mb-12 max-w-2xl mx-auto">
 						{'* '}
 						{isZh
 							? 'PageAgent.js 本身无需任何扩展即可工作，扩展是额外的能力增强。'
@@ -49,7 +49,7 @@ export default function OneMoreThingSection() {
 					</a>
 					<Link
 						href="/docs/features/chrome-extension"
-						className="inline-flex items-center gap-3 px-8 py-4 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-2xl transition-all duration-300 hover:scale-105"
+						className="inline-flex items-center gap-3 px-8 py-4 bg-muted hover:bg-accent text-foreground font-medium rounded-2xl transition-all duration-300 hover:scale-105"
 					>
 						<svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
 							<path d={siGooglechrome.path} fill="currentColor" />
@@ -86,8 +86,8 @@ export default function OneMoreThingSection() {
 							gradientOpacity={0.15}
 						>
 							<div className="p-5">
-								<h3 className="font-semibold text-gray-900 dark:text-white mb-1">{item.title}</h3>
-								<p className="text-sm text-gray-600 dark:text-gray-300">{item.desc}</p>
+								<h3 className="font-semibold text-foreground mb-1">{item.title}</h3>
+								<p className="text-sm text-muted-foreground">{item.desc}</p>
 							</div>
 						</MagicCard>
 					))}
