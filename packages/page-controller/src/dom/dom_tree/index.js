@@ -17,6 +17,7 @@
  * @edit add `data-browser-use-ignore` attribute
  * @edit improve `sampleRect`, filter out rects with 0 area
  * @edit exclude aria-hidden elements
+ * @edit make sure attributes exist for interactive candidates.
  */
 
 export default (
@@ -1609,10 +1610,10 @@ export default (
 					 */
 					nodeData.ref = node
 
-					// Extract attributes for heuristically-detected interactive elements
-					// isInteractiveCandidate() only covers standard tags and ARIA attributes,
-					// so elements detected via cursor:pointer, class names, or event listeners
-					// may have empty attributes. Fill them in so include_attributes works.
+					/**
+					 * @edit make sure attributes exist for interactive candidates.
+					 * @note if the element failed the isInteractiveCandidate, attributes would be empty.
+					 */
 					if (nodeData.isInteractive && Object.keys(nodeData.attributes).length === 0) {
 						const attributeNames = node.getAttributeNames?.() || []
 						for (const name of attributeNames) {
