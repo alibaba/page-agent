@@ -286,6 +286,10 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			{/* Footer */}
 			<div className="mt-4 mb-4 pt-4 border-t border-border/50 flex gap-2 justify-between text-[10px] text-muted-foreground">
 				<div className="flex flex-col justify-between">
+					<span>
+						Version <span className="font-mono">v{__VERSION__}</span>
+					</span>
+
 					<a
 						href="https://github.com/alibaba/page-agent"
 						target="_blank"
@@ -297,7 +301,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						</svg>
 						<span>Source Code</span>
 					</a>
+				</div>
 
+				<div className="flex flex-col items-end">
 					<a
 						href="https://alibaba.github.io/page-agent/"
 						target="_blank"
@@ -315,14 +321,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						className="flex items-center gap-1 hover:text-foreground"
 					>
 						<HatGlasses className="size-3" />
-						<span>Privacy Policy</span>
+						<span>Privacy</span>
 					</a>
-				</div>
-
-				<div className="flex flex-col items-end">
-					<span>
-						Version <span className="font-mono">v{__VERSION__}</span>
-					</span>
 				</div>
 			</div>
 
