@@ -15,7 +15,7 @@ interface CodeEditorProps {
 	className?: string
 }
 
-const CodeEditor: React.FC = ({
+const CodeEditor: React.FC<CodeEditorProps> = ({
 	code,
 	language = 'javascript',
 	title,

@@ -17,7 +17,8 @@ import {
 import { useLanguage } from '../../i18n/context'
 
 // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-let pageAgentModule: Promise | null = null
+// eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+let pageAgentModule: Promise<typeof import('page-agent')> | null = null
 
 function getInjection(useCN?: boolean) {
 	const cdn = useCN ? CDN_DEMO_CN_URL : CDN_DEMO_URL

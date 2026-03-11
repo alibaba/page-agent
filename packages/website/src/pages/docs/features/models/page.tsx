@@ -14,7 +14,7 @@ const BASELINE = new Set([
 ])
 
 // Models grouped by brand, newest first
-const MODEL_GROUPS: Record = {
+const MODEL_GROUPS: Record<string, string[]> = {
 	Qwen: [
 		'qwen3.5-plus',
 		'qwen3.5-flash',
