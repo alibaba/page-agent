@@ -4,17 +4,18 @@
 import * as z from 'zod/v4'
 
 import { InvokeError, InvokeErrorType } from './errors'
-import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
+import type { ParsedLLMConfig } from './index'
+import type { InvokeOptions, InvokeResult, LLMClient, Message, Tool } from './types'
 import { modelPatch, zodToOpenAITool } from './utils'
 
 /**
  * Client for OpenAI compatible APIs
  */
 export class OpenAIClient implements LLMClient {
-	config: Required<LLMConfig>
+	config: ParsedLLMConfig
 	private fetch: typeof globalThis.fetch
 
-	constructor(config: Required<LLMConfig>) {
+	constructor(config: ParsedLLMConfig) {
 		this.config = config
 		this.fetch = config.customFetch
 	}
@@ -50,7 +51,7 @@ export class OpenAIClient implements LLMClient {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					Authorization: `Bearer ${this.config.apiKey}`,
+					...(this.config.apiKey ? { Authorization: `Bearer ${this.config.apiKey}` } : {}),
 				},
 				body: JSON.stringify(requestBody),
 				signal: abortSignal,

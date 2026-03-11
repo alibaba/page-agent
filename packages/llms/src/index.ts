@@ -6,18 +6,28 @@ import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
 export { InvokeError, InvokeErrorType }
 export type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
 
-export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
-	// Runtime validation as defensive programming (types already guarantee these)
-	if (!config.baseURL || !config.apiKey || !config.model) {
+export interface ParsedLLMConfig extends Omit<Required<LLMConfig>, 'apiKey'> {
+	apiKey: string
+}
+
+export function parseLLMConfig(config: LLMConfig): ParsedLLMConfig {
+	if (!config.baseURL || !config.model) {
 		throw new Error(
-			'[PageAgent] LLM configuration required. Please provide: baseURL, apiKey, model. ' +
+			'[PageAgent] LLM configuration required. Please provide: baseURL, model, and either apiKey or customFetch-auth. ' +
+				'See: https://alibaba.github.io/page-agent/docs/features/models'
+		)
+	}
+
+	if (!config.apiKey && !config.customFetch) {
+		throw new Error(
+			'[PageAgent] LLM configuration required. Please provide an apiKey, or use customFetch to handle authentication. ' +
 				'See: https://alibaba.github.io/page-agent/docs/features/models'
 		)
 	}
 
 	return {
 		baseURL: config.baseURL,
-		apiKey: config.apiKey,
+		apiKey: config.apiKey ?? '',
 		model: config.model,
 		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
@@ -26,7 +36,7 @@ export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 }
 
 export class LLM extends EventTarget {
-	config: Required<LLMConfig>
+	config: ParsedLLMConfig
 	client: LLMClient
 
 	constructor(config: LLMConfig) {
