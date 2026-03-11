@@ -40,13 +40,13 @@ export function createReflectionLines(reflection: {
 }): string[] {
 	const lines: string[] = []
 	if (reflection.evaluation_previous_goal) {
-		lines.push(`<div>🔍 ${reflection.evaluation_previous_goal}</div>`)
+		lines.push(`🔍 ${reflection.evaluation_previous_goal}`)
 	}
 	if (reflection.memory) {
-		lines.push(`<div>💾 ${reflection.memory}</div>`)
+		lines.push(`💾 ${reflection.memory}`)
 	}
 	if (reflection.next_goal) {
-		lines.push(`<div>🎯 ${reflection.next_goal}</div>`)
+		lines.push(`🎯 ${reflection.next_goal}`)
 	}
 	return lines
 }
