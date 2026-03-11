@@ -61,7 +61,12 @@ const llmsTxtCache = new Map<string, string | null>()
 
 /** Fetch /llms.txt for a URL's origin. Cached per origin, `null` = tried and not found. */
 export async function fetchLlmsTxt(url: string): Promise<string | null> {
-	const origin = new URL(url).origin
+	let origin: string
+	try {
+		origin = new URL(url).origin
+	} catch {
+		return null // Invalid URL
+	}
 	if (llmsTxtCache.has(origin)) return llmsTxtCache.get(origin)!
 
 	const endpoint = `${origin}/llms.txt`
@@ -100,4 +105,31 @@ export function assert(condition: unknown, message?: string, silent?: boolean): 
 
 		throw new Error(errorMessage)
 	}
+}
+
+/**
+ * Check if an error is an AbortError (from AbortController)
+ * Handles various forms: Error with name 'AbortError', or rawError property
+ */
+export function isAbortError(error: unknown): boolean {
+	if (error instanceof Error && error.name === 'AbortError') return true
+	if (
+		typeof error === 'object' &&
+		error !== null &&
+		'rawError' in error &&
+		(error as { rawError?: Error }).rawError?.name === 'AbortError'
+	)
+		return true
+	return false
+}
+
+/**
+ * Safely extract detail from CustomEvent
+ * @returns The detail object or null if not a CustomEvent
+ */
+export function getEventDetail<T>(event: Event): T | null {
+	if (event instanceof CustomEvent) {
+		return event.detail as T
+	}
+	return null
 }

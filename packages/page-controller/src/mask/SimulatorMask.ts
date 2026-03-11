@@ -151,7 +151,7 @@ export class SimulatorMask {
 		this.motion?.start()
 		this.motion?.fadeIn()
 
-		this.wrapper.style.display = 'block'
+		this.wrapper.classList.add(styles.visible)
 
 		// Initialize cursor position
 		this.#currentCursorX = window.innerWidth / 2
@@ -172,7 +172,7 @@ export class SimulatorMask {
 		this.#cursor.classList.remove(cursorStyles.clicking)
 
 		setTimeout(() => {
-			this.wrapper.style.display = 'none'
+			this.wrapper.classList.remove(styles.visible)
 		}, 800) // Match the animation duration
 	}
 
