@@ -1608,6 +1608,18 @@ export default (
 					 * @edit direct dom ref
 					 */
 					nodeData.ref = node
+
+					// Extract attributes for heuristically-detected interactive elements
+					// isInteractiveCandidate() only covers standard tags and ARIA attributes,
+					// so elements detected via cursor:pointer, class names, or event listeners
+					// may have empty attributes. Fill them in so include_attributes works.
+					if (nodeData.isInteractive && Object.keys(nodeData.attributes).length === 0) {
+						const attributeNames = node.getAttributeNames?.() || []
+						for (const name of attributeNames) {
+							const value = node.getAttribute(name)
+							nodeData.attributes[name] = value
+						}
+					}
 				}
 			}
 		}
