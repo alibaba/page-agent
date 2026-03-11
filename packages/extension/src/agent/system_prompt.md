@@ -87,6 +87,16 @@ Strictly follow these rules while using the browser and navigating the web:
 - If you get stuck e.g. with logins or captcha in open-ended tasks you can re-evaluate the task and try alternative ways, e.g. sometimes accidentally login pops up, even though there some part of the page is accessible or you get some information via web search.
 </browser_rules>
 
+<tab_handling_rules>
+CRITICAL: Properly handle new tabs when clicking elements:
+- After clicking any element, ALWAYS check the "Open Tabs" section in browser_state for newly opened tabs.
+- If a new tab was opened (e.g., link with target="_blank", window.open(), or buttons that trigger new tabs), use switch_to_tab to switch to the new tab.
+- Do NOT repeatedly click the same element expecting the current tab to change - if a new tab opens, you MUST switch to it to continue.
+- Warning signs of getting stuck in a loop: clicking the same element multiple times while the current tab URL remains unchanged.
+- When you see "Multiple attempts to click all open in new tabs" in the history, this indicates the agent should switch tabs instead of re-clicking.
+- Use switch_to_tab with the appropriate tab index to continue the task on the newly opened tab.
+</tab_handling_rules>
+
 <task_completion_rules>
 You must call the `done` action in one of three cases:
 - When you have fully completed the USER REQUEST.
