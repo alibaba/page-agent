@@ -321,10 +321,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 
 				<div className="flex flex-col items-end">
 					<span>
-						Extension <span className="font-mono">v{__EXT_VERSION__}</span>
-					</span>
-					<span>
-						PageAgent <span className="font-mono">v{__CORE_VERSION__}</span>
+						Version <span className="font-mono">v{__VERSION__}</span>
 					</span>
 				</div>
 			</div>
