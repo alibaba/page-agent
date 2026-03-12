@@ -20,7 +20,15 @@ import type {
 	MacroToolInput,
 	MacroToolResult,
 } from './types'
-import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
+import {
+	assert,
+	fetchLlmsTxt,
+	getEventDetail,
+	isAbortError,
+	normalizeResponse,
+	uid,
+	waitFor,
+} from './utils'
 
 export { tool, type PageAgentTool } from './tools'
 export type * from './types'
@@ -104,27 +112,35 @@ export class PageAgentCore extends EventTarget {
 
 		// Listen to LLM retry events
 		this.#llm.addEventListener('retry', (e) => {
-			const { attempt, maxAttempts } = (e as CustomEvent).detail
-			this.#emitActivity({ type: 'retrying', attempt, maxAttempts })
+			const detail = getEventDetail<{ attempt: number; maxAttempts: number }>(e)
+			if (!detail) return
+			this.#emitActivity({
+				type: 'retrying',
+				attempt: detail.attempt,
+				maxAttempts: detail.maxAttempts,
+			})
 			// Also push to history for panel rendering
 			this.history.push({
 				type: 'retry',
-				message: `LLM retry attempt ${attempt} of ${maxAttempts}`,
-				attempt,
-				maxAttempts,
+				message: `LLM retry attempt ${detail.attempt} of ${detail.maxAttempts}`,
+				attempt: detail.attempt,
+				maxAttempts: detail.maxAttempts,
 			})
 			this.#emitHistoryChange()
 		})
 		this.#llm.addEventListener('error', (e) => {
-			const error = (e as CustomEvent).detail.error as Error | InvokeError
-			if ((error as any)?.rawError?.name === 'AbortError') return
-			const message = String(error)
+			const detail = getEventDetail<{ error: unknown }>(e)
+			if (!detail) return
+			const error = detail.error
+			if (isAbortError(error)) return
+			const message = error instanceof Error ? error.message : String(error)
 			this.#emitActivity({ type: 'error', message })
 			// Also push to history for panel rendering
 			this.history.push({
 				type: 'error',
 				message,
-				rawResponse: (error as InvokeError).rawResponse,
+				rawResponse:
+					error instanceof Error ? (error as InvokeError).rawResponse : undefined,
 			})
 			this.#emitHistoryChange()
 		})
@@ -314,10 +330,10 @@ export class PageAgentCore extends EventTarget {
 				}
 			} catch (error: unknown) {
 				console.groupEnd() // to prevent nested groups
-				const isAbortError = (error as any)?.rawError?.name === 'AbortError'
+				const isAborted = isAbortError(error)
 
 				console.error('Task failed', error)
-				const errorMessage = isAbortError ? 'Task stopped' : String(error)
+				const errorMessage = isAborted ? 'Task stopped' : String(error)
 				this.#emitActivity({ type: 'error', message: errorMessage })
 				this.history.push({ type: 'error', message: errorMessage, rawResponse: error })
 				this.#emitHistoryChange()
