@@ -1,7 +1,7 @@
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react-swc'
 import { config as dotenvConfig } from 'dotenv'
-import { copyFileSync, mkdirSync, readFileSync } from 'node:fs'
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import process from 'node:process'
 import { dirname, join, resolve } from 'path'
 import { fileURLToPath } from 'url'
@@ -35,6 +35,8 @@ const SPA_ROUTES = [
 	'docs/advanced/security-permissions',
 ]
 
+const SITE_URL = 'https://alibaba.github.io/page-agent'
+
 function spaRoutes() {
 	return {
 		name: 'spa-routes',
@@ -47,6 +49,19 @@ function spaRoutes() {
 				copyFileSync(src, join(dir, 'index.html'))
 			}
 			console.log(`  ✓ Copied index.html to ${SPA_ROUTES.length} SPA routes`)
+
+			const today = new Date().toISOString().split('T')[0]
+			const urls = ['', ...SPA_ROUTES]
+				.map(
+					(route) =>
+						`  <url>\n    <loc>${SITE_URL}/${route}</loc>\n    <lastmod>${today}</lastmod>\n  </url>`
+				)
+				.join('\n')
+			writeFileSync(
+				join(dist, 'sitemap.xml'),
+				`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`
+			)
+			console.log(`  ✓ Generated sitemap.xml with ${SPA_ROUTES.length + 1} URLs`)
 		},
 	}
 }
