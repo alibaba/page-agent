@@ -187,9 +187,12 @@ export class PageAgentCore extends EventTarget {
 
 	/** Stop the current task. Agent remains reusable. */
 	stop() {
+		if (this.#abortController.signal.aborted) return // Already stopped
 		this.pageController.cleanUpHighlights()
 		this.pageController.hideMask()
 		this.#abortController.abort()
+		this.#setStatus('idle')
+		this.#abortController = new AbortController()
 	}
 
 	async execute(task: string): Promise<ExecutionResult> {
