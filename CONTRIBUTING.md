@@ -1,20 +1,21 @@
 # Contributing to PageAgent
 
-Thank you for your interest in contributing to PageAgent! We welcome contributions from everyone.
+♥️ We welcome contributions from everyone.
 
 ## 🚀 Quick Start
 
 ### Development Setup
 
 1. **Prerequisites**
+    - `macOS` / `Linux` / `WSL`
     - `node.js >= 20` with `npm >= 10`
     - An editor that supports `ts/eslint/prettier`
-    - Make sure `eslint`, `prettier` and `commitlint` work well
+    - Make sure `eslint`, `prettier` and `commitlint` work well. Un-linted code won't pass the CI.
 
 2. **Setup**
 
     ```bash
-    npm ci
+    npm i
     npm start          # Start demo and documentation site
     npm run build      # Build libs and website
     ```
@@ -31,8 +32,8 @@ This is a **monorepo** with npm workspaces containing **4 main packages**:
 > We use a simplified monorepo solution with `native npm-workspace + ts reference + vite alias`. No fancy tooling. Hoisting is required.
 > 
 > - When developing. Use alias so that we don't have to pre-build.
-> - When bundling. Use external and disable ts `paths` alias to leave deps out.
-> - When bundling `IIFE` and `Website`. Bundle everything including local packages.
+> - When bundling. Use external and disable ts `paths` alias.
+> - When bundling `IIFE` and `Website`. Bundle everything together.
 
 ## 🤝 How to Contribute
 
@@ -64,6 +65,7 @@ This is a **monorepo** with npm workspaces containing **4 main packages**:
     - Update documentation as needed
 
 4. **Test Your Changes**
+    - Build and lint everything.
     - Test in our demo website
     - Test it on other websites if applicable
     - `@TODO: test suite`
@@ -93,7 +95,7 @@ This is a **monorepo** with npm workspaces containing **4 main packages**:
 
 ### Vibe Coding with AI
 
-> [Vibe coding](https://en.wikipedia.org/wiki/Vibe_coding) = describe what you want in natural language, let AI write the code, and you review the result.
+> [Vibe coding](https://en.wikipedia.org/wiki/Vibe_coding)
 
 - Vibe coding is **RECOMMENDED** when maintaining **the demo, the website, the UI and tests**.
     - We have a [website/AGENTS.md](packages/website/AGENTS.md) for that.
@@ -144,12 +146,6 @@ If your AI assistant does not support [AGENTS.md](https://agents.md/). Add an al
 - **Restart the dev server** to load new env vars
 - LLM_MODEL_NAME and LLM_BASE_URL must be set to use the demo
 
-### Website Development
-
-```bash
-npm start
-```
-
 ### Extension Development
 
 ```bash
@@ -185,17 +181,6 @@ Ask an AI to help you add documentation to the `website/` package. Follow the ex
 
 > Our AGENTS.md file and guardrails are designed for this purpose. But please be careful and review anything AI generated.
 
-## 🎯 Contribution Areas
-
-We especially welcome contributions in:
-
-- **Browser compatibility** improvements
-- **Performance optimizations** for DOM processing
-- **Documentation** and examples
-- **Testing** and quality assurance
-- **Accessibility** features
-- **Internationalization** support
-
 ## 🚫 What We Don't Accept
 
 - Breaking changes and large PRs without prior discussion
@@ -203,12 +188,13 @@ We especially welcome contributions in:
 - Contributions without proper testing
 - Code that doesn't follow project conventions
 - Dependencies or code with licenses incompatible with MIT
+- Bot or AI-generated pull requests without meaningful human involvement
 
 ## 📄 Legal
 
 By contributing to this project, you agree that your contributions will be licensed under the MIT License.
 
-> You need to sign a github CLA when you create a PR.
+> CLA is optional.
 
 ## 💬 Questions?
 

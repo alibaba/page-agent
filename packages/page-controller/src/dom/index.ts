@@ -1,4 +1,3 @@
-import { VIEWPORT_EXPANSION } from '../constants'
 import domTree from './dom_tree/index.js'
 import {
 	ElementDomNode,
@@ -7,7 +6,23 @@ import {
 	TextDomNode,
 } from './dom_tree/type'
 
+/**
+ * Viewport expansion for DOM tree extraction.
+ * -1 means full page (no viewport restriction)
+ * 0 means viewport only
+ * positive values expand the viewport by that many pixels
+ *
+ * @note Since isTopElement depends on elementFromPoint,
+ * it returns null when out of viewport, this feature has no practical use, only differ between -1 and 0
+ */
+const DEFAULT_VIEWPORT_EXPANSION = -1
+
+export function resolveViewportExpansion(viewportExpansion?: number): number {
+	return viewportExpansion ?? DEFAULT_VIEWPORT_EXPANSION
+}
+
 export interface DomConfig {
+	viewportExpansion?: number
 	interactiveBlacklist?: (Element | (() => Element))[]
 	interactiveWhitelist?: (Element | (() => Element))[]
 	includeAttributes?: string[]
@@ -21,6 +36,8 @@ export interface DomConfig {
 const newElementsCache = new WeakMap<HTMLElement, string>()
 
 export function getFlatTree(config: DomConfig): FlatDomTree {
+	const viewportExpansion = resolveViewportExpansion(config.viewportExpansion)
+
 	const interactiveBlacklist = [] as Element[]
 	for (const item of config.interactiveBlacklist || []) {
 		if (typeof item === 'function') {
@@ -43,7 +60,7 @@ export function getFlatTree(config: DomConfig): FlatDomTree {
 		doHighlightElements: true,
 		debugMode: true,
 		focusHighlightIndex: -1,
-		viewportExpansion: VIEWPORT_EXPANSION,
+		viewportExpansion,
 		interactiveBlacklist,
 		interactiveWhitelist,
 		highlightOpacity: config.highlightOpacity ?? 0.0,
@@ -72,6 +89,43 @@ export function getFlatTree(config: DomConfig): FlatDomTree {
 	}
 
 	return elements
+}
+
+const globRegexCache = new Map<string, RegExp>()
+
+function globToRegex(pattern: string): RegExp {
+	let regex = globRegexCache.get(pattern)
+	if (!regex) {
+		const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&')
+		regex = new RegExp(`^${escaped.replace(/\*/g, '.*')}$`)
+		globRegexCache.set(pattern, regex)
+	}
+	return regex
+}
+
+function matchAttributes(
+	attrs: Record<string, string>,
+	patterns: string[]
+): Record<string, string> {
+	const result: Record<string, string> = {}
+
+	for (const pattern of patterns) {
+		if (pattern.includes('*')) {
+			const regex = globToRegex(pattern)
+			for (const key of Object.keys(attrs)) {
+				if (regex.test(key) && attrs[key].trim()) {
+					result[key] = attrs[key].trim()
+				}
+			}
+		} else {
+			const value = attrs[pattern]
+			if (value && value.trim()) {
+				result[pattern] = value.trim()
+			}
+		}
+	}
+
+	return result
 }
 
 /**
@@ -248,23 +302,15 @@ export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: stri
 				let attributesHtmlStr = ''
 
 				if (includeAttrs.length > 0 && node.attributes) {
-					const attributesToInclude: Record<string, string> = {}
-
-					// Filter attributes
-					for (const key of includeAttrs) {
-						const value = node.attributes[key]
-						if (value && value.trim() !== '') {
-							attributesToInclude[key] = value.trim()
-						}
-					}
+					const attributesToInclude = matchAttributes(node.attributes, includeAttrs)
 
 					// Remove duplicate values (for attributes longer than 5 chars)
-					const orderedKeys = includeAttrs.filter((key) => key in attributesToInclude)
-					if (orderedKeys.length > 1) {
+					const keys = Object.keys(attributesToInclude)
+					if (keys.length > 1) {
 						const keysToRemove = new Set<string>()
 						const seenValues: Record<string, string> = {}
 
-						for (const key of orderedKeys) {
+						for (const key of keys) {
 							const value = attributesToInclude[key]
 							if (value.length > 5) {
 								if (value in seenValues) {

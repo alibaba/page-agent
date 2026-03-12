@@ -6,7 +6,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 🌐 **English** | [中文](./docs/README-zh.md)
 
-👉 <a href="https://zhulinchng.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://zhulinchng.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a> | <a href="https://news.ycombinator.com/item?id=47264138" target="_blank">📢 Join HN Discussion</a>
+👉 <a href="https://zhulinchng.github.io/page-agent/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://zhulinchng.github.io/page-agent/docs/introduction/overview" target="_blank"><b>📖 Documentation</b></a> | <a href="https://news.ycombinator.com/item?id=47264138" target="_blank"><b>📢 Join HN Discussion</b></a>
 
 <video id="demo-video" src="https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2" controls crossorigin muted></video>
 
@@ -17,20 +17,18 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 - **🎯 Easy integration**
     - No need for `browser extension` / `python` / `headless browser`.
     - Just in-page javascript. Everything happens in your web page.
-    - The best tool for your agent to control web pages.
 - **📖 Text-based DOM manipulation**
-    - No screenshots. No OCR or multi-modal LLMs needed.
-    - No special permissions required.
+    - No screenshots. No multi-modal LLMs or special permissions needed.
 - **🧠 Bring your own LLMs**
 - **🎨 Pretty UI with human-in-the-loop**
 - **🐙 Optional [chrome extension](https://zhulinchng.github.io/page-agent/docs/features/chrome-extension) for multi-page tasks.**
 
 ## 💡 Use Cases
 
-- **SaaS AI Copilot** — Ship an AI copilot in your product in lines of code. No backend rewrite needed.
+- **SaaS AI Copilot** — Ship an AI copilot in your product in lines of code. No backend rewrite.
 - **Smart Form Filling** — Turn 20-click workflows into one sentence. Perfect for ERP, CRM, and admin systems.
 - **Accessibility** — Make any web app accessible through natural language. Voice commands, screen readers, zero barrier.
-- **Multi-page Agent** — Extend your agent's reach across browser tabs with the optional [chrome extension](https://zhulinchng.github.io/page-agent/docs/features/chrome-extension).
+- **Multi-page Agent** — Extend your own agent's reach across browser tabs with the optional [chrome extension](https://zhulinchng.github.io/page-agent/docs/features/chrome-extension).
 
 ## 🚀 Quick Start
 
@@ -39,12 +37,12 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 Fastest way to try PageAgent with your own LLM key:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.3/dist/iife/page-agent.demo.js?baseURL=YOUR_API_BASE_URL&model=YOUR_MODEL&apiKey=YOUR_KEY" crossorigin="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.6/dist/iife/page-agent.demo.js?baseURL=YOUR_API_BASE_URL&model=YOUR_MODEL&apiKey=YOUR_KEY" crossorigin="true"></script>
 ```
 
 | Mirror | URL                                                                        |
 | ------ | -------------------------------------------------------------------------- |
-| Global | https://cdn.jsdelivr.net/npm/page-agent@1.5.3/dist/iife/page-agent.demo.js |
+| Global | https://cdn.jsdelivr.net/npm/page-agent@1.5.6/dist/iife/page-agent.demo.js |
 
 ### NPM Installation
 
@@ -69,7 +67,7 @@ For more programmatic usage, see [📖 Documentations](https://zhulinchng.github
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Follow our instructions in [CONTRIBUTING.md](CONTRIBUTING.md) for environment setup and local development.
+We welcome contributions from the community! Follow our instructions in [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines.
 
 Please read [Code of Conduct](docs/CODE_OF_CONDUCT.md) before contributing.
 
@@ -82,11 +80,9 @@ This project builds upon the excellent work of **[`browser-use`](https://github.
 ```
 DOM processing components and prompt are derived from browser-use:
 
-Browser Use
+Browser Use <https://github.com/browser-use/browser-use>
 Copyright (c) 2024 Gregor Zunic
 Licensed under the MIT License
-
-Original browser-use project: <https://github.com/browser-use/browser-use>
 
 We gratefully acknowledge the browser-use project and its contributors for their
 excellent work on web automation and DOM interaction patterns that helped make
@@ -106,8 +102,8 @@ file and in the node_modules directory after installation.
 
 <a href="https://www.star-history.com/?repos=zhulinchng%2Fpage-agent&type=date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=zhulinchng/page-agent&type=date&theme=dark" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=zhulinchng/page-agent&type=date" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=zhulinchng/page-agent&type=date" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=zhulinchng/page-agent&type=date&theme=dark&legend=top-left&v=3" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=zhulinchng/page-agent&type=date&legend=top-left&v=3" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=zhulinchng/page-agent&type=date&legend=top-left&v=3" />
  </picture>
 </a>

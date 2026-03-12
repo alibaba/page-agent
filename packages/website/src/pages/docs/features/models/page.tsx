@@ -23,7 +23,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'qwen-3-plus',
 		'qwen3:14b (ollama)',
 	],
-	OpenAI: ['gpt-5.2', 'gpt-5.1', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'gpt-4.1-mini'],
+	OpenAI: ['gpt-5.4', 'gpt-5.2', 'gpt-5.1', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'gpt-4.1-mini'],
 	DeepSeek: ['deepseek-3.2'],
 	Google: ['gemini-3-pro', 'gemini-3-flash', 'gemini-2.5'],
 	Anthropic: [
@@ -68,11 +68,6 @@ export default function Models() {
 				<Heading id="tested-models" className="text-2xl font-semibold mb-3">
 					{isZh ? '已测试模型' : 'Tested Models'}
 				</Heading>
-				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-					{isZh
-						? '推荐使用 ToolCall 能力强的轻量级模型。'
-						: 'Recommended: Fast, lightweight models with strong ToolCall capabilities.'}
-				</p>
 				<div className="bg-linear-to-br from-emerald-50 to-cyan-50 dark:from-emerald-950/30 dark:to-cyan-950/30 rounded-xl p-6 border border-emerald-200/50 dark:border-emerald-800/50">
 					<div className="grid grid-cols-[5rem_1fr] gap-x-3 gap-y-3 items-start">
 						{Object.entries(MODEL_GROUPS).map(([brand, models]) => (
@@ -98,6 +93,11 @@ export default function Models() {
 					<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
 						<li>
 							{isZh
+								? '⭐ 推荐使用 ToolCall 能力强的轻量级模型'
+								: '⭐ Recommended: Fast, lightweight models with strong ToolCall capabilities'}
+						</li>
+						<li>
+							{isZh
 								? 'ToolCall 能力较弱的模型可能返回错误的格式，常见错误能够自动恢复，建议设置较高的 temperature'
 								: 'Models with weaker ToolCall capabilities may return incorrect formats. Common errors usually auto-recover. Higher temperature recommended'}
 						</li>
@@ -105,39 +105,6 @@ export default function Models() {
 							{isZh
 								? '小模型或者无法适应复杂 Tool 定义的模型，通常效果不佳'
 								: 'Small models or those unable to handle complex tool definitions typically perform poorly'}
-						</li>
-					</ul>
-				</div>
-			</section>
-
-			{/* Security Section */}
-			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">
-					{isZh ? '🔐 生产环境鉴权建议' : '🔐 Production Authentication'}
-				</h2>
-				<div className="bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 p-5 rounded-r-lg mb-4">
-					<p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
-						{isZh
-							? '⚠️ 永远不要把真实的 LLM API Key 发布到前端代码'
-							: '⚠️ Never commit real LLM API Keys to your frontend code'}
-					</p>
-				</div>
-				<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
-					<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-						{isZh ? '后端代理转发' : 'Backend Proxy Pattern'}
-					</h3>
-					<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-						{isZh
-							? '在后端搭建一个 LLM 流量转发接口,该接口使用与你网站上其他接口相同的鉴权方式,例如:'
-							: 'Set up a backend LLM proxy endpoint that uses the same authentication method as other APIs in your website, such as:'}
-					</p>
-					<ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-						<li>{isZh ? '• Session/Cookie 会话认证' : '• Session/Cookie-based authentication'}</li>
-						<li>
-							{isZh ? '• OIDC (OpenID Connect) 单点登录' : '• OIDC (OpenID Connect) single sign-on'}
-						</li>
-						<li>
-							{isZh ? '• 临时 Access Key 或 JWT Token' : '• Temporary Access Key or JWT Token'}
 						</li>
 					</ul>
 				</div>
@@ -225,6 +192,48 @@ LLM_MODEL_NAME="llama3.2"`}
 							code={`$env:OLLAMA_CONTEXT_LENGTH=64000; $env:OLLAMA_HOST="0.0.0.0:11434"; $env:OLLAMA_ORIGINS="*"; ollama serve`}
 						/>
 					</div>
+				</div>
+			</section>
+
+			{/* Production Authentication */}
+			<section className="mb-10">
+				<Heading id="production-authentication" className="text-2xl font-semibold mb-4">
+					{isZh ? '🔐 生产环境鉴权' : '🔐 Production Authentication'}
+				</Heading>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+					{isZh
+						? '如果你只是将它用作个人助手，可以直接连接你的 LLM 服务。'
+						: 'If you only use it as a personal assistant, you can connect to your LLM service directly.'}
+				</p>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+					{isZh ? (
+						<>
+							如果你计划将它集成到你的 Web 应用中，建议搭建一个后端代理来转发 LLM 请求，并使用{' '}
+							<code>customFetch</code> 携带 Cookie 或其他鉴权信息：
+						</>
+					) : (
+						<>
+							If you plan to integrate it into your web app, it's better to have a backend proxy for
+							the LLM and use <code>customFetch</code> to authenticate the request with cookies or
+							other methods:
+						</>
+					)}
+				</p>
+				<CodeEditor
+					code={`const agent = new PageAgent({
+  baseURL: '/api/llm-proxy',
+  apiKey: 'NA',
+  model: 'gpt-5.1',
+  customFetch: (url, init) =>
+    fetch(url, { ...init, credentials: 'include' }),
+});`}
+				/>
+				<div className="mt-4 bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+					<p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
+						{isZh
+							? '⚠️ 永远不要把真实的 LLM API Key 提交到前端代码中'
+							: '⚠️ NEVER commit real LLM API keys to your frontend code'}
+					</p>
 				</div>
 			</section>
 		</div>

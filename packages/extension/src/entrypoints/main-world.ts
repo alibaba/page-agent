@@ -110,9 +110,9 @@ export default defineUnlistedScript(() => {
 		)
 	}
 
-	;(window as any).PAGE_AGENT_EXT_VERSION = __EXT_VERSION__
+	;(window as any).PAGE_AGENT_EXT_VERSION = __VERSION__
 	;(window as any).PAGE_AGENT_EXT = {
-		version: __EXT_VERSION__,
+		version: __VERSION__,
 		execute,
 		stop,
 	}
