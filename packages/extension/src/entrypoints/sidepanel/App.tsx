@@ -1,4 +1,4 @@
-import { History, Send, Settings, Square } from 'lucide-react'
+import { Eraser, History, Send, Settings, Square } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -29,7 +29,8 @@ export default function App() {
 	const historyRef = useRef<HTMLDivElement>(null)
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-	const { status, history, activity, currentTask, config, execute, stop, configure } = useAgent()
+	const { status, history, activity, currentTask, config, execute, stop, clear, configure } =
+		useAgent()
 
 	// Persist session when task finishes
 	const prevStatusRef = useRef(status)
@@ -127,6 +128,18 @@ export default function App() {
 				</div>
 				<div className="flex items-center gap-1">
 					<StatusDot status={status} />
+					{!showEmptyState && (
+						<Button
+							variant="ghost"
+							size="icon-sm"
+							onClick={clear}
+							disabled={isRunning}
+							className="cursor-pointer"
+							title="Clear Context"
+						>
+							<Eraser className="size-3.5" />
+						</Button>
+					)}
 					<Button
 						variant="ghost"
 						size="icon-sm"

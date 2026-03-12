@@ -34,6 +34,7 @@ export interface UseAgentResult {
 	config: ExtConfig | null
 	execute: (task: string) => Promise<void>
 	stop: () => void
+	clear: () => void
 	configure: (config: ExtConfig) => Promise<void>
 }
 
@@ -117,6 +118,14 @@ export function useAgent(): UseAgentResult {
 		agentRef.current?.stop()
 	}, [])
 
+	const clear = useCallback(() => {
+		if (status === 'running') return
+		setCurrentTask('')
+		setHistory([])
+		setActivity(null)
+		setStatus('idle')
+	}, [status])
+
 	const configure = useCallback(
 		async ({
 			language,
@@ -146,6 +155,7 @@ export function useAgent(): UseAgentResult {
 		config,
 		execute,
 		stop,
+		clear,
 		configure,
 	}
 }
