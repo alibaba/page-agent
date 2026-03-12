@@ -259,14 +259,18 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 	await waitFor(0.1) // Wait to ensure change event processing completes
 }
 
+interface ScrollableElement extends HTMLElement {
+	scrollIntoViewIfNeeded?: (centerIfNeeded?: boolean) => void
+}
+
 export async function scrollIntoViewIfNeeded(element: HTMLElement) {
-	const el = element as any
-	if (el.scrollIntoViewIfNeeded) {
+	const el = element as ScrollableElement
+	if (typeof el.scrollIntoViewIfNeeded === 'function') {
 		el.scrollIntoViewIfNeeded()
 		// await waitFor(0.5) // Animation playback
 	} else {
 		// @todo visibility check
-		el.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' })
+		element.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' })
 		// await waitFor(0.5) // Animation playback
 	}
 }
