@@ -1605,24 +1605,24 @@ export default (
 					// Call the dedicated highlighting function
 					nodeWasHighlighted = handleHighlighting(nodeData, node, parentIframe, isParentHighlighted)
 
-/**
- * @edit direct dom ref
- * @note This creates a memory reference that persists until the next updateTree() call.
- * PageController.dispose() clears flatTree to release these references.
- */
-nodeData.ref = node
+					/**
+					 * @edit direct dom ref
+					 * @note This creates a memory reference that persists until the next updateTree() call.
+					 * PageController.dispose() clears flatTree to release these references.
+					 */
+					nodeData.ref = node
 
-/**
- * @edit make sure attributes exist for interactive candidates.
- * @note if the element failed the isInteractiveCandidate, attributes would be empty.
- */
-if (nodeData.isInteractive && Object.keys(nodeData.attributes).length === 0) {
-	const attributeNames = node.getAttributeNames?.() || []
-	for (const name of attributeNames) {
-		const value = node.getAttribute(name)
-		nodeData.attributes[name] = value
-	}
-}
+					/**
+					 * @edit make sure attributes exist for interactive candidates.
+					 * @note if the element failed the isInteractiveCandidate, attributes would be empty.
+					 */
+					if (nodeData.isInteractive && Object.keys(nodeData.attributes).length === 0) {
+						const attributeNames = node.getAttributeNames?.() || []
+						for (const name of attributeNames) {
+							const value = node.getAttribute(name)
+							nodeData.attributes[name] = value
+						}
+					}
 				}
 			}
 		}

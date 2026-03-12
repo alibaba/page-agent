@@ -23,7 +23,6 @@ npm run build                # Build all packages
 npm run build:libs           # Build all libraries
 npm run lint                 # ESLint with TypeScript strict rules
 npm run zip -w @page-agent/ext # Zip the extension package
-
 ```
 
 ## Architecture
