@@ -7,3 +7,7 @@
 
 	display: none;
 }
+
+.wrapper.visible {
+	display: block;
+}
