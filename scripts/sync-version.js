@@ -4,7 +4,7 @@
  *
  * Usage:
  *   node scripts/sync-version.js        # Sync current version from root
- *   node scripts/sync-version.js 0.1.0  # Set and sync new version
+ *   node scripts/sync-version.js 0.1.0  # Set root version, then sync all packages
  */
 import chalk from 'chalk'
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'fs'
@@ -15,19 +15,18 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const rootDir = join(__dirname, '..')
 
-// Parse arguments
 const versionArg = process.argv[2]
-
-if (!versionArg) {
-	console.log(chalk.yellow('⚠️  No version specified.\n'))
-	exit(1)
-}
 
 // Read root package.json
 const rootPkgPath = join(rootDir, 'package.json')
 const rootPkg = JSON.parse(readFileSync(rootPkgPath, 'utf-8'))
 const oldVersion = rootPkg.version
-const newVersion = versionArg
+const newVersion = versionArg ?? rootPkg.version
+
+if (!newVersion) {
+	console.log(chalk.yellow('⚠️  No version found in root package.json.\n'))
+	exit(1)
+}
 
 console.log(chalk.cyan.bold('\n📦 Syncing version\n'))
 
@@ -35,7 +34,10 @@ console.log(chalk.cyan.bold('\n📦 Syncing version\n'))
 if (versionArg) {
 	rootPkg.version = newVersion
 	writeFileSync(rootPkgPath, JSON.stringify(rootPkg, null, '    ') + '\n')
-	console.log(chalk.green('✓') + ` ${chalk.bold('root')} → ${chalk.yellow(newVersion)}`)
+	console.log(
+		chalk.green('✓') +
+			` ${chalk.bold('root')}: ${chalk.dim(oldVersion)} → ${chalk.yellow(newVersion)}`
+	)
 } else {
 	console.log(chalk.dim('  root:') + ` ${chalk.yellow(newVersion)} ${chalk.dim('(source)')}`)
 }
@@ -78,11 +80,8 @@ for (const pkg of packages) {
 	const pkgJson = JSON.parse(readFileSync(pkgPath, 'utf-8'))
 	let pkgChanged = false
 
-	// Skip extension package version (it has its own versioning)
-	const isExtension = pkg === 'extension'
-
-	// Update package version (skip extension)
-	if (!isExtension && pkgJson.version !== newVersion) {
+	// Update package version
+	if (pkgJson.version !== newVersion) {
 		pkgJson.version = newVersion
 		pkgChanged = true
 	}
