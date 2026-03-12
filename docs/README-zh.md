@@ -71,6 +71,8 @@ const agent = new PageAgent({
 await agent.execute('点击登录按钮')
 ```
 
+支持所有 OpenAI 兼容的 LLM 服务 — [OpenAI](https://openai.com)、[Anthropic](https://anthropic.com)、[MiniMax](https://platform.minimax.io)、[Google Gemini](https://ai.google.dev)、[DeepSeek](https://deepseek.com)、[通义千问](https://dashscope.aliyuncs.com)、[Ollama](https://ollama.com) 等。详见[模型配置](https://alibaba.github.io/page-agent/docs/features/models)。
+
 更多编程用法，请参阅 [📖 文档](https://alibaba.github.io/page-agent/docs/introduction/overview)。
 
 ## 🤝 贡献
