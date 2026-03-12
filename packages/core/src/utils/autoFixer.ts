@@ -17,6 +17,11 @@ const log = console.log.bind(console, chalk.yellow('[autoFixer]'))
  * - Missing action field (fallback to wait)
  * - Primitive action input for single-field tools (e.g. `{"click_element_by_index": 2}`)
  * - etc.
+ * 
+ * @param response - Raw LLM response to normalize
+ * @param tools - Optional map of tools for schema validation
+ * @returns Normalized response in standard AgentOutput format
+ * @throws Error if response cannot be normalized
  */
 export function normalizeResponse(response: any, tools?: Map<string, PageAgentTool>): any {
 	let resolvedArguments = null as any
@@ -126,6 +131,11 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
  *
  * Also coerces primitive inputs for single-field tools:
  * e.g. `{"click_element_by_index": 2}` → `{"click_element_by_index": {"index": 2}}`
+ * 
+ * @param action - The action object to validate
+ * @param tools - Map of available tools with their input schemas
+ * @returns Validated and potentially coerced action
+ * @throws InvokeError if action is invalid or tool is not found
  */
 function validateAction(action: any, tools: Map<string, PageAgentTool>): any {
 	if (typeof action !== 'object' || action === null) return action
@@ -169,12 +179,17 @@ function validateAction(action: any, tools: Map<string, PageAgentTool>): any {
 
 /**
  * Safely parse JSON, return original input if not json.
+ * 
+ * @param input - The input to parse (string or already parsed value)
+ * @returns Parsed JSON value or original input if parsing fails
  */
 function safeJsonParse(input: any): any {
 	if (typeof input === 'string') {
 		try {
 			return JSON.parse(input.trim())
-		} catch {
+		} catch (error) {
+			// Silently return original input for non-JSON strings
+			// This is expected behavior for malformed LLM responses
 			return input
 		}
 	}
@@ -185,6 +200,9 @@ function safeJsonParse(input: any): any {
  * Extract and parse JSON from a string.
  * - Treat content between the first `{` and the last `}` as JSON.
  * - Try to parse that content as JSON and return the parsed value (object/array/primitive) if successful, otherwise return null.
+ * 
+ * @param str - The string to extract JSON from
+ * @returns Parsed JSON object or null if extraction/parsing fails
  */
 function retrieveJsonFromString(str: string): any {
 	try {
@@ -193,7 +211,8 @@ function retrieveJsonFromString(str: string): any {
 			return null
 		}
 		return JSON.parse(json[0]!)
-	} catch {
+	} catch (error) {
+		// Return null for invalid JSON - caller should handle this case
 		return null
 	}
 }
