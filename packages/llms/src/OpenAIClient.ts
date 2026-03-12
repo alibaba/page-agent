@@ -64,7 +64,9 @@ export class OpenAIClient implements LLMClient {
 
 		// 3. Handle HTTP errors
 		if (!response.ok) {
-			const errorData = await response.json().catch(() => ({ error: { message: response.statusText } }))
+			const errorData = await response
+				.json()
+				.catch(() => ({ error: { message: response.statusText } }))
 			const errorMessage =
 				(errorData as { error?: { message?: string } }).error?.message || response.statusText
 
@@ -135,7 +137,15 @@ export class OpenAIClient implements LLMClient {
 
 		// Apply normalizeResponse if provided (for fixing format issues automatically)
 		const normalizedData = options?.normalizeResponse ? options.normalizeResponse(data) : data
-		const normalizedChoice = (normalizedData as { choices?: { message?: { tool_calls?: { function?: { name?: string; arguments?: string } }[] } }[] })?.choices?.[0]
+		const normalizedChoice = (
+			normalizedData as {
+				choices?: {
+					message?: {
+						tool_calls?: { function?: { name?: string; arguments?: string } }[]
+					}
+				}[]
+			}
+		)?.choices?.[0]
 
 		// Get tool name from response
 		const toolCallName = normalizedChoice?.message?.tool_calls?.[0]?.function?.name

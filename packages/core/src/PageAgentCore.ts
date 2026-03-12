@@ -20,7 +20,15 @@ import type {
 	MacroToolInput,
 	MacroToolResult,
 } from './types'
-import { assert, fetchLlmsTxt, getEventDetail, isAbortError, normalizeResponse, uid, waitFor } from './utils'
+import {
+	assert,
+	fetchLlmsTxt,
+	getEventDetail,
+	isAbortError,
+	normalizeResponse,
+	uid,
+	waitFor,
+} from './utils'
 
 export { tool, type PageAgentTool } from './tools'
 export type * from './types'
@@ -106,7 +114,11 @@ export class PageAgentCore extends EventTarget {
 		this.#llm.addEventListener('retry', (e) => {
 			const detail = getEventDetail<{ attempt: number; maxAttempts: number }>(e)
 			if (!detail) return
-			this.#emitActivity({ type: 'retrying', attempt: detail.attempt, maxAttempts: detail.maxAttempts })
+			this.#emitActivity({
+				type: 'retrying',
+				attempt: detail.attempt,
+				maxAttempts: detail.maxAttempts,
+			})
 			// Also push to history for panel rendering
 			this.history.push({
 				type: 'retry',
