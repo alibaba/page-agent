@@ -61,7 +61,12 @@ const llmsTxtCache = new Map<string, string | null>()
 
 /** Fetch /llms.txt for a URL's origin. Cached per origin, `null` = tried and not found. */
 export async function fetchLlmsTxt(url: string): Promise<string | null> {
-	const origin = new URL(url).origin
+	let origin: string
+	try {
+		origin = new URL(url).origin
+	} catch {
+		return null // Invalid URL
+	}
 	if (llmsTxtCache.has(origin)) return llmsTxtCache.get(origin)!
 
 	const endpoint = `${origin}/llms.txt`
