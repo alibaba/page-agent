@@ -10,6 +10,52 @@ async function waitFor(seconds: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
+/**
+ * Find a scrollable container without scanning the entire DOM.
+ * Tries common selectors first, then falls back to viewport elements.
+ */
+function findScrollableContainer(
+	canScroll: (el: HTMLElement | null) => boolean
+): HTMLElement | undefined {
+	// Try common scrollable container selectors first (fast path)
+	const commonSelectors = [
+		'[data-scrollable="true"]',
+		'.scrollable',
+		'.overflow-auto',
+		'.overflow-scroll',
+		'[class*="scroll"]',
+		'main',
+		'article',
+		'section',
+		'aside',
+	]
+
+	for (const selector of commonSelectors) {
+		const containers = document.querySelectorAll<HTMLElement>(selector)
+		for (const container of containers) {
+			if (canScroll(container)) return container
+		}
+	}
+
+	// Fallback: check elements near viewport center (more likely to be visible)
+	const viewportElements = document.elementsFromPoint(
+		window.innerWidth / 2,
+		window.innerHeight / 2
+	) as HTMLElement[]
+
+	for (const el of viewportElements) {
+		if (canScroll(el)) return el
+		// Check ancestors up to 3 levels
+		let parent = el.parentElement
+		for (let i = 0; i < 3 && parent; i++) {
+			if (canScroll(parent)) return parent
+			parent = parent.parentElement
+		}
+	}
+
+	return undefined
+}
+
 // ======= dom utils =======
 
 export async function movePointerToElement(element: HTMLElement) {
@@ -299,7 +345,7 @@ export async function scrollVertically(
 
 	el = canScroll(el)
 		? el
-		: Array.from(document.querySelectorAll<HTMLElement>('*')).find(canScroll) ||
+		: findScrollableContainer(canScroll) ||
 			(document.scrollingElement as HTMLElement) ||
 			(document.documentElement as HTMLElement)
 
@@ -427,7 +473,7 @@ export async function scrollHorizontally(
 
 	el = canScroll(el)
 		? el
-		: Array.from(document.querySelectorAll<HTMLElement>('*')).find(canScroll) ||
+		: findScrollableContainer(canScroll) ||
 			(document.scrollingElement as HTMLElement) ||
 			(document.documentElement as HTMLElement)
 
