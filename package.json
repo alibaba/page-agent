@@ -1,7 +1,7 @@
 {
     "name": "root",
     "private": true,
-    "version": "1.5.5",
+    "version": "1.5.6",
     "type": "module",
     "workspaces": [
         "packages/page-controller",
@@ -32,7 +32,6 @@
         "build:website": "npm run build:website --workspace=@page-agent/website",
         "build:ext": "npm run build:libs && npm run zip -w @page-agent/ext",
         "version": "node scripts/sync-version.js",
-        "version:ext": "node scripts/ext-version.js",
         "lint": "eslint .",
         "cleanup": "rm -rf packages/*/dist",
         "prepare": "husky"
