@@ -79,6 +79,8 @@ We welcome contributions from the community! Follow our instructions in [CONTRIB
 
 Please read [Code of Conduct](docs/CODE_OF_CONDUCT.md) before contributing.
 
+Contributions generated entirely by bots or agents without substantial human involvement will not be accepted, and bot accounts may be blocked.
+
 ## 👏 Acknowledgments
 
 This project builds upon the excellent work of **[`browser-use`](https://github.com/browser-use/browser-use)**.
@@ -110,8 +112,8 @@ file and in the node_modules directory after installation.
 
 <a href="https://www.star-history.com/?repos=alibaba%2Fpage-agent&type=date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&theme=dark&legend=top-left&v=3" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=3" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=3" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&theme=dark&legend=top-left&v=4" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=4" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=4" />
  </picture>
 </a>
