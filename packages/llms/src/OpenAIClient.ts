@@ -46,12 +46,18 @@ export class OpenAIClient implements LLMClient {
 		// 2. Call API
 		let response: Response
 		try {
+			// Only include Authorization header when an API key is present.
+			// When customFetch handles auth (e.g. via cookies/proxy), apiKey may be empty.
+			const headers: Record<string, string> = {
+				'Content-Type': 'application/json',
+			}
+			if (this.config.apiKey) {
+				headers['Authorization'] = `Bearer ${this.config.apiKey}`
+			}
+
 			response = await this.fetch(`${this.config.baseURL}/chat/completions`, {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${this.config.apiKey}`,
-				},
+				headers,
 				body: JSON.stringify(requestBody),
 				signal: abortSignal,
 			})

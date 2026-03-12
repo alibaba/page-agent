@@ -7,17 +7,23 @@ export { InvokeError, InvokeErrorType }
 export type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
 
 export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
-	// Runtime validation as defensive programming (types already guarantee these)
-	if (!config.baseURL || !config.apiKey || !config.model) {
+	// When customFetch is provided the caller handles auth themselves, so apiKey
+	// is not required.  Otherwise all three fields must be present.
+	const needsApiKey = !config.customFetch
+	if (!config.baseURL || !config.model || (needsApiKey && !config.apiKey)) {
+		const missing: string[] = []
+		if (!config.baseURL) missing.push('baseURL')
+		if (!config.model) missing.push('model')
+		if (needsApiKey && !config.apiKey) missing.push('apiKey')
 		throw new Error(
-			'[PageAgent] LLM configuration required. Please provide: baseURL, apiKey, model. ' +
+			`[PageAgent] LLM configuration required. Please provide: ${missing.join(', ')}. ` +
 				'See: https://alibaba.github.io/page-agent/docs/features/models'
 		)
 	}
 
 	return {
 		baseURL: config.baseURL,
-		apiKey: config.apiKey,
+		apiKey: config.apiKey ?? '',
 		model: config.model,
 		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
