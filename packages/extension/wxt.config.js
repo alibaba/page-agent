@@ -19,8 +19,7 @@ export default defineConfig({
 	vite: () => ({
 		plugins: [tailwindcss()],
 		define: {
-			__EXT_VERSION__: JSON.stringify(pkg.version),
-			__CORE_VERSION__: JSON.stringify(pkg.dependencies['@page-agent/core']),
+			__VERSION__: JSON.stringify(pkg.version),
 		},
 		optimizeDeps: {
 			force: true,

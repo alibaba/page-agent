@@ -139,8 +139,7 @@ export class PageAgentCore extends EventTarget {
 			this.history.push({
 				type: 'error',
 				message,
-				rawResponse:
-					error instanceof Error ? (error as InvokeError).rawResponse : undefined,
+				rawResponse: error instanceof Error ? (error as InvokeError).rawResponse : undefined,
 			})
 			this.#emitHistoryChange()
 		})
