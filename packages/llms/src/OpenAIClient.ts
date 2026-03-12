@@ -135,7 +135,7 @@ export class OpenAIClient implements LLMClient {
 
 		// Apply normalizeResponse if provided (for fixing format issues automatically)
 		const normalizedData = options?.normalizeResponse ? options.normalizeResponse(data) : data
-		const normalizedChoice = (normalizedData as { choices?: Array<{ message?: { tool_calls?: Array<{ function?: { name?: string; arguments?: string } }> } }> })?.choices?.[0]
+		const normalizedChoice = (normalizedData as { choices?: { message?: { tool_calls?: { function?: { name?: string; arguments?: string } }[] } }[] })?.choices?.[0]
 
 		// Get tool name from response
 		const toolCallName = normalizedChoice?.message?.tool_calls?.[0]?.function?.name
