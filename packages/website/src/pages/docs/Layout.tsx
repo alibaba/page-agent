@@ -4,6 +4,7 @@ import { Link, useLocation } from 'wouter'
 
 import { SparklesText } from '@/components/ui/sparkles-text'
 import { useLanguage } from '@/i18n/context'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 
 interface DocsLayoutProps {
 	children: ReactNode
@@ -64,6 +65,12 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 			],
 		},
 	]
+
+	const activeTitle = navigationSections
+		.flatMap((s) => s.items)
+		.find((item) => item.path === location)?.title
+
+	useDocumentTitle(activeTitle)
 
 	return (
 		<div className="max-w-7xl mx-auto px-6 py-8 overflow-x-auto">
