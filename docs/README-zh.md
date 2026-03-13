@@ -49,8 +49,8 @@
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.5.6/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.5.6/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.5.7/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.5.7/files/dist/iife/page-agent.demo.js |
 
 ### NPM 安装
 
@@ -110,8 +110,8 @@ file and in the node_modules directory after installation.
 
 <a href="https://www.star-history.com/?repos=alibaba%2Fpage-agent&type=date">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&theme=dark&legend=top-left&v=4" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=4" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=4" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&theme=dark&legend=top-left&vv=6" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&vv=6" />
+   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&vv=6" />
  </picture>
 </a>
