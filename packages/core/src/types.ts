@@ -17,6 +17,12 @@ export interface AgentConfig extends LLMConfig {
 	maxSteps?: number
 
 	/**
+	 * Delay in seconds between each step to allow page stabilization.
+	 * @default 0.4
+	 */
+	stepDelay?: number
+
+	/**
 	 * Custom tools to extend PageAgent capabilities
 	 * @experimental
 	 * @note You can also override or remove internal tools by using the same name.

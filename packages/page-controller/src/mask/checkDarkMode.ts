@@ -88,8 +88,65 @@ function isBackgroundDark() {
 }
 
 /**
+ * Checks if the text color of major content elements is light (indicating dark mode).
+ * @returns {boolean} - True if text color suggests dark mode.
+ */
+function isTextColorDark(): boolean {
+	try {
+		// Check color of common content containers
+		const selectors = ['main', '#app', '#root', '.content', 'article', 'body']
+		for (const selector of selectors) {
+			const element = document.querySelector(selector)
+			if (element) {
+				const style = window.getComputedStyle(element)
+				const color = style.color
+				// Light text color (high luminance) suggests dark background
+				if (isColorDark(color, 100)) {
+					// Invert logic: dark text on light background is NOT dark mode
+					// Light text (low luminance value) on dark background IS dark mode
+					const rgb = parseRgbColor(color)
+					if (rgb) {
+						const luminance = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b
+						if (luminance > 180) {
+							// Light colored text suggests dark mode
+							return true
+						}
+					}
+				}
+			}
+		}
+		return false
+	} catch {
+		return false
+	}
+}
+
+/**
+ * Checks the background color of major layout elements.
+ * @returns {boolean} - True if layout background is dark.
+ */
+function isLayoutBackgroundDark(): boolean {
+	try {
+		const selectors = ['main', '#app', '#root', '.container', '.content']
+		for (const selector of selectors) {
+			const element = document.querySelector(selector)
+			if (element) {
+				const style = window.getComputedStyle(element)
+				const bgColor = style.backgroundColor
+				if (isColorDark(bgColor)) {
+					return true
+				}
+			}
+		}
+		return false
+	} catch {
+		return false
+	}
+}
+
+/**
  * A comprehensive function to determine if the page is currently in a dark theme.
- * It combines class checking and background color analysis.
+ * It combines class checking, background color analysis, text color analysis, and layout element checks.
  * @returns {boolean} - True if the page is likely dark.
  */
 export function isPageDark() {
@@ -104,8 +161,15 @@ export function isPageDark() {
 			return true
 		}
 
-		// @TODO add more checks here, e.g., analyzing text color,
-		// or checking the background of major layout elements like <main> or #app.
+		// Additional check: analyze text color of major content elements
+		if (isTextColorDark()) {
+			return true
+		}
+
+		// Additional check: check background of major layout elements
+		if (isLayoutBackgroundDark()) {
+			return true
+		}
 
 		return false
 	} catch (error) {

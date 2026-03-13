@@ -343,7 +343,7 @@ export class PageAgentCore extends EventTarget {
 				return result
 			}
 
-			await waitFor(0.4) // @TODO: configurable
+			await waitFor(this.config.stepDelay ?? 0.4)
 		}
 	}
 
