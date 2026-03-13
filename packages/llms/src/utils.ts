@@ -93,6 +93,14 @@ export function modelPatch(body: Record<string, any>) {
 		body.reasoning_effort = 'minimal'
 	}
 
+	if (modelName.startsWith('minimax')) {
+		// MiniMax temperature range: (0.0, 1.0], cannot be 0
+		if (!body.temperature || body.temperature <= 0) {
+			debug('Applying MiniMax patch: set temperature to 1.0 (must be > 0)')
+			body.temperature = 1.0
+		}
+	}
+
 	return body
 }
 

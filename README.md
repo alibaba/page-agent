@@ -71,6 +71,8 @@ const agent = new PageAgent({
 await agent.execute('Click the login button')
 ```
 
+Works with any OpenAI-compatible LLM provider — [OpenAI](https://openai.com), [Anthropic](https://anthropic.com), [MiniMax](https://platform.minimax.io), [Google Gemini](https://ai.google.dev), [DeepSeek](https://deepseek.com), [Qwen](https://dashscope.aliyuncs.com), [Ollama](https://ollama.com), and more. See [Models](https://alibaba.github.io/page-agent/docs/features/models) for configuration details.
+
 For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/docs/introduction/overview).
 
 ## 🤝 Contributing
