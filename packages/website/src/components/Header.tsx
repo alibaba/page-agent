@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { siGithub } from 'simple-icons'
 import { Link } from 'wouter'
 
+import { formatStars, useGitHubStars } from '@/hooks/useGitHubStars'
 import { useLanguage } from '@/i18n/context'
 
 import LanguageSwitcher from './LanguageSwitcher'
@@ -12,6 +13,7 @@ import { HyperText } from './ui/hyper-text'
 export default function Header() {
 	const { isZh } = useLanguage()
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+	const stars = useGitHubStars()
 
 	return (
 		<>
@@ -34,8 +36,11 @@ export default function Header() {
 								className="w-10 h-10 rounded-xl group-hover:scale-110 transition-transform duration-200"
 							/>
 							<div>
-								<span className="text-base sm:text-xl font-bold text-gray-900 dark:text-white block leading-tight">
+								<span className="text-base sm:text-xl font-bold text-gray-900 dark:text-white leading-tight flex items-baseline gap-1.5">
 									page-agent
+									<span className="hidden sm:inline text-[10px] font-mono font-normal text-gray-400 dark:text-gray-500 tabular-nums before:content-['v']">
+										{import.meta.env.VERSION}
+									</span>
 								</span>
 								<HyperText
 									as="p"
@@ -66,7 +71,7 @@ export default function Header() {
 								href="https://github.com/alibaba/page-agent"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 shrink-0"
+								className="flex items-center gap-1 p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 shrink-0"
 								aria-label="GitHub"
 							>
 								<svg
@@ -77,6 +82,9 @@ export default function Header() {
 								>
 									<path d={siGithub.path} />
 								</svg>
+								{stars !== null && (
+									<span className="text-sm tabular-nums">★ {formatStars(stars)}</span>
+								)}
 							</a>
 						</nav>
 
@@ -86,9 +94,6 @@ export default function Header() {
 							role="navigation"
 							aria-label={isZh ? '文档' : 'Docs'}
 						>
-							<span className="text-xs font-mono text-gray-400 dark:text-gray-500 tabular-nums before:content-['v']">
-								{import.meta.env.VERSION}
-							</span>
 							<Link
 								href="/docs/introduction/overview"
 								className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
@@ -112,6 +117,9 @@ export default function Header() {
 									<path d={siGithub.path} />
 								</svg>
 								GitHub
+								{stars !== null && (
+									<span className="text-sm font-medium tabular-nums ">★ {formatStars(stars)}</span>
+								)}
 							</a>
 							<ThemeSwitcher />
 							<LanguageSwitcher />
@@ -161,6 +169,11 @@ export default function Header() {
 									<path d={siGithub.path} />
 								</svg>
 								GitHub
+								{stars !== null && (
+									<span className="text-xs tabular-nums text-gray-400 dark:text-gray-500">
+										★ {formatStars(stars)}
+									</span>
+								)}
 							</a>
 							<div className="flex items-center gap-3 px-3 py-2">
 								<ThemeSwitcher />
