@@ -511,7 +511,8 @@ export class PageAgentCore extends EventTarget {
 		// Accumulated wait time warning
 		if (this.#states.totalWaitTime >= 3) {
 			this.pushObservation(
-				`You have waited ${this.#states.totalWaitTime} seconds accumulatively. DO NOT wait any longer unless you have a good reason.`
+				`You have waited ${this.#states.totalWaitTime} seconds accumulatively. ` +
+					`DO NOT wait any longer unless you have a good reason.`
 			)
 		}
 
@@ -527,7 +528,8 @@ export class PageAgentCore extends EventTarget {
 		const remaining = this.config.maxSteps - step
 		if (remaining === 5) {
 			this.pushObservation(
-				`⚠️ Only ${remaining} steps remaining. Consider wrapping up or calling done with partial results.`
+				`⚠️ Only ${remaining} steps remaining. ` +
+					`Consider wrapping up or calling done with partial results.`
 			)
 		} else if (remaining === 2) {
 			this.pushObservation(
