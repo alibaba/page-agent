@@ -375,6 +375,14 @@ export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: stri
 
 						line += ` data-scrollable="${scrollDataText}"`
 					}
+					// Add table-specific information
+					if (node.extra.table) {
+						line += ' data-table="true"'
+					} else if (node.extra.row) {
+						line += ' data-row="true"'
+					} else if (node.extra.cell) {
+						line += ` data-cell="true" data-header="${node.extra.isHeader ? 'true' : 'false'}"`
+					}
 				}
 
 				if (text) {
@@ -389,6 +397,29 @@ export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: stri
 
 				line += ' />'
 				result.push(line)
+			} else if (
+				node.tagName === 'table' ||
+				node.tagName === 'tr' ||
+				node.tagName === 'td' ||
+				node.tagName === 'th'
+			) {
+				// For non-interactive table elements, still show them with structure
+				let line = `${depthStr}<${node.tagName ?? ''}`
+
+				// Add table-specific attributes
+				if (node.tagName === 'th') {
+					line += ' data-header="true"'
+				}
+
+				const text = getAllTextTillNextClickableElement(node)
+				if (text) {
+					const trimmedText = text.trim()
+					line += `>${trimmedText}`
+				}
+
+				line += ' />'
+				result.push(line)
+				nextDepth += 1
 			}
 
 			// Process children regardless
@@ -405,7 +436,7 @@ export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: stri
 				node.parent &&
 				node.parent.type === 'element' &&
 				node.parent.isVisible &&
-				node.parent.isTopElement
+				(node.parent.isTopElement || node.parent.tagName === 'td' || node.parent.tagName === 'th')
 			) {
 				result.push(`${depthStr}${node.text ?? ''}`)
 			}
