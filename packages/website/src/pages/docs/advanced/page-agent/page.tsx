@@ -169,7 +169,7 @@ agent.panel.dispose()`}
 				<Heading id="pageagent-vs-pageagentcore">
 					{isZh ? 'PageAgent vs PageAgentCore' : 'PageAgent vs PageAgentCore'}
 				</Heading>
-				<div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+				<div className="overflow-hidden rounded-lg border border-border">
 					<table className="w-full text-sm">
 						<thead>
 							<tr className="bg-gray-50 dark:bg-gray-800/50">
@@ -183,28 +183,28 @@ agent.panel.dispose()`}
 							</tr>
 						</thead>
 						<tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-							<tr className="bg-white dark:bg-gray-900">
+							<tr className="bg-background">
 								<td className="px-4 py-3 text-gray-600 dark:text-gray-400">
 									{isZh ? 'UI 面板' : 'UI Panel'}
 								</td>
 								<td className="px-4 py-3 text-center text-green-600 dark:text-green-400">✓</td>
 								<td className="px-4 py-3 text-center text-gray-400 dark:text-gray-600">-</td>
 							</tr>
-							<tr className="bg-white dark:bg-gray-900">
+							<tr className="bg-background">
 								<td className="px-4 py-3 text-gray-600 dark:text-gray-400">
 									{isZh ? '自动创建 PageController' : 'Auto-creates PageController'}
 								</td>
 								<td className="px-4 py-3 text-center text-green-600 dark:text-green-400">✓</td>
 								<td className="px-4 py-3 text-center text-gray-400 dark:text-gray-600">-</td>
 							</tr>
-							<tr className="bg-white dark:bg-gray-900">
+							<tr className="bg-background">
 								<td className="px-4 py-3 text-gray-600 dark:text-gray-400">
 									{isZh ? 'Headless 模式' : 'Headless Mode'}
 								</td>
 								<td className="px-4 py-3 text-center text-gray-400 dark:text-gray-600">-</td>
 								<td className="px-4 py-3 text-center text-green-600 dark:text-green-400">✓</td>
 							</tr>
-							<tr className="bg-white dark:bg-gray-900">
+							<tr className="bg-background">
 								<td className="px-4 py-3 text-gray-600 dark:text-gray-400">
 									{isZh ? '适用场景' : 'Use Case'}
 								</td>

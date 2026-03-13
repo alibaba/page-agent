@@ -43,7 +43,7 @@ const ModelBadge = ({ model, baseline }: { model: string; baseline?: boolean }) 
 		className={`px-3 py-1.5 rounded-md text-xs font-medium font-mono transition-colors ${
 			baseline
 				? 'bg-emerald-500 text-white shadow-sm'
-				: 'bg-white/80 dark:bg-gray-800/80 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600'
+				: 'bg-card/80 text-foreground border border-border'
 		}`}
 	>
 		{model}
@@ -155,10 +155,8 @@ const pageAgent = new PageAgent({
 						</a>
 					</p>
 				</div>
-				<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
-					<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-						Qwen (Alibaba Cloud China)
-					</h3>
+				<div className="bg-muted/50 rounded-lg p-5 border border-border">
+					<h3 className="font-semibold text-foreground mb-2">Qwen (Alibaba Cloud China)</h3>
 					<p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
 						{isZh
 							? '通过阿里云函数计算（中国大陆）转发至百炼 Qwen 模型'

@@ -28,15 +28,13 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
 
 	// 使用 Tailwind 的 dark: 前缀实现自动主题切换
 	const containerClasses =
-		'bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-gray-300 dark:border-gray-700'
-	const headerClasses = 'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700'
-	const headerTextClasses = 'text-gray-700 dark:text-gray-300'
-	const languageTextClasses = 'text-gray-600 dark:text-gray-400'
-	const lineNumbersClasses =
-		'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-500'
-	const codeAreaClasses = 'bg-white dark:bg-gray-900'
-	const footerClasses =
-		'bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400'
+		'bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-border'
+	const headerClasses = 'bg-muted border-border'
+	const headerTextClasses = 'text-muted-foreground'
+	const languageTextClasses = 'text-muted-foreground'
+	const lineNumbersClasses = 'bg-muted border-border text-muted-foreground'
+	const codeAreaClasses = 'bg-background'
+	const footerClasses = 'bg-muted border-border text-muted-foreground'
 	const copyButtonClasses =
 		'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-white'
 

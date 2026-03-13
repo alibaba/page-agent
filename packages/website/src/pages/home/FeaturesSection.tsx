@@ -143,7 +143,7 @@ export default function FeaturesSection() {
 										<div className="shrink-0 w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
 											<Bot className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
 										</div>
-										<div className="bg-gray-100 dark:bg-white/10 rounded-2xl rounded-tl-md px-3.5 py-2 text-sm text-gray-700 dark:text-gray-200">
+										<div className="bg-muted rounded-2xl rounded-tl-md px-3.5 py-2 text-sm text-muted-foreground">
 											{isZh ? '找到 3 条匹配记录。选择哪一条？' : 'Found 3 matches. Which one?'}
 										</div>
 									</div>
@@ -159,7 +159,7 @@ export default function FeaturesSection() {
 										<div className="shrink-0 w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-xs font-bold">
 											✓
 										</div>
-										<div className="bg-gray-100 dark:bg-white/10 rounded-2xl rounded-tl-md px-3.5 py-2 text-sm text-gray-700 dark:text-gray-200">
+										<div className="bg-muted rounded-2xl rounded-tl-md px-3.5 py-2 text-sm text-muted-foreground">
 											{isZh ? '已选择并提交！' : 'Done! Selected and submitted.'}
 										</div>
 									</div>
