@@ -56,15 +56,17 @@ export class OpenAIClient implements LLMClient {
 				signal: abortSignal,
 			})
 		} catch (error: unknown) {
-			const isAbortError = (error as any)?.name === 'AbortError'
-			const errorMessage = isAbortError ? 'Network request aborted' : 'Network request failed'
-			if (!isAbortError) console.error(error)
+			const isAborted = error instanceof Error && error.name === 'AbortError'
+			const errorMessage = isAborted ? 'Network request aborted' : 'Network request failed'
+			if (!isAborted) console.error(error)
 			throw new InvokeError(InvokeErrorType.NETWORK_ERROR, errorMessage, error)
 		}
 
 		// 3. Handle HTTP errors
 		if (!response.ok) {
-			const errorData = await response.json().catch()
+			const errorData = await response
+				.json()
+				.catch(() => ({ error: { message: response.statusText } }))
 			const errorMessage =
 				(errorData as { error?: { message?: string } }).error?.message || response.statusText
 
@@ -135,7 +137,15 @@ export class OpenAIClient implements LLMClient {
 
 		// Apply normalizeResponse if provided (for fixing format issues automatically)
 		const normalizedData = options?.normalizeResponse ? options.normalizeResponse(data) : data
-		const normalizedChoice = (normalizedData as any).choices?.[0]
+		const normalizedChoice = (
+			normalizedData as {
+				choices?: {
+					message?: {
+						tool_calls?: { function?: { name?: string; arguments?: string } }[]
+					}
+				}[]
+			}
+		)?.choices?.[0]
 
 		// Get tool name from response
 		const toolCallName = normalizedChoice?.message?.tool_calls?.[0]?.function?.name
@@ -201,7 +211,7 @@ export class OpenAIClient implements LLMClient {
 		} catch (e) {
 			throw new InvokeError(
 				InvokeErrorType.TOOL_EXECUTION_ERROR,
-				`Tool execution failed: ${(e as Error).message}`,
+				`Tool execution failed: ${e instanceof Error ? e.message : String(e)}`,
 				e,
 				data
 			)

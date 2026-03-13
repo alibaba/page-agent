@@ -142,7 +142,7 @@ export default (
 
 	const HIGHLIGHT_CONTAINER_ID = 'playwright-highlight-container'
 
-	// Add a WeakMap cache for XPath strings
+	// Add a WeakMap cache for XPath strings (WeakMap to avoid memory leaks with DOM nodes)
 	const xpathCache = new WeakMap()
 
 	// // Initialize once and reuse
@@ -1607,6 +1607,8 @@ export default (
 
 					/**
 					 * @edit direct dom ref
+					 * @note This creates a memory reference that persists until the next updateTree() call.
+					 * PageController.dispose() clears flatTree to release these references.
 					 */
 					nodeData.ref = node
 
