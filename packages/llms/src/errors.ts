@@ -40,8 +40,8 @@ export class InvokeError extends Error {
 	}
 
 	private isRetryable(type: InvokeErrorType, rawError?: unknown): boolean {
-		const isAbortError = (rawError as any)?.name === 'AbortError'
-		if (isAbortError) return false
+		const isAborted = rawError instanceof Error && rawError.name === 'AbortError'
+		if (isAborted) return false
 
 		const retryableTypes: InvokeErrorType[] = [
 			InvokeErrorType.NETWORK_ERROR,
