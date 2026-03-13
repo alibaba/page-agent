@@ -67,6 +67,9 @@ export async function fetchLlmsTxt(url: string): Promise<string | null> {
 	} catch {
 		return null // Invalid URL
 	}
+	// about:blank, data:, file:
+	if (origin === 'null') return null
+
 	if (llmsTxtCache.has(origin)) return llmsTxtCache.get(origin)!
 
 	const endpoint = `${origin}/llms.txt`
