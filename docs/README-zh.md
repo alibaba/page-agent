@@ -22,7 +22,7 @@
 - **🎯 轻松集成**
     - 无需 `浏览器插件` / `Python` / `无头浏览器`。
     - 纯页面内 JavaScript，一切都在你的网页中完成。
-    - The best tool for your agent to control web pages.
+    - 让你的 Agent 控制网页的最佳工具。
 - **📖 基于文本的 DOM 操作**
     - 无需截图，无需 OCR 或多模态模型。
     - 无需特殊权限。
