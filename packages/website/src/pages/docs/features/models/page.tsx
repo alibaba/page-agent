@@ -259,20 +259,20 @@ LLM_MODEL_NAME="qwen3:14b"`}
 					{isZh ? (
 						<>
 							如果你计划将它集成到你的 Web 应用中，建议搭建一个后端代理来转发 LLM 请求，并使用{' '}
-							<code>customFetch</code> 携带 Cookie 或其他鉴权信息：
+							<code>customFetch</code> 携带 Cookie 或其他鉴权信息；这种模式下可以省略{' '}
+							<code>apiKey</code>：
 						</>
 					) : (
 						<>
 							If you plan to integrate it into your web app, it's better to have a backend proxy for
 							the LLM and use <code>customFetch</code> to authenticate the request with cookies or
-							other methods:
+							other methods. In this mode, <code>apiKey</code> can be omitted:
 						</>
 					)}
 				</p>
 				<CodeEditor
 					code={`const agent = new PageAgent({
   baseURL: '/api/llm-proxy',
-  apiKey: 'NA',
   model: 'gpt-5.1',
   customFetch: (url, init) =>
     fetch(url, { ...init, credentials: 'include' }),

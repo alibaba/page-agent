@@ -89,7 +89,11 @@ export interface InvokeResult<TResult = unknown> {
  */
 export interface LLMConfig {
 	baseURL: string
-	apiKey: string
+	/**
+	 * API key for Authorization header injection.
+	 * Optional when customFetch handles authentication itself.
+	 */
+	apiKey?: string
 	model: string
 
 	temperature?: number
