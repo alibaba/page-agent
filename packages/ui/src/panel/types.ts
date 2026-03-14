@@ -16,6 +16,15 @@ export type AgentActivity =
 	| { type: 'retrying'; attempt: number; maxAttempts: number }
 	| { type: 'error'; message: string }
 
+export interface ToolApprovalRequest {
+	toolName: string
+	input: unknown
+	description: string
+	title?: string
+	message?: string
+	question?: string
+}
+
 /**
  * Minimal interface that Panel expects from an agent.
  * Panel does not depend on PageAgent directly - it only requires this interface.
@@ -64,6 +73,12 @@ export interface PanelAgentAdapter extends EventTarget {
 	 * Panel will set this to handle user questions via its UI.
 	 */
 	onAskUser?: (question: string) => Promise<string>
+
+	/**
+	 * Callback for when a tool requires explicit approval.
+	 * Panel will set this to render approval controls in the UI.
+	 */
+	onApproveTool?: (request: ToolApprovalRequest) => Promise<boolean>
 
 	/** Execute a task */
 	execute(task: string): Promise<unknown>

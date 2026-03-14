@@ -8,7 +8,7 @@ import chalk from 'chalk'
 import * as z from 'zod/v4'
 
 import SYSTEM_PROMPT from './prompts/system_prompt.md?raw'
-import { tools } from './tools'
+import { type PageAgentTool, tools } from './tools'
 import type {
 	AgentActivity,
 	AgentConfig,
@@ -19,6 +19,7 @@ import type {
 	HistoricalEvent,
 	MacroToolInput,
 	MacroToolResult,
+	ToolApprovalRequest,
 } from './types'
 import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
 
@@ -77,6 +78,12 @@ export class PageAgentCore extends EventTarget {
 	 * @example onAskUser: (q) => window.prompt(q) || ''
 	 */
 	onAskUser?: (question: string) => Promise<string>
+
+	/**
+	 * Callback for when a tool requires explicit approval before execution.
+	 * If not set, PageAgent falls back to `onAskUser`.
+	 */
+	onApproveTool?: (request: ToolApprovalRequest) => Promise<boolean>
 
 	#status: AgentStatus = 'idle'
 	#llm: LLM
@@ -403,6 +410,21 @@ export class PageAgentCore extends EventTarget {
 				const tool = tools.get(toolName)
 				assert(tool, `Tool ${toolName} not found`)
 
+				const deniedMessage = await this.#maybeRequireToolApproval(toolName, toolInput, tool)
+				if (deniedMessage) {
+					this.#emitActivity({
+						type: 'executed',
+						tool: toolName,
+						input: toolInput,
+						output: deniedMessage,
+						duration: 0,
+					})
+					return {
+						input,
+						output: deniedMessage,
+					}
+				}
+
 				console.log(chalk.blue.bold(`Executing tool: ${toolName}`), toolInput)
 
 				// Emit executing activity
@@ -439,6 +461,97 @@ export class PageAgentCore extends EventTarget {
 				}
 			},
 		}
+	}
+
+	async #maybeRequireToolApproval(
+		toolName: string,
+		toolInput: unknown,
+		tool: PageAgentTool
+	): Promise<string | null> {
+		const toolApproval = tool.requiresApproval
+		if (!toolApproval) return null
+
+		const approvalMeta =
+			toolApproval && typeof toolApproval === 'object'
+				? toolApproval
+				: { title: undefined, message: undefined, question: undefined }
+
+		const request: ToolApprovalRequest = {
+			toolName,
+			input: toolInput,
+			description: tool.description,
+			title: approvalMeta.title,
+			message: approvalMeta.message,
+			question: approvalMeta.question,
+		}
+
+		let approved = false
+		if (this.onApproveTool) {
+			approved = await this.onApproveTool(request)
+		} else if (this.onAskUser) {
+			const question = request.question ?? this.#getToolApprovalQuestion(request)
+			const answer = await this.onAskUser(question)
+			approved = this.#isAffirmativeAnswer(answer)
+		} else {
+			throw new Error('tool approval requires agent.onApproveTool or agent.onAskUser')
+		}
+
+		if (approved) return null
+
+		this.pushObservation(
+			`Tool "${toolName}" was not approved by the user. Do not retry it unless the user explicitly changes their decision.`
+		)
+		return `❌ Tool "${toolName}" was not approved by the user.`
+	}
+
+	#getToolApprovalQuestion(request: ToolApprovalRequest): string {
+		let serializedInput = ''
+		try {
+			serializedInput = JSON.stringify(request.input, null, 2)
+		} catch {
+			serializedInput = String(request.input)
+		}
+
+		return [
+			request.title || 'Allow this tool to run?',
+			`Tool: ${request.toolName}`,
+			`Description: ${request.description}`,
+			request.message || '',
+			'Input:',
+			serializedInput,
+			'Reply with "yes" to allow. Any other answer will deny it.',
+		]
+			.filter(Boolean)
+			.join('\n')
+	}
+
+	#isAffirmativeAnswer(answer: string): boolean {
+		const normalized = answer.trim().toLowerCase()
+		return [
+			'y',
+			'yes',
+			'ok',
+			'okay',
+			'approve',
+			'approved',
+			'allow',
+			'allowed',
+			'continue',
+			'run',
+			'confirm',
+			'confirmed',
+			'evet',
+			'onay',
+			'onayla',
+			'tamam',
+			'kabul',
+			'kabul et',
+			'是',
+			'好',
+			'好的',
+			'允许',
+			'确认',
+		].includes(normalized)
 	}
 
 	/**
