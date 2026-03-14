@@ -1,7 +1,7 @@
 import { I18n, type SupportedLanguage } from '../i18n'
-import { truncate } from '../utils'
+import { escapeHtml, truncate } from '../utils'
 import { createCard, createReflectionLines } from './cards'
-import type { AgentActivity, PanelAgentAdapter } from './types'
+import type { AgentActivity, PanelAgentAdapter, ToolApprovalRequest } from './types'
 
 import styles from './Panel.module.css'
 
@@ -43,6 +43,8 @@ export class Panel {
 	#i18n: I18n
 	#userAnswerResolver: ((input: string) => void) | null = null
 	#isWaitingForUserAnswer: boolean = false
+	#toolApprovalResolver: ((approved: boolean) => void) | null = null
+	#isWaitingForToolApproval: boolean = false
 	#headerUpdateTimer: ReturnType<typeof setInterval> | null = null
 	#pendingHeaderText: string | null = null
 	#isAnimating = false
@@ -69,6 +71,7 @@ export class Panel {
 
 		// Set up askUser callback on agent
 		this.#agent.onAskUser = (question) => this.#askUser(question)
+		this.#agent.onApproveTool = (request) => this.#askToolApproval(request)
 
 		// Create UI elements
 		this.#wrapper = this.#createWrapper()
@@ -198,6 +201,21 @@ export class Panel {
 		})
 	}
 
+	#askToolApproval(request: ToolApprovalRequest): Promise<boolean> {
+		return new Promise((resolve) => {
+			this.#isWaitingForToolApproval = true
+			this.#toolApprovalResolver = resolve
+			this.#pendingHeaderText = this.#i18n.t('ui.panel.waitingApproval')
+
+			if (!this.#isExpanded) {
+				this.#expand()
+			}
+
+			this.#renderToolApprovalCard(request)
+			this.#hideInputArea()
+		})
+	}
+
 	// ========== Public control methods ==========
 
 	show(): void {
@@ -221,6 +239,10 @@ export class Panel {
 		// Reset user input state
 		this.#isWaitingForUserAnswer = false
 		this.#userAnswerResolver = null
+		this.#isWaitingForToolApproval = false
+		this.#toolApprovalResolver?.(false)
+		this.#toolApprovalResolver = null
+		this.#removeTemporaryCards()
 		// Show input area
 		this.#showInputArea()
 	}
@@ -245,6 +267,10 @@ export class Panel {
 
 		// Clean up UI
 		this.#isWaitingForUserAnswer = false
+		this.#isWaitingForToolApproval = false
+		this.#toolApprovalResolver?.(false)
+		this.#toolApprovalResolver = null
+		this.#removeTemporaryCards()
 		this.#stopHeaderUpdateLoop()
 		this.wrapper.remove()
 	}
@@ -324,6 +350,24 @@ export class Panel {
 		}
 	}
 
+	#handleToolApprovalDecision(approved: boolean): void {
+		this.#removeTemporaryCards()
+		this.#isWaitingForToolApproval = false
+
+		if (this.#toolApprovalResolver) {
+			this.#toolApprovalResolver(approved)
+			this.#toolApprovalResolver = null
+		}
+	}
+
+	#removeTemporaryCards(): void {
+		Array.from(this.#historySection.children).forEach((child) => {
+			if (child.getAttribute('data-temp-card') === 'true') {
+				child.remove()
+			}
+		})
+	}
+
 	/**
 	 * Show input area
 	 */
@@ -351,6 +395,7 @@ export class Panel {
 	#shouldShowInputArea(): boolean {
 		// Always show input area if waiting for user input
 		if (this.#isWaitingForUserAnswer) return true
+		if (this.#isWaitingForToolApproval) return false
 
 		const history = this.#agent.history
 		if (history.length === 0) {
@@ -366,6 +411,53 @@ export class Panel {
 		}
 
 		return false
+	}
+
+	#renderToolApprovalCard(request: ToolApprovalRequest): void {
+		this.#removeTemporaryCards()
+
+		let serializedInput = ''
+		try {
+			serializedInput = JSON.stringify(request.input, null, 2)
+		} catch {
+			serializedInput = String(request.input)
+		}
+
+		const card = document.createElement('div')
+		card.className = `${styles.historyItem} ${styles.question} ${styles.approvalCard}`
+		card.setAttribute('data-temp-card', 'true')
+		card.innerHTML = `
+			<div class="${styles.historyContent}">
+				<span class="${styles.statusIcon}">🛡️</span>
+				<div class="${styles.approvalContent}">
+					<div class="${styles.approvalTitle}">${escapeHtml(request.title || this.#i18n.t('ui.panel.approvalRequired'))}</div>
+					<div>${escapeHtml(this.#i18n.t('ui.panel.approvalTool', { toolName: request.toolName }))}</div>
+					<div>${escapeHtml(
+						request.message ||
+							this.#i18n.t('ui.panel.approvalDescription', { description: request.description })
+					)}</div>
+					<div class="${styles.approvalLabel}">${escapeHtml(this.#i18n.t('ui.panel.approvalInput'))}</div>
+					<pre class="${styles.approvalInputPreview}">${escapeHtml(serializedInput)}</pre>
+				</div>
+			</div>
+			<div class="${styles.approvalActions}">
+				<button type="button" class="${styles.approvalButton} ${styles.approveButton}">${escapeHtml(this.#i18n.t('ui.panel.approve'))}</button>
+				<button type="button" class="${styles.approvalButton} ${styles.denyButton}">${escapeHtml(this.#i18n.t('ui.panel.deny'))}</button>
+			</div>
+		`
+
+		card.querySelector(`.${styles.approveButton}`)?.addEventListener('click', (e) => {
+			e.stopPropagation()
+			this.#handleToolApprovalDecision(true)
+		})
+
+		card.querySelector(`.${styles.denyButton}`)?.addEventListener('click', (e) => {
+			e.stopPropagation()
+			this.#handleToolApprovalDecision(false)
+		})
+
+		this.#historySection.appendChild(card)
+		this.#scrollToBottom()
 	}
 
 	#createWrapper(): HTMLElement {

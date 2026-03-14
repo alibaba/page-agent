@@ -599,3 +599,84 @@
 		}
 	}
 }
+
+.approvalCard {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.approvalContent {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	flex: 1;
+}
+
+.approvalTitle {
+	font-weight: 600;
+	color: rgb(255, 220, 180);
+}
+
+.approvalLabel {
+	font-size: 10px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.7);
+}
+
+.approvalInputPreview {
+	margin: 0;
+	padding: 8px;
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.2);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	color: rgba(255, 255, 255, 0.88);
+	font-size: 11px;
+	line-height: 1.35;
+	white-space: pre-wrap;
+	word-break: break-word;
+	max-height: 140px;
+	overflow: auto;
+}
+
+.approvalActions {
+	display: flex;
+	gap: 8px;
+	padding-left: 20px;
+}
+
+.approvalButton {
+	border: none;
+	border-radius: 8px;
+	padding: 6px 10px;
+	font-size: 11px;
+	font-weight: 600;
+	cursor: pointer;
+	transition:
+		transform 0.15s ease,
+		background 0.15s ease,
+		opacity 0.15s ease;
+
+	&:hover {
+		transform: translateY(-1px);
+	}
+}
+
+.approveButton {
+	background: rgba(34, 197, 94, 0.2);
+	color: rgb(220, 252, 231);
+
+	&:hover {
+		background: rgba(34, 197, 94, 0.32);
+	}
+}
+
+.denyButton {
+	background: rgba(239, 68, 68, 0.2);
+	color: rgb(254, 226, 226);
+
+	&:hover {
+		background: rgba(239, 68, 68, 0.32);
+	}
+}

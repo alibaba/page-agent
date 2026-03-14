@@ -10,11 +10,22 @@ import { waitFor } from '../utils'
 /**
  * Internal tool definition that has access to PageAgent `this` context
  */
+export interface PageAgentToolApproval {
+	/** Short headline shown in approval UI */
+	title?: string
+	/** Extra context shown in approval UI */
+	message?: string
+	/** Custom plain-text question used by onAskUser fallback */
+	question?: string
+}
+
 export interface PageAgentTool<TParams = any> {
 	// name: string
 	description: string
 	inputSchema: z.ZodType<TParams>
 	execute: (this: PageAgentCore, args: TParams) => Promise<string>
+	/** Require explicit user approval before the tool can run */
+	requiresApproval?: boolean | PageAgentToolApproval
 }
 
 export function tool<TParams>(options: PageAgentTool<TParams>): PageAgentTool<TParams> {

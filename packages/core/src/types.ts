@@ -154,6 +154,15 @@ export interface AgentConfig extends LLMConfig {
 	customSystemPrompt?: string
 }
 
+export interface ToolApprovalRequest {
+	toolName: string
+	input: unknown
+	description: string
+	title?: string
+	message?: string
+	question?: string
+}
+
 /**
  * Agent reflection state - the reflection-before-action model
  *
