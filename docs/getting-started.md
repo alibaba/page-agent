@@ -4,44 +4,15 @@ Page Agent is a GUI automation library that runs entirely in-page JavaScript. It
 
 ---
 
-## Simple Demo
-
-The fastest way to try Page Agent is by dropping a single script tag into any page.
-
-### Via CDN (no build step)
-
-```html
-<!DOCTYPE html>
-<html>
-  <head><title>My App</title></head>
-  <body>
-    <h1>Hello World</h1>
-    <button id="btn">Click me</button>
-
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/page-agent/dist/iife/page-agent.demo.js?
-           model=gpt-4o&
-           baseURL=https://api.openai.com/v1&
-           apiKey=YOUR_KEY"
-    ></script>
-  </body>
-</html>
-```
-
-The demo script auto-initializes a `PageAgent`, mounts a side panel to the page, and exposes `window.pageAgent` for console access. URL query params configure the model.
-
-> **Note:** Never put real API keys in client-side HTML you deploy publicly. Use this approach for local development only.
-
-### Via npm (recommended for projects)
-
-Install the package:
+## Installation
 
 ```bash
 npm install page-agent zod
 ```
 
-Initialize in your app entry point:
+---
+
+## Simple Demo
 
 ```ts
 import { PageAgent } from 'page-agent'
@@ -53,31 +24,29 @@ const agent = new PageAgent({
   language: 'en-US',
 })
 
-// Show the built-in panel UI
+// Show the built-in panel UI so a user can type tasks
 agent.panel.show()
-```
 
-Run a task programmatically:
-
-```ts
+// Or run a task programmatically
 const result = await agent.execute('Find the login button and click it')
-
 console.log(result.success) // true | false
 console.log(result.data)    // agent's summary of what it did
 ```
+
+Page Agent calls the LLM API directly from the browser on every step. No server, no proxy, no background script.
 
 ---
 
 ## Using Gemini
 
-Google Gemini exposes an OpenAI-compatible endpoint. Point `baseURL` at it and use a `gemini-*` model name.
+Google Gemini exposes an OpenAI-compatible endpoint, so it works with zero adapter code — just change `baseURL` and `model`.
 
 ```ts
 import { PageAgent } from 'page-agent'
 
 const agent = new PageAgent({
   baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
-  apiKey: 'YOUR_GEMINI_API_KEY',   // from https://aistudio.google.com/app/apikey
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY,
   model: 'gemini-2.0-flash',
   language: 'en-US',
 })
@@ -85,80 +54,70 @@ const agent = new PageAgent({
 agent.panel.show()
 ```
 
-**Recommended Gemini models:**
-
 | Model | Notes |
 |---|---|
-| `gemini-2.0-flash` | Fast and cheap, good for most tasks |
+| `gemini-2.0-flash` | Fast, cheap, good for most tasks |
 | `gemini-2.5-pro` | Best reasoning, use for complex multi-step tasks |
-| `gemini-2.0-flash-lite` | Lowest cost option |
+| `gemini-2.0-flash-lite` | Lowest cost |
+
+Get an API key at [aistudio.google.com](https://aistudio.google.com/app/apikey).
 
 ---
 
 ## Using Claude (Anthropic)
 
-Anthropic's API is not OpenAI-compatible natively, but you can bridge it using the `customFetch` option to rewrite requests/responses, or use a proxy that exposes an OpenAI-compatible interface.
-
-### Option A — AWS Bedrock or a proxy (simplest)
-
-If you have access to an OpenAI-compatible Claude endpoint (e.g. via AWS Bedrock with a compatibility layer, or a self-hosted proxy like [litellm](https://github.com/BerriAI/litellm)):
+Anthropic's API uses a different request/response format from OpenAI's. Page Agent's `customFetch` option lets you intercept each API call, reformat it for Anthropic, and return the result — all in your own in-page code, no proxy server needed.
 
 ```ts
 import { PageAgent } from 'page-agent'
 
-const agent = new PageAgent({
-  baseURL: 'https://your-litellm-proxy.example.com/v1',
-  apiKey: 'YOUR_PROXY_KEY',
-  model: 'claude-sonnet-4-5',   // model name as exposed by the proxy
-  language: 'en-US',
-})
+const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY
 
-agent.panel.show()
-```
-
-### Option B — `customFetch` adapter (no proxy needed)
-
-Page Agent sends standard OpenAI-format requests. You can intercept them with `customFetch` and translate to the Anthropic API format:
-
-```ts
-import Anthropic from '@anthropic-ai/sdk'
-import { PageAgent } from 'page-agent'
-
-const anthropic = new Anthropic({ apiKey: 'YOUR_ANTHROPIC_API_KEY' })
-
-/**
- * Translate an OpenAI-format chat/completions request to Anthropic Messages API.
- * Returns a Response object shaped like an OpenAI response so Page Agent
- * can parse it without changes.
- */
-async function claudeFetch(url: string, init?: RequestInit): Promise<Response> {
+async function claudeFetch(_url: string, init?: RequestInit): Promise<Response> {
   const body = JSON.parse(init?.body as string)
 
-  // Separate system message from conversation
+  // Anthropic separates the system message from the conversation
   const systemMsg = body.messages.find((m: any) => m.role === 'system')?.content ?? ''
   const messages = body.messages
     .filter((m: any) => m.role !== 'system')
-    .map((m: any) => ({ role: m.role, content: m.content }))
+    .map((m: any) => ({ role: m.role as 'user' | 'assistant', content: m.content }))
 
-  // Convert OpenAI tool definitions to Anthropic format
+  // Anthropic's tool format differs from OpenAI's
   const tools = (body.tools ?? []).map((t: any) => ({
     name: t.function.name,
     description: t.function.description,
     input_schema: t.function.parameters,
   }))
 
-  const response = await anthropic.messages.create({
-    model: body.model,
-    max_tokens: 8096,
-    system: systemMsg,
-    messages,
-    tools,
-    tool_choice: { type: 'any' },
+  // Call Anthropic directly from the browser
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+    },
+    body: JSON.stringify({
+      model: body.model,
+      max_tokens: 8096,
+      system: systemMsg,
+      messages,
+      tools,
+      tool_choice: { type: 'any' },
+    }),
+    signal: init?.signal,
   })
 
-  // Map Anthropic response back to OpenAI shape
-  const toolUse = response.content.find((b: any) => b.type === 'tool_use')
-  const openaiResponse = {
+  if (!res.ok) {
+    return res // let Page Agent handle HTTP errors normally
+  }
+
+  const data = await res.json()
+
+  // Translate the Anthropic response back to OpenAI shape for Page Agent
+  const toolUse = data.content?.find((b: any) => b.type === 'tool_use')
+  const openaiShape = {
     choices: [
       {
         finish_reason: 'tool_calls',
@@ -180,21 +139,21 @@ async function claudeFetch(url: string, init?: RequestInit): Promise<Response> {
       },
     ],
     usage: {
-      prompt_tokens: response.usage.input_tokens,
-      completion_tokens: response.usage.output_tokens,
-      total_tokens: response.usage.input_tokens + response.usage.output_tokens,
+      prompt_tokens: data.usage.input_tokens,
+      completion_tokens: data.usage.output_tokens,
+      total_tokens: data.usage.input_tokens + data.usage.output_tokens,
     },
   }
 
-  return new Response(JSON.stringify(openaiResponse), {
+  return new Response(JSON.stringify(openaiShape), {
     status: 200,
     headers: { 'Content-Type': 'application/json' },
   })
 }
 
 const agent = new PageAgent({
-  baseURL: 'https://api.anthropic.com',  // not actually used, but required by config
-  apiKey: 'YOUR_ANTHROPIC_API_KEY',      // not used either (SDK handles auth)
+  baseURL: 'https://api.anthropic.com', // not used directly, required by config type
+  apiKey: ANTHROPIC_API_KEY,
   model: 'claude-sonnet-4-5',
   customFetch: claudeFetch,
   language: 'en-US',
@@ -203,13 +162,15 @@ const agent = new PageAgent({
 agent.panel.show()
 ```
 
-**Recommended Claude models:**
+The `anthropic-dangerous-direct-browser-access` header is required by Anthropic when calling their API directly from a browser (instead of a server). It acknowledges that the API key will be visible in client-side code.
 
 | Model | Notes |
 |---|---|
 | `claude-sonnet-4-5` | Best balance of speed and capability |
 | `claude-opus-4-5` | Strongest reasoning, slower |
 | `claude-haiku-4-5-20251001` | Fastest and cheapest |
+
+Get an API key at [console.anthropic.com](https://console.anthropic.com/).
 
 ---
 
