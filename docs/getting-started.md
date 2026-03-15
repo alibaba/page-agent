@@ -1,58 +1,52 @@
 # Getting Started with Page Agent
 
-Page Agent is a GUI automation library that runs entirely in-page JavaScript. It reads the DOM as text, calls an LLM, and executes browser actions — no screenshots, no headless browser, no extension required for basic usage.
+Page Agent is a GUI automation library that runs entirely in-page JavaScript. It reads the DOM as text, calls an LLM API directly from the browser, and executes actions — no server, no build step, no npm required.
+
+Add it to any static HTML page via a CDN script tag.
 
 ---
 
-## Installation
+## Simple Demo (OpenAI)
 
-```bash
-npm install page-agent zod
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My App</title>
+</head>
+<body>
+
+  <!-- Your page content here -->
+
+  <script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.7/dist/iife/page-agent.demo.js
+    ?model=gpt-4o
+    &baseURL=https://api.openai.com/v1
+    &apiKey=YOUR_OPENAI_API_KEY
+    &lang=en-US">
+  </script>
+
+</body>
+</html>
 ```
 
----
-
-## Simple Demo
-
-```ts
-import { PageAgent } from 'page-agent'
-
-const agent = new PageAgent({
-  model: 'gpt-4o',
-  baseURL: 'https://api.openai.com/v1',
-  apiKey: import.meta.env.VITE_OPENAI_API_KEY,
-  language: 'en-US',
-})
-
-// Show the built-in panel UI so a user can type tasks
-agent.panel.show()
-
-// Or run a task programmatically
-const result = await agent.execute('Find the login button and click it')
-console.log(result.success) // true | false
-console.log(result.data)    // agent's summary of what it did
-```
-
-Page Agent calls the LLM API directly from the browser on every step. No server, no proxy, no background script.
+The script auto-initializes, mounts a side panel on the page, and the agent is ready to take tasks. The four supported URL params are `model`, `baseURL`, `apiKey`, and `lang` (`en-US` or `zh-CN`).
 
 ---
 
 ## Using Gemini
 
-Google Gemini exposes an OpenAI-compatible endpoint, so it works with zero adapter code — just change `baseURL` and `model`.
+Google Gemini exposes an OpenAI-compatible endpoint, so it works with the same script — just change the params:
 
-```ts
-import { PageAgent } from 'page-agent'
-
-const agent = new PageAgent({
-  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
-  apiKey: import.meta.env.VITE_GEMINI_API_KEY,
-  model: 'gemini-2.0-flash',
-  language: 'en-US',
-})
-
-agent.panel.show()
+```html
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.7/dist/iife/page-agent.demo.js
+  ?model=gemini-2.0-flash
+  &baseURL=https://generativelanguage.googleapis.com/v1beta/openai
+  &apiKey=YOUR_GEMINI_API_KEY
+  &lang=en-US">
+</script>
 ```
+
+Get an API key at [aistudio.google.com](https://aistudio.google.com/app/apikey).
 
 | Model | Notes |
 |---|---|
@@ -60,109 +54,130 @@ agent.panel.show()
 | `gemini-2.5-pro` | Best reasoning, use for complex multi-step tasks |
 | `gemini-2.0-flash-lite` | Lowest cost |
 
-Get an API key at [aistudio.google.com](https://aistudio.google.com/app/apikey).
-
 ---
 
 ## Using Claude (Anthropic)
 
-Anthropic's API uses a different request/response format from OpenAI's. Page Agent's `customFetch` option lets you intercept each API call, reformat it for Anthropic, and return the result — all in your own in-page code, no proxy server needed.
+Anthropic's API uses a different request/response format than OpenAI's. Because of this, you need a small inline adapter that translates each request before it reaches Anthropic and maps the response back. This code runs entirely in the browser — no proxy, no server.
 
-```ts
-import { PageAgent } from 'page-agent'
+The demo script exposes `window.PageAgent` (the class) synchronously, then auto-initializes a default instance in a `setTimeout`. The inline script below queues its own `setTimeout` immediately after, which runs second — it disposes the default instance and replaces it with your Claude config.
 
-const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My App</title>
+</head>
+<body>
 
-async function claudeFetch(_url: string, init?: RequestInit): Promise<Response> {
-  const body = JSON.parse(init?.body as string)
+  <!-- Your page content here -->
 
-  // Anthropic separates the system message from the conversation
-  const systemMsg = body.messages.find((m: any) => m.role === 'system')?.content ?? ''
-  const messages = body.messages
-    .filter((m: any) => m.role !== 'system')
-    .map((m: any) => ({ role: m.role as 'user' | 'assistant', content: m.content }))
+  <!-- Step 1: load page-agent — exposes window.PageAgent synchronously -->
+  <script src="https://cdn.jsdelivr.net/npm/page-agent@1.5.7/dist/iife/page-agent.demo.js"></script>
 
-  // Anthropic's tool format differs from OpenAI's
-  const tools = (body.tools ?? []).map((t: any) => ({
-    name: t.function.name,
-    description: t.function.description,
-    input_schema: t.function.parameters,
-  }))
+  <!-- Step 2: override auto-init with your Claude config -->
+  <script>
+    var ANTHROPIC_API_KEY = 'YOUR_ANTHROPIC_API_KEY'
 
-  // Call Anthropic directly from the browser
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
-    },
-    body: JSON.stringify({
-      model: body.model,
-      max_tokens: 8096,
-      system: systemMsg,
-      messages,
-      tools,
-      tool_choice: { type: 'any' },
-    }),
-    signal: init?.signal,
-  })
+    async function claudeFetch(url, init) {
+      var body = JSON.parse(init.body)
 
-  if (!res.ok) {
-    return res // let Page Agent handle HTTP errors normally
-  }
+      // Anthropic separates the system message from the conversation
+      var systemMsg = ''
+      var messages = []
+      for (var i = 0; i < body.messages.length; i++) {
+        if (body.messages[i].role === 'system') {
+          systemMsg = body.messages[i].content
+        } else {
+          messages.push({ role: body.messages[i].role, content: body.messages[i].content })
+        }
+      }
 
-  const data = await res.json()
+      // Anthropic's tool schema uses input_schema instead of parameters
+      var tools = (body.tools || []).map(function(t) {
+        return {
+          name: t.function.name,
+          description: t.function.description,
+          input_schema: t.function.parameters,
+        }
+      })
 
-  // Translate the Anthropic response back to OpenAI shape for Page Agent
-  const toolUse = data.content?.find((b: any) => b.type === 'tool_use')
-  const openaiShape = {
-    choices: [
-      {
-        finish_reason: 'tool_calls',
-        message: {
-          role: 'assistant',
-          tool_calls: toolUse
-            ? [
-                {
-                  id: toolUse.id,
-                  type: 'function',
-                  function: {
-                    name: toolUse.name,
-                    arguments: JSON.stringify(toolUse.input),
-                  },
-                },
-              ]
-            : [],
+      // Call Anthropic directly from the browser
+      var res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+          // Required by Anthropic when calling their API directly from a browser
+          'anthropic-dangerous-direct-browser-access': 'true',
         },
-      },
-    ],
-    usage: {
-      prompt_tokens: data.usage.input_tokens,
-      completion_tokens: data.usage.output_tokens,
-      total_tokens: data.usage.input_tokens + data.usage.output_tokens,
-    },
-  }
+        body: JSON.stringify({
+          model: body.model,
+          max_tokens: 8096,
+          system: systemMsg,
+          messages: messages,
+          tools: tools,
+          tool_choice: { type: 'any' },
+        }),
+        signal: init.signal,
+      })
 
-  return new Response(JSON.stringify(openaiShape), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  })
-}
+      if (!res.ok) return res  // pass HTTP errors through to page-agent's error handling
 
-const agent = new PageAgent({
-  baseURL: 'https://api.anthropic.com', // not used directly, required by config type
-  apiKey: ANTHROPIC_API_KEY,
-  model: 'claude-sonnet-4-5',
-  customFetch: claudeFetch,
-  language: 'en-US',
-})
+      var data = await res.json()
 
-agent.panel.show()
+      // Translate Anthropic response back to OpenAI shape for page-agent
+      var toolUse = null
+      for (var i = 0; i < (data.content || []).length; i++) {
+        if (data.content[i].type === 'tool_use') { toolUse = data.content[i]; break }
+      }
+
+      return new Response(JSON.stringify({
+        choices: [{
+          finish_reason: 'tool_calls',
+          message: {
+            role: 'assistant',
+            tool_calls: toolUse ? [{
+              id: toolUse.id,
+              type: 'function',
+              function: {
+                name: toolUse.name,
+                arguments: JSON.stringify(toolUse.input),
+              },
+            }] : [],
+          },
+        }],
+        usage: {
+          prompt_tokens: data.usage.input_tokens,
+          completion_tokens: data.usage.output_tokens,
+          total_tokens: data.usage.input_tokens + data.usage.output_tokens,
+        },
+      }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    }
+
+    // The demo script above auto-inits a default instance in a setTimeout.
+    // This setTimeout is queued after it, so it runs second — disposing
+    // the default instance and replacing it with the Claude config.
+    setTimeout(function() {
+      if (window.pageAgent) window.pageAgent.dispose()
+
+      window.pageAgent = new window.PageAgent({
+        baseURL: 'https://api.anthropic.com',  // not used directly; claudeFetch handles the call
+        apiKey: ANTHROPIC_API_KEY,
+        model: 'claude-sonnet-4-5',
+        customFetch: claudeFetch,
+        language: 'en-US',
+      })
+      window.pageAgent.panel.show()
+    })
+  </script>
+
+</body>
+</html>
 ```
 
-The `anthropic-dangerous-direct-browser-access` header is required by Anthropic when calling their API directly from a browser (instead of a server). It acknowledges that the API key will be visible in client-side code.
+Get an API key at [console.anthropic.com](https://console.anthropic.com/).
 
 | Model | Notes |
 |---|---|
@@ -170,65 +185,83 @@ The `anthropic-dangerous-direct-browser-access` header is required by Anthropic 
 | `claude-opus-4-5` | Strongest reasoning, slower |
 | `claude-haiku-4-5-20251001` | Fastest and cheapest |
 
-Get an API key at [console.anthropic.com](https://console.anthropic.com/).
+---
+
+## Running a Task from JavaScript
+
+After the agent is initialized, you can run tasks programmatically from any script on the page:
+
+```html
+<script>
+  document.getElementById('my-button').addEventListener('click', async function() {
+    var result = await window.pageAgent.execute('Fill in the search box and search for "hello"')
+    console.log(result.success) // true | false
+    console.log(result.data)    // agent's summary of what it did
+  })
+</script>
+```
 
 ---
 
 ## Configuration Reference
 
-All options passed to `new PageAgent(config)`:
+The following options can be passed to `new window.PageAgent(config)` in an inline script. The URL-param approach (used by the auto-init demo) only supports `model`, `baseURL`, `apiKey`, and `lang`.
 
-| Option | Type | Required | Default | Description |
-|---|---|---|---|---|
-| `baseURL` | `string` | yes | — | Base URL of the OpenAI-compatible API |
-| `apiKey` | `string` | yes | — | API key |
-| `model` | `string` | yes | — | Model name |
-| `language` | `'en-US' \| 'zh-CN'` | no | `'zh-CN'` | Panel and agent response language |
-| `maxSteps` | `number` | no | `40` | Max agent steps per task |
-| `temperature` | `number` | no | `0.7` | LLM temperature |
-| `maxRetries` | `number` | no | `2` | LLM call retry count on failure |
-| `customFetch` | `typeof fetch` | no | — | Override HTTP requests (useful for non-OpenAI APIs) |
-| `instructions.system` | `string` | no | — | Persistent system-level instructions for the agent |
-| `instructions.getPageInstructions` | `(url) => string` | no | — | Per-URL instructions called before each step |
-| `customTools` | `Record<string, tool \| null>` | no | — | Add, override, or remove built-in tools |
-| `transformPageContent` | `(content) => string` | no | — | Transform DOM content before sending to LLM (e.g. mask PII) |
-| `customSystemPrompt` | `string` | no | — | Completely replace the default system prompt |
-| `experimentalScriptExecutionTool` | `boolean` | no | `false` | Enable JS execution tool |
-| `experimentalLlmsTxt` | `boolean` | no | `false` | Fetch `/llms.txt` from page origin and include as context |
+| Option | Default | Description |
+|---|---|---|
+| `model` | — | Model name |
+| `baseURL` | — | Base URL of the OpenAI-compatible API |
+| `apiKey` | — | API key |
+| `language` | `'zh-CN'` | Panel language: `'en-US'` or `'zh-CN'` |
+| `maxSteps` | `40` | Max agent steps per task |
+| `temperature` | `0.7` | LLM temperature |
+| `maxRetries` | `2` | LLM call retry count on failure |
+| `customFetch` | — | Override HTTP requests (used for non-OpenAI APIs like Claude) |
+| `instructions.system` | — | Persistent instructions applied to every task |
+| `instructions.getPageInstructions` | — | `function(url)` returning per-URL instructions |
+| `customTools` | — | Add, override, or remove built-in agent tools |
+| `transformPageContent` | — | `function(content)` to transform DOM text before sending to LLM |
+| `customSystemPrompt` | — | Fully replace the default system prompt |
+| `experimentalScriptExecutionTool` | `false` | Enable JS execution tool |
+| `experimentalLlmsTxt` | `false` | Fetch `/llms.txt` from page origin and include as context |
 
 ---
 
 ## Listening to Agent Events
 
-`PageAgent` extends `EventTarget`. You can observe what the agent is doing:
+```html
+<script>
+  // Wait for the agent to be ready (it's created in a setTimeout by the demo script)
+  setTimeout(function() {
+    // Status changes: 'idle' → 'running' → 'completed' | 'error'
+    window.pageAgent.addEventListener('statuschange', function() {
+      console.log('Status:', window.pageAgent.status)
+    })
 
-```ts
-// Status changes: 'idle' → 'running' → 'completed' | 'error'
-agent.addEventListener('statuschange', () => {
-  console.log('Status:', agent.status)
-})
+    // History updated (persistent agent memory)
+    window.pageAgent.addEventListener('historychange', function() {
+      console.log('History:', window.pageAgent.history)
+    })
 
-// History updated (persistent agent memory)
-agent.addEventListener('historychange', () => {
-  console.log('History:', agent.history)
-})
-
-// Real-time activity (transient, for live UI feedback)
-agent.addEventListener('activity', (e) => {
-  const activity = (e as CustomEvent).detail
-  // activity.type: 'thinking' | 'executing' | 'executed' | 'retrying' | 'error'
-  console.log(activity)
-})
+    // Real-time activity (transient, for live UI feedback)
+    window.pageAgent.addEventListener('activity', function(e) {
+      // e.detail.type: 'thinking' | 'executing' | 'executed' | 'retrying' | 'error'
+      console.log(e.detail)
+    })
+  })
+</script>
 ```
 
 ---
 
 ## Cleanup
 
-```ts
-// Stop current task (agent stays reusable)
-agent.stop()
+```html
+<script>
+  // Stop current task (agent stays reusable)
+  window.pageAgent.stop()
 
-// Fully tear down the agent and its DOM overlays
-agent.dispose()
+  // Fully tear down the agent and its DOM overlays
+  window.pageAgent.dispose()
+</script>
 ```
