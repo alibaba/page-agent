@@ -40,7 +40,7 @@ export default function LanguageSwitcher() {
 		<div className="relative" ref={dropdownRef}>
 			<button
 				onClick={() => setIsOpen(!isOpen)}
-				className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors text-sm font-medium border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300"
+				className="flex cursor-pointer items-center gap-2 rounded-lg border border-gray-200 bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
 				aria-label={isZh ? '切换语言' : 'Switch language'}
 				aria-expanded={isOpen}
 				aria-haspopup="true"
@@ -81,7 +81,7 @@ export default function LanguageSwitcher() {
 						<button
 							key={lang.code}
 							onClick={() => handleLanguageChange(lang.code)}
-							className={`w-full flex items-center gap-2 px-4 py-2 text-sm text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+							className={`flex w-full cursor-pointer items-center gap-2 px-4 py-2 text-left text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-700 ${
 								language === lang.code
 									? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
 									: 'text-gray-700 dark:text-gray-300'
