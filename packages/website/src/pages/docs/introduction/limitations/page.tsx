@@ -116,6 +116,9 @@ export default function LimitationsPage() {
 									isZh ? '键盘快捷键' : 'Keyboard shortcuts',
 									isZh ? '坐标定位操作' : 'Position-based control',
 									isZh ? '绘图操作' : 'Drawing',
+									isZh
+										? 'Monaco、CodeMirror 等需要通过 JS 实例控制的编辑器'
+										: 'Monaco, CodeMirror and other editors that require JS instance access',
 								].map((text) => (
 									<li key={text} className="flex items-center text-gray-700 dark:text-gray-300">
 										<span className="mr-2 text-red-600 dark:text-red-400">✗</span>
@@ -128,8 +131,8 @@ export default function LimitationsPage() {
 				</div>
 
 				{/* Understanding Limitations */}
-				<Heading id="understanding" className="text-2xl font-bold mb-3 mt-6">
-					{isZh ? '理解能力' : 'Understanding'}
+				<Heading id="text-based-approach" className="text-2xl font-bold mb-3 mt-6">
+					{isZh ? '基于文本的方案' : 'Text-Based Approach'}
 				</Heading>
 
 				<p className="mb-2 font-medium">

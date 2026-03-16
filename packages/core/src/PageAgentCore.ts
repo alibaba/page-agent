@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2025 Alibaba Group Holding Limited
+ * Copyright (C) 2026 SimonLuvRamen
  * All rights reserved.
  */
 import { InvokeError, LLM, type Tool } from '@page-agent/llms'
