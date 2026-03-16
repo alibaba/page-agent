@@ -9,7 +9,7 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // Load .env from repo root
-dotenvConfig({ path: resolve(__dirname, '../../.env') })
+dotenvConfig({ path: resolve(__dirname, '../../.env'), quiet: true })
 
 // UMD Bundle for CDN
 // - alias all local packages so that they can be build in

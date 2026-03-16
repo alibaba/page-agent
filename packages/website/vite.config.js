@@ -13,7 +13,7 @@ const pageAgentPkg = JSON.parse(
 )
 
 // Load .env from repo root
-dotenvConfig({ path: resolve(__dirname, '../../.env') })
+dotenvConfig({ path: resolve(__dirname, '../../.env'), quiet: true })
 
 // All SPA routes that need index.html copies for direct access on static hosts
 const SPA_ROUTES = [
