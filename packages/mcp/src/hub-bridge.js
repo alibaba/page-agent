@@ -96,6 +96,8 @@ export class HubBridge {
 		}
 	}
 
+	// TODO: Add version checking
+
 	/** @param {import('ws').WebSocket} ws */
 	#onConnection(ws) {
 		if (this.#hub && this.#hub.readyState === 1) {
