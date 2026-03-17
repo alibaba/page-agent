@@ -84,3 +84,11 @@ src/
 ├── hub-bridge.js   # HTTP server + WebSocket bridge to hub tab
 └── launcher.html   # Bootstrap page: detects extension, triggers hub open
 ```
+
+## Dev
+
+```bash
+npm run build:libs
+npm run dev:ext
+npx @modelcontextprotocol/inspector node packages/mcp/src/index.js
+```
