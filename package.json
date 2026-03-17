@@ -9,6 +9,7 @@
         "packages/llms",
         "packages/core",
         "packages/page-agent",
+        "packages/mcp",
         "packages/extension",
         "packages/website"
     ],

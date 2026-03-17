@@ -4,6 +4,7 @@
 import type {
 	AgentActivity,
 	AgentStatus,
+	ExecutionResult,
 	HistoricalEvent,
 	SupportedLanguage,
 } from '@page-agent/core'
@@ -32,7 +33,7 @@ export interface UseAgentResult {
 	activity: AgentActivity | null
 	currentTask: string
 	config: ExtConfig | null
-	execute: (task: string) => Promise<void>
+	execute: (task: string) => Promise<ExecutionResult>
 	stop: () => void
 	configure: (config: ExtConfig) => Promise<void>
 }
@@ -110,7 +111,7 @@ export function useAgent(): UseAgentResult {
 
 		setCurrentTask(task)
 		setHistory([])
-		await agent.execute(task)
+		return agent.execute(task)
 	}, [])
 
 	const stop = useCallback(() => {

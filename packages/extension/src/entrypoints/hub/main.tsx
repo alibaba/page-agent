@@ -7,7 +7,6 @@ import App from './App'
 
 import '@/assets/index.css'
 
-// Sync dark mode with system preference
 const syncDarkMode = () => {
 	document.documentElement.classList.toggle(
 		'dark',
