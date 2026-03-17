@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Page Agent – Connecting</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			body {
+				font-family:
+					system-ui,
+					-apple-system,
+					sans-serif;
+				background: #0a0a0a;
+				color: #e5e5e5;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 100vh;
+			}
+			.card {
+				text-align: center;
+				max-width: 420px;
+				padding: 3rem 2rem;
+			}
+			h1 {
+				font-size: 1.25rem;
+				font-weight: 600;
+				margin-bottom: 0.5rem;
+			}
+			p {
+				font-size: 0.875rem;
+				color: #a3a3a3;
+				line-height: 1.6;
+			}
+			.spinner {
+				width: 32px;
+				height: 32px;
+				border: 3px solid #333;
+				border-top-color: #fff;
+				border-radius: 50%;
+				animation: spin 0.8s linear infinite;
+				margin: 0 auto 1.5rem;
+			}
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			a {
+				color: #60a5fa;
+				text-decoration: none;
+			}
+			a:hover {
+				text-decoration: underline;
+			}
+			.install {
+				display: none;
+			}
+			.install.show {
+				display: block;
+			}
+			.btn {
+				display: inline-block;
+				margin-top: 1rem;
+				padding: 0.5rem 1.25rem;
+				background: #2563eb;
+				color: #fff;
+				border-radius: 0.5rem;
+				font-size: 0.875rem;
+				font-weight: 500;
+			}
+			.btn:hover {
+				background: #1d4ed8;
+				text-decoration: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="card">
+			<div id="connecting">
+				<div class="spinner"></div>
+				<h1>Connecting to Page Agent</h1>
+				<p>Opening the hub in your browser...</p>
+			</div>
+			<div id="install" class="install">
+				<h1>Extension Not Found</h1>
+				<p>The Page Agent browser extension is required.<br />Install it and try again.</p>
+				<a class="btn" href="__STORE_URL__" target="_blank">Install Extension</a>
+				<p style="margin-top: 1.5rem; font-size: 0.75rem">
+					After installing, restart the MCP server or refresh this page.
+				</p>
+			</div>
+		</div>
+		<script>
+			;(function () {
+				var EXT_ID = '__EXT_ID__'
+				var wsPort = __WS_PORT__
+
+				function showInstall() {
+					document.getElementById('connecting').style.display = 'none'
+					document.getElementById('install').classList.add('show')
+				}
+
+				try {
+					if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.sendMessage) {
+						showInstall()
+						return
+					}
+					chrome.runtime.sendMessage(
+						EXT_ID,
+						{ type: 'OPEN_HUB', wsPort: wsPort },
+						function (response) {
+							if (chrome.runtime.lastError || !response || !response.ok) {
+								showInstall()
+							}
+						}
+					)
+				} catch (e) {
+					showInstall()
+				}
+			})()
+		</script>
+	</body>
+</html>
