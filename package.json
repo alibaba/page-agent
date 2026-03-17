@@ -1,7 +1,7 @@
 {
     "name": "root",
     "private": true,
-    "version": "1.5.8",
+    "version": "1.5.9",
     "type": "module",
     "workspaces": [
         "packages/page-controller",
