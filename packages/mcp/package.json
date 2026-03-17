@@ -1,5 +1,6 @@
 {
     "name": "@page-agent/mcp",
+    "private": true,
     "version": "1.5.8",
     "type": "module",
     "bin": {
