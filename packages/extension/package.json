@@ -16,7 +16,6 @@
         "@radix-ui/react-separator": "^1.1.8",
         "@radix-ui/react-slot": "^1.2.4",
         "@radix-ui/react-switch": "^1.2.6",
-        "@radix-ui/react-tooltip": "^1.2.8",
         "@types/chrome": "^0.1.37",
         "@types/react": "^19.2.14",
         "@types/react-dom": "^19.2.1",

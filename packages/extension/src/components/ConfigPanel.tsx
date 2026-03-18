@@ -1,13 +1,14 @@
 import {
-	ChevronDown,
 	Copy,
 	CornerUpLeft,
 	Eye,
 	EyeOff,
+	FoldVertical,
 	HatGlasses,
 	Home,
 	Loader2,
 	Scale,
+	UnfoldVertical,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
@@ -153,6 +154,16 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				</div>
 			</div>
 
+			{/* Hub link */}
+			<a
+				href="/hub.html"
+				target="_blank"
+				className="flex items-center justify-between p-3 rounded-md border bg-muted/50 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
+			>
+				Manage Page Agent Hub config
+				<CornerUpLeft className="size-3 rotate-180" />
+			</a>
+
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Base URL</label>
 				<Input
@@ -231,10 +242,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer mt-1 font-bold"
 			>
 				Advanced
-				<ChevronDown
-					className="size-3 transition-transform"
-					style={{ transform: advancedOpen ? 'rotate(0deg)' : 'rotate(90deg)' }}
-				/>
+				{advancedOpen ? <FoldVertical className="size-3" /> : <UnfoldVertical className="size-3" />}
 			</button>
 
 			{advancedOpen && (
