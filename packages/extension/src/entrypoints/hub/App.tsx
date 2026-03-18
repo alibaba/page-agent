@@ -31,8 +31,6 @@ export default function App() {
 
 	return (
 		<div className="flex h-screen bg-background">
-			<MotionOverlay active={isRunning} />
-
 			{/* Left — Protocol docs */}
 			<aside className="w-80 shrink-0 border-r flex flex-col bg-muted/20">
 				<a
@@ -90,7 +88,9 @@ export default function App() {
 			</aside>
 
 			{/* Right — Live session */}
-			<main className="flex-1 flex flex-col min-w-0">
+			<main className="flex-1 flex flex-col min-w-0 relative">
+				<MotionOverlay active={isRunning} />
+
 				<header className="flex items-center justify-between border-b px-5 h-12">
 					<div className="flex items-center gap-2 text-xs text-muted-foreground">
 						<WsIcon className="size-3.5" />

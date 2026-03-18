@@ -1,6 +1,7 @@
 import {
 	Copy,
 	CornerUpLeft,
+	ExternalLink,
 	Eye,
 	EyeOff,
 	FoldVertical,
@@ -160,8 +161,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				target="_blank"
 				className="flex items-center justify-between p-3 rounded-md border bg-muted/50 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
 			>
-				Manage Page Agent Hub config
-				<CornerUpLeft className="size-3 rotate-180" />
+				Manage Page Agent Hub
+				<ExternalLink className="size-3" />
 			</a>
 
 			<div className="flex flex-col gap-1.5">
@@ -178,7 +179,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			{isTestingEndpoint(baseURL) && (
 				<div className="p-2.5 rounded-md border border-amber-500/30 bg-amber-500/5 text-[11px] text-muted-foreground leading-relaxed">
 					<Scale className="size-3 inline-block mr-1 -mt-0.5 text-amber-600" />
-					You are using the free testing API. By using this service you agree to the{' '}
+					You are using our testing API. By using this you agree to the{' '}
 					<a
 						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
 						target="_blank"
@@ -187,7 +188,6 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					>
 						Terms of Use & Privacy Policy
 					</a>
-					. No sensitive data. No guaranteed availability.
 				</div>
 			)}
 
@@ -223,7 +223,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			</div>
 
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">Language</label>
+				<label className="text-xs text-muted-foreground">Response Language</label>
 				<select
 					value={language ?? ''}
 					onChange={(e) => setLanguage((e.target.value || undefined) as LanguagePreference)}
