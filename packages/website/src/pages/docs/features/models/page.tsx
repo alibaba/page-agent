@@ -34,7 +34,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'claude-sonnet-3.5',
 	],
 	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
-	MiniMax: ['MiniMax-M2.5', 'MiniMax-M2.5-highspeed'],
+	MiniMax: ['MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed'],
 	MoonshotAI: ['kimi-k2.5'],
 	'Z.AI': ['glm-5', 'glm-4.7'],
 }
@@ -126,7 +126,7 @@ const pageAgent = new PageAgent({
 const pageAgent = new PageAgent({
   baseURL: 'https://api.minimax.io/v1',
   apiKey: 'your-minimax-api-key',
-  model: 'MiniMax-M2.5'
+  model: 'MiniMax-M2.7'
 });
 
 // Self-hosted models (e.g., Ollama)
