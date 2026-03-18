@@ -19,6 +19,7 @@ import {
 	Zap,
 } from 'lucide-react'
 import { Fragment, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 
 import { cn } from '@/lib/utils'
 
@@ -54,7 +55,77 @@ function ResultCard({
 					Result: {success ? 'Success' : 'Failed'}
 				</span>
 			</div>
-			<p className="text-xs text-[11px] text-muted-foreground pl-5 whitespace-pre-wrap">{text}</p>
+			<div className="text-xs text-[11px] text-muted-foreground pl-5">
+				<ReactMarkdown
+					components={{
+						// Style code blocks
+						code({ className, children, ...props }) {
+							return (
+								<code
+									className={cn(
+										'bg-muted px-1 py-0.5 rounded text-[10px]',
+										className
+									)}
+									{...props}
+								>
+									{children}
+								</code>
+							)
+						},
+						// Style paragraphs
+						p({ children, ...props }) {
+							return (
+								<p className="mb-2 last:mb-0" {...props}>
+									{children}
+								</p>
+							)
+						},
+						// Style headings
+						h1({ children, ...props }) {
+							return (
+								<h1 className="text-sm font-bold mb-2" {...props}>
+									{children}
+								</h1>
+							)
+						},
+						h2({ children, ...props }) {
+							return (
+								<h2 className="text-xs font-bold mb-1.5" {...props}>
+									{children}
+								</h2>
+							)
+						},
+						// Style lists
+						ul({ children, ...props }) {
+							return (
+								<ul className="list-disc pl-4 mb-2" {...props}>
+									{children}
+								</ul>
+							)
+						},
+						ol({ children, ...props }) {
+							return (
+								<ol className="list-decimal pl-4 mb-2" {...props}>
+									{children}
+								</ol>
+							)
+						},
+						// Style blockquotes
+						blockquote({ children, ...props }) {
+							return (
+								<blockquote
+									className="border-l-2 border-muted-foreground pl-2 italic text-muted-foreground mb-2"
+									{...props}
+								>
+									{children}
+								</blockquote>
+							)
+						},
+					}}
+				>
+					{text}
+				</ReactMarkdown>
+			</div>
 			{children}
 		</div>
 	)
