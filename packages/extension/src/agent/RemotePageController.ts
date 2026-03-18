@@ -58,8 +58,6 @@ export class RemotePageController {
 	}
 
 	async getBrowserState(): Promise<BrowserState> {
-		if (!this.currentTabId) throw new Error('tabsController not initialized.')
-
 		let browserState = {} as BrowserState
 		debug('getBrowserState', this.currentTabId)
 
@@ -178,7 +176,7 @@ interface DomActionReturn {
 /**
  * Check if a URL can run content scripts.
  */
-function isContentScriptAllowed(url: string | undefined): boolean {
+export function isContentScriptAllowed(url: string | undefined): boolean {
 	if (!url) return false
 
 	const restrictedPatterns = [

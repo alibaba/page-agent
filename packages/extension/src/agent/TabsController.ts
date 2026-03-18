@@ -1,3 +1,5 @@
+import { isContentScriptAllowed } from './RemotePageController'
+
 const PREFIX = '[TabsController]'
 
 function debug(...messages: any[]) {
@@ -49,23 +51,25 @@ export class TabsController extends EventTarget {
 		}
 
 		if (includeInitialTab) {
-			this.currentTabId = this.initialTabId
-
 			const info = await sendMessage({
 				type: 'TAB_CONTROL',
 				action: 'get_tab_info',
 				payload: { tabId: this.initialTabId },
 			})
 
-			this.tabs.push({
-				id: result.tabId,
-				isInitial: true,
-				url: info.url,
-				title: info.title,
-				status: info.status,
-			})
+			if (isContentScriptAllowed(info.url)) {
+				this.currentTabId = this.initialTabId
 
-			await this.createTabGroup([this.initialTabId])
+				this.tabs.push({
+					id: result.tabId,
+					isInitial: true,
+					url: info.url,
+					title: info.title,
+					status: info.status,
+				})
+
+				await this.createTabGroup([this.initialTabId])
+			}
 		}
 
 		await this.updateCurrentTabId(this.currentTabId)
