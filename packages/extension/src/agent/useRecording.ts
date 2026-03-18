@@ -7,9 +7,11 @@
  *
  * Phase 6: error handling, defensive coding
  */
+import type { LLMConfig } from '@page-agent/llms'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { saveRecording } from '@/lib/db'
+import { autoNameRecording } from '@/agent/autoNameRecording'
+import { saveRecording, updateRecording } from '@/lib/db'
 import type { RawRecordingEvent, RecordedStep, Recording } from '@/lib/recording-types'
 
 export type RecordingState = 'idle' | 'recording'
@@ -171,6 +173,34 @@ export function useRecording(): UseRecordingResult {
 		return () => chrome.runtime.onMessage.removeListener(listener)
 	}, [])
 
+	// ─── Auto-naming helper ─────────────────────────────────────────────
+	/** Call LLM to generate name/desc in background, update DB silently */
+	async function autoNameInBackground(recording: Recording) {
+		try {
+			const result = await chrome.storage.local.get('llmConfig')
+			const llmConfig = result.llmConfig as LLMConfig | undefined
+			if (!llmConfig) return
+
+			const { name, desc } = await autoNameRecording(
+				recording.steps,
+				recording.startUrl,
+				llmConfig
+			)
+
+			if (name || desc) {
+				const updated = {
+					...recording,
+					name: name || recording.name,
+					desc: desc || recording.desc,
+				}
+				await updateRecording(updated)
+				console.debug('[useRecording] Auto-named recording:', name)
+			}
+		} catch (err) {
+			console.debug('[useRecording] Auto-naming failed (non-critical):', err)
+		}
+	}
+
 	const startRecording = useCallback(async () => {
 		setError(null)
 
@@ -219,7 +249,7 @@ export function useRecording(): UseRecordingResult {
 		const currentSteps = stepsRef.current
 		if (currentSteps.length === 0) return null
 
-		// Create and save recording
+		// Create and save recording (with empty name/desc initially)
 		try {
 			const recording = await saveRecording({
 				v: 1,
@@ -229,6 +259,10 @@ export function useRecording(): UseRecordingResult {
 				startUrl: startUrlRef.current,
 				steps: currentSteps,
 			})
+
+			// Auto-name in background — don't block the UI
+			autoNameInBackground(recording)
+
 			return recording
 		} catch (err) {
 			setError('Failed to save recording')

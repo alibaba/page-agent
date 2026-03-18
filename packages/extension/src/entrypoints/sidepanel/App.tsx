@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { ConfigPanel } from '@/components/ConfigPanel'
 import { HistoryDetail } from '@/components/HistoryDetail'
 import { HistoryList } from '@/components/HistoryList'
+import { MentionSuggestions } from '@/components/MentionSuggestions'
 import { RecordingDetail } from '@/components/RecordingDetail'
 import { RecordingIndicator } from '@/components/RecordingIndicator'
 import { RecordingList } from '@/components/RecordingList'
@@ -22,6 +23,7 @@ import { setLocale, t } from '@/lib/i18n'
 
 import { useAgent } from '../../agent/useAgent'
 import { useRecording } from '../../agent/useRecording'
+import { useRecordingMention } from '../../agent/useRecordingMention'
 
 type View =
 	| { name: 'chat' }
@@ -46,6 +48,16 @@ export default function App() {
 		discardRecording,
 		eventCount,
 	} = useRecording()
+
+	const {
+		suggestions,
+		showSuggestions,
+		selectSuggestion,
+		onInputChange: onMentionInputChange,
+		resolvedRecording,
+		buildTaskFromInput,
+		reset: resetMention,
+	} = useRecordingMention()
 
 	// Sync i18n locale with agent config language
 	useEffect(() => {
@@ -78,18 +90,38 @@ export default function App() {
 	}, [history, activity, recordingSteps])
 
 	const handleSubmit = useCallback(
-		(e?: React.SyntheticEvent) => {
+		async (e?: React.SyntheticEvent) => {
 			e?.preventDefault()
 			if (!inputValue.trim() || status === 'running') return
 
 			const taskToExecute = inputValue.trim()
 			setInputValue('')
+			resetMention()
 
+			// Check if input contains @recording mention
+			const mentionResult = await buildTaskFromInput(taskToExecute)
+			if (mentionResult) {
+				// Execute via recording replay
+				try {
+					if (mentionResult.systemInstruction && config) {
+						// Store task, then configure — execute will happen after agent reinit
+						pendingReplayRef.current = mentionResult.task
+						await configure({ ...config, systemInstruction: mentionResult.systemInstruction })
+					} else {
+						await execute(mentionResult.task)
+					}
+				} catch (error) {
+					console.error('[SidePanel] Failed to execute @mention replay:', error)
+				}
+				return
+			}
+
+			// Normal task execution
 			execute(taskToExecute).catch((error) => {
 				console.error('[SidePanel] Failed to execute task:', error)
 			})
 		},
-		[inputValue, status, execute]
+		[inputValue, status, execute, buildTaskFromInput, resetMention, config, configure]
 	)
 
 	const handleStop = useCallback(() => {
@@ -321,11 +353,37 @@ export default function App() {
 			{/* Input */}
 			<footer className="border-t p-3">
 				<InputGroup className="relative rounded-lg">
+					{/* @ mention suggestions dropdown */}
+					{showSuggestions && (
+						<MentionSuggestions
+							suggestions={suggestions}
+							onSelect={(recording) => {
+								selectSuggestion(recording)
+								// Replace @query with @name in input
+								const mentionName = recording.name || recording.startUrl || ''
+								const newValue = inputValue.replace(/@[^\s]*$/, `@${mentionName} `)
+								setInputValue(newValue)
+								textareaRef.current?.focus()
+							}}
+						/>
+					)}
+					{/* Resolved recording indicator */}
+					{resolvedRecording && (
+						<div className="absolute -top-6 left-0 right-0 flex items-center gap-1 px-2 text-[10px] text-muted-foreground">
+							<span aria-hidden="true">🎬</span>
+							<span className="truncate">
+								{resolvedRecording.name || resolvedRecording.startUrl}
+							</span>
+						</div>
+					)}
 					<InputGroupTextarea
 						ref={textareaRef}
-						placeholder="Describe your task... (Enter to send)"
+						placeholder="Describe your task... (@name to reference recording)"
 						value={inputValue}
-						onChange={(e) => setInputValue(e.target.value)}
+						onChange={(e) => {
+							setInputValue(e.target.value)
+							onMentionInputChange(e.target.value)
+						}}
 						onKeyDown={handleKeyDown}
 						disabled={isRunning || isRecordingActive}
 						className="text-xs pr-12 min-h-10"

@@ -5,8 +5,10 @@
  * and reports them as RawRecordingEvents to the background script.
  *
  * Handles edge cases: iframe, shadow DOM, contenteditable, file upload.
+ * Captures highlightIndex from PageController for element identification.
  */
 
+import { PageController } from '@page-agent/page-controller'
 import type { ElementDescriptor, RawRecordingEvent } from '@/lib/recording-types'
 
 const DEBUG_PREFIX = '[EventRecorder.content]'
@@ -16,13 +18,106 @@ let scrollTimer: ReturnType<typeof setTimeout> | null = null
 let lastScrollY = 0
 let inputDebounceTimers = new Map<EventTarget, ReturnType<typeof setTimeout>>()
 
+// ─── Shared PageController for element indexing ─────────────────────
+
+let recordingPageController: PageController | null = null
+let indexRefreshTimer: ReturnType<typeof setTimeout> | null = null
+
+function getRecordingPageController(): PageController {
+	if (!recordingPageController) {
+		recordingPageController = new PageController({ enableMask: false, viewportExpansion: -1 })
+	}
+	return recordingPageController
+}
+
+/**
+ * Update the DOM tree and cache highlightIndex into element dataset.
+ * Called on recording start and periodically during recording.
+ */
+async function refreshElementIndices() {
+	try {
+		const pc = getRecordingPageController()
+		await pc.updateTree()
+
+		const selectorMap = (pc as any).selectorMap as Map<number, any>
+		selectorMap.forEach((node: any, index: number) => {
+			if (node.ref instanceof HTMLElement) {
+				node.ref.dataset.pageAgentIdx = String(index)
+			}
+		})
+
+		console.debug(DEBUG_PREFIX, `Indexed ${selectorMap.size} interactive elements`)
+	} catch {
+		// Ignore errors — page may not be ready
+	}
+}
+
+/**
+ * Schedule periodic index refresh during recording.
+ * Re-indexes every 3 seconds to catch dynamic DOM changes.
+ */
+function startIndexRefresh() {
+	stopIndexRefresh()
+	// Initial index
+	refreshElementIndices()
+	indexRefreshTimer = setInterval(() => {
+		refreshElementIndices()
+	}, 3000)
+}
+
+function stopIndexRefresh() {
+	if (indexRefreshTimer) {
+		clearInterval(indexRefreshTimer)
+		indexRefreshTimer = null
+	}
+}
+
+/**
+ * Get the highlightIndex for a specific element.
+ * First checks cache, then does a targeted lookup.
+ */
+async function getElementHighlightIndex(element: Element): Promise<number | undefined> {
+	// Check cache first
+	if (element instanceof HTMLElement && element.dataset.pageAgentIdx) {
+		return parseInt(element.dataset.pageAgentIdx, 10)
+	}
+
+	try {
+		const pc = getRecordingPageController()
+		await pc.updateTree()
+
+		const selectorMap = (pc as any).selectorMap as Map<number, any>
+		for (const [index, node] of selectorMap.entries()) {
+			if (node.ref === element) {
+				if (element instanceof HTMLElement) {
+					element.dataset.pageAgentIdx = String(index)
+				}
+				return index
+			}
+		}
+		return undefined
+	} catch {
+		return undefined
+	}
+}
+
 // ─── Element Descriptor Builder ────────────────────────────────────
 
 function buildElementDescriptor(el: Element): ElementDescriptor {
 	const tag = el.tagName.toLowerCase()
 
+	// Get highlightIndex from dataset cache
+	let idx: number | undefined = undefined
+	if (el instanceof HTMLElement && el.dataset.pageAgentIdx) {
+		idx = parseInt(el.dataset.pageAgentIdx, 10)
+	}
+
+	// If not cached, trigger async refresh (result will be available for next event)
+	if (idx === undefined && isRecording) {
+		getElementHighlightIndex(el)
+	}
+
 	// Visible text — trim and limit
-	// For contenteditable, prefer textContent
 	let text = ''
 	if (el instanceof HTMLElement) {
 		if (el.isContentEditable) {
@@ -66,6 +161,7 @@ function buildElementDescriptor(el: Element): ElementDescriptor {
 		...(name && { name }),
 		...(selector && { selector }),
 		...(context && { context }),
+		...(idx !== undefined && { idx }),
 		...extras,
 	}
 }
@@ -411,6 +507,9 @@ function startRecording() {
 	isRecording = true
 	lastScrollY = window.scrollY
 
+	// Start periodic element indexing
+	startIndexRefresh()
+
 	document.addEventListener('click', handleClick, { capture: true })
 	document.addEventListener('input', handleInput, { capture: true })
 	document.addEventListener('change', handleChange, { capture: true })
@@ -424,11 +523,20 @@ function stopRecording() {
 	if (!isRecording) return
 	isRecording = false
 
+	// Stop periodic element indexing
+	stopIndexRefresh()
+
 	document.removeEventListener('click', handleClick, { capture: true })
 	document.removeEventListener('input', handleInput, { capture: true })
 	document.removeEventListener('change', handleChange, { capture: true })
 	document.removeEventListener('keydown', handleKeyDown, { capture: true })
 	window.removeEventListener('scroll', handleScroll)
+
+	// Clean up PageController
+	if (recordingPageController) {
+		recordingPageController.dispose()
+		recordingPageController = null
+	}
 
 	// Clear pending timers
 	if (scrollTimer) {

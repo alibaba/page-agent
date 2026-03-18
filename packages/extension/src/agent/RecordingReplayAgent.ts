@@ -22,19 +22,22 @@ function formatStepForLLM(step: RecordedStep, index: number): string {
 		case 'click': {
 			const target = describeElement(el)
 			const context = el?.context ? ` in ${el.context}` : ''
-			return `${prefix} click ${target}${context}`
+			const idxNote = el?.idx !== undefined ? ` (index:${el.idx})` : ''
+			return `${prefix} click ${target}${idxNote}${context}`
 		}
 
 		case 'input': {
 			const target = describeElement(el)
 			const paramNote = act.param ? ` [PARAM:${act.param}]` : ''
-			return `${prefix} type "${act.value}" → ${target}${paramNote}`
+			const idxNote = el?.idx !== undefined ? ` (index:${el.idx})` : ''
+			return `${prefix} type "${act.value}" → ${target}${idxNote}${paramNote}`
 		}
 
 		case 'select': {
 			const target = describeElement(el)
 			const paramNote = act.param ? ` [PARAM:${act.param}]` : ''
-			return `${prefix} select "${act.value}" in ${target}${paramNote}`
+			const idxNote = el?.idx !== undefined ? ` (index:${el.idx})` : ''
+			return `${prefix} select "${act.value}" in ${target}${idxNote}${paramNote}`
 		}
 
 		case 'scroll':
@@ -58,7 +61,8 @@ function formatStepForLLM(step: RecordedStep, index: number): string {
 			const mods = act.modifiers?.join('+') ?? ''
 			const key = mods ? `${mods}+${act.key}` : act.key
 			const target = el ? ` → ${describeElement(el)}` : ''
-			return `${prefix} press ${key}${target}`
+			const idxNote = el?.idx !== undefined ? ` (index:${el.idx})` : ''
+			return `${prefix} press ${key}${target}${idxNote}`
 		}
 
 		case 'wait':

@@ -68,6 +68,32 @@ export function RecordingDetail({
 			})
 	}, [recordingId])
 
+	// Poll for auto-naming updates (LLM names in background after save)
+	useEffect(() => {
+		if (!recording || recording.name) return // already has a name, no need to poll
+
+		const interval = setInterval(() => {
+			getRecording(recordingId)
+				.then((r) => {
+					if (r && r.name && r.name !== recording.name) {
+						setRecording(r)
+						setName(r.name)
+						setDesc(r.desc)
+						clearInterval(interval)
+					}
+				})
+				.catch(() => {})
+		}, 2000)
+
+		// Stop polling after 30s max
+		const timeout = setTimeout(() => clearInterval(interval), 30000)
+
+		return () => {
+			clearInterval(interval)
+			clearTimeout(timeout)
+		}
+	}, [recordingId, recording?.name])
+
 	const handleSave = useCallback(async () => {
 		if (!recording) return
 		try {
