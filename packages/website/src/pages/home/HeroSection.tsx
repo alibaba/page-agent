@@ -10,7 +10,7 @@ import { Particles } from '../../components/ui/particles'
 import {
 	CDN_DEMO_CN_URL,
 	CDN_DEMO_URL,
-	DEMO_API_KEY,
+	// DEMO_API_KEY,
 	DEMO_BASE_URL,
 	DEMO_MODEL,
 } from '../../constants'
@@ -94,7 +94,7 @@ export default function HeroSection() {
 				apiKey:
 					import.meta.env.DEV && import.meta.env.LLM_API_KEY
 						? import.meta.env.LLM_API_KEY
-						: DEMO_API_KEY,
+						: undefined,
 			})
 		}
 

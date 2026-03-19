@@ -12,9 +12,9 @@ const port = parseInt(env.PORT || '38401')
 
 /** @type {Record<string, string>} */
 const llmConfig = {}
-if (env.LLM_API_KEY) llmConfig.apiKey = env.LLM_API_KEY
 if (env.LLM_BASE_URL) llmConfig.baseURL = env.LLM_BASE_URL
 if (env.LLM_MODEL_NAME) llmConfig.model = env.LLM_MODEL_NAME
+if (env.LLM_API_KEY) llmConfig.apiKey = env.LLM_API_KEY
 
 // --- Hub bridge (HTTP + WebSocket) ---
 

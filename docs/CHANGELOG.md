@@ -153,42 +153,6 @@ PageAgent is now ready for production use. The API is stable and breaking change
 - **Ask User Tool** - Agent can ask users for clarification
 - **i18n Support** - English and Chinese localization
 
-### Configuration 
-
-```typescript
-// Version 1.0.0
-interface PageAgentConfig {
-    // LLM Configuration (required)
-    baseURL: string
-    apiKey: string
-    model: string
-    temperature?: number
-    maxRetries?: number
-    customFetch?: typeof fetch
-
-    // Agent Configuration
-    language?: 'en-US' | 'zh-CN'
-    maxSteps?: number // default: 20
-    customTools?: Record<string, PageAgentTool> // experimental
-    instructions?: InstructionsConfig
-    transformPageContent?: (content: string) => string | Promise<string>
-    experimentalScriptExecutionTool?: boolean // default: false
-
-    // Lifecycle Hooks (experimental)
-    onBeforeTask?: (agent, result) => void
-    onAfterTask?: (agent, result) => void
-    onBeforeStep?: (agent, stepCount) => void
-    onAfterStep?: (agent, history) => void
-    onDispose?: (agent, reason?) => void
-
-    // Page Controller Configuration
-    enableMask?: boolean // default: true
-    viewportExpansion?: number
-    interactiveBlacklist?: Element[]
-    interactiveWhitelist?: Element[]
-}
-```
-
 ### Packages
 
 | Package                       | Description                        |

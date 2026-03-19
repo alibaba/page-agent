@@ -14,7 +14,7 @@ import {
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
 
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/agent/constants'
+import { DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/agent/constants'
 import type { ExtConfig, LanguagePreference } from '@/agent/useAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -27,9 +27,9 @@ interface ConfigPanelProps {
 }
 
 export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
-	const [apiKey, setApiKey] = useState(config?.apiKey || DEMO_API_KEY)
 	const [baseURL, setBaseURL] = useState(config?.baseURL || DEMO_BASE_URL)
 	const [model, setModel] = useState(config?.model || DEMO_MODEL)
+	const [apiKey, setApiKey] = useState(config?.apiKey)
 	const [language, setLanguage] = useState<LanguagePreference>(config?.language)
 	const [maxSteps, setMaxSteps] = useState<number | undefined>(config?.maxSteps)
 	const [systemInstruction, setSystemInstruction] = useState(config?.systemInstruction ?? '')
@@ -44,9 +44,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [showApiKey, setShowApiKey] = useState(false)
 
 	useEffect(() => {
-		setApiKey(config?.apiKey || DEMO_API_KEY)
 		setBaseURL(config?.baseURL || DEMO_BASE_URL)
 		setModel(config?.model || DEMO_MODEL)
+		setApiKey(config?.apiKey)
 		setLanguage(config?.language)
 		setMaxSteps(config?.maxSteps)
 		setSystemInstruction(config?.systemInstruction ?? '')
@@ -194,7 +194,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Model</label>
 				<Input
-					placeholder="gpt-5.2"
+					placeholder="gpt-5.1"
 					value={model}
 					onChange={(e) => setModel(e.target.value)}
 					className="text-xs h-8"
@@ -206,7 +206,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				<div className="flex gap-2 items-center">
 					<Input
 						type={showApiKey ? 'text' : 'password'}
-						placeholder="sk-..."
+						// placeholder="sk-..."
 						value={apiKey}
 						onChange={(e) => setApiKey(e.target.value)}
 						className="text-xs h-8"
