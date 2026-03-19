@@ -129,10 +129,9 @@ const pageAgent = new PageAgent({
   model: 'MiniMax-M2.7'
 });
 
-// Self-hosted models (e.g., Ollama)
+// Self-hosted models (e.g., Ollama) — no apiKey needed
 const pageAgent = new PageAgent({
   baseURL: 'http://localhost:11434/v1',
-  apiKey: 'NA',
   model: 'qwen3:14b'
 });
 
@@ -280,7 +279,6 @@ LLM_MODEL_NAME="qwen3:14b"`}
 				<CodeEditor
 					code={`const agent = new PageAgent({
   baseURL: '/api/llm-proxy',
-  apiKey: 'NA',
   model: 'gpt-5.1',
   customFetch: (url, init) =>
     fetch(url, { ...init, credentials: 'include' }),

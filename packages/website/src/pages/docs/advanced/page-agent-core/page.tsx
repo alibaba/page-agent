@@ -130,18 +130,18 @@ const result = await agent.execute('Fill in the form with test data')`}
 								: 'Base URL of the LLM API (e.g., https://api.openai.com/v1)',
 						},
 						{
-							name: 'apiKey',
-							type: 'string',
-							required: true,
-							description: isZh ? 'API 密钥' : 'API key for authentication',
-						},
-						{
 							name: 'model',
 							type: 'string',
 							required: true,
 							description: isZh
 								? '模型名称（如 gpt-5.2, anthropic/claude-4.5-haiku）'
 								: 'Model name (e.g., gpt-5.2, anthropic/claude-4.5-haiku)',
+						},
+						{
+							name: 'apiKey',
+							type: 'string',
+							required: false,
+							description: 'LLM AK',
 						},
 						{
 							name: 'temperature',

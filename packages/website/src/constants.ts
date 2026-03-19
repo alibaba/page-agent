@@ -7,4 +7,4 @@ export const CDN_DEMO_CN_URL =
 // Demo LLM for website testing (homepage quick trial uses flash)
 export const DEMO_MODEL = 'qwen3.5-flash'
 export const DEMO_BASE_URL = 'https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run'
-export const DEMO_API_KEY = 'NA'
+// export const DEMO_API_KEY = ''
