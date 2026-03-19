@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle, Trash2, XCircle } from 'lucide-react'
+import { ArrowLeft, CheckCircle, RotateCcw, Trash2, XCircle } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -18,9 +18,13 @@ function timeAgo(ts: number): string {
 export function HistoryList({
 	onSelect,
 	onBack,
+	onRerun,
+	rerunDisabled = false,
 }: {
 	onSelect: (id: string) => void
 	onBack: () => void
+	onRerun: (task: string) => void
+	rerunDisabled?: boolean
 }) {
 	const [sessions, setSessions] = useState<SessionRecord[]>([])
 	const [loading, setLoading] = useState(true)
@@ -39,6 +43,11 @@ export function HistoryList({
 		e.stopPropagation()
 		await deleteSession(id)
 		setSessions((prev) => prev.filter((s) => s.id !== id))
+	}
+
+	const handleRerun = (e: React.MouseEvent, task: string) => {
+		e.stopPropagation()
+		onRerun(task)
 	}
 
 	return (
@@ -85,7 +94,12 @@ export function HistoryList({
 						role="button"
 						tabIndex={0}
 						onClick={() => onSelect(session.id)}
-						onKeyDown={(e) => e.key === 'Enter' && onSelect(session.id)}
+						onKeyDown={(e) => {
+							if (e.target !== e.currentTarget) return
+							if (e.key !== 'Enter' && e.key !== ' ') return
+							e.preventDefault()
+							onSelect(session.id)
+						}}
 						className="w-full text-left px-3 py-2.5 border-b hover:bg-muted/50 transition-colors cursor-pointer flex items-start gap-2 group"
 					>
 						{/* Status icon */}
@@ -103,14 +117,27 @@ export function HistoryList({
 							</p>
 						</div>
 
-						{/* Delete */}
-						<button
-							type="button"
-							onClick={(e) => handleDelete(e, session.id)}
-							className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-destructive cursor-pointer shrink-0"
-						>
-							<Trash2 className="size-3" />
-						</button>
+						<div className="flex items-center gap-1 shrink-0">
+							<button
+								type="button"
+								onClick={(e) => handleRerun(e, session.task)}
+								disabled={rerunDisabled}
+								className="p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+								title="Run task again"
+								aria-label={`Run history task again: ${session.task}`}
+							>
+								<RotateCcw className="size-3" />
+							</button>
+							<button
+								type="button"
+								onClick={(e) => handleDelete(e, session.id)}
+								className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-destructive cursor-pointer shrink-0"
+								title="Delete history"
+								aria-label={`Delete history for ${session.task}`}
+							>
+								<Trash2 className="size-3" />
+							</button>
+						</div>
 					</div>
 				))}
 			</div>

@@ -1,4 +1,4 @@
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, RotateCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -6,7 +6,17 @@ import { type SessionRecord, getSession } from '@/lib/db'
 
 import { EventCard } from './cards'
 
-export function HistoryDetail({ sessionId, onBack }: { sessionId: string; onBack: () => void }) {
+export function HistoryDetail({
+	sessionId,
+	onBack,
+	onRerun,
+	rerunDisabled = false,
+}: {
+	sessionId: string
+	onBack: () => void
+	onRerun: (task: string) => void
+	rerunDisabled?: boolean
+}) {
 	const [session, setSession] = useState<SessionRecord | null>(null)
 
 	useEffect(() => {
@@ -36,6 +46,19 @@ export function HistoryDetail({ sessionId, onBack }: { sessionId: string; onBack
 				<div className="text-[10px] text-muted-foreground uppercase tracking-wide">Task</div>
 				<div className="text-xs font-medium" title={session.task}>
 					{session.task}
+				</div>
+				<div className="mt-2">
+					<Button
+						type="button"
+						variant="secondary"
+						size="sm"
+						onClick={() => onRerun(session.task)}
+						disabled={rerunDisabled}
+						className="h-7 cursor-pointer text-[10px]"
+					>
+						<RotateCcw className="size-3" />
+						Run again
+					</Button>
 				</div>
 			</div>
 
