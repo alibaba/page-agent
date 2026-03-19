@@ -47,6 +47,14 @@ export interface PanelAgentAdapter extends EventTarget {
 			input: unknown
 			output: string
 		}
+		/** For 'step' type - token usage */
+		usage?: {
+			promptTokens: number
+			completionTokens: number
+			totalTokens: number
+			cachedTokens?: number
+			reasoningTokens?: number
+		}
 		/** For 'observation' type */
 		content?: string
 		/** For 'retry' type */

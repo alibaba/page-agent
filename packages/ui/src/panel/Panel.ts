@@ -128,6 +128,7 @@ export class Panel {
 			if (this.#shouldShowInputArea()) {
 				this.#showInputArea()
 			}
+			this.#renderHistory()
 		}
 	}
 
@@ -580,8 +581,64 @@ export class Panel {
 			items.push(...this.#createHistoryCards(event))
 		}
 
+		// 3. Token usage summary card (after task ends)
+		const status = this.#agent.status
+		if (status === 'completed' || status === 'error') {
+			const statsCard = this.#createTokenStatsCard()
+			if (statsCard) {
+				items.push(statsCard)
+			}
+		}
+
 		this.#historySection.innerHTML = items.join('')
 		this.#scrollToBottom()
+	}
+
+	/** Create token usage stats summary card */
+	#createTokenStatsCard(): string | null {
+		const history = this.#agent.history
+		let totalPromptTokens = 0
+		let totalCompletionTokens = 0
+		let totalTokens = 0
+		let cachedTokens = 0
+		let reasoningTokens = 0
+		let steps = 0
+
+		for (const event of history) {
+			if (event.type === 'step' && event.usage) {
+				totalPromptTokens += event.usage.promptTokens
+				totalCompletionTokens += event.usage.completionTokens
+				totalTokens += event.usage.totalTokens
+				cachedTokens += event.usage.cachedTokens ?? 0
+				reasoningTokens += event.usage.reasoningTokens ?? 0
+				steps++
+			}
+		}
+
+		if (steps === 0) return null
+
+		const lines: string[] = [
+			this.#i18n.t('ui.panel.tokenSteps', { count: steps }),
+			this.#i18n.t('ui.panel.promptTokens', { count: totalPromptTokens.toLocaleString() }),
+			this.#i18n.t('ui.panel.completionTokens', { count: totalCompletionTokens.toLocaleString() }),
+			this.#i18n.t('ui.panel.totalTokens', { count: totalTokens.toLocaleString() }),
+		]
+
+		if (cachedTokens > 0) {
+			lines.push(this.#i18n.t('ui.panel.cachedTokens', { count: cachedTokens.toLocaleString() }))
+		}
+		if (reasoningTokens > 0) {
+			lines.push(
+				this.#i18n.t('ui.panel.reasoningTokens', { count: reasoningTokens.toLocaleString() })
+			)
+		}
+
+		return createCard({
+			icon: '📊',
+			content: lines,
+			meta: this.#i18n.t('ui.panel.tokenUsage'),
+			type: 'tokenStats',
+		})
 	}
 
 	#createTaskCard(task: string): string {
