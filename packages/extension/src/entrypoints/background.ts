@@ -1,3 +1,4 @@
+import { handleRecordingControlMessage, recoverRecordingState } from '@/agent/EventRecorder.background'
 import { handlePageControlMessage } from '@/agent/RemotePageController.background'
 import { handleTabControlMessage, setupTabChangeEvents } from '@/agent/TabsController.background'
 
@@ -17,6 +18,10 @@ export default defineBackground(() => {
 		chrome.storage.local.set({ PageAgentExtUserAuthToken: userAuthToken })
 	})
 
+	// recover recording state after service worker restart
+
+	recoverRecordingState()
+
 	// message proxy
 
 	chrome.runtime.onMessage.addListener((message, sender, sendResponse): true | undefined => {
@@ -24,6 +29,8 @@ export default defineBackground(() => {
 			return handleTabControlMessage(message, sender, sendResponse)
 		} else if (message.type === 'PAGE_CONTROL') {
 			return handlePageControlMessage(message, sender, sendResponse)
+		} else if (message.type === 'RECORDING_CONTROL') {
+			return handleRecordingControlMessage(message, sender, sendResponse)
 		} else {
 			sendResponse({ error: 'Unknown message type' })
 			return

@@ -1,3 +1,4 @@
+import { initEventRecorder } from '@/agent/EventRecorder.content'
 import { initPageController } from '@/agent/RemotePageController.content'
 
 // import { DEMO_CONFIG } from '@/agent/constants'
@@ -11,6 +12,7 @@ export default defineContentScript({
 	main() {
 		console.debug(`${DEBUG_PREFIX} Loaded on ${window.location.href}`)
 		initPageController()
+		initEventRecorder()
 
 		// if auth token matches, expose agent to page
 		chrome.storage.local.get('PageAgentExtUserAuthToken').then((result) => {
