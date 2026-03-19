@@ -1,7 +1,8 @@
-import { ArrowLeft, CheckCircle, Trash2, XCircle } from 'lucide-react'
+import { ArrowDownToLine, ArrowLeft, CheckCircle, Trash2, XCircle } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { downloadHistoryExport } from '@/lib/history-export'
 import { type SessionRecord, clearSessions, deleteSession, listSessions } from '@/lib/db'
 
 function timeAgo(ts: number): string {
@@ -39,6 +40,11 @@ export function HistoryList({
 		e.stopPropagation()
 		await deleteSession(id)
 		setSessions((prev) => prev.filter((s) => s.id !== id))
+	}
+
+	const handleExport = (e: React.MouseEvent, session: SessionRecord) => {
+		e.stopPropagation()
+		downloadHistoryExport(session.task, session.createdAt, session.history)
 	}
 
 	return (
@@ -103,14 +109,26 @@ export function HistoryList({
 							</p>
 						</div>
 
-						{/* Delete */}
-						<button
-							type="button"
-							onClick={(e) => handleDelete(e, session.id)}
-							className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-destructive cursor-pointer shrink-0"
-						>
-							<Trash2 className="size-3" />
-						</button>
+						<div className="flex items-center gap-1 shrink-0">
+							<button
+								type="button"
+								onClick={(e) => handleExport(e, session)}
+								className="p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+								title="Export history JSON"
+								aria-label={`Export history for ${session.task}`}
+							>
+								<ArrowDownToLine className="size-3" />
+							</button>
+							<button
+								type="button"
+								onClick={(e) => handleDelete(e, session.id)}
+								className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-destructive cursor-pointer"
+								title="Delete history"
+								aria-label={`Delete history for ${session.task}`}
+							>
+								<Trash2 className="size-3" />
+							</button>
+						</div>
 					</div>
 				))}
 			</div>
