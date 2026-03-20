@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2026-03-21
+
+### Features
+
+- **Beta MCP support** - New `@page-agent/mcp` package lets MCP clients such as Claude Desktop and Copilot control the browser through the Page Agent extension
+- **Better iframe handling** - Same-origin iframe elements are handled more reliably during DOM extraction and actions
+- **Extension history workflows** - Users can rerun past tasks, export history sessions as JSON, and approve MCP-triggered tasks before execution
+
+### Improvements
+
+- **Unified versioning across packages** - The extension now follows the root workspace version. Changelog entries are no longer split into a separate extension version section
+- **Configurable `stepDelay`** - Agent pacing between steps is now configurable via `stepDelay`
+- **Optional API key** - `apiKey` can now be omitted for compatible deployments that do not require one
+- **Optional named tool choice** - Tool invocation can disable named tool choice for providers that behave better without it
+- **Better rich-text input support** - Improved `contenteditable` handling with better event dispatching and `execCommand` fallback for more editors
+- **More flexible DOM extraction** - `includeAttributes` now supports wildcards, `contenteditable` is included by default, and heuristically interactive elements expose more useful attributes
+- **MiniMax model support** - Added MiniMax compatibility, with the default recommendation updated to `MiniMax-M2.7`
+
+### Bug Fixes
+
+- Fixed Safari issues when `requestIdleCallback` is unavailable
+- Avoid throwing when `webgl2` initialization fails
+- Improved OpenAI-compatible request patches for GPT-5.4 chat tools and MiniMax temperature/tool-call compatibility
+- Fixed several UI polish issues in the extension and website, including cursor and layout regressions
+
 ## [1.5.1] - 2026-03-05
 
 ### Breaking Changes
