@@ -98,12 +98,6 @@ export function HistoryList({
 						role="button"
 						tabIndex={0}
 						onClick={() => onSelect(session.id)}
-						onKeyDown={(e) => {
-							if (e.target !== e.currentTarget) return
-							if (e.key !== 'Enter' && e.key !== ' ') return
-							e.preventDefault()
-							onSelect(session.id)
-						}}
 						className="w-full text-left px-3 py-2.5 border-b hover:bg-muted/50 transition-colors cursor-pointer flex items-start gap-2 group"
 					>
 						{/* Status icon */}
