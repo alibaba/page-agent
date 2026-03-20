@@ -112,7 +112,6 @@ export default function App() {
 				onSelect={(id) => setView({ name: 'history-detail', sessionId: id })}
 				onBack={() => setView({ name: 'chat' })}
 				onRerun={runTask}
-				rerunDisabled={status === 'running'}
 			/>
 		)
 	}
@@ -123,7 +122,6 @@ export default function App() {
 				sessionId={view.sessionId}
 				onBack={() => setView({ name: 'history' })}
 				onRerun={runTask}
-				rerunDisabled={status === 'running'}
 			/>
 		)
 	}

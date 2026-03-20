@@ -1,8 +1,8 @@
-import { ArrowLeft, RotateCcw } from 'lucide-react'
+import { ArrowLeft, RotateCcw, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { type SessionRecord, getSession } from '@/lib/db'
+import { type SessionRecord, deleteSession, getSession } from '@/lib/db'
 
 import { EventCard } from './cards'
 
@@ -10,12 +10,10 @@ export function HistoryDetail({
 	sessionId,
 	onBack,
 	onRerun,
-	rerunDisabled = false,
 }: {
 	sessionId: string
 	onBack: () => void
 	onRerun: (task: string) => void
-	rerunDisabled?: boolean
 }) {
 	const [session, setSession] = useState<SessionRecord | null>(null)
 
@@ -47,18 +45,26 @@ export function HistoryDetail({
 				<div className="text-xs font-medium" title={session.task}>
 					{session.task}
 				</div>
-				<div className="mt-2">
-					<Button
+				<div className="mt-2 flex items-center gap-2">
+					<button
 						type="button"
-						variant="secondary"
-						size="sm"
 						onClick={() => onRerun(session.task)}
-						disabled={rerunDisabled}
-						className="h-7 cursor-pointer text-[10px]"
+						className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						<RotateCcw className="size-3" />
 						Run again
-					</Button>
+					</button>
+					<button
+						type="button"
+						onClick={async () => {
+							await deleteSession(sessionId)
+							onBack()
+						}}
+						className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+					>
+						<Trash2 className="size-3" />
+						Delete
+					</button>
 				</div>
 			</div>
 
