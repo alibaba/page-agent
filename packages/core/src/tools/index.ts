@@ -21,6 +21,49 @@ export function tool<TParams>(options: PageAgentTool<TParams>): PageAgentTool<TP
 	return options
 }
 
+function createAbortError(): Error {
+	const error = new Error('AbortError')
+	// Align with DOM AbortError semantics
+	;(error as any).name = 'AbortError'
+	return error
+}
+
+/**
+ * Wrap a promise so it rejects with AbortError when signal is aborted.
+ * Ensures event listener cleanup to avoid leaks/unhandled rejections.
+ */
+function withAbortSignal<T>(signal: AbortSignal, promise: Promise<T>): Promise<T> {
+	return new Promise<T>((resolve, reject) => {
+		const onAbort = () => {
+			cleanup()
+			reject(createAbortError())
+		}
+
+		const cleanup = () => {
+			signal.removeEventListener('abort', onAbort)
+		}
+
+		if (signal.aborted) {
+			onAbort()
+			return
+		}
+
+		signal.addEventListener('abort', onAbort)
+
+		promise.then(
+			(value) => {
+				cleanup()
+				resolve(value)
+			},
+			(err) => {
+				cleanup()
+				// Ensure we reject with an Error object to satisfy lint
+				reject(err instanceof Error ? err : new Error(String(err)))
+			}
+		)
+	})
+}
+
 /**
  * Internal tools for PageAgent.
  * Note: Using any to allow different parameter types for each tool
@@ -74,7 +117,8 @@ tools.set(
 			if (!this.onAskUser) {
 				throw new Error('ask_user tool requires onAskUser callback to be set')
 			}
-			const answer = await this.onAskUser(input.question)
+
+			const answer = await withAbortSignal(this.abortSignal, this.onAskUser(input.question))
 			return `User answered: ${answer}`
 		},
 	})
