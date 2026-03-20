@@ -187,7 +187,9 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 			selection?.removeAllRanges()
 			selection?.addRange(range)
 
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			document.execCommand('delete', false)
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
 			document.execCommand('insertText', false, text)
 		}
 
