@@ -1,8 +1,9 @@
-import { ArrowLeft, CheckCircle, RotateCcw, Trash2, XCircle } from 'lucide-react'
+import { ArrowDownToLine, ArrowLeft, CheckCircle, RotateCcw, Trash2, XCircle } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { type SessionRecord, clearSessions, deleteSession, listSessions } from '@/lib/db'
+import { downloadHistoryExport } from '@/lib/history-export'
 
 function timeAgo(ts: number): string {
 	const seconds = Math.floor((Date.now() - ts) / 1000)
@@ -41,6 +42,11 @@ export function HistoryList({
 		e.stopPropagation()
 		await deleteSession(id)
 		setSessions((prev) => prev.filter((s) => s.id !== id))
+	}
+
+	const handleExport = (e: React.MouseEvent, session: SessionRecord) => {
+		e.stopPropagation()
+		downloadHistoryExport(session.task, session.createdAt, session.history)
 	}
 
 	const handleRerun = (e: React.MouseEvent, task: string) => {
@@ -123,6 +129,15 @@ export function HistoryList({
 										aria-label={`Run history task again: ${session.task}`}
 									>
 										<RotateCcw className="size-3" />
+									</button>
+									<button
+										type="button"
+										onClick={(e) => handleExport(e, session)}
+										className="p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+										title="Export history JSON"
+										aria-label={`Export history for ${session.task}`}
+									>
+										<ArrowDownToLine className="size-3" />
 									</button>
 									<button
 										type="button"
