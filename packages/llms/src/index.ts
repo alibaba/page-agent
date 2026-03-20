@@ -21,6 +21,7 @@ export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
 		apiKey: config.apiKey || '',
 		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
 		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
+		disableNamedToolChoice: config.disableNamedToolChoice ?? false,
 		customFetch: (config.customFetch ?? fetch).bind(globalThis), // fetch will be illegal unless bound
 	}
 }

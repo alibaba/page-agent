@@ -21,6 +21,7 @@ export interface AdvancedConfig {
 	maxSteps?: number
 	systemInstruction?: string
 	experimentalLlmsTxt?: boolean
+	disableNamedToolChoice?: boolean
 }
 
 export interface ExtConfig extends LLMConfig, AdvancedConfig {
@@ -124,6 +125,7 @@ export function useAgent(): UseAgentResult {
 			maxSteps,
 			systemInstruction,
 			experimentalLlmsTxt,
+			disableNamedToolChoice,
 			...llmConfig
 		}: ExtConfig) => {
 			await chrome.storage.local.set({ llmConfig })
@@ -132,7 +134,12 @@ export function useAgent(): UseAgentResult {
 			} else {
 				await chrome.storage.local.remove('language')
 			}
-			const advancedConfig: AdvancedConfig = { maxSteps, systemInstruction, experimentalLlmsTxt }
+			const advancedConfig: AdvancedConfig = {
+				maxSteps,
+				systemInstruction,
+				experimentalLlmsTxt,
+				disableNamedToolChoice,
+			}
 			await chrome.storage.local.set({ advancedConfig })
 			setConfig({ ...llmConfig, ...advancedConfig, language })
 		},

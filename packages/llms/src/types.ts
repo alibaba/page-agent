@@ -96,6 +96,12 @@ export interface LLMConfig {
 	maxRetries?: number
 
 	/**
+	 * remove the tool_choice field from the request.
+	 * @note fix "Invalid tool_choice type: 'object'" for some LLMs.
+	 */
+	disableNamedToolChoice?: boolean
+
+	/**
 	 * Custom fetch function for LLM API requests.
 	 * Use this to customize headers, credentials, proxy, etc.
 	 * The response should follow OpenAI API format.
