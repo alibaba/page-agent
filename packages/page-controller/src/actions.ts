@@ -123,7 +123,7 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// to Plan B (execCommand) if the text wasn't actually inserted.
 		//
 		// Plan A: Dispatch synthetic events
-		// Works: React contenteditable, Quill, LinkedIn.
+		// Works: React contenteditable, Quill.
 		// Fails: Slate.js, some contenteditable editors that ignore synthetic events.
 		// Sequence: beforeinput -> mutation -> input -> change -> blur
 
@@ -172,7 +172,7 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 
 		if (!planASucceeded) {
 			// Plan B: execCommand fallback (deprecated but widely supported)
-			// Works: LinkedIn, Quill, Slate.js, react contenteditable components.
+			// Works: Quill, Slate.js, react contenteditable components.
 			// This approach integrates with the browser's undo stack and is handled
 			// natively by most rich-text editors.
 			element.focus()
