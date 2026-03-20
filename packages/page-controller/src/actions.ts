@@ -54,6 +54,9 @@ function blurLastClickedElement() {
 		lastClickedElement.dispatchEvent(
 			new MouseEvent('mouseout', { bubbles: true, cancelable: true })
 		)
+		lastClickedElement.dispatchEvent(
+			new MouseEvent('mouseleave', { bubbles: false, cancelable: true })
+		)
 		lastClickedElement = null
 	}
 }
@@ -119,9 +122,12 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// - Monaco/CodeMirror: Require direct JS instance access. No universal way to obtain.
 		// - Draft.js: Not responsive to synthetic/execCommand/Range/DataTransfer. Unmaintained.
 		//
+		// Strategy: Try Plan A (synthetic events) first, then verify and fall back
+		// to Plan B (execCommand) if the text wasn't actually inserted.
+		//
 		// Plan A: Dispatch synthetic events
-		// Works: LinkedIn, React contenteditable, Quill.
-		// Fails: Slate.js
+		// Works: React contenteditable, Quill.
+		// Fails: Slate.js, some contenteditable editors that ignore synthetic events.
 		// Sequence: beforeinput -> mutation -> input -> change -> blur
 
 		// Dispatch beforeinput + mutation + input for clearing
@@ -164,18 +170,34 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 			)
 		}
 
+		// Verify Plan A worked by checking if the text was actually inserted
+		const planASucceeded = element.innerText.trim() === text.trim()
+
+		if (!planASucceeded) {
+			// Plan B: execCommand fallback (deprecated but widely supported)
+			// Works: Quill, Slate.js, react contenteditable components.
+			// This approach integrates with the browser's undo stack and is handled
+			// natively by most rich-text editors.
+			element.focus()
+
+			// Select all existing content and delete it
+			const selection = window.getSelection()
+			const range = document.createRange()
+			range.selectNodeContents(element)
+			selection?.removeAllRanges()
+			selection?.addRange(range)
+
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			document.execCommand('delete', false)
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			document.execCommand('insertText', false, text)
+		}
+
 		// Dispatch change event (for good measure)
 		element.dispatchEvent(new Event('change', { bubbles: true }))
 
 		// Trigger blur for validation
 		element.blur()
-
-		// Plan B: execCommand (deprecated but works better for some editors)
-		// Works: LinkedIn, Quill, Slate.js, react contenteditable components
-		//
-		// document.execCommand('selectAll')
-		// document.execCommand('delete')
-		// document.execCommand('insertText', false, text)
 	} else if (element instanceof HTMLTextAreaElement) {
 		nativeTextAreaValueSetter.call(element, text)
 	} else {

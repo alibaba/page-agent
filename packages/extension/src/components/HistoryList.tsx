@@ -1,9 +1,9 @@
-import { ArrowDownToLine, ArrowLeft, CheckCircle, Trash2, XCircle } from 'lucide-react'
+import { ArrowDownToLine, ArrowLeft, CheckCircle, RotateCcw, Trash2, XCircle } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { downloadHistoryExport } from '@/lib/history-export'
 import { type SessionRecord, clearSessions, deleteSession, listSessions } from '@/lib/db'
+import { downloadHistoryExport } from '@/lib/history-export'
 
 function timeAgo(ts: number): string {
 	const seconds = Math.floor((Date.now() - ts) / 1000)
@@ -19,9 +19,11 @@ function timeAgo(ts: number): string {
 export function HistoryList({
 	onSelect,
 	onBack,
+	onRerun,
 }: {
 	onSelect: (id: string) => void
 	onBack: () => void
+	onRerun: (task: string) => void
 }) {
 	const [sessions, setSessions] = useState<SessionRecord[]>([])
 	const [loading, setLoading] = useState(true)
@@ -45,6 +47,11 @@ export function HistoryList({
 	const handleExport = (e: React.MouseEvent, session: SessionRecord) => {
 		e.stopPropagation()
 		downloadHistoryExport(session.task, session.createdAt, session.history)
+	}
+
+	const handleRerun = (e: React.MouseEvent, task: string) => {
+		e.stopPropagation()
+		onRerun(task)
 	}
 
 	return (
@@ -91,7 +98,12 @@ export function HistoryList({
 						role="button"
 						tabIndex={0}
 						onClick={() => onSelect(session.id)}
-						onKeyDown={(e) => e.key === 'Enter' && onSelect(session.id)}
+						onKeyDown={(e) => {
+							if (e.target !== e.currentTarget) return
+							if (e.key !== 'Enter' && e.key !== ' ') return
+							e.preventDefault()
+							onSelect(session.id)
+						}}
 						className="w-full text-left px-3 py-2.5 border-b hover:bg-muted/50 transition-colors cursor-pointer flex items-start gap-2 group"
 					>
 						{/* Status icon */}
@@ -104,30 +116,40 @@ export function HistoryList({
 						{/* Content */}
 						<div className="flex-1 min-w-0">
 							<p className="text-xs font-medium truncate">{session.task}</p>
-							<p className="text-[10px] text-muted-foreground mt-0.5">
-								{timeAgo(session.createdAt)} · {session.history.length} steps
-							</p>
-						</div>
-
-						<div className="flex items-center gap-1 shrink-0">
-							<button
-								type="button"
-								onClick={(e) => handleExport(e, session)}
-								className="p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-								title="Export history JSON"
-								aria-label={`Export history for ${session.task}`}
-							>
-								<ArrowDownToLine className="size-3" />
-							</button>
-							<button
-								type="button"
-								onClick={(e) => handleDelete(e, session.id)}
-								className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-destructive cursor-pointer"
-								title="Delete history"
-								aria-label={`Delete history for ${session.task}`}
-							>
-								<Trash2 className="size-3" />
-							</button>
+							<div className="flex items-center mt-0.5">
+								<p className="text-[10px] text-muted-foreground">
+									{timeAgo(session.createdAt)} · {session.history.length} steps
+								</p>
+								<div className="flex items-center gap-0.5 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+									<button
+										type="button"
+										onClick={(e) => handleRerun(e, session.task)}
+										className="p-0.5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+										title="Run task again"
+										aria-label={`Run history task again: ${session.task}`}
+									>
+										<RotateCcw className="size-3" />
+									</button>
+									<button
+										type="button"
+										onClick={(e) => handleExport(e, session)}
+										className="p-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+										title="Export history JSON"
+										aria-label={`Export history for ${session.task}`}
+									>
+										<ArrowDownToLine className="size-3" />
+									</button>
+									<button
+										type="button"
+										onClick={(e) => handleDelete(e, session.id)}
+										className="p-0.5 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+										title="Delete history"
+										aria-label={`Delete history for ${session.task}`}
+									>
+										<Trash2 className="size-3" />
+									</button>
+								</div>
+							</div>
 						</div>
 					</div>
 				))}
