@@ -3,24 +3,15 @@
  * All rights reserved.
  */
 import type { InteractiveElementDomNode } from './dom/dom_tree/type'
-
-// ======= general utils =======
-
-async function waitFor(seconds: number): Promise<void> {
-	await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
-}
-
-// ======= dom utils =======
-
-export async function movePointerToElement(element: HTMLElement) {
-	const rect = element.getBoundingClientRect()
-	const x = rect.left + rect.width / 2
-	const y = rect.top + rect.height / 2
-
-	window.dispatchEvent(new CustomEvent('PageAgent::MovePointerTo', { detail: { x, y } }))
-
-	await waitFor(0.3)
-}
+import {
+	getNativeValueSetter,
+	isHTMLElement,
+	isInputElement,
+	isSelectElement,
+	isTextAreaElement,
+	movePointerToElement,
+	waitFor,
+} from './utils'
 
 /**
  * Get the HTMLElement by index from a selectorMap.
@@ -39,7 +30,7 @@ export function getElementByIndex(
 		throw new Error(`Element at index ${index} does not have a reference`)
 	}
 
-	if (!(element instanceof HTMLElement)) {
+	if (!isHTMLElement(element)) {
 		throw new Error(`Element at index ${index} is not an HTMLElement`)
 	}
 
@@ -71,6 +62,11 @@ export async function clickElement(element: HTMLElement) {
 	await scrollIntoViewIfNeeded(element)
 	await movePointerToElement(element)
 	window.dispatchEvent(new CustomEvent('PageAgent::ClickPointer'))
+
+	// Scroll the iframe element itself into view if needed
+	const frame = element.ownerDocument.defaultView?.frameElement
+	if (frame) await scrollIntoViewIfNeeded(frame)
+
 	await waitFor(0.1)
 
 	// hover it
@@ -92,25 +88,9 @@ export async function clickElement(element: HTMLElement) {
 	await waitFor(0.2) // Wait to ensure click event processing completes
 }
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-	window.HTMLInputElement.prototype,
-	'value'
-)!.set!
-
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
-	window.HTMLTextAreaElement.prototype,
-	'value'
-)!.set!
-
 export async function inputTextElement(element: HTMLElement, text: string) {
 	const isContentEditable = element.isContentEditable
-	if (
-		!(element instanceof HTMLInputElement) &&
-		!(element instanceof HTMLTextAreaElement) &&
-		!isContentEditable
-	) {
+	if (!isInputElement(element) && !isTextAreaElement(element) && !isContentEditable) {
 		throw new Error('Element is not an input, textarea, or contenteditable')
 	}
 
@@ -181,16 +161,17 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 			element.focus()
 
 			// Select all existing content and delete it
-			const selection = window.getSelection()
-			const range = document.createRange()
+			const doc = element.ownerDocument
+			const selection = (doc.defaultView || window).getSelection()
+			const range = doc.createRange()
 			range.selectNodeContents(element)
 			selection?.removeAllRanges()
 			selection?.addRange(range)
 
 			// eslint-disable-next-line @typescript-eslint/no-deprecated
-			document.execCommand('delete', false)
+			doc.execCommand('delete', false)
 			// eslint-disable-next-line @typescript-eslint/no-deprecated
-			document.execCommand('insertText', false, text)
+			doc.execCommand('insertText', false, text)
 		}
 
 		// Dispatch change event (for good measure)
@@ -198,10 +179,8 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 
 		// Trigger blur for validation
 		element.blur()
-	} else if (element instanceof HTMLTextAreaElement) {
-		nativeTextAreaValueSetter.call(element, text)
 	} else {
-		nativeInputValueSetter.call(element, text)
+		getNativeValueSetter(element as HTMLInputElement | HTMLTextAreaElement).call(element, text)
 	}
 
 	// Only dispatch shared input event for non-contenteditable (contenteditable has its own)
@@ -218,7 +197,7 @@ export async function inputTextElement(element: HTMLElement, text: string) {
  * @todo browser-use version is very complex and supports menu tags, need to follow up
  */
 export async function selectOptionElement(selectElement: HTMLSelectElement, optionText: string) {
-	if (!(selectElement instanceof HTMLSelectElement)) {
+	if (!isSelectElement(selectElement)) {
 		throw new Error('Element is not a select element')
 	}
 
@@ -235,11 +214,11 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 	await waitFor(0.1) // Wait to ensure change event processing completes
 }
 
-interface ScrollableElement extends HTMLElement {
+interface ScrollableElement extends Element {
 	scrollIntoViewIfNeeded?: (centerIfNeeded?: boolean) => void
 }
 
-export async function scrollIntoViewIfNeeded(element: HTMLElement) {
+export async function scrollIntoViewIfNeeded(element: Element) {
 	const el = element as ScrollableElement
 	if (typeof el.scrollIntoViewIfNeeded === 'function') {
 		el.scrollIntoViewIfNeeded()
