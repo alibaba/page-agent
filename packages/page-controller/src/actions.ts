@@ -54,6 +54,9 @@ function blurLastClickedElement() {
 		lastClickedElement.dispatchEvent(
 			new MouseEvent('mouseout', { bubbles: true, cancelable: true })
 		)
+		lastClickedElement.dispatchEvent(
+			new MouseEvent('mouseleave', { bubbles: false, cancelable: true })
+		)
 		lastClickedElement = null
 	}
 }
