@@ -59,13 +59,14 @@ export async function clickElement(element: HTMLElement) {
 	blurLastClickedElement()
 
 	lastClickedElement = element
-	await scrollIntoViewIfNeeded(element)
-	await movePointerToElement(element)
-	window.dispatchEvent(new CustomEvent('PageAgent::ClickPointer'))
 
+	await scrollIntoViewIfNeeded(element)
 	// Scroll the iframe element itself into view if needed
 	const frame = element.ownerDocument.defaultView?.frameElement
 	if (frame) await scrollIntoViewIfNeeded(frame)
+
+	await movePointerToElement(element)
+	window.dispatchEvent(new CustomEvent('PageAgent::ClickPointer'))
 
 	await waitFor(0.1)
 
