@@ -157,6 +157,14 @@ const result = await agent.execute('Fill in the form with test data')`}
 							description: isZh ? 'API 调用失败时的最大重试次数' : 'Maximum retries on API failure',
 						},
 						{
+							name: 'disableNamedToolChoice',
+							type: 'boolean',
+							defaultValue: 'false',
+							description: isZh
+								? '禁用命名 tool_choice，始终使用 "required" 字符串。适用于不支持 tool_choice 对象格式的 LLM 服务。'
+								: 'Disable named tool_choice, always use "required" string. For LLM services that don\'t support the object format of tool_choice.',
+						},
+						{
 							name: 'customFetch',
 							type: 'typeof fetch',
 							description: isZh

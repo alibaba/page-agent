@@ -36,6 +36,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [experimentalLlmsTxt, setExperimentalLlmsTxt] = useState(
 		config?.experimentalLlmsTxt ?? false
 	)
+	const [disableNamedToolChoice, setDisableNamedToolChoice] = useState(
+		config?.disableNamedToolChoice ?? false
+	)
 	const [advancedOpen, setAdvancedOpen] = useState(false)
 	const [saving, setSaving] = useState(false)
 	const [userAuthToken, setUserAuthToken] = useState<string>('')
@@ -51,6 +54,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		setMaxSteps(config?.maxSteps)
 		setSystemInstruction(config?.systemInstruction ?? '')
 		setExperimentalLlmsTxt(config?.experimentalLlmsTxt ?? false)
+		setDisableNamedToolChoice(config?.disableNamedToolChoice ?? false)
 	}, [config])
 
 	// Poll for user auth token every second until found
@@ -96,6 +100,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				maxSteps: maxSteps || undefined,
 				systemInstruction: systemInstruction || undefined,
 				experimentalLlmsTxt,
+				disableNamedToolChoice,
 			})
 		} finally {
 			setSaving(false)
@@ -270,6 +275,11 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 							className="text-xs rounded-md border border-input bg-background px-3 py-2 resize-y min-h-[60px]"
 						/>
 					</div>
+
+					<label className="flex items-center justify-between cursor-pointer">
+						<span className="text-xs text-muted-foreground">Disable named tool_choice</span>
+						<Switch checked={disableNamedToolChoice} onCheckedChange={setDisableNamedToolChoice} />
+					</label>
 
 					<label className="flex items-center justify-between cursor-pointer">
 						<span className="text-xs text-muted-foreground">Experimental llms.txt support</span>
