@@ -123,11 +123,9 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// to Plan B (execCommand) if the text wasn't actually inserted.
 		//
 		// Plan A: Dispatch synthetic events
-		// Works: React contenteditable, Quill, some LinkedIn versions.
+		// Works: React contenteditable, Quill, LinkedIn.
 		// Fails: Slate.js, some contenteditable editors that ignore synthetic events.
 		// Sequence: beforeinput -> mutation -> input -> change -> blur
-
-		let planASucceeded = false
 
 		// Dispatch beforeinput + mutation + input for clearing
 		if (
@@ -170,8 +168,7 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		}
 
 		// Verify Plan A worked by checking if the text was actually inserted
-		const currentText = element.innerText.trim()
-		planASucceeded = currentText === text.trim()
+		const planASucceeded = element.innerText.trim() === text.trim()
 
 		if (!planASucceeded) {
 			// Plan B: execCommand fallback (deprecated but widely supported)
