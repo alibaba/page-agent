@@ -46,6 +46,10 @@ async function exposeAgentToPage() {
 	let multiPageAgent: InstanceType<typeof MultiPageAgent> | null = null
 
 	window.addEventListener('message', async (e) => {
+		// Validate origin and source to prevent cross-origin attacks
+		if (e.origin !== window.origin) return
+		if (e.source !== window) return
+
 		const data = e.data
 		if (typeof data !== 'object' || data === null) return
 		if (data.channel !== 'PAGE_AGENT_EXT_REQUEST') return
@@ -63,7 +67,7 @@ async function exposeAgentToPage() {
 							action: 'execute_result',
 							error: 'Agent is already running a task. Please wait until it finishes.',
 						},
-						'*'
+						window.origin
 					)
 					return
 				}
@@ -87,7 +91,7 @@ async function exposeAgentToPage() {
 								action: 'status_change_event',
 								payload: multiPageAgent.status,
 							},
-							'*'
+							window.origin
 						)
 					})
 
@@ -100,7 +104,7 @@ async function exposeAgentToPage() {
 								action: 'activity_event',
 								payload: (event as CustomEvent).detail,
 							},
-							'*'
+							window.origin
 						)
 					})
 
@@ -113,7 +117,7 @@ async function exposeAgentToPage() {
 								action: 'history_change_event',
 								payload: multiPageAgent.history,
 							},
-							'*'
+							window.origin
 						)
 					})
 
@@ -128,7 +132,7 @@ async function exposeAgentToPage() {
 							action: 'execute_result',
 							payload: result,
 						},
-						'*'
+						window.origin
 					)
 				} catch (error) {
 					window.postMessage(
@@ -138,7 +142,7 @@ async function exposeAgentToPage() {
 							action: 'execute_result',
 							error: (error as Error).message,
 						},
-						'*'
+						window.origin
 					)
 				}
 
@@ -151,7 +155,7 @@ async function exposeAgentToPage() {
 			}
 
 			default:
-				console.warn(`${DEBUG_PREFIX} Unknown action from page:`, action)
+				console.warn('[Content] Unknown action from page:', action)
 				break
 		}
 	})
