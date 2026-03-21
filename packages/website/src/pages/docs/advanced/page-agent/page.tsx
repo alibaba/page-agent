@@ -61,6 +61,7 @@ const agent = new PageAgent({
   
   // Optional settings
   language: 'en-US',
+  taskInputMaxLength: 1000,
 })
 
 // Execute a task
@@ -100,7 +101,7 @@ console.log(result.history) // Full execution history`}
 							>
 								AgentConfig
 							</Link>{' '}
-							和{' '}
+							、 PanelConfig 和{' '}
 							<Link
 								href="/advanced/page-controller#configuration"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
@@ -125,7 +126,7 @@ console.log(result.history) // Full execution history`}
 							>
 								AgentConfig
 							</Link>{' '}
-							and{' '}
+							, PanelConfig, and{' '}
 							<Link
 								href="/advanced/page-controller#configuration"
 								className="text-blue-600 dark:text-blue-400 hover:underline"

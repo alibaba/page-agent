@@ -15,6 +15,12 @@ export interface PanelConfig {
 	 * @default true
 	 */
 	promptForNextTask?: boolean
+
+	/**
+	 * Maximum number of characters allowed in the panel task input.
+	 * @default 1000
+	 */
+	taskInputMaxLength?: number
 }
 
 /**
@@ -369,6 +375,7 @@ export class Panel {
 	}
 
 	#createWrapper(): HTMLElement {
+		const taskInputMaxLength = this.#getTaskInputMaxLength()
 		const wrapper = document.createElement('div')
 		wrapper.id = 'page-agent-runtime_agent-panel'
 		wrapper.className = styles.wrapper
@@ -406,7 +413,7 @@ export class Panel {
 					<input 
 						type="text" 
 						class="${styles.taskInput}" 
-						maxlength="200"
+						maxlength="${taskInputMaxLength}"
 					/>
 				</div>
 			</div>
@@ -414,6 +421,18 @@ export class Panel {
 
 		document.body.appendChild(wrapper)
 		return wrapper
+	}
+
+	#getTaskInputMaxLength(): number {
+		const configuredMaxLength = this.#config.taskInputMaxLength
+		if (
+			typeof configuredMaxLength !== 'number' ||
+			!Number.isFinite(configuredMaxLength) ||
+			configuredMaxLength < 1
+		) {
+			return 1000
+		}
+		return Math.floor(configuredMaxLength)
 	}
 
 	#setupEventListeners(): void {
