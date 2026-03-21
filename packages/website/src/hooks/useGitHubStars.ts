@@ -10,7 +10,13 @@ export function useGitHubStars() {
 	useEffect(() => {
 		if (cached !== null) return
 		fetch(STATS_URL)
-			.then((r) => r.json())
+			.then((r) => {
+				const contentType = r.headers.get('content-type')
+				if (!r.ok || !contentType?.includes('application/json')) {
+					throw new Error(`Non-JSON response: ${r.status} ${contentType}`)
+				}
+				return r.json()
+			})
 			.then((data) => {
 				cached = data.stargazers_count ?? null
 				setStars(cached)
