@@ -15,6 +15,7 @@ import {
 
 /**
  * Get the HTMLElement by index from a selectorMap.
+ * @private Internal method, subject to change at any time.
  */
 export function getElementByIndex(
 	selectorMap: Map<number, InteractiveElementDomNode>,
@@ -54,6 +55,7 @@ function blurLastClickedElement() {
 
 /**
  * Simulate a click on the element
+ * @private Internal method, subject to change at any time.
  */
 export async function clickElement(element: HTMLElement) {
 	blurLastClickedElement()
@@ -89,6 +91,9 @@ export async function clickElement(element: HTMLElement) {
 	await waitFor(0.2) // Wait to ensure click event processing completes
 }
 
+/**
+ * @private Internal method, subject to change at any time.
+ */
 export async function inputTextElement(element: HTMLElement, text: string) {
 	const isContentEditable = element.isContentEditable
 	if (!isInputElement(element) && !isTextAreaElement(element) && !isContentEditable) {
@@ -196,6 +201,7 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 
 /**
  * @todo browser-use version is very complex and supports menu tags, need to follow up
+ * @private Internal method, subject to change at any time.
  */
 export async function selectOptionElement(selectElement: HTMLSelectElement, optionText: string) {
 	if (!isSelectElement(selectElement)) {
@@ -219,6 +225,9 @@ interface ScrollableElement extends Element {
 	scrollIntoViewIfNeeded?: (centerIfNeeded?: boolean) => void
 }
 
+/**
+ * @private Internal method, subject to change at any time.
+ */
 export async function scrollIntoViewIfNeeded(element: Element) {
 	const el = element as ScrollableElement
 	if (typeof el.scrollIntoViewIfNeeded === 'function') {
@@ -231,6 +240,9 @@ export async function scrollIntoViewIfNeeded(element: Element) {
 	}
 }
 
+/**
+ * @private Internal method, subject to change at any time.
+ */
 export async function scrollVertically(
 	down: boolean,
 	scroll_amount: number,
@@ -359,6 +371,9 @@ export async function scrollVertically(
 	}
 }
 
+/**
+ * @private Internal method, subject to change at any time.
+ */
 export async function scrollHorizontally(
 	right: boolean,
 	scroll_amount: number,

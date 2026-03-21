@@ -424,3 +424,5 @@ export class PageController extends EventTarget {
 		this.mask = null
 	}
 }
+
+export * from './actions'
