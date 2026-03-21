@@ -231,11 +231,7 @@ export async function scrollIntoViewIfNeeded(element: Element) {
 	}
 }
 
-export async function scrollVertically(
-	down: boolean,
-	scroll_amount: number,
-	element?: HTMLElement | null
-) {
+export async function scrollVertically(scroll_amount: number, element?: HTMLElement | null) {
 	// Element-specific scrolling if element is provided
 	if (element) {
 		const targetElement = element
@@ -359,11 +355,7 @@ export async function scrollVertically(
 	}
 }
 
-export async function scrollHorizontally(
-	right: boolean,
-	scroll_amount: number,
-	element?: HTMLElement | null
-) {
+export async function scrollHorizontally(scroll_amount: number, element?: HTMLElement | null) {
 	// Element-specific scrolling if element is provided
 	if (element) {
 		const targetElement = element
@@ -372,7 +364,7 @@ export async function scrollHorizontally(
 		let scrolledElement: HTMLElement | null = null
 		let scrollDelta = 0
 		let attempts = 0
-		const dx = right ? scroll_amount : -scroll_amount
+		const dx = scroll_amount
 
 		while (currentElement && attempts < 10) {
 			const computedStyle = window.getComputedStyle(currentElement)
@@ -420,7 +412,7 @@ export async function scrollHorizontally(
 
 	// Page-level scrolling (default or fallback)
 
-	const dx = right ? scroll_amount : -scroll_amount
+	const dx = scroll_amount
 	const bigEnough = (el: HTMLElement) => el.clientWidth >= window.innerWidth * 0.5
 	const canScroll = (el: HTMLElement | null) =>
 		el &&
