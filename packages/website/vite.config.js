@@ -27,6 +27,7 @@ const SPA_ROUTES = [
 	'docs/features/custom-instructions',
 	'docs/features/models',
 	'docs/features/chrome-extension',
+	'docs/features/mcp-server',
 	'docs/features/third-party-agent',
 	'docs/advanced/page-agent',
 	'docs/advanced/page-agent-core',

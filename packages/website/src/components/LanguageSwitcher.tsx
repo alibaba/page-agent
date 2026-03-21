@@ -8,8 +8,8 @@ export default function LanguageSwitcher() {
 	const dropdownRef = useRef<HTMLDivElement>(null)
 
 	const languages = [
-		{ code: 'zh-CN' as const, label: '中文' },
 		{ code: 'en-US' as const, label: 'English' },
+		{ code: 'zh-CN' as const, label: '中文' },
 	]
 
 	const currentLanguage = languages.find((lang) => lang.code === language) || languages[0]

@@ -33,8 +33,8 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'claude-haiku-4.5',
 		'claude-sonnet-3.5',
 	],
-	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
 	MiniMax: ['MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed'],
+	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
 	MoonshotAI: ['kimi-k2.5'],
 	'Z.AI': ['glm-5', 'glm-4.7'],
 }
