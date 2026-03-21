@@ -35,11 +35,14 @@ const mcpServer = new McpServer({ name: 'page-agent', version: '1.5.8' })
 mcpServer.registerTool(
 	'execute_task',
 	{
-		description:
-			'Execute a browser automation task described in natural language. ' +
-			'The Page Agent extension will control the browser to complete the task. ' +
-			'Blocks until the task is complete.',
-		inputSchema: { task: z.string().describe('Task description in natural language') },
+		description: "Execute a task in user's browser.",
+		inputSchema: {
+			task: z
+				.string()
+				.describe(
+					'Task description. Give specific instructions for the task. Steps preferable. And the information you want to get after the task is done.'
+				),
+		},
 	},
 	async ({ task }) => {
 		try {
@@ -50,7 +53,7 @@ mcpServer.registerTool(
 					{
 						type: 'text',
 						text: result.success
-							? `Task completed successfully.\n\n${result.data}`
+							? `Task completed.\n\n${result.data}`
 							: `Task failed.\n\n${result.data}`,
 					},
 				],
@@ -67,7 +70,7 @@ mcpServer.registerTool(
 mcpServer.registerTool(
 	'get_status',
 	{
-		description: 'Check the current status of the Page Agent hub connection and agent.',
+		description: 'Check the current status of the Page Agent hub.',
 	},
 	async () => ({
 		content: [
