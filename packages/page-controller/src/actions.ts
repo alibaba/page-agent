@@ -203,19 +203,81 @@ export async function inputTextElement(element: HTMLElement, text: string) {
  * @todo browser-use version is very complex and supports menu tags, need to follow up
  * @private Internal method, subject to change at any time.
  */
-export async function selectOptionElement(selectElement: HTMLSelectElement, optionText: string) {
-	if (!isSelectElement(selectElement)) {
-		throw new Error('Element is not a select element')
+export async function selectOptionElement(selectElement: HTMLElement, optionText: string) {
+	const normalizedOptionText = optionText.trim()
+
+	if (isSelectElement(selectElement)) {
+		const options = Array.from(selectElement.options)
+		const option = options.find((opt) => opt.textContent?.trim() === normalizedOptionText)
+
+		if (!option) {
+			throw new Error(`Option with text "${optionText}" not found in select element`)
+		}
+
+		selectElement.value = option.value
+		selectElement.dispatchEvent(new Event('change', { bubbles: true }))
+		await waitFor(0.1)
+		return
 	}
 
-	const options = Array.from(selectElement.options)
-	const option = options.find((opt) => opt.textContent?.trim() === optionText.trim())
+	const isComboBox =
+		selectElement.getAttribute('role') === 'combobox' ||
+		selectElement.getAttribute('aria-haspopup') === 'listbox' ||
+		selectElement.tagName === 'INPUT'
+
+	if (!isComboBox) {
+		throw new Error('Element is not a select element or supported combobox')
+	}
+
+	await clickElement(selectElement)
+	await waitFor(0.1)
+
+	const popupIds = [
+		selectElement.getAttribute('aria-controls'),
+		selectElement.getAttribute('aria-owns'),
+	].filter(Boolean) as string[]
+
+	const candidateRoots: HTMLElement[] = []
+	for (const id of popupIds) {
+		const popup = selectElement.ownerDocument.getElementById(id)
+		if (popup && isHTMLElement(popup)) candidateRoots.push(popup)
+	}
+
+	if (candidateRoots.length === 0) {
+		candidateRoots.push(selectElement.ownerDocument.body)
+	}
+
+	const optionSelectors = [
+		'[role="option"]',
+		'.ant-select-item-option',
+		'.el-select-dropdown__item',
+		'li',
+		'[data-option-index]',
+	]
+
+	const candidates = candidateRoots.flatMap((root) =>
+		optionSelectors.flatMap((selector) => Array.from(root.querySelectorAll<HTMLElement>(selector)))
+	)
+
+	const option = candidates.find((el) => el.textContent?.trim() === normalizedOptionText)
 
 	if (!option) {
-		throw new Error(`Option with text "${optionText}" not found in select element`)
+		throw new Error(`Option with text "${optionText}" not found in combobox`)
 	}
 
-	selectElement.value = option.value
+	await scrollIntoViewIfNeeded(option)
+	await movePointerToElement(option)
+	option.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true }))
+	option.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, cancelable: true }))
+	option.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }))
+	option.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }))
+	option.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+	option.click()
+
+	if (isInputElement(selectElement)) {
+		getNativeValueSetter(selectElement).call(selectElement, normalizedOptionText)
+		selectElement.dispatchEvent(new Event('input', { bubbles: true }))
+	}
 	selectElement.dispatchEvent(new Event('change', { bubbles: true }))
 
 	await waitFor(0.1) // Wait to ensure change event processing completes
