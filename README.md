@@ -6,6 +6,7 @@
 </picture>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-auto.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
+[![gitcgr](https://gitcgr.com/badge/alibaba/page-agent.svg)](https://gitcgr.com/alibaba/page-agent)
 
 The GUI Agent Living in Your Webpage. Control web interfaces with natural language.
 
