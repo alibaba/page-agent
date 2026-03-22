@@ -54,6 +54,31 @@ function blurLastClickedElement() {
 }
 
 /**
+ * Resolve the actual click target within an element.
+ *
+ * Uses elementFromPoint to find the innermost element at the center of the
+ * given element, simulating where a real user click would land. This is
+ * critical for UI frameworks (e.g. Element Plus, Quasar) where event
+ * listeners are attached to inner child elements rather than the outer
+ * container that gets detected as interactive.
+ */
+function resolveClickTarget(element: HTMLElement): HTMLElement {
+	const rect = element.getBoundingClientRect()
+	if (rect.width === 0 || rect.height === 0) return element
+
+	const centerX = rect.left + rect.width / 2
+	const centerY = rect.top + rect.height / 2
+	const innerElement = document.elementFromPoint(centerX, centerY)
+
+	// Only use the inner element if it's a descendant of the original element
+	if (innerElement && innerElement !== element && element.contains(innerElement)) {
+		return innerElement as HTMLElement
+	}
+
+	return element
+}
+
+/**
  * Simulate a click on the element
  * @private Internal method, subject to change at any time.
  */
@@ -72,21 +97,22 @@ export async function clickElement(element: HTMLElement) {
 
 	await waitFor(0.1)
 
+	// Resolve the actual click target — find the innermost element at the
+	// center of the detected element, matching real browser click behavior.
+	const target = resolveClickTarget(element)
+
 	// hover it
-	element.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true }))
-	element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, cancelable: true }))
+	target.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true }))
+	target.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, cancelable: true }))
 
 	// dispatch a sequence of events to ensure all listeners are triggered
-	element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }))
+	target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }))
 
 	// focus it to ensure it gets the click event
-	element.focus()
+	target.focus()
 
-	element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }))
-	element.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
-
-	// dispatch a click event
-	// element.click()
+	target.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }))
+	target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
 
 	await waitFor(0.2) // Wait to ensure click event processing completes
 }
