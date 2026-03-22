@@ -38,7 +38,7 @@ export function getElementByIndex(
 	return element
 }
 
-let lastClickedElement: HTMLElement | null = null
+export let lastClickedElement: HTMLElement | null = null
 
 function blurLastClickedElement() {
 	if (lastClickedElement) {
@@ -312,16 +312,27 @@ export async function scrollVertically(
 		el.scrollHeight > el.clientHeight &&
 		bigEnough(el)
 
-	let el: HTMLElement | null = document.activeElement as HTMLElement | null
-	while (el && !canScroll(el) && el !== document.body) el = el.parentElement
+	// Prefer the scrollable ancestor of the last interacted element to avoid
+	// accidentally scrolling the wrong container in multi-scroll layouts (#303)
+	const findScrollableAncestor = (start: HTMLElement | null): HTMLElement | null => {
+		let cur = start
+		while (cur && cur !== document.body) {
+			if (canScroll(cur)) return cur
+			cur = cur.parentElement
+		}
+		return null
+	}
 
-	el = canScroll(el)
-		? el
-		: Array.from(document.querySelectorAll<HTMLElement>('*')).find(canScroll) ||
-			(document.scrollingElement as HTMLElement) ||
-			(document.documentElement as HTMLElement)
+	let el: HTMLElement | null =
+		findScrollableAncestor(lastClickedElement) ||
+		findScrollableAncestor(document.activeElement as HTMLElement | null) ||
+		Array.from(document.querySelectorAll<HTMLElement>('*')).find(canScroll) ||
+		null
 
-	if (el === document.scrollingElement || el === document.documentElement || el === document.body) {
+	const isPageLevel =
+		!el || el === document.scrollingElement || el === document.documentElement || el === document.body
+
+	if (isPageLevel) {
 		// Page-level scroll
 		const scrollBefore = window.scrollY
 		const scrollMax = document.documentElement.scrollHeight - window.innerHeight
@@ -345,29 +356,29 @@ export async function scrollVertically(
 		return `✅ Scrolled page by ${scrolled}px.`
 	} else {
 		// Container scroll
-		const scrollBefore = el!.scrollTop
-		const scrollMax = el!.scrollHeight - el!.clientHeight
+		const scrollBefore = el.scrollTop
+		const scrollMax = el.scrollHeight - el.clientHeight
 
-		el!.scrollBy({ top: dy, behavior: 'smooth' })
+		el.scrollBy({ top: dy, behavior: 'smooth' })
 		await waitFor(0.1)
 
-		const scrollAfter = el!.scrollTop
+		const scrollAfter = el.scrollTop
 		const scrolled = scrollAfter - scrollBefore
 
 		if (Math.abs(scrolled) < 1) {
 			return dy > 0
-				? `⚠️ Already at the bottom of container (${el!.tagName}), cannot scroll down further.`
-				: `⚠️ Already at the top of container (${el!.tagName}), cannot scroll up further.`
+				? `⚠️ Already at the bottom of container (${el.tagName}), cannot scroll down further.`
+				: `⚠️ Already at the top of container (${el.tagName}), cannot scroll up further.`
 		}
 
 		const reachedBottom = dy > 0 && scrollAfter >= scrollMax - 1
 		const reachedTop = dy < 0 && scrollAfter <= 1
 
 		if (reachedBottom)
-			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the bottom.`
+			return `✅ Scrolled container (${el.tagName}) by ${scrolled}px. Reached the bottom.`
 		if (reachedTop)
-			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the top.`
-		return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px.`
+			return `✅ Scrolled container (${el.tagName}) by ${scrolled}px. Reached the top.`
+		return `✅ Scrolled container (${el.tagName}) by ${scrolled}px.`
 	}
 }
 

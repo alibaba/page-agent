@@ -131,7 +131,8 @@ tools.set(
 tools.set(
 	'scroll',
 	tool({
-		description: 'Scroll the page vertically. Use index for scroll elements (dropdowns/custom UI).',
+		description:
+		'Scroll the page or a specific container vertically. When the page has multiple independent scrollable panels (e.g. left list + right detail), pass the index of an element inside the target container so the correct panel is scrolled. Without index, the scroll targets the container that was last interacted with.',
 		inputSchema: z.object({
 			down: z.boolean().default(true),
 			num_pages: z.number().min(0).max(10).optional().default(0.1),
