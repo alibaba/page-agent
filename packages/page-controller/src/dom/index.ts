@@ -15,7 +15,8 @@ import {
  * @note Since isTopElement depends on elementFromPoint,
  * it returns null when out of viewport, this feature has no practical use, only differ between -1 and 0
  */
-const DEFAULT_VIEWPORT_EXPANSION = -1
+// const DEFAULT_VIEWPORT_EXPANSION = -1
+const DEFAULT_VIEWPORT_EXPANSION = 0
 
 export function resolveViewportExpansion(viewportExpansion?: number): number {
 	return viewportExpansion ?? DEFAULT_VIEWPORT_EXPANSION
