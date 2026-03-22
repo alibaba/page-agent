@@ -67,7 +67,14 @@ export class OpenAIClient implements LLMClient {
 
 		// 3. Handle HTTP errors
 		if (!response.ok) {
-			const errorData = await response.json().catch()
+			let errorData: unknown
+			const contentType = response.headers.get('content-type')
+			if (contentType?.includes('application/json')) {
+				errorData = await response.json().catch(() => undefined)
+			} else {
+				const text = await response.text().catch(() => '')
+				errorData = { error: { message: `Non-JSON response (${contentType || 'unknown content-type'}): ${text.slice(0, 200)}` } }
+			}
 			const errorMessage =
 				(errorData as { error?: { message?: string } }).error?.message || response.statusText
 
@@ -100,7 +107,25 @@ export class OpenAIClient implements LLMClient {
 		}
 
 		// 4. Parse and validate response
-		const data = await response.json()
+		let data: any
+		const responseContentType = response.headers.get('content-type')
+		if (!responseContentType?.includes('application/json')) {
+			const text = await response.text().catch(() => '')
+			throw new InvokeError(
+				InvokeErrorType.UNKNOWN,
+				`Expected JSON response but received ${responseContentType || 'unknown content-type'}. Body starts with: ${text.slice(0, 200)}`,
+				undefined
+			)
+		}
+		try {
+			data = await response.json()
+		} catch (error) {
+			throw new InvokeError(
+				InvokeErrorType.UNKNOWN,
+				'Failed to parse API response as JSON',
+				error
+			)
+		}
 
 		const choice = data.choices?.[0]
 		if (!choice) {
