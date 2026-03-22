@@ -26,7 +26,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
     - No screenshots. No multi-modal LLMs or special permissions needed.
 - **🧠 Bring your own LLMs**
 - **🐙 Optional [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension) for multi-page tasks.**
-    - [MCP Server (Beta)](https://alibaba.github.io/page-agent/docs/features/mcp-server)
+    - And an [MCP Server (Beta)](https://alibaba.github.io/page-agent/docs/features/mcp-server) to control it from outside
 
 ## 💡 Use Cases
 
@@ -79,7 +79,7 @@ We welcome contributions from the community! Follow our instructions in [CONTRIB
 
 Please read [Code of Conduct](docs/CODE_OF_CONDUCT.md) before contributing.
 
-Contributions generated entirely by bots or agents without substantial human involvement will not be accepted, and bot accounts may be blocked.
+Contributions generated entirely by **bots or agents** without substantial human involvement will **not be accepted**.
 
 ## 👏 Acknowledgments
 
