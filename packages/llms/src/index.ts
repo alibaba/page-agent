@@ -94,15 +94,21 @@ async function withRetry<T>(
 			return await fn()
 		} catch (error: unknown) {
 			// do not retry if aborted by user
-			if ((error as any)?.rawError?.name === 'AbortError') throw error
+			if (
+				error instanceof InvokeError &&
+				error.rawError instanceof Error &&
+				error.rawError.name === 'AbortError'
+			) {
+				throw error
+			}
 
 			console.error(error)
-			settings.onError(error as Error)
+			settings.onError(error instanceof Error ? error : new Error(String(error)))
 
 			// do not retry if error is not retryable (InvokeError)
 			if (error instanceof InvokeError && !error.retryable) throw error
 
-			lastError = error as Error
+			lastError = error instanceof Error ? error : new Error(String(error))
 			attempt++
 
 			await new Promise((resolve) => setTimeout(resolve, 100))
