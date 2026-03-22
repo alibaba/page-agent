@@ -79,6 +79,11 @@ export class PageAgentCore extends EventTarget {
 	 */
 	onAskUser?: (question: string) => Promise<string>
 
+	/** AbortSignal for the current task execution. */
+	get abortSignal(): AbortSignal {
+		return this.#abortController.signal
+	}
+
 	#status: AgentStatus = 'idle'
 	#llm: LLM
 	#abortController = new AbortController()
@@ -312,7 +317,10 @@ export class PageAgentCore extends EventTarget {
 				}
 			} catch (error: unknown) {
 				console.groupEnd() // to prevent nested groups
-				const isAbortError = (error as any)?.rawError?.name === 'AbortError'
+				const isAbortError =
+					(error as any)?.rawError?.name === 'AbortError' ||
+					(error as any)?.name === 'AbortError' ||
+					(error as any)?.message === 'AbortError'
 
 				console.error('Task failed', error)
 				const errorMessage = isAbortError ? 'Task stopped' : String(error)
