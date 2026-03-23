@@ -10,7 +10,7 @@ export * from '@page-agent/core'
 
 export type PageAgentConfig = AgentConfig &
 	PageControllerConfig &
-	Pick<PanelConfig, 'promptForNextTask' | 'taskInputMaxLength'>
+	Pick<PanelConfig, 'promptForNextTask'>
 
 export class PageAgent extends PageAgentCore {
 	panel: Panel
@@ -26,7 +26,6 @@ export class PageAgent extends PageAgentCore {
 		this.panel = new Panel(this, {
 			language: config.language,
 			promptForNextTask: config.promptForNextTask,
-			taskInputMaxLength: config.taskInputMaxLength,
 		})
 	}
 }
