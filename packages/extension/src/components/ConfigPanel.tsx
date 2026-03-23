@@ -1,18 +1,20 @@
 import {
-	ChevronDown,
 	Copy,
 	CornerUpLeft,
+	ExternalLink,
 	Eye,
 	EyeOff,
+	FoldVertical,
 	HatGlasses,
 	Home,
 	Loader2,
 	Scale,
+	UnfoldVertical,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
 
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/agent/constants'
+import { DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/agent/constants'
 import type { ExtConfig, LanguagePreference } from '@/agent/useAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,14 +27,17 @@ interface ConfigPanelProps {
 }
 
 export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
-	const [apiKey, setApiKey] = useState(config?.apiKey || DEMO_API_KEY)
 	const [baseURL, setBaseURL] = useState(config?.baseURL || DEMO_BASE_URL)
 	const [model, setModel] = useState(config?.model || DEMO_MODEL)
+	const [apiKey, setApiKey] = useState(config?.apiKey)
 	const [language, setLanguage] = useState<LanguagePreference>(config?.language)
 	const [maxSteps, setMaxSteps] = useState<number | undefined>(config?.maxSteps)
 	const [systemInstruction, setSystemInstruction] = useState(config?.systemInstruction ?? '')
 	const [experimentalLlmsTxt, setExperimentalLlmsTxt] = useState(
 		config?.experimentalLlmsTxt ?? false
+	)
+	const [disableNamedToolChoice, setDisableNamedToolChoice] = useState(
+		config?.disableNamedToolChoice ?? false
 	)
 	const [advancedOpen, setAdvancedOpen] = useState(false)
 	const [saving, setSaving] = useState(false)
@@ -42,13 +47,14 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [showApiKey, setShowApiKey] = useState(false)
 
 	useEffect(() => {
-		setApiKey(config?.apiKey || DEMO_API_KEY)
 		setBaseURL(config?.baseURL || DEMO_BASE_URL)
 		setModel(config?.model || DEMO_MODEL)
+		setApiKey(config?.apiKey)
 		setLanguage(config?.language)
 		setMaxSteps(config?.maxSteps)
 		setSystemInstruction(config?.systemInstruction ?? '')
 		setExperimentalLlmsTxt(config?.experimentalLlmsTxt ?? false)
+		setDisableNamedToolChoice(config?.disableNamedToolChoice ?? false)
 	}, [config])
 
 	// Poll for user auth token every second until found
@@ -94,6 +100,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				maxSteps: maxSteps || undefined,
 				systemInstruction: systemInstruction || undefined,
 				experimentalLlmsTxt,
+				disableNamedToolChoice,
 			})
 		} finally {
 			setSaving(false)
@@ -153,6 +160,16 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				</div>
 			</div>
 
+			{/* Hub link */}
+			<a
+				href="/hub.html"
+				target="_blank"
+				className="flex items-center justify-between p-3 rounded-md border bg-muted/50 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
+			>
+				Manage Page Agent Hub
+				<ExternalLink className="size-3" />
+			</a>
+
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Base URL</label>
 				<Input
@@ -167,7 +184,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			{isTestingEndpoint(baseURL) && (
 				<div className="p-2.5 rounded-md border border-amber-500/30 bg-amber-500/5 text-[11px] text-muted-foreground leading-relaxed">
 					<Scale className="size-3 inline-block mr-1 -mt-0.5 text-amber-600" />
-					You are using the free testing API. By using this service you agree to the{' '}
+					You are using our testing API. By using this you agree to the{' '}
 					<a
 						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
 						target="_blank"
@@ -176,14 +193,13 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					>
 						Terms of Use & Privacy Policy
 					</a>
-					. No sensitive data. No guaranteed availability.
 				</div>
 			)}
 
 			<div className="flex flex-col gap-1.5">
 				<label className="text-xs text-muted-foreground">Model</label>
 				<Input
-					placeholder="gpt-5.2"
+					placeholder="gpt-5.1"
 					value={model}
 					onChange={(e) => setModel(e.target.value)}
 					className="text-xs h-8"
@@ -195,7 +211,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				<div className="flex gap-2 items-center">
 					<Input
 						type={showApiKey ? 'text' : 'password'}
-						placeholder="sk-..."
+						// placeholder="sk-..."
 						value={apiKey}
 						onChange={(e) => setApiKey(e.target.value)}
 						className="text-xs h-8"
@@ -212,7 +228,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			</div>
 
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">Language</label>
+				<label className="text-xs text-muted-foreground">Response Language</label>
 				<select
 					value={language ?? ''}
 					onChange={(e) => setLanguage((e.target.value || undefined) as LanguagePreference)}
@@ -231,10 +247,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer mt-1 font-bold"
 			>
 				Advanced
-				<ChevronDown
-					className="size-3 transition-transform"
-					style={{ transform: advancedOpen ? 'rotate(0deg)' : 'rotate(90deg)' }}
-				/>
+				{advancedOpen ? <FoldVertical className="size-3" /> : <UnfoldVertical className="size-3" />}
 			</button>
 
 			{advancedOpen && (
@@ -264,6 +277,11 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					</div>
 
 					<label className="flex items-center justify-between cursor-pointer">
+						<span className="text-xs text-muted-foreground">Disable named tool_choice</span>
+						<Switch checked={disableNamedToolChoice} onCheckedChange={setDisableNamedToolChoice} />
+					</label>
+
+					<label className="flex items-center justify-between cursor-pointer">
 						<span className="text-xs text-muted-foreground">Experimental llms.txt support</span>
 						<Switch checked={experimentalLlmsTxt} onCheckedChange={setExperimentalLlmsTxt} />
 					</label>
@@ -286,6 +304,10 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			{/* Footer */}
 			<div className="mt-4 mb-4 pt-4 border-t border-border/50 flex gap-2 justify-between text-[10px] text-muted-foreground">
 				<div className="flex flex-col justify-between">
+					<span>
+						Version <span className="font-mono">v{__VERSION__}</span>
+					</span>
+
 					<a
 						href="https://github.com/alibaba/page-agent"
 						target="_blank"
@@ -297,7 +319,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						</svg>
 						<span>Source Code</span>
 					</a>
+				</div>
 
+				<div className="flex flex-col items-end">
 					<a
 						href="https://alibaba.github.io/page-agent/"
 						target="_blank"
@@ -315,17 +339,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						className="flex items-center gap-1 hover:text-foreground"
 					>
 						<HatGlasses className="size-3" />
-						<span>Privacy Policy</span>
+						<span>Privacy</span>
 					</a>
-				</div>
-
-				<div className="flex flex-col items-end">
-					<span>
-						Extension <span className="font-mono">v{__EXT_VERSION__}</span>
-					</span>
-					<span>
-						PageAgent <span className="font-mono">v{__CORE_VERSION__}</span>
-					</span>
 				</div>
 			</div>
 

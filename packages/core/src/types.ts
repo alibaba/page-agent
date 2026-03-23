@@ -152,6 +152,12 @@ export interface AgentConfig extends LLMConfig {
 	 * @experimental Use with caution - incorrect prompts may break agent behavior.
 	 */
 	customSystemPrompt?: string
+
+	/**
+	 * Delay between steps in seconds.
+	 * @default 0.4
+	 */
+	stepDelay?: number
 }
 
 /**

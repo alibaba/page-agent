@@ -71,7 +71,7 @@ Strictly follow these rules while using the browser and navigating the web:
 - By default, only elements in the visible viewport are listed. Use scrolling actions if you suspect relevant content is offscreen which you need to interact with. Scroll ONLY if there are more pixels below or above the page.
 - You can scroll by a specific number of pages using the num_pages parameter (e.g., 0.5 for half page, 2.0 for two pages).
 - All the elements that are scrollable are marked with `data-scrollable` attribute. Including the scrollable distance in every directions. You can scroll *the element* in case some area are overflowed.
-- If a captcha appears, tell user you can not solve captcha. finished the task and ask user to solve it.
+- If a captcha appears, tell user you can not solve captcha. Finish the task and ask user to solve it.
 - If expected elements are missing, try scrolling, or navigating back.
 - If the page is not fully loaded, use the `wait` action.
 - Do not repeat one action for more than 3 times unless some conditions changed.

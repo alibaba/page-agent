@@ -4,6 +4,7 @@
 import type {
 	AgentActivity,
 	AgentStatus,
+	ExecutionResult,
 	HistoricalEvent,
 	SupportedLanguage,
 } from '@page-agent/core'
@@ -20,6 +21,7 @@ export interface AdvancedConfig {
 	maxSteps?: number
 	systemInstruction?: string
 	experimentalLlmsTxt?: boolean
+	disableNamedToolChoice?: boolean
 }
 
 export interface ExtConfig extends LLMConfig, AdvancedConfig {
@@ -32,7 +34,7 @@ export interface UseAgentResult {
 	activity: AgentActivity | null
 	currentTask: string
 	config: ExtConfig | null
-	execute: (task: string) => Promise<void>
+	execute: (task: string) => Promise<ExecutionResult>
 	stop: () => void
 	configure: (config: ExtConfig) => Promise<void>
 }
@@ -110,7 +112,7 @@ export function useAgent(): UseAgentResult {
 
 		setCurrentTask(task)
 		setHistory([])
-		await agent.execute(task)
+		return agent.execute(task)
 	}, [])
 
 	const stop = useCallback(() => {
@@ -123,6 +125,7 @@ export function useAgent(): UseAgentResult {
 			maxSteps,
 			systemInstruction,
 			experimentalLlmsTxt,
+			disableNamedToolChoice,
 			...llmConfig
 		}: ExtConfig) => {
 			await chrome.storage.local.set({ llmConfig })
@@ -131,7 +134,12 @@ export function useAgent(): UseAgentResult {
 			} else {
 				await chrome.storage.local.remove('language')
 			}
-			const advancedConfig: AdvancedConfig = { maxSteps, systemInstruction, experimentalLlmsTxt }
+			const advancedConfig: AdvancedConfig = {
+				maxSteps,
+				systemInstruction,
+				experimentalLlmsTxt,
+				disableNamedToolChoice,
+			}
 			await chrome.storage.local.set({ advancedConfig })
 			setConfig({ ...llmConfig, ...advancedConfig, language })
 		},

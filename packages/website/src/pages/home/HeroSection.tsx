@@ -10,7 +10,7 @@ import { Particles } from '../../components/ui/particles'
 import {
 	CDN_DEMO_CN_URL,
 	CDN_DEMO_URL,
-	DEMO_API_KEY,
+	// DEMO_API_KEY,
 	DEMO_BASE_URL,
 	DEMO_MODEL,
 } from '../../constants'
@@ -94,7 +94,7 @@ export default function HeroSection() {
 				apiKey:
 					import.meta.env.DEV && import.meta.env.LLM_API_KEY
 						? import.meta.env.LLM_API_KEY
-						: DEMO_API_KEY,
+						: undefined,
 			})
 		}
 
@@ -103,10 +103,7 @@ export default function HeroSection() {
 	}
 
 	return (
-		<section
-			className="relative px-6 pt-24 py-20 pb-18 lg:py-22 lg:pt-28 overflow-hidden"
-			aria-labelledby="hero-heading"
-		>
+		<section className="relative px-6 pt-18 pb-14 lg:pb-20 lg:pt-24" aria-labelledby="hero-heading">
 			<div className="max-w-7xl mx-auto text-center">
 				{/* Background Pattern + Particles */}
 				<div className="absolute inset-0 opacity-30" aria-hidden="true">
@@ -122,7 +119,7 @@ export default function HeroSection() {
 				/>
 
 				<div className="relative z-10">
-					<div className="inline-flex items-center px-4 py-2 mb-8 text-sm font-medium bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg border border-gray-200 dark:border-gray-700">
+					<div className="inline-flex items-center px-4 py-2 mb-4 text-sm font-medium bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg border border-gray-200 dark:border-gray-700">
 						<span
 							className="w-2 h-2 bg-blue-500 rounded-full mr-2 animate-pulse"
 							aria-hidden="true"
@@ -134,7 +131,7 @@ export default function HeroSection() {
 
 					<h1
 						id="hero-heading"
-						className="text-5xl lg:text-7xl font-bold mb-14 mt-8 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent pb-1"
+						className="text-5xl lg:text-7xl font-bold mb-10 mt-8 bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent pb-1"
 					>
 						{isZh ? (
 							<>

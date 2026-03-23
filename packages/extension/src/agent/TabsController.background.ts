@@ -52,7 +52,7 @@ export function handleTabControlMessage(
 				.create({ url: payload.url, active: false })
 				.then((newTab) => {
 					debug('open_new_tab: success', newTab)
-					sendResponse({ success: true, tabId: newTab.id, windowId: newTab.windowId })
+					sendResponse({ success: true, tabId: newTab.id })
 				})
 				.catch((error) => {
 					sendResponse({ error: error instanceof Error ? error.message : String(error) })
@@ -63,7 +63,7 @@ export function handleTabControlMessage(
 		case 'create_tab_group': {
 			debug('create_tab_group', payload)
 			chrome.tabs
-				.group({ tabIds: payload.tabIds, createProperties: { windowId: payload.windowId } })
+				.group({ tabIds: payload.tabIds })
 				.then((groupId) => {
 					debug('create_tab_group: success', groupId)
 					sendResponse({ success: true, groupId })

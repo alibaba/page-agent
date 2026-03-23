@@ -31,7 +31,7 @@ export function randomID(existingIDs?: string[]): string {
 		id = Math.random().toString(36).substring(2, 11)
 		tryCount++
 		if (tryCount > MAX_TRY) {
-			throw new Error('randomID: too many try')
+			throw new Error('randomID: too many tries')
 		}
 	}
 
@@ -61,7 +61,15 @@ const llmsTxtCache = new Map<string, string | null>()
 
 /** Fetch /llms.txt for a URL's origin. Cached per origin, `null` = tried and not found. */
 export async function fetchLlmsTxt(url: string): Promise<string | null> {
-	const origin = new URL(url).origin
+	let origin: string
+	try {
+		origin = new URL(url).origin
+	} catch {
+		return null // Invalid URL
+	}
+	// about:blank, data:, file:
+	if (origin === 'null') return null
+
 	if (llmsTxtCache.has(origin)) return llmsTxtCache.get(origin)!
 
 	const endpoint = `${origin}/llms.txt`

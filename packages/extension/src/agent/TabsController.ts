@@ -1,3 +1,5 @@
+import { isContentScriptAllowed } from './RemotePageController'
+
 const PREFIX = '[TabsController]'
 
 function debug(...messages: any[]) {
@@ -27,7 +29,6 @@ export class TabsController extends EventTarget {
 	private initialTabId: number | null = null
 	private tabGroupId: number | null = null
 	private task: string = ''
-	private windowId: number | null = null
 
 	async init(task: string, includeInitialTab: boolean = true) {
 		debug('init', task, includeInitialTab)
@@ -37,7 +38,6 @@ export class TabsController extends EventTarget {
 		this.currentTabId = null
 		this.tabGroupId = null
 		this.initialTabId = null
-		this.windowId = null
 
 		const result = await sendMessage({
 			type: 'TAB_CONTROL',
@@ -51,22 +51,25 @@ export class TabsController extends EventTarget {
 		}
 
 		if (includeInitialTab) {
-			this.currentTabId = this.initialTabId
-
-			// update tab status immediately
 			const info = await sendMessage({
 				type: 'TAB_CONTROL',
 				action: 'get_tab_info',
 				payload: { tabId: this.initialTabId },
 			})
 
-			this.tabs.push({
-				id: result.tabId,
-				isInitial: true,
-				url: info.url,
-				title: info.title,
-				status: info.status,
-			})
+			if (isContentScriptAllowed(info.url)) {
+				this.currentTabId = this.initialTabId
+
+				this.tabs.push({
+					id: result.tabId,
+					isInitial: true,
+					url: info.url,
+					title: info.title,
+					status: info.status,
+				})
+
+				await this.createTabGroup([this.initialTabId])
+			}
 		}
 
 		await this.updateCurrentTabId(this.currentTabId)
@@ -132,9 +135,6 @@ export class TabsController extends EventTarget {
 		}
 
 		const tabId = result.tabId as number
-		const windowId = result.windowId as number
-
-		this.windowId = windowId
 
 		this.tabs.push({
 			id: tabId,
@@ -144,32 +144,7 @@ export class TabsController extends EventTarget {
 		await this.switchToTab(tabId)
 
 		if (!this.tabGroupId) {
-			const result = await sendMessage({
-				type: 'TAB_CONTROL',
-				action: 'create_tab_group',
-				payload: { tabIds: [tabId], windowId: this.windowId },
-			})
-
-			if (!result.success) {
-				throw new Error(`Failed to create tab group: ${result.error}`)
-			}
-
-			const groupId = result.groupId as number
-
-			this.tabGroupId = groupId
-
-			await sendMessage({
-				type: 'TAB_CONTROL',
-				action: 'update_tab_group',
-				payload: {
-					groupId: this.tabGroupId,
-					properties: {
-						title: `PageAgent(${this.task})`,
-						color: randomColor(),
-						collapsed: false,
-					},
-				},
-			})
+			await this.createTabGroup([tabId])
 		} else {
 			await sendMessage({
 				type: 'TAB_CONTROL',
@@ -228,6 +203,33 @@ export class TabsController extends EventTarget {
 		} else {
 			throw new Error(`Failed to close tab ID ${tabId}: ${result.error}`)
 		}
+	}
+
+	private async createTabGroup(tabIds: number[]) {
+		const result = await sendMessage({
+			type: 'TAB_CONTROL',
+			action: 'create_tab_group',
+			payload: { tabIds },
+		})
+
+		if (!result?.success) {
+			throw new Error(`Failed to create tab group: ${result?.error}`)
+		}
+
+		this.tabGroupId = result.groupId as number
+
+		await sendMessage({
+			type: 'TAB_CONTROL',
+			action: 'update_tab_group',
+			payload: {
+				groupId: this.tabGroupId,
+				properties: {
+					title: `PageAgent(${this.task})`,
+					color: randomColor(),
+					collapsed: false,
+				},
+			},
+		})
 	}
 
 	async updateCurrentTabId(tabId: number | null) {
@@ -309,16 +311,7 @@ interface TabMeta {
 	status?: 'loading' | 'unloaded' | 'complete'
 }
 
-const TAB_GROUP_COLORS = [
-	'grey',
-	'blue',
-	'red',
-	'yellow',
-	'green',
-	'pink',
-	'purple',
-	'cyan',
-] as const
+const TAB_GROUP_COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan'] as const
 
 type TabGroupColor = (typeof TAB_GROUP_COLORS)[number]
 

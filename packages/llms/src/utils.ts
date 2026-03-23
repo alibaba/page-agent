@@ -93,6 +93,15 @@ export function modelPatch(body: Record<string, any>) {
 		body.reasoning_effort = 'minimal'
 	}
 
+	if (modelName.startsWith('minimax')) {
+		debug('Applying MiniMax patch: clamp temperature to (0, 1]')
+		// MiniMax API rejects temperature = 0; clamp to a small positive value
+		body.temperature = Math.max(body.temperature || 0, 0.01)
+		if (body.temperature > 1) body.temperature = 1
+		// MiniMax does not support parallel_tool_calls
+		delete body.parallel_tool_calls
+	}
+
 	return body
 }
 

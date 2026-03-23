@@ -75,6 +75,7 @@ export class MultiPageAgent extends PageAgentCore {
 			},
 
 			onBeforeStep: async (agent) => {
+				if (!tabsController.currentTabId) return
 				// make sure the current tab is loaded before the step starts
 				await tabsController.waitUntilTabLoaded(tabsController.currentTabId!)
 			},

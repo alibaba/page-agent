@@ -4,6 +4,7 @@ import { Link, useLocation } from 'wouter'
 
 import { SparklesText } from '@/components/ui/sparkles-text'
 import { useLanguage } from '@/i18n/context'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 
 interface DocsLayoutProps {
 	children: ReactNode
@@ -44,6 +45,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 				{ title: isZh ? '知识注入' : 'Instructions', path: '/features/custom-instructions' },
 				{ title: isZh ? '数据脱敏' : 'Data Masking', path: '/features/data-masking' },
 				{ title: isZh ? 'Chrome 扩展' : 'Chrome Extension', path: '/features/chrome-extension' },
+				{ title: 'MCP Server (Beta)', path: '/features/mcp-server' },
 				{
 					title: isZh ? '接入第三方 Agent' : 'Third-party Agent',
 					path: '/features/third-party-agent',
@@ -64,6 +66,12 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 			],
 		},
 	]
+
+	const activeTitle = navigationSections
+		.flatMap((s) => s.items)
+		.find((item) => item.path === location)?.title
+
+	useDocumentTitle(activeTitle)
 
 	return (
 		<div className="max-w-7xl mx-auto px-6 py-8 overflow-x-auto">

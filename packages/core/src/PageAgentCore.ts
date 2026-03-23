@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2025 Alibaba Group Holding Limited
+ * Copyright (C) 2026 SimonLuvRamen
  * All rights reserved.
  */
 import { InvokeError, LLM, type Tool } from '@page-agent/llms'
@@ -176,7 +177,7 @@ export class PageAgentCore extends EventTarget {
 	}
 
 	/**
-	 * Push a observation message to the history event stream.
+	 * Push an observation message to the history event stream.
 	 * This will be visible in <agent_history> and remain persistent in memory across steps.
 	 * @experimental @internal
 	 * @note history change will be emitted before next step starts
@@ -343,7 +344,7 @@ export class PageAgentCore extends EventTarget {
 				return result
 			}
 
-			await waitFor(0.4) // @TODO: configurable
+			await waitFor(this.config.stepDelay ?? 0.4)
 		}
 	}
 
@@ -511,7 +512,8 @@ export class PageAgentCore extends EventTarget {
 		// Accumulated wait time warning
 		if (this.#states.totalWaitTime >= 3) {
 			this.pushObservation(
-				`You have waited ${this.#states.totalWaitTime} seconds accumulatively. DO NOT wait any longer unless you have a good reason.`
+				`You have waited ${this.#states.totalWaitTime} seconds accumulatively. ` +
+					`DO NOT wait any longer unless you have a good reason.`
 			)
 		}
 
@@ -527,7 +529,8 @@ export class PageAgentCore extends EventTarget {
 		const remaining = this.config.maxSteps - step
 		if (remaining === 5) {
 			this.pushObservation(
-				`⚠️ Only ${remaining} steps remaining. Consider wrapping up or calling done with partial results.`
+				`⚠️ Only ${remaining} steps remaining. ` +
+					`Consider wrapping up or calling done with partial results.`
 			)
 		} else if (remaining === 2) {
 			this.pushObservation(

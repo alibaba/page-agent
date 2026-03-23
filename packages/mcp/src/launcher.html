@@ -1,0 +1,237 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" href="https://img.alicdn.com/imgextra/i1/O1CN01mRGret1QrKiu7CFJI_!!6000000002029-2-tps-64-64.png" />
+		<title>Page Agent MCP Launcher</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			body {
+				font-family:
+					system-ui,
+					-apple-system,
+					sans-serif;
+				background: #09090b;
+				color: #e5e5e5;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 100vh;
+			}
+			.card {
+				text-align: center;
+				max-width: 480px;
+				padding: 3rem 2rem;
+			}
+			.logo {
+				width: 72px;
+				height: 72px;
+				border-radius: 18px;
+				margin-bottom: 1rem;
+			}
+			.badge {
+				font-size: 0.6875rem;
+				font-weight: 500;
+				color: #52525b;
+				letter-spacing: 0.05em;
+				text-transform: uppercase;
+				margin-bottom: 1.5rem;
+			}
+			h1 {
+				font-size: 1.35rem;
+				font-weight: 600;
+				margin-bottom: 0.5rem;
+			}
+			.sub {
+				font-size: 0.875rem;
+				color: #a1a1aa;
+				line-height: 1.7;
+			}
+			.spinner {
+				width: 32px;
+				height: 32px;
+				border: 3px solid #27272a;
+				border-top-color: #fff;
+				border-radius: 50%;
+				animation: spin 0.8s linear infinite;
+				margin: 0 auto 1.5rem;
+			}
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+			a {
+				color: #60a5fa;
+				text-decoration: none;
+			}
+			a:hover {
+				text-decoration: underline;
+			}
+
+			.install {
+				display: none;
+			}
+			.install.show {
+				display: block;
+			}
+
+			.tips {
+				margin-top: 1.75rem;
+				text-align: left;
+				background: #18181b;
+				border: 1px solid #27272a;
+				border-radius: 12px;
+				padding: 1.25rem 1.5rem;
+			}
+			.tips li {
+				font-size: 0.8125rem;
+				color: #a1a1aa;
+				line-height: 1.7;
+				margin-left: 1rem;
+			}
+			.tips li + li {
+				margin-top: 0.35rem;
+			}
+
+			.store-btn {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.625rem;
+				margin-top: 1.5rem;
+				padding: 0.625rem 1.5rem;
+				background: #2563eb;
+				color: #fff;
+				border-radius: 10px;
+				font-size: 0.875rem;
+				font-weight: 500;
+				transition: background 0.15s;
+			}
+			.store-btn:hover {
+				background: #1d4ed8;
+				text-decoration: none;
+			}
+			.store-btn img {
+				width: 20px;
+				height: 20px;
+			}
+
+			.links {
+				margin-top: 1.75rem;
+				display: flex;
+				justify-content: center;
+				gap: 1.5rem;
+				font-size: 0.8125rem;
+			}
+			.links a {
+				color: #71717a;
+				transition: color 0.15s;
+			}
+			.links a:hover {
+				color: #a1a1aa;
+				text-decoration: none;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="card">
+			<img
+				class="logo"
+				src="https://img.alicdn.com/imgextra/i3/O1CN01JPT4Fj1FJTfmHfNxO_!!6000000000466-49-tps-512-512.webp"
+				alt="Page Agent"
+			/>
+			<div class="badge">Page Agent MCP Launcher</div>
+
+			<div id="connecting">
+				<div class="spinner"></div>
+				<h1 data-i18n="connecting_title">Connecting to Page Agent</h1>
+				<p class="sub" data-i18n="connecting_sub">Opening the hub in your browser…</p>
+			</div>
+
+			<div id="install" class="install">
+				<h1 data-i18n="install_title">Extension Required</h1>
+				<p class="sub" data-i18n="install_sub">
+					Page Agent requires the latest browser extension to work.
+				</p>
+
+				<a class="store-btn" href="__STORE_URL__" target="_blank">
+					<img
+						src="https://img.alicdn.com/imgextra/i3/O1CN01JpW0Vo1sR3FpiZKFM_!!6000000005762-55-tps-192-192.svg"
+						alt=""
+					/>
+					<span data-i18n="install_btn">Install from Chrome Web Store</span>
+				</a>
+
+				<ul class="tips">
+					<li data-i18n="tip_outdated">
+						If the extension is outdated, please update it to the latest version.
+					</li>
+					<li data-i18n="tip_other_browser">
+						If the extension is not installed in this browser, open this page from the
+						browser that has it installed.
+					</li>
+					<li data-i18n="tip_refresh">Refresh this page after installing or updating.</li>
+				</ul>
+			</div>
+
+			<div class="links">
+				<a href="https://alibaba.github.io/page-agent/docs/introduction/overview" target="_blank" data-i18n="link_docs">Docs</a>
+				<a href="https://github.com/alibaba/page-agent/issues" target="_blank" data-i18n="link_issues">Report an Issue</a>
+			</div>
+		</div>
+
+		<script>
+			{
+				const EXT_ID = '__EXT_ID__'
+				const wsPort = __WS_PORT__
+
+				const zh = {
+					connecting_title: '正在连接 Page Agent',
+					connecting_sub: '正在浏览器中打开 Hub…',
+					install_title: '需要安装浏览器插件',
+					install_sub: 'Page Agent 需要安装最新版浏览器插件才能运行。',
+					install_btn: '从 Chrome 应用商店安装',
+					tip_outdated: '如果插件版本过旧，请更新到最新版本。',
+					tip_other_browser:
+						'如果该浏览器中未安装插件，请从装有插件的浏览器打开此页面。',
+					tip_refresh: '安装或更新后，请刷新此页面。',
+					link_docs: '文档',
+					link_issues: '问题反馈',
+				}
+
+				if (/^zh\b/i.test(navigator.language)) {
+					document.querySelectorAll('[data-i18n]').forEach((el) => {
+						const key = el.getAttribute('data-i18n')
+						if (zh[key]) el.textContent = zh[key]
+					})
+				}
+
+				const showInstall = () => {
+					document.getElementById('connecting').style.display = 'none'
+					document.getElementById('install').classList.add('show')
+				}
+
+				try {
+					if (!globalThis.chrome?.runtime?.sendMessage) {
+						showInstall()
+					} else {
+						chrome.runtime.sendMessage(
+							EXT_ID,
+							{ type: 'OPEN_HUB', wsPort },
+							(response) => {
+								if (chrome.runtime.lastError || !response?.ok) showInstall()
+							}
+						)
+					}
+				} catch {
+					showInstall()
+				}
+			}
+		</script>
+	</body>
+</html>

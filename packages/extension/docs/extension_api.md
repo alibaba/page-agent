@@ -115,8 +115,8 @@ import type {
 
 export interface ExecuteConfig {
   baseURL: string
-  apiKey: string
   model: string
+  apiKey?: string
 
   // Include the initial tab where page JS starts. Default: true.
   includeInitialTab?: boolean
@@ -205,8 +205,8 @@ import type {
 
 interface ExecuteConfig {
   baseURL: string
-  apiKey: string
   model: string
+  apiKey?: string
   includeInitialTab?: boolean
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
