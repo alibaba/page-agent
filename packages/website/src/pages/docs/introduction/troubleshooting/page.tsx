@@ -410,7 +410,7 @@ export default function TroubleshootingPage() {
 											.getElementById(section.id)
 											?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 									}
-									className={`block text-sm py-1 text-left transition-colors ${
+									className={`block cursor-pointer py-1 text-left text-sm transition-colors ${
 										activeId === section.id
 											? 'text-blue-600 dark:text-blue-400 font-medium'
 											: 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'

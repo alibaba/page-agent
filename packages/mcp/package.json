@@ -1,0 +1,35 @@
+{
+    "name": "@page-agent/mcp",
+    "private": false,
+    "version": "1.6.1",
+    "type": "module",
+    "bin": {
+        "page-agent-mcp": "src/index.js"
+    },
+    "files": [
+        "src/"
+    ],
+    "description": "MCP server for controlling the browser via Page Agent extension",
+    "keywords": [
+        "page-agent",
+        "mcp",
+        "browser-automation",
+        "chrome-extension"
+    ],
+    "author": "Simon<gaomeng1900>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/alibaba/page-agent.git",
+        "directory": "packages/mcp"
+    },
+    "homepage": "https://alibaba.github.io/page-agent/",
+    "engines": {
+        "node": ">=20"
+    },
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.27.1",
+        "ws": "^8.19.0",
+        "zod": "^4.3.5"
+    }
+}

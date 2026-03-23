@@ -2,7 +2,7 @@
 
 **Last updated:** March 2026
 
-"We" in this document refers to the maintainers of the open-source Page Agent project (https://github.com/alibaba/page-agent). "The software" refers to PageAgent.js (the JavaScript library) and Page Agent Ext (the browser extension). This document covers the software itself and the testing API we provide — **not** any third-party product or service built with it.
+"We" in this document refers to the maintainers of the open-source Page Agent project (https://github.com/alibaba/page-agent). "The software" refers to Page Agent (the JavaScript library) and Page Agent Ext (the browser extension). This document covers the software itself and the testing API we provide — **not** any third-party product or service built with it.
 
 ---
 
@@ -12,17 +12,17 @@ The software is a **client-side only** tool with a "Bring Your Own Key" (BYOK) a
 
 All data transmission occurs **only** between your browser and the LLM provider you configure. You are in full control of which provider receives your data.
 
-- You choose which LLM provider to use
-- You may configure your own API endpoint at any time
-- The project is open source under the [MIT License](https://github.com/alibaba/page-agent/blob/main/LICENSE) and can be audited at: https://github.com/alibaba/page-agent
+The project is open source under the [MIT License](https://github.com/alibaba/page-agent/blob/main/LICENSE) and can be audited at: https://github.com/alibaba/page-agent
 
 ---
 
 ## 2. Testing API and Demo Disclaimer & Terms of Use
 
-To facilitate easy testing and technical evaluation, we provide a free testing LLM API. This API is used in the project homepage's live demo, the pre-built demo CDN bundles, and the browser extension's default configuration. Users may also use it independently for their own technical evaluation of page-agent.
+To facilitate easy testing and technical evaluation, we provide a free testing LLM API. This API is used in the project homepage's live demo, the pre-built demo CDN bundles, and the browser extension's default configuration. Users may also use it independently for their own technical evaluation of the software.
 
 This free testing API is provided **strictly for technical evaluation and R&D purposes only**. It must not be used in any production environment. By using this API, you agree to the following terms:
+
+- **Permitted Use Only**: This API must be used solely for technical evaluation of the software. Any other use — including integration into other products or services, unlawful activities, violation of the underlying LLM provider's usage policies, or automated scraping at scale — is strictly prohibited.
 
 - **No Sensitive Data**: You are strictly prohibited from inputting any Personal Identifiable Information (PII), confidential business data, financial/medical records, or using this agent on web pages containing such sensitive information.
 

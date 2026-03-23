@@ -89,11 +89,17 @@ export interface InvokeResult<TResult = unknown> {
  */
 export interface LLMConfig {
 	baseURL: string
-	apiKey: string
 	model: string
+	apiKey?: string
 
 	temperature?: number
 	maxRetries?: number
+
+	/**
+	 * remove the tool_choice field from the request.
+	 * @note fix "Invalid tool_choice type: 'object'" for some LLMs.
+	 */
+	disableNamedToolChoice?: boolean
 
 	/**
 	 * Custom fetch function for LLM API requests.

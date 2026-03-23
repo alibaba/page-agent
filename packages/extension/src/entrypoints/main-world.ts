@@ -4,8 +4,8 @@ export type Execute = (task: string, config: ExecuteConfig) => Promise<Execution
 
 export interface ExecuteConfig {
 	baseURL: string
-	apiKey: string
 	model: string
+	apiKey?: string
 
 	/**
 	 * Whether to include the initial tab (that holds this main world script) in the task.
@@ -30,7 +30,6 @@ export default defineUnlistedScript(() => {
 		if (task.trim().length === 0) throw new Error('Task cannot be empty')
 		if (!config) throw new Error('Config is required')
 		if (!config.baseURL) throw new Error('Config must have a baseURL')
-		if (!config.apiKey) throw new Error('Config must have an apiKey')
 		if (!config.model) throw new Error('Config must have a model')
 
 		const id = getId()
@@ -85,8 +84,8 @@ export default defineUnlistedScript(() => {
 					task,
 					config: {
 						baseURL: config.baseURL,
-						apiKey: config.apiKey,
 						model: config.model,
+						apiKey: config.apiKey,
 						includeInitialTab: config.includeInitialTab,
 					},
 				},
@@ -110,9 +109,9 @@ export default defineUnlistedScript(() => {
 		)
 	}
 
-	;(window as any).PAGE_AGENT_EXT_VERSION = __EXT_VERSION__
+	;(window as any).PAGE_AGENT_EXT_VERSION = __VERSION__
 	;(window as any).PAGE_AGENT_EXT = {
-		version: __EXT_VERSION__,
+		version: __VERSION__,
 		execute,
 		stop,
 	}

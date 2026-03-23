@@ -3,27 +3,19 @@
  * All rights reserved.
  */
 import type { InteractiveElementDomNode } from './dom/dom_tree/type'
-
-// ======= general utils =======
-
-async function waitFor(seconds: number): Promise<void> {
-	await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
-}
-
-// ======= dom utils =======
-
-export async function movePointerToElement(element: HTMLElement) {
-	const rect = element.getBoundingClientRect()
-	const x = rect.left + rect.width / 2
-	const y = rect.top + rect.height / 2
-
-	window.dispatchEvent(new CustomEvent('PageAgent::MovePointerTo', { detail: { x, y } }))
-
-	await waitFor(0.3)
-}
+import {
+	getNativeValueSetter,
+	isHTMLElement,
+	isInputElement,
+	isSelectElement,
+	isTextAreaElement,
+	movePointerToElement,
+	waitFor,
+} from './utils'
 
 /**
  * Get the HTMLElement by index from a selectorMap.
+ * @private Internal method, subject to change at any time.
  */
 export function getElementByIndex(
 	selectorMap: Map<number, InteractiveElementDomNode>,
@@ -39,7 +31,7 @@ export function getElementByIndex(
 		throw new Error(`Element at index ${index} does not have a reference`)
 	}
 
-	if (!(element instanceof HTMLElement)) {
+	if (!isHTMLElement(element)) {
 		throw new Error(`Element at index ${index} is not an HTMLElement`)
 	}
 
@@ -53,6 +45,9 @@ function blurLastClickedElement() {
 		lastClickedElement.blur()
 		lastClickedElement.dispatchEvent(
 			new MouseEvent('mouseout', { bubbles: true, cancelable: true })
+		)
+		lastClickedElement.dispatchEvent(
+			new MouseEvent('mouseleave', { bubbles: false, cancelable: true })
 		)
 		lastClickedElement = null
 	}
@@ -85,14 +80,21 @@ function resolveClickTarget(element: HTMLElement): HTMLElement {
 
 /**
  * Simulate a click on the element
+ * @private Internal method, subject to change at any time.
  */
 export async function clickElement(element: HTMLElement) {
 	blurLastClickedElement()
 
 	lastClickedElement = element
+
 	await scrollIntoViewIfNeeded(element)
+	// Scroll the iframe element itself into view if needed
+	const frame = element.ownerDocument.defaultView?.frameElement
+	if (frame) await scrollIntoViewIfNeeded(frame)
+
 	await movePointerToElement(element)
 	window.dispatchEvent(new CustomEvent('PageAgent::ClickPointer'))
+
 	await waitFor(0.1)
 
 	// Resolve the actual click target — find the innermost element at the
@@ -115,25 +117,12 @@ export async function clickElement(element: HTMLElement) {
 	await waitFor(0.2) // Wait to ensure click event processing completes
 }
 
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-	window.HTMLInputElement.prototype,
-	'value'
-)!.set!
-
-// eslint-disable-next-line @typescript-eslint/unbound-method
-const nativeTextAreaValueSetter = Object.getOwnPropertyDescriptor(
-	window.HTMLTextAreaElement.prototype,
-	'value'
-)!.set!
-
+/**
+ * @private Internal method, subject to change at any time.
+ */
 export async function inputTextElement(element: HTMLElement, text: string) {
 	const isContentEditable = element.isContentEditable
-	if (
-		!(element instanceof HTMLInputElement) &&
-		!(element instanceof HTMLTextAreaElement) &&
-		!isContentEditable
-	) {
+	if (!isInputElement(element) && !isTextAreaElement(element) && !isContentEditable) {
 		throw new Error('Element is not an input, textarea, or contenteditable')
 	}
 
@@ -145,9 +134,12 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		// - Monaco/CodeMirror: Require direct JS instance access. No universal way to obtain.
 		// - Draft.js: Not responsive to synthetic/execCommand/Range/DataTransfer. Unmaintained.
 		//
+		// Strategy: Try Plan A (synthetic events) first, then verify and fall back
+		// to Plan B (execCommand) if the text wasn't actually inserted.
+		//
 		// Plan A: Dispatch synthetic events
-		// Works: LinkedIn, React contenteditable, Quill.
-		// Fails: Slate.js
+		// Works: React contenteditable, Quill.
+		// Fails: Slate.js, some contenteditable editors that ignore synthetic events.
 		// Sequence: beforeinput -> mutation -> input -> change -> blur
 
 		// Dispatch beforeinput + mutation + input for clearing
@@ -190,22 +182,37 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 			)
 		}
 
+		// Verify Plan A worked by checking if the text was actually inserted
+		const planASucceeded = element.innerText.trim() === text.trim()
+
+		if (!planASucceeded) {
+			// Plan B: execCommand fallback (deprecated but widely supported)
+			// Works: Quill, Slate.js, react contenteditable components.
+			// This approach integrates with the browser's undo stack and is handled
+			// natively by most rich-text editors.
+			element.focus()
+
+			// Select all existing content and delete it
+			const doc = element.ownerDocument
+			const selection = (doc.defaultView || window).getSelection()
+			const range = doc.createRange()
+			range.selectNodeContents(element)
+			selection?.removeAllRanges()
+			selection?.addRange(range)
+
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			doc.execCommand('delete', false)
+			// eslint-disable-next-line @typescript-eslint/no-deprecated
+			doc.execCommand('insertText', false, text)
+		}
+
 		// Dispatch change event (for good measure)
 		element.dispatchEvent(new Event('change', { bubbles: true }))
 
 		// Trigger blur for validation
 		element.blur()
-
-		// Plan B: execCommand (deprecated but works better for some editors)
-		// Works: LinkedIn, Quill, Slate.js, react contenteditable components
-		//
-		// document.execCommand('selectAll')
-		// document.execCommand('delete')
-		// document.execCommand('insertText', false, text)
-	} else if (element instanceof HTMLTextAreaElement) {
-		nativeTextAreaValueSetter.call(element, text)
 	} else {
-		nativeInputValueSetter.call(element, text)
+		getNativeValueSetter(element as HTMLInputElement | HTMLTextAreaElement).call(element, text)
 	}
 
 	// Only dispatch shared input event for non-contenteditable (contenteditable has its own)
@@ -220,9 +227,10 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 
 /**
  * @todo browser-use version is very complex and supports menu tags, need to follow up
+ * @private Internal method, subject to change at any time.
  */
 export async function selectOptionElement(selectElement: HTMLSelectElement, optionText: string) {
-	if (!(selectElement instanceof HTMLSelectElement)) {
+	if (!isSelectElement(selectElement)) {
 		throw new Error('Element is not a select element')
 	}
 
@@ -239,18 +247,28 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 	await waitFor(0.1) // Wait to ensure change event processing completes
 }
 
-export async function scrollIntoViewIfNeeded(element: HTMLElement) {
-	const el = element as any
-	if (el.scrollIntoViewIfNeeded) {
+interface ScrollableElement extends Element {
+	scrollIntoViewIfNeeded?: (centerIfNeeded?: boolean) => void
+}
+
+/**
+ * @private Internal method, subject to change at any time.
+ */
+export async function scrollIntoViewIfNeeded(element: Element) {
+	const el = element as ScrollableElement
+	if (typeof el.scrollIntoViewIfNeeded === 'function') {
 		el.scrollIntoViewIfNeeded()
 		// await waitFor(0.5) // Animation playback
 	} else {
 		// @todo visibility check
-		el.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' })
+		element.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' })
 		// await waitFor(0.5) // Animation playback
 	}
 }
 
+/**
+ * @private Internal method, subject to change at any time.
+ */
 export async function scrollVertically(
 	down: boolean,
 	scroll_amount: number,
@@ -379,6 +397,9 @@ export async function scrollVertically(
 	}
 }
 
+/**
+ * @private Internal method, subject to change at any time.
+ */
 export async function scrollHorizontally(
 	right: boolean,
 	scroll_amount: number,

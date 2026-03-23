@@ -33,6 +33,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'claude-haiku-4.5',
 		'claude-sonnet-3.5',
 	],
+	MiniMax: ['MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed'],
 	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
 	MoonshotAI: ['kimi-k2.5'],
 	'Z.AI': ['glm-5', 'glm-4.7'],
@@ -121,10 +122,16 @@ const pageAgent = new PageAgent({
   model: 'qwen3.5-plus'
 });
 
-// Self-hosted models (e.g., Ollama)
+// MiniMax
+const pageAgent = new PageAgent({
+  baseURL: 'https://api.minimax.io/v1',
+  apiKey: 'your-minimax-api-key',
+  model: 'MiniMax-M2.7'
+});
+
+// Self-hosted models (e.g., Ollama) — no apiKey needed
 const pageAgent = new PageAgent({
   baseURL: 'http://localhost:11434/v1',
-  apiKey: 'NA',
   model: 'qwen3:14b'
 });
 
@@ -272,7 +279,6 @@ LLM_MODEL_NAME="qwen3:14b"`}
 				<CodeEditor
 					code={`const agent = new PageAgent({
   baseURL: '/api/llm-proxy',
-  apiKey: 'NA',
   model: 'gpt-5.1',
   customFetch: (url, init) =>
     fetch(url, { ...init, credentials: 'include' }),
