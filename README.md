@@ -66,7 +66,6 @@ const agent = new PageAgent({
     baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     apiKey: 'YOUR_API_KEY',
     language: 'en-US',
-    taskInputMaxLength: 1000,
 })
 
 await agent.execute('Click the login button')

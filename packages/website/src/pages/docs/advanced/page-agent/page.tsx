@@ -61,7 +61,6 @@ const agent = new PageAgent({
   
   // Optional settings
   language: 'en-US',
-  taskInputMaxLength: 1000,
 })
 
 // Execute a task
