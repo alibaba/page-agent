@@ -1,5 +1,7 @@
 # Contributing to PageAgent
 
+> **[A note from the maintainer](https://github.com/alibaba/page-agent/issues/349)** — Please read before opening issues or PRs.
+
 ♥️ We welcome contributions from everyone.
 
 ## 🚀 Quick Start

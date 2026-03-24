@@ -74,7 +74,9 @@ await agent.execute('点击登录按钮')
 
 ## 🤝 贡献
 
-欢迎社区贡献！请参阅 [CONTRIBUTING.md](../CONTRIBUTING.md) 了解安装与贡献指南。请在贡献前阅读[行为准则](CODE_OF_CONDUCT.md)。
+欢迎社区贡献！请参阅 [CONTRIBUTING.md](../CONTRIBUTING.md) 了解安装与贡献指南。
+
+提交 issue 或 PR 之前，请先阅读[维护者说明](https://github.com/alibaba/page-agent/issues/349)和[行为准则](CODE_OF_CONDUCT.md)。
 
 我们不接受未经实质性人类参与、完全由 Bot 或 Agent 自动生成的代码，机器人账号可能被禁止参与互动。
 

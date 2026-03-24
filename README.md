@@ -77,7 +77,7 @@ For more programmatic usage, see [📖 Documentations](https://alibaba.github.io
 
 We welcome contributions from the community! Follow our instructions in [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines.
 
-Please read [Code of Conduct](docs/CODE_OF_CONDUCT.md) before contributing.
+Please read the [maintainer note](https://github.com/alibaba/page-agent/issues/349) and [Code of Conduct](docs/CODE_OF_CONDUCT.md) before opening issues or PRs.
 
 Contributions generated entirely by **bots or agents** without substantial human involvement will **not be accepted**.
 
