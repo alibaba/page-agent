@@ -8,9 +8,7 @@ import { Panel, type PanelConfig } from '@page-agent/ui'
 
 export * from '@page-agent/core'
 
-export type PageAgentConfig = AgentConfig &
-	PageControllerConfig &
-	Pick<PanelConfig, 'promptForNextTask'>
+export type PageAgentConfig = AgentConfig & PageControllerConfig & Omit<PanelConfig, 'language'>
 
 export class PageAgent extends PageAgentCore {
 	panel: Panel
