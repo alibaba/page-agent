@@ -1,7 +1,7 @@
 {
     "name": "@page-agent/website",
     "private": true,
-    "version": "1.6.1",
+    "version": "1.6.2",
     "type": "module",
     "scripts": {
         "dev": "vite --host 0.0.0.0",
