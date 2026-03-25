@@ -120,6 +120,11 @@ export class Panel {
 			this.#hideInputArea() // Hide input while running
 		}
 
+		// If task ended while waiting for input (e.g. user clicked Stop), clean up ask_user UI.
+		if (status !== 'running') {
+			this.#cancelWaitingForUserAnswer()
+		}
+
 		// Handle completion
 		if (status === 'completed' || status === 'error') {
 			if (!this.#isExpanded) {
@@ -322,6 +327,23 @@ export class Panel {
 			this.#userAnswerResolver(input)
 			this.#userAnswerResolver = null
 		}
+	}
+
+	/**
+	 * Cancel a pending ask_user UI state (e.g. when task is stopped while waiting for input).
+	 */
+	#cancelWaitingForUserAnswer(): void {
+		if (!this.#isWaitingForUserAnswer) return
+
+		// Remove temporary question cards (only direct children for safety)
+		Array.from(this.#historySection.children).forEach((child) => {
+			if (child.getAttribute('data-temp-card') === 'true') {
+				child.remove()
+			}
+		})
+
+		this.#isWaitingForUserAnswer = false
+		this.#userAnswerResolver = null
 	}
 
 	/**
