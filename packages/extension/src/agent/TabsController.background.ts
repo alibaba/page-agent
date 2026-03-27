@@ -114,6 +114,19 @@ export function handleTabControlMessage(
 			return true // async response
 		}
 
+		case 'get_window_tabs': {
+			debug('get_window_tabs')
+			chrome.tabs
+				.query({ currentWindow: true })
+				.then((tabs) => {
+					sendResponse({ success: true, tabs })
+				})
+				.catch((error) => {
+					sendResponse({ error: error instanceof Error ? error.message : String(error) })
+				})
+			return true
+		}
+
 		default:
 			sendResponse({ error: `Unknown action: ${action}` })
 			return
