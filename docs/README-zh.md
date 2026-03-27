@@ -32,7 +32,8 @@
 - **SaaS AI Copilot** — 几行代码为你的产品加上 AI 副驾驶，无需重写后端。
 - **智能表单填写** — 把 20 次点击变成一句话。ERP、CRM、管理后台的最佳拍档。
 - **无障碍增强** — 用自然语言让任何网页无障碍。语音指令、屏幕阅读器，零门槛。
-- **跨页面 Agent** — 通过可选的 [Chrome 扩展](https://alibaba.github.io/page-agent/docs/features/chrome-extension)，让你自己的 Agent 跨标签页工作。
+- **跨页面 Agent** — 通过可选的 [Chrome 扩展](https://alibaba.github.io/page-agent/docs/features/chrome-extension)，让你自己的 Web Agent 跨标签页工作。
+- 通过 MCP 为现有 Agent 加入浏览器控制能力。
 
 ## 🚀 快速开始
 
@@ -76,11 +77,11 @@ await agent.execute('点击登录按钮')
 
 欢迎社区贡献！请参阅 [CONTRIBUTING.md](../CONTRIBUTING.md) 了解安装与贡献指南。
 
-提交 issue 或 PR 之前，请先阅读[维护者说明](https://github.com/alibaba/page-agent/issues/349)和[行为准则](CODE_OF_CONDUCT.md)。
+提交 issue 或 PR 之前，请先阅读[作者声明](https://github.com/alibaba/page-agent/issues/349)和[行为准则](CODE_OF_CONDUCT.md)。
 
-我们不接受未经实质性人类参与、完全由 Bot 或 Agent 自动生成的代码，机器人账号可能被禁止参与互动。
+我们不接受未经实质性人类参与、完全由 Bot 或 Agent 自动生成的代码。
 
-## 👏 致谢
+## 👏 声明与致谢
 
 本项目基于 **[`browser-use`](https://github.com/browser-use/browser-use)** 的优秀工作构建。
 
@@ -96,12 +97,9 @@ Licensed under the MIT License
 We gratefully acknowledge the browser-use project and its contributors for their
 excellent work on web automation and DOM interaction patterns that helped make
 this project possible.
-
-Third-party dependencies and their licenses can be found in the package.json
-file and in the node_modules directory after installation.
 ```
 
-## 📄 许可证
+## ⚖️ 许可证
 
 [MIT License](../LICENSE)
 
@@ -109,10 +107,3 @@ file and in the node_modules directory after installation.
 
 **⭐ 如果觉得 PageAgent 有用或有趣，请给项目点个星！**
 
-<a href="https://www.star-history.com/?repos=alibaba%2Fpage-agent&type=date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&theme=dark&legend=top-left&v=7" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=7" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=7" />
- </picture>
-</a>

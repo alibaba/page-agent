@@ -33,7 +33,8 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 - **SaaS AI Copilot** — Ship an AI copilot in your product in lines of code. No backend rewrite.
 - **Smart Form Filling** — Turn 20-click workflows into one sentence. Perfect for ERP, CRM, and admin systems.
 - **Accessibility** — Make any web app accessible through natural language. Voice commands, screen readers, zero barrier.
-- **Multi-page Agent** — Extend your own agent's reach across browser tabs with the optional [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension).
+- **Multi-page Agent** — Extend your own web agent's reach across browser tabs [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension).
+- **MCP** - Allow your agent clients to control your browser.
 
 ## 🚀 Quick Start
 
@@ -97,23 +98,12 @@ Licensed under the MIT License
 We gratefully acknowledge the browser-use project and its contributors for their
 excellent work on web automation and DOM interaction patterns that helped make
 this project possible.
-
-Third-party dependencies and their licenses can be found in the package.json
-file and in the node_modules directory after installation.
 ```
 
-## 📄 License
+## ⚖️ License
 
 [MIT License](LICENSE)
 
 ---
 
 **⭐ Star this repo if you find PageAgent helpful!**
-
-<a href="https://www.star-history.com/?repos=alibaba%2Fpage-agent&type=date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&theme=dark&legend=top-left&v=7" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=7" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=7" />
- </picture>
-</a>
