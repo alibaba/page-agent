@@ -1167,7 +1167,7 @@ export default (
 			element.hasAttribute('onclick') ||
 			element.hasAttribute('role') ||
 			element.hasAttribute('tabindex') ||
-			element.hasAttribute('aria-') ||
+			element.getAttributeNames?.().some((n) => n.startsWith('aria-')) ||
 			element.hasAttribute('data-action') ||
 			element.getAttribute('contenteditable') === 'true'
 
