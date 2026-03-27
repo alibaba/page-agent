@@ -28,16 +28,19 @@ export class TabsController extends EventTarget {
 	private tabs: TabMeta[] = []
 	private initialTabId: number | null = null
 	private tabGroupId: number | null = null
+	private experimentalIncludeAllTabs = false
 	private task: string = ''
 
-	async init(task: string, includeInitialTab: boolean = true) {
-		debug('init', task, includeInitialTab)
+	async init(task: string, options: TabsInitOptions = {}) {
+		const { includeInitialTab = true, experimentalIncludeAllTabs = false } = options
+		debug('init', task, options)
 
 		this.task = task
 		this.tabs = []
 		this.currentTabId = null
 		this.tabGroupId = null
 		this.initialTabId = null
+		this.experimentalIncludeAllTabs = experimentalIncludeAllTabs
 
 		const result = await sendMessage({
 			type: 'TAB_CONTROL',
@@ -50,14 +53,34 @@ export class TabsController extends EventTarget {
 			throw new Error('Failed to get initial tab ID')
 		}
 
-		if (includeInitialTab) {
+		if (experimentalIncludeAllTabs) {
+			const allTabs = await sendMessage({
+				type: 'TAB_CONTROL',
+				action: 'get_window_tabs',
+			})
+			for (const tab of allTabs.tabs as chrome.tabs.Tab[]) {
+				if (tab.id && !tab.pinned && isContentScriptAllowed(tab.url)) {
+					this.tabs.push({
+						id: tab.id,
+						isInitial: tab.id === this.initialTabId,
+						url: tab.url,
+						title: tab.title,
+						status: tab.status,
+					})
+				}
+			}
+			if (this.tabs.find((t) => t.id === this.initialTabId)) {
+				this.currentTabId = this.initialTabId
+				await this.createTabGroup([this.initialTabId])
+			}
+		} else if (includeInitialTab) {
 			const info = await sendMessage({
 				type: 'TAB_CONTROL',
 				action: 'get_tab_info',
 				payload: { tabId: this.initialTabId },
 			})
 
-			if (isContentScriptAllowed(info.url)) {
+			if (isContentScriptAllowed(info.url) && !info.pinned) {
 				this.currentTabId = this.initialTabId
 
 				this.tabs.push({
@@ -76,14 +99,13 @@ export class TabsController extends EventTarget {
 
 		const tabChangeHandler = (message: any): void => {
 			if (message.type !== 'TAB_CHANGE') {
-				// throw new Error(`[TabsController]: Invalid message type: ${message.type}`)
 				return
 			}
 
 			if (message.action === 'created') {
 				const tab = message.payload.tab as chrome.tabs.Tab
-				if (tab.groupId === this.tabGroupId && tab.id != null) {
-					// Tab created in our controlled group
+				const shouldTrack = this.experimentalIncludeAllTabs || tab.groupId === this.tabGroupId
+				if (shouldTrack && tab.id != null) {
 					if (!this.tabs.find((t) => t.id === tab.id)) {
 						this.tabs.push({ id: tab.id, isInitial: false })
 					}
@@ -293,6 +315,11 @@ export class TabsController extends EventTarget {
 	}
 }
 
+export interface TabsInitOptions {
+	includeInitialTab?: boolean
+	experimentalIncludeAllTabs?: boolean
+}
+
 export type TabAction =
 	| 'get_active_tab'
 	| 'get_tab_info'
@@ -302,6 +329,7 @@ export type TabAction =
 	| 'add_tab_to_group'
 	| 'close_tab'
 	| 'get_tab_title'
+	| 'get_window_tabs'
 
 interface TabMeta {
 	id: number

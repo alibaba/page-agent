@@ -13,6 +13,9 @@ export interface ExecuteConfig {
 	 */
 	includeInitialTab?: boolean
 
+	/** Control all unpinned tabs in the window instead of only the tab group. */
+	experimentalIncludeAllTabs?: boolean
+
 	onStatusChange?: (status: AgentStatus) => void
 	onActivity?: (activity: AgentActivity) => void
 	onHistoryUpdate?: (history: HistoricalEvent[]) => void
@@ -87,6 +90,7 @@ export default defineUnlistedScript(() => {
 						model: config.model,
 						apiKey: config.apiKey,
 						includeInitialTab: config.includeInitialTab,
+						experimentalIncludeAllTabs: config.experimentalIncludeAllTabs,
 					},
 				},
 			},
