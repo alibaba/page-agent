@@ -82,6 +82,10 @@ Please read the [maintainer note](https://github.com/alibaba/page-agent/issues/3
 
 Contributions generated entirely by **bots or agents** without substantial human involvement will **not be accepted**.
 
+## ⚖️ License
+
+[MIT License](LICENSE)
+
 ## 👏 Acknowledgments
 
 This project builds upon the excellent work of **[`browser-use`](https://github.com/browser-use/browser-use)**.
@@ -100,9 +104,15 @@ excellent work on web automation and DOM interaction patterns that helped make
 this project possible.
 ```
 
-## ⚖️ License
+## 🌟 Awesome Page Agent
 
-[MIT License](LICENSE)
+Built something cool with PageAgent? Add it here! Open a PR to share your project.
+
+> These are community projects — not maintained or endorsed by us. Use at your own discretion.
+
+| Project | Description |
+| ------- | ----------- |
+| _Yours?_ | [Open a PR](https://github.com/alibaba/page-agent/pulls) 🙌 |
 
 ---
 
