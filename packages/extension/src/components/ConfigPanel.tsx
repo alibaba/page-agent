@@ -31,7 +31,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [model, setModel] = useState(config?.model || DEMO_MODEL)
 	const [apiKey, setApiKey] = useState(config?.apiKey)
 	const [language, setLanguage] = useState<LanguagePreference>(config?.language)
-	const [maxSteps, setMaxSteps] = useState<number | undefined>(config?.maxSteps)
+	const [maxSteps, setMaxSteps] = useState(config?.maxSteps)
 	const [systemInstruction, setSystemInstruction] = useState(config?.systemInstruction ?? '')
 	const [experimentalLlmsTxt, setExperimentalLlmsTxt] = useState(
 		config?.experimentalLlmsTxt ?? false
@@ -41,7 +41,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	)
 	const [advancedOpen, setAdvancedOpen] = useState(false)
 	const [saving, setSaving] = useState(false)
-	const [userAuthToken, setUserAuthToken] = useState<string>('')
+	const [userAuthToken, setUserAuthToken] = useState('')
 	const [copied, setCopied] = useState(false)
 	const [showToken, setShowToken] = useState(false)
 	const [showApiKey, setShowApiKey] = useState(false)
