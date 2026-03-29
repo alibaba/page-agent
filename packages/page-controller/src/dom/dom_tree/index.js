@@ -882,6 +882,7 @@ export default (
 			'searchbox', // Search input field
 			'textbox', // Text input field
 			'listbox', // Selectable list
+			'listitem', // Clickable list item (e.g. Quasar q-item)
 			'option', // Selectable option in a list
 			'scrollbar', // Scrollable control
 		])
@@ -1202,6 +1203,7 @@ export default (
 		'searchbox',
 		'textbox',
 		'listbox',
+		'listitem',
 		'option',
 		'scrollbar',
 	])
