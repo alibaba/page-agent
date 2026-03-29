@@ -36,7 +36,7 @@ const SPA_ROUTES = [
 	'docs/advanced/security-permissions',
 ]
 
-const SITE_URL = 'https://alibaba.github.io/page-agent'
+const SITE_URL = 'https://cemdrk.github.io/page-agent'
 
 function spaRoutes() {
 	return {
