@@ -5,7 +5,7 @@ import { escapeHtml } from '../utils'
 
 import styles from './Panel.module.css'
 
-type CardType = 'default' | 'input' | 'output' | 'question' | 'observation'
+export type CardType = 'default' | 'input' | 'output' | 'question' | 'observation' | 'tokenStats'
 
 interface CardOptions {
 	icon: string
