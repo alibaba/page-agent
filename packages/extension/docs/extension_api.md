@@ -121,6 +121,11 @@ export interface ExecuteConfig {
   // Include the initial tab where page JS starts. Default: true.
   includeInitialTab?: boolean
 
+  // Control all unpinned tabs in the window instead of only the tab group.
+  // When enabled, agent sees and can switch to every non-pinned tab.
+  // Default: false. Experimental.
+  experimentalIncludeAllTabs?: boolean
+
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
   onHistoryUpdate?: (history: HistoricalEvent[]) => void
@@ -208,6 +213,7 @@ interface ExecuteConfig {
   model: string
   apiKey?: string
   includeInitialTab?: boolean
+  experimentalIncludeAllTabs?: boolean
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
   onHistoryUpdate?: (history: HistoricalEvent[]) => void
