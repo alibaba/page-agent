@@ -76,11 +76,11 @@ For more programmatic usage, see [📖 Documentations](https://alibaba.github.io
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Follow our instructions in [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines.
+We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and [docs/developer-guide.md](docs/developer-guide.md) for local development workflows.
 
-Please read the [maintainer note](https://github.com/alibaba/page-agent/issues/349) and [Code of Conduct](docs/CODE_OF_CONDUCT.md) before opening issues or PRs.
+Please read the [maintainer's note](https://github.com/alibaba/page-agent/issues/349) on principles and current state.
 
-Contributions generated entirely by **bots or agents** without substantial human involvement will **not be accepted**.
+Contributions generated entirely by **bots or AI** without substantial human involvement will **not be accepted**.
 
 ## ⚖️ License
 
@@ -110,8 +110,8 @@ Built something cool with PageAgent? Add it here! Open a PR to share your projec
 
 > These are community projects — not maintained or endorsed by us. Use at your own discretion.
 
-| Project | Description |
-| ------- | ----------- |
+| Project  | Description                                                 |
+| -------- | ----------------------------------------------------------- |
 | _Yours?_ | [Open a PR](https://github.com/alibaba/page-agent/pulls) 🙌 |
 
 ---
