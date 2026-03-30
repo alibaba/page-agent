@@ -1,12 +1,12 @@
 import { handlePageControlMessage } from '@/agent/RemotePageController.background'
-import { handleTabControlMessage, setupTabChangeEvents } from '@/agent/TabsController.background'
+import { handleTabControlMessage, setupTabEventsPort } from '@/agent/TabsController.background'
 
 export default defineBackground(() => {
 	console.log('[Background] Service Worker started')
 
 	// tab change events
 
-	setupTabChangeEvents()
+	setupTabEventsPort()
 
 	// generate user auth token
 

@@ -36,6 +36,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [experimentalLlmsTxt, setExperimentalLlmsTxt] = useState(
 		config?.experimentalLlmsTxt ?? false
 	)
+	const [experimentalIncludeAllTabs, setExperimentalIncludeAllTabs] = useState(
+		config?.experimentalIncludeAllTabs ?? false
+	)
 	const [disableNamedToolChoice, setDisableNamedToolChoice] = useState(
 		config?.disableNamedToolChoice ?? false
 	)
@@ -54,6 +57,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		setMaxSteps(config?.maxSteps)
 		setSystemInstruction(config?.systemInstruction ?? '')
 		setExperimentalLlmsTxt(config?.experimentalLlmsTxt ?? false)
+		setExperimentalIncludeAllTabs(config?.experimentalIncludeAllTabs ?? false)
 		setDisableNamedToolChoice(config?.disableNamedToolChoice ?? false)
 	}, [config])
 
@@ -100,6 +104,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				maxSteps: maxSteps || undefined,
 				systemInstruction: systemInstruction || undefined,
 				experimentalLlmsTxt,
+				experimentalIncludeAllTabs,
 				disableNamedToolChoice,
 			})
 		} finally {
@@ -284,6 +289,14 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					<label className="flex items-center justify-between cursor-pointer">
 						<span className="text-xs text-muted-foreground">Experimental llms.txt support</span>
 						<Switch checked={experimentalLlmsTxt} onCheckedChange={setExperimentalLlmsTxt} />
+					</label>
+
+					<label className="flex items-center justify-between cursor-pointer">
+						<span className="text-xs text-muted-foreground">Experimental include all tabs</span>
+						<Switch
+							checked={experimentalIncludeAllTabs}
+							onCheckedChange={setExperimentalIncludeAllTabs}
+						/>
 					</label>
 				</>
 			)}
