@@ -80,7 +80,7 @@ export class TabsController {
 			})
 			for (const tab of allTabs.tabs as chrome.tabs.Tab[]) {
 				if (tab.id && !tab.pinned && isContentScriptAllowed(tab.url)) {
-					this.tabs.push({
+					this.addTab({
 						id: tab.id,
 						isInitial: tab.id === this.initialTabId,
 						url: tab.url,
@@ -103,7 +103,7 @@ export class TabsController {
 			if (isContentScriptAllowed(info.url) && !info.pinned) {
 				this.currentTabId = this.initialTabId
 
-				this.tabs.push({
+				this.addTab({
 					id: this.initialTabId,
 					isInitial: true,
 					url: info.url,
@@ -133,7 +133,7 @@ export class TabsController {
 
 		const tabId = result.tabId as number
 
-		this.tabs.push({
+		this.addTab({
 			id: tabId,
 			isInitial: false,
 		})
@@ -229,6 +229,11 @@ export class TabsController {
 		})
 	}
 
+	private addTab(meta: TabMeta) {
+		if (this.tabs.find((t) => t.id === meta.id)) return
+		this.tabs.push(meta)
+	}
+
 	async updateCurrentTabId(tabId: number | null) {
 		debug('updateCurrentTabId', tabId)
 
@@ -304,9 +309,7 @@ export class TabsController {
 				const tab = message.payload.tab as chrome.tabs.Tab
 				const shouldTrack = this.experimentalIncludeAllTabs || tab.groupId === this.tabGroupId
 				if (shouldTrack && tab.id != null) {
-					if (!this.tabs.find((t) => t.id === tab.id)) {
-						this.tabs.push({ id: tab.id, isInitial: false })
-					}
+					this.addTab({ id: tab.id, isInitial: false })
 					this.switchToTab(tab.id)
 				}
 			} else if (message.action === 'removed') {
