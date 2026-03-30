@@ -18,8 +18,10 @@ function hasDarkModeClass() {
 	// Some sites use data attributes (data-theme, data-color-mode, data-bs-theme, etc.)
 	const dataAttrs = ['data-theme', 'data-color-mode', 'data-bs-theme', 'data-color-scheme']
 	for (const attr of dataAttrs) {
-		const value = htmlElement.getAttribute(attr) || bodyElement?.getAttribute(attr)
-		if (value?.toLowerCase().includes('dark')) {
+		const bodyValue = bodyElement?.getAttribute(attr)
+		const htmlValue = htmlElement.getAttribute(attr)
+
+		if (bodyValue?.toLowerCase().includes('dark') || htmlValue?.toLowerCase().includes('dark')) {
 			return true
 		}
 	}
