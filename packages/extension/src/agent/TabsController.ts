@@ -20,8 +20,12 @@ function sendMessage(message: {
  * - live in the agent env (extension page or content script)
  * - no chrome apis. call sw for tab operations
  */
-export class TabsController extends EventTarget {
+export class TabsController {
 	currentTabId: number | null = null
+
+	private disposed = false
+	private port: chrome.runtime.Port | null = null
+	private portRetries = 0
 
 	private windowId: number | null = null
 	private tabs: TabMeta[] = []
@@ -34,13 +38,21 @@ export class TabsController extends EventTarget {
 		const { includeInitialTab = true, experimentalIncludeAllTabs = false } = options
 		debug('init', task, options)
 
-		this.task = task
+		if (this.disposed) {
+			throw new Error('TabsController already disposed')
+		}
+
+		this.currentTabId = null
+		this.disposed = false
+		this.port = null
+		this.portRetries = 0
+
 		this.windowId = null
 		this.tabs = []
-		this.currentTabId = null
 		this.tabGroupId = null
 		this.initialTabId = null
 		this.experimentalIncludeAllTabs = experimentalIncludeAllTabs
+		this.task = task
 
 		const activeTabResult = await sendMessage({
 			type: 'TAB_CONTROL',
@@ -57,6 +69,8 @@ export class TabsController extends EventTarget {
 				throw new Error('Failed to get active tab')
 			}
 		}
+
+		this.connectTabEvents()
 
 		if (experimentalIncludeAllTabs) {
 			const allTabs = await sendMessage({
@@ -102,51 +116,6 @@ export class TabsController extends EventTarget {
 		}
 
 		await this.updateCurrentTabId(this.currentTabId)
-
-		const tabChangeHandler = (message: any): void => {
-			if (message.type !== 'TAB_CHANGE') {
-				return
-			}
-
-			if (message.action === 'created') {
-				const tab = message.payload.tab as chrome.tabs.Tab
-				const shouldTrack = this.experimentalIncludeAllTabs || tab.groupId === this.tabGroupId
-				if (shouldTrack && tab.id != null) {
-					if (!this.tabs.find((t) => t.id === tab.id)) {
-						this.tabs.push({ id: tab.id, isInitial: false })
-					}
-					this.switchToTab(tab.id)
-				}
-			} else if (message.action === 'removed') {
-				const { tabId } = message.payload as { tabId: number }
-				const targetTab = this.tabs.find((t) => t.id === tabId)
-				if (targetTab) {
-					this.tabs = this.tabs.filter((t) => t.id !== tabId)
-					if (this.currentTabId === tabId) {
-						const newCurrentTab = this.tabs[this.tabs.length - 1] || null
-						if (newCurrentTab) {
-							this.switchToTab(newCurrentTab.id)
-						} else {
-							this.updateCurrentTabId(null)
-						}
-					}
-				}
-			} else if (message.action === 'updated') {
-				const { tabId, tab } = message.payload as { tabId: number; tab: chrome.tabs.Tab }
-				const targetTab = this.tabs.find((t) => t.id === tabId)
-				if (targetTab) {
-					targetTab.url = tab.url
-					targetTab.title = tab.title
-					targetTab.status = tab.status
-				}
-			}
-		}
-
-		chrome.runtime.onMessage.addListener(tabChangeHandler)
-
-		this.addEventListener('dispose', () => {
-			chrome.runtime.onMessage.removeListener(tabChangeHandler)
-		})
 	}
 
 	async openNewTab(url: string): Promise<string> {
@@ -316,8 +285,73 @@ export class TabsController extends EventTarget {
 		await waitUntil(() => tab.status === 'complete', 4_000)
 	}
 
+	/**
+	 * Connect to background SW via port to receive tab change events.
+	 *
+	 * @note Port is 1:1 (runtime.connect → background SW has no frames),
+	 * so onDisconnect fires exactly once and we can safely reconnect.
+	 * Reconnection may miss events during the gap.
+	 * TODO: refresh this.tabs from background after reconnect to stay consistent.
+	 */
+	private connectTabEvents() {
+		this.port = chrome.runtime.connect({ name: 'tab-events' })
+
+		this.port.onMessage.addListener((message: any) => {
+			if (this.disposed) return
+			this.portRetries = 0
+
+			if (message.action === 'created') {
+				const tab = message.payload.tab as chrome.tabs.Tab
+				const shouldTrack = this.experimentalIncludeAllTabs || tab.groupId === this.tabGroupId
+				if (shouldTrack && tab.id != null) {
+					if (!this.tabs.find((t) => t.id === tab.id)) {
+						this.tabs.push({ id: tab.id, isInitial: false })
+					}
+					this.switchToTab(tab.id)
+				}
+			} else if (message.action === 'removed') {
+				const { tabId } = message.payload as { tabId: number }
+				const targetTab = this.tabs.find((t) => t.id === tabId)
+				if (targetTab) {
+					this.tabs = this.tabs.filter((t) => t.id !== tabId)
+					if (this.currentTabId === tabId) {
+						const newCurrentTab = this.tabs[this.tabs.length - 1] || null
+						if (newCurrentTab) {
+							this.switchToTab(newCurrentTab.id)
+						} else {
+							this.updateCurrentTabId(null)
+						}
+					}
+				}
+			} else if (message.action === 'updated') {
+				const { tabId, tab } = message.payload as { tabId: number; tab: chrome.tabs.Tab }
+				const targetTab = this.tabs.find((t) => t.id === tabId)
+				if (targetTab) {
+					targetTab.url = tab.url
+					targetTab.title = tab.title
+					targetTab.status = tab.status
+				}
+			}
+		})
+
+		this.port.onDisconnect.addListener(() => {
+			this.port = null
+			if (this.disposed) return
+			if (this.portRetries >= 7) {
+				console.error(PREFIX, 'tab events port failed after 3 retries, giving up')
+				return
+			}
+			debug('port disconnected, reconnecting...')
+			this.portRetries++
+			this.connectTabEvents()
+		})
+	}
+
 	dispose() {
-		this.dispatchEvent(new Event('dispose'))
+		debug('dispose')
+		this.disposed = true
+		this.port?.disconnect()
+		this.port = null
 	}
 }
 

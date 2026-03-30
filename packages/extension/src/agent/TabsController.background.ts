@@ -6,7 +6,6 @@ import type { TabAction } from './TabsController'
 const PREFIX = '[TabsController.background]'
 
 const debug = console.debug.bind(console, `\x1b[90m${PREFIX}\x1b[0m`)
-const debugError = console.error.bind(console, `\x1b[91m${PREFIX}\x1b[0m`)
 
 export function handleTabControlMessage(
 	message: { type: 'TAB_CONTROL'; action: TabAction; payload: any },
@@ -131,42 +130,40 @@ export function handleTabControlMessage(
 	}
 }
 
-export function setupTabChangeEvents() {
-	// @note It's normal to catch errors here before `TabsController.init()`
-	console.log('[TabsController.background] setupTabChangeEvents')
+const tabEventPorts = new Set<chrome.runtime.Port>()
+
+function broadcastTabEvent(message: object) {
+	for (const port of tabEventPorts) {
+		port.postMessage(message)
+	}
+}
+
+/**
+ * Port-based tab events: agents connect via `chrome.runtime.connect({ name: 'tab-events' })`
+ * and receive tab change events through the port. Works for both extension pages and content scripts.
+ */
+export function setupTabEventsPort() {
+	chrome.runtime.onConnect.addListener((port) => {
+		if (port.name !== 'tab-events') return
+
+		debug('port connected', port.sender?.tab?.id ?? port.sender?.url)
+		tabEventPorts.add(port)
+
+		port.onDisconnect.addListener(() => {
+			debug('port disconnected')
+			tabEventPorts.delete(port)
+		})
+	})
 
 	chrome.tabs.onCreated.addListener((tab) => {
-		debug('onCreated', tab)
-		chrome.runtime
-			.sendMessage({ type: 'TAB_CHANGE', action: 'created', payload: { tab } })
-			.catch((error) => {
-				debugError('onCreated error:', error)
-			})
+		broadcastTabEvent({ action: 'created', payload: { tab } })
 	})
 
 	chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-		debug('onRemoved', tabId, removeInfo)
-		chrome.runtime
-			.sendMessage({
-				type: 'TAB_CHANGE',
-				action: 'removed',
-				payload: { tabId, removeInfo },
-			})
-			.catch((error) => {
-				debugError('onRemoved error:', error)
-			})
+		broadcastTabEvent({ action: 'removed', payload: { tabId, removeInfo } })
 	})
 
 	chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-		debug('onUpdated', tabId, changeInfo)
-		chrome.runtime
-			.sendMessage({
-				type: 'TAB_CHANGE',
-				action: 'updated',
-				payload: { tabId, changeInfo, tab },
-			})
-			.catch((error) => {
-				debugError('onUpdated error:', error)
-			})
+		broadcastTabEvent({ action: 'updated', payload: { tabId, changeInfo, tab } })
 	})
 }
