@@ -23,6 +23,7 @@ function sendMessage(message: {
 export class TabsController extends EventTarget {
 	currentTabId: number | null = null
 
+	private windowId: number | null = null
 	private tabs: TabMeta[] = []
 	private initialTabId: number | null = null
 	private tabGroupId: number | null = null
@@ -34,27 +35,34 @@ export class TabsController extends EventTarget {
 		debug('init', task, options)
 
 		this.task = task
+		this.windowId = null
 		this.tabs = []
 		this.currentTabId = null
 		this.tabGroupId = null
 		this.initialTabId = null
 		this.experimentalIncludeAllTabs = experimentalIncludeAllTabs
 
-		const result = await sendMessage({
+		const activeTabResult = await sendMessage({
 			type: 'TAB_CONTROL',
 			action: 'get_active_tab',
 		})
 
-		this.initialTabId = result.tabId
+		this.initialTabId = activeTabResult.tab?.id
+		this.windowId = activeTabResult.tab?.windowId
 
-		if (!this.initialTabId) {
-			throw new Error('Failed to get initial tab ID')
+		if (!this.initialTabId || !this.windowId) {
+			if (activeTabResult.error) {
+				throw new Error(activeTabResult.error)
+			} else {
+				throw new Error('Failed to get active tab')
+			}
 		}
 
 		if (experimentalIncludeAllTabs) {
 			const allTabs = await sendMessage({
 				type: 'TAB_CONTROL',
 				action: 'get_window_tabs',
+				payload: { windowId: this.windowId },
 			})
 			for (const tab of allTabs.tabs as chrome.tabs.Tab[]) {
 				if (tab.id && !tab.pinned && isContentScriptAllowed(tab.url)) {
@@ -82,7 +90,7 @@ export class TabsController extends EventTarget {
 				this.currentTabId = this.initialTabId
 
 				this.tabs.push({
-					id: result.tabId,
+					id: this.initialTabId,
 					isInitial: true,
 					url: info.url,
 					title: info.title,
@@ -229,7 +237,7 @@ export class TabsController extends EventTarget {
 		const result = await sendMessage({
 			type: 'TAB_CONTROL',
 			action: 'create_tab_group',
-			payload: { tabIds },
+			payload: { tabIds, windowId: this.windowId },
 		})
 
 		if (!result?.success) {

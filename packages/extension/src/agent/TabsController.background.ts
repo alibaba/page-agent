@@ -19,11 +19,10 @@ export function handleTabControlMessage(
 		case 'get_active_tab': {
 			debug('get_active_tab')
 			chrome.tabs
-				.query({ active: true, currentWindow: true })
+				.query({ active: true })
 				.then((tabs) => {
-					const tabId = tabs.length > 0 ? tabs[0].id || null : null
-					debug('get_active_tab: success', tabId)
-					sendResponse({ success: true, tabId })
+					debug('get_active_tab: success', tabs)
+					sendResponse({ success: true, tab: tabs[0] })
 				})
 				.catch((error) => {
 					sendResponse({ error: error instanceof Error ? error.message : String(error) })
@@ -62,7 +61,7 @@ export function handleTabControlMessage(
 		case 'create_tab_group': {
 			debug('create_tab_group', payload)
 			chrome.tabs
-				.group({ tabIds: payload.tabIds })
+				.group({ tabIds: payload.tabIds, createProperties: { windowId: payload.windowId } })
 				.then((groupId) => {
 					debug('create_tab_group: success', groupId)
 					sendResponse({ success: true, groupId })
@@ -114,9 +113,9 @@ export function handleTabControlMessage(
 		}
 
 		case 'get_window_tabs': {
-			debug('get_window_tabs')
+			debug('get_window_tabs', payload)
 			chrome.tabs
-				.query({ currentWindow: true })
+				.query({ windowId: payload.windowId })
 				.then((tabs) => {
 					sendResponse({ success: true, tabs })
 				})
@@ -133,6 +132,7 @@ export function handleTabControlMessage(
 }
 
 export function setupTabChangeEvents() {
+	// @note It's normal to catch errors here before `TabsController.init()`
 	console.log('[TabsController.background] setupTabChangeEvents')
 
 	chrome.tabs.onCreated.addListener((tab) => {
