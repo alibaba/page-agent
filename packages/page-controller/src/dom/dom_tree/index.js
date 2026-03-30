@@ -1143,6 +1143,43 @@ export default (
 	 * @param {HTMLElement} element - The element to check.
 	 * @returns {boolean} Whether the element is an interactive candidate.
 	 */
+	const INTERACTIVE_ARIA_ATTRS = [
+		'aria-label',
+		'aria-labelledby',
+		'aria-describedby',
+		'aria-expanded',
+		'aria-checked',
+		'aria-selected',
+		'aria-pressed',
+		'aria-hidden',
+		'aria-haspopup',
+		'aria-controls',
+		'aria-owns',
+		'aria-current',
+		'aria-disabled',
+		'aria-live',
+		'aria-modal',
+		'aria-activedescendant',
+		'aria-valuenow',
+		'aria-valuetext',
+		'aria-valuemax',
+		'aria-valuemin',
+		'aria-autocomplete',
+		'aria-invalid',
+		'aria-required',
+		'aria-level',
+		'aria-sort',
+		'aria-orientation',
+		'aria-multiline',
+	]
+
+	function hasAriaAttribute(el) {
+		for (let i = 0; i < INTERACTIVE_ARIA_ATTRS.length; i++) {
+			if (el.hasAttribute(INTERACTIVE_ARIA_ATTRS[i])) return true
+		}
+		return false
+	}
+
 	function isInteractiveCandidate(element) {
 		if (!element || element.nodeType !== Node.ELEMENT_NODE) return false
 
@@ -1167,7 +1204,7 @@ export default (
 			element.hasAttribute('onclick') ||
 			element.hasAttribute('role') ||
 			element.hasAttribute('tabindex') ||
-			element.hasAttribute('aria-') ||
+			hasAriaAttribute(element) ||
 			element.hasAttribute('data-action') ||
 			element.getAttribute('contenteditable') === 'true'
 
