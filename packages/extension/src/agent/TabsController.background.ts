@@ -5,9 +5,8 @@ import type { TabAction } from './TabsController'
 
 const PREFIX = '[TabsController.background]'
 
-function debug(...messages: any[]) {
-	console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
-}
+const debug = console.debug.bind(console, `\x1b[90m${PREFIX}\x1b[0m`)
+const debugError = console.error.bind(console, `\x1b[91m${PREFIX}\x1b[0m`)
 
 export function handleTabControlMessage(
 	message: { type: 'TAB_CONTROL'; action: TabAction; payload: any },
@@ -141,7 +140,7 @@ export function setupTabChangeEvents() {
 		chrome.runtime
 			.sendMessage({ type: 'TAB_CHANGE', action: 'created', payload: { tab } })
 			.catch((error) => {
-				debug('onCreated error:', error)
+				debugError('onCreated error:', error)
 			})
 	})
 
@@ -154,7 +153,7 @@ export function setupTabChangeEvents() {
 				payload: { tabId, removeInfo },
 			})
 			.catch((error) => {
-				debug('onRemoved error:', error)
+				debugError('onRemoved error:', error)
 			})
 	})
 
@@ -167,7 +166,7 @@ export function setupTabChangeEvents() {
 				payload: { tabId, changeInfo, tab },
 			})
 			.catch((error) => {
-				debug('onUpdated error:', error)
+				debugError('onUpdated error:', error)
 			})
 	})
 }
