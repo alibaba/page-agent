@@ -177,41 +177,44 @@ export class PageController extends EventTarget {
 		this.lastTimeUpdate = Date.now()
 
 		// Temporarily bypass mask to allow DOM extraction
-		if (this.mask) {
-			this.mask.wrapper.style.pointerEvents = 'none'
+		const maskExisted = !!this.mask
+		if (maskExisted) {
+			this.mask!.wrapper.style.pointerEvents = 'none'
 		}
 
-		dom.cleanUpHighlights()
+		try {
+			dom.cleanUpHighlights()
 
-		const blacklist = [
-			...(this.config.interactiveBlacklist || []),
-			...document.querySelectorAll('[data-page-agent-not-interactive]').values(),
-		]
+			const blacklist = [
+				...(this.config.interactiveBlacklist || []),
+				...document.querySelectorAll('[data-page-agent-not-interactive]').values(),
+			]
 
-		this.flatTree = dom.getFlatTree({
-			...this.config,
-			interactiveBlacklist: blacklist,
-		})
+			this.flatTree = dom.getFlatTree({
+				...this.config,
+				interactiveBlacklist: blacklist,
+			})
 
-		this.simplifiedHTML = dom.flatTreeToString(this.flatTree, this.config.includeAttributes)
+			this.simplifiedHTML = dom.flatTreeToString(this.flatTree, this.config.includeAttributes)
 
-		this.selectorMap.clear()
-		this.selectorMap = dom.getSelectorMap(this.flatTree)
+			this.selectorMap.clear()
+			this.selectorMap = dom.getSelectorMap(this.flatTree)
 
-		this.elementTextMap.clear()
-		this.elementTextMap = dom.getElementTextMap(this.simplifiedHTML)
+			this.elementTextMap.clear()
+			this.elementTextMap = this.simplifiedHTML
 
-		// Mark as indexed - now element actions are allowed
-		this.isIndexed = true
+			// Mark as indexed - now element actions are allowed
+			this.isIndexed = true
 
-		// Restore mask blocking
-		if (this.mask) {
-			this.mask.wrapper.style.pointerEvents = 'auto'
+			return this.simplifiedHTML
+		} finally {
+			// Restore mask blocking even if an error occurs
+			if (maskExisted) {
+				this.mask!.wrapper.style.pointerEvents = 'auto'
+			}
+
+			this.dispatchEvent(new Event('afterUpdate'))
 		}
-
-		this.dispatchEvent(new Event('afterUpdate'))
-
-		return this.simplifiedHTML
 	}
 
 	/**
