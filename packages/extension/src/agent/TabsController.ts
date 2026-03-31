@@ -341,7 +341,7 @@ export class TabsController {
 			this.port = null
 			if (this.disposed) return
 			if (this.portRetries >= 7) {
-				console.error(PREFIX, 'tab events port failed after 3 retries, giving up')
+				console.error(PREFIX, 'tab events port failed after 7 retries, giving up')
 				return
 			}
 			debug('port disconnected, reconnecting...')
