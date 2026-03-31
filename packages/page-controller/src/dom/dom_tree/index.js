@@ -798,7 +798,7 @@ export default (
 		const explicitDisableTags = new Set([
 			'disabled', // Standard disabled attribute
 			// 'aria-disabled',      // ARIA disabled state
-			'readonly', // Read-only state
+			// 'readonly', // Read-only state
 			// 'aria-readonly',     // ARIA read-only state
 			// 'aria-hidden',       // Hidden from accessibility
 			// 'hidden',            // Hidden attribute
@@ -832,9 +832,9 @@ export default (
 			}
 
 			// Check for readonly property on form elements
-			if (element.readOnly) {
-				return false
-			}
+			// if (element.readOnly) {
+			// 	return false
+			// }
 
 			// Check for inert property
 			if (element.inert) {
