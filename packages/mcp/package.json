@@ -1,7 +1,7 @@
 {
     "name": "@page-agent/mcp",
     "private": false,
-    "version": "1.6.3",
+    "version": "1.7.0",
     "type": "module",
     "bin": {
         "page-agent-mcp": "src/index.js"
