@@ -42,19 +42,20 @@ let lastClickedElement: HTMLElement | null = null
 
 function blurLastClickedElement() {
 	if (lastClickedElement) {
+		lastClickedElement.dispatchEvent(new PointerEvent('pointerout', { bubbles: true }))
+		lastClickedElement.dispatchEvent(new PointerEvent('pointerleave', { bubbles: false }))
+		lastClickedElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+		lastClickedElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
 		lastClickedElement.blur()
-		lastClickedElement.dispatchEvent(
-			new MouseEvent('mouseout', { bubbles: true, cancelable: true })
-		)
-		lastClickedElement.dispatchEvent(
-			new MouseEvent('mouseleave', { bubbles: false, cancelable: true })
-		)
 		lastClickedElement = null
 	}
 }
 
 /**
- * Simulate a click on the element
+ * Simulate a full click following W3C Pointer Events + UI Events spec order:
+ * pointerover/enter → mouseover/enter → pointerdown → mousedown → [focus] →
+ * pointerup → mouseup → click
+ *
  * @private Internal method, subject to change at any time.
  */
 export async function clickElement(element: HTMLElement) {
@@ -63,7 +64,6 @@ export async function clickElement(element: HTMLElement) {
 	lastClickedElement = element
 
 	await scrollIntoViewIfNeeded(element)
-	// Scroll the iframe element itself into view if needed
 	const frame = element.ownerDocument.defaultView?.frameElement
 	if (frame) await scrollIntoViewIfNeeded(frame)
 
@@ -72,23 +72,41 @@ export async function clickElement(element: HTMLElement) {
 
 	await waitFor(0.1)
 
-	// hover it
-	element.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true }))
-	element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, cancelable: true }))
+	const rect = element.getBoundingClientRect()
+	const x = rect.left + rect.width / 2
+	const y = rect.top + rect.height / 2
+	const pointerOpts = {
+		bubbles: true,
+		cancelable: true,
+		clientX: x,
+		clientY: y,
+		pointerType: 'mouse' as const,
+	}
+	const mouseOpts = { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 }
 
-	// dispatch a sequence of events to ensure all listeners are triggered
-	element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }))
+	// Hover — pointer events first, then mouse events (spec order)
+	element.dispatchEvent(new PointerEvent('pointerover', pointerOpts))
+	element.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
+	element.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
+	element.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
 
-	// focus it to ensure it gets the click event
-	element.focus()
+	// Press
+	element.dispatchEvent(new PointerEvent('pointerdown', pointerOpts))
+	element.dispatchEvent(new MouseEvent('mousedown', mouseOpts))
 
-	element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }))
-	element.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+	// Focus is not part of the standard "undefined and varies between user agents".
+	// Browsers implicitly focus focusable elements on mousedown as an internal behavior.
+	element.focus({ preventScroll: true })
 
-	// dispatch a click event
-	// element.click()
+	// Release
+	element.dispatchEvent(new PointerEvent('pointerup', pointerOpts))
+	element.dispatchEvent(new MouseEvent('mouseup', mouseOpts))
 
-	await waitFor(0.2) // Wait to ensure click event processing completes
+	// Click — element.click() triggers default behaviors (e.g. <a> navigation,
+	// form submission) that dispatchEvent(new MouseEvent('click')) may not.
+	element.click()
+
+	await waitFor(0.2)
 }
 
 /**
