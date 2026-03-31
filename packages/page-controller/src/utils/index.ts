@@ -48,7 +48,7 @@ export async function waitFor(seconds: number): Promise<void> {
 	await new Promise((resolve) => setTimeout(resolve, seconds * 1000))
 }
 
-// ======= dom utils =======
+// ======= mask events =======
 
 export async function movePointerToElement(element: HTMLElement) {
 	const rect = element.getBoundingClientRect()
@@ -59,4 +59,16 @@ export async function movePointerToElement(element: HTMLElement) {
 	window.dispatchEvent(new CustomEvent('PageAgent::MovePointerTo', { detail: { x, y } }))
 
 	await waitFor(0.3)
+}
+
+export async function clickPointer() {
+	window.dispatchEvent(new CustomEvent('PageAgent::ClickPointer'))
+}
+
+export async function enablePassThrough() {
+	window.dispatchEvent(new CustomEvent('PageAgent::EnablePassThrough'))
+}
+
+export async function disablePassThrough() {
+	window.dispatchEvent(new CustomEvent('PageAgent::DisablePassThrough'))
 }

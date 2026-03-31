@@ -4,6 +4,9 @@
  */
 import type { InteractiveElementDomNode } from './dom/dom_tree/type'
 import {
+	clickPointer,
+	disablePassThrough,
+	enablePassThrough,
 	getNativeValueSetter,
 	isHTMLElement,
 	isInputElement,
@@ -68,43 +71,56 @@ export async function clickElement(element: HTMLElement) {
 	if (frame) await scrollIntoViewIfNeeded(frame)
 
 	await movePointerToElement(element)
-	window.dispatchEvent(new CustomEvent('PageAgent::ClickPointer'))
+	await clickPointer()
 
 	await waitFor(0.1)
 
 	const rect = element.getBoundingClientRect()
 	const x = rect.left + rect.width / 2
 	const y = rect.top + rect.height / 2
+
+	// Hit-test to find the deepest element at click coordinates, matching
+	// real browser behavior where events target the innermost element.
+	// @note This may hit a element in the blacklist
+	// TODO: This is a temporary workaround. Should have been handled during dom extraction.
+	const doc = element.ownerDocument
+	await enablePassThrough()
+	const hitTarget = doc.elementFromPoint(x, y)
+	await disablePassThrough()
+	const target =
+		hitTarget instanceof HTMLElement && element.contains(hitTarget) ? hitTarget : element
+
 	const pointerOpts = {
 		bubbles: true,
 		cancelable: true,
 		clientX: x,
 		clientY: y,
-		pointerType: 'mouse' as const,
+		pointerType: 'mouse',
 	}
 	const mouseOpts = { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 }
 
 	// Hover — pointer events first, then mouse events (spec order)
-	element.dispatchEvent(new PointerEvent('pointerover', pointerOpts))
-	element.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
-	element.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
-	element.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
+	target.dispatchEvent(new PointerEvent('pointerover', pointerOpts))
+	target.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
+	target.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
+	target.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
 
 	// Press
-	element.dispatchEvent(new PointerEvent('pointerdown', pointerOpts))
-	element.dispatchEvent(new MouseEvent('mousedown', mouseOpts))
+	target.dispatchEvent(new PointerEvent('pointerdown', pointerOpts))
+	target.dispatchEvent(new MouseEvent('mousedown', mouseOpts))
 
-	// Focus is not part of the standard "undefined and varies between user agents".
-	// Browsers implicitly focus focusable elements on mousedown as an internal behavior.
+	// Focus is not part of the standard pointer/mouse event sequence
+	// "undefined and varies between user agents".
+	// We focus the original element (nearest focusable ancestor), not the hit-test target, matching browser behavior.
 	element.focus({ preventScroll: true })
 
 	// Release
-	element.dispatchEvent(new PointerEvent('pointerup', pointerOpts))
-	element.dispatchEvent(new MouseEvent('mouseup', mouseOpts))
+	target.dispatchEvent(new PointerEvent('pointerup', pointerOpts))
+	target.dispatchEvent(new MouseEvent('mouseup', mouseOpts))
 
-	// Click — element.click() triggers default behaviors (e.g. <a> navigation,
-	// form submission) that dispatchEvent(new MouseEvent('click')) may not.
-	element.click()
+	// Click — activation behavior (navigation, form submit, etc.) triggers
+	// via bubbling from target up to the interactive ancestor.
+	target.click()
 
 	await waitFor(0.2)
 }
