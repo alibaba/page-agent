@@ -50,13 +50,19 @@ export async function waitFor(seconds: number): Promise<void> {
 
 // ======= mask events =======
 
-export async function movePointerToElement(element: HTMLElement) {
-	const rect = element.getBoundingClientRect()
+/**
+ * Move the visual pointer to a position within an element.
+ * @param x - x coordinate in the element's document viewport
+ * @param y - y coordinate in the element's document viewport
+ */
+export async function movePointerToElement(element: HTMLElement, x: number, y: number) {
 	const offset = getIframeOffset(element)
-	const x = rect.left + rect.width / 2 + offset.x
-	const y = rect.top + rect.height / 2 + offset.y
 
-	window.dispatchEvent(new CustomEvent('PageAgent::MovePointerTo', { detail: { x, y } }))
+	window.dispatchEvent(
+		new CustomEvent('PageAgent::MovePointerTo', {
+			detail: { x: x + offset.x, y: y + offset.y },
+		})
+	)
 
 	await waitFor(0.3)
 }

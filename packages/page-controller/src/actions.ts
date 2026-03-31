@@ -70,14 +70,14 @@ export async function clickElement(element: HTMLElement) {
 	const frame = element.ownerDocument.defaultView?.frameElement
 	if (frame) await scrollIntoViewIfNeeded(frame)
 
-	await movePointerToElement(element)
-	await clickPointer()
-
-	await waitFor(0.1)
-
 	const rect = element.getBoundingClientRect()
 	const x = rect.left + rect.width / 2
 	const y = rect.top + rect.height / 2
+
+	await movePointerToElement(element, x, y)
+	await clickPointer()
+
+	await waitFor(0.1)
 
 	// Hit-test to find the deepest element at click coordinates, matching
 	// real browser behavior where events target the innermost element.
