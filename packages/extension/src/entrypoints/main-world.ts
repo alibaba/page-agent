@@ -6,7 +6,23 @@ export interface ExecuteConfig {
 	baseURL: string
 	model: string
 	apiKey?: string
+	/**
+	 * Instructions to guide the agent's behavior
+	 */
+	instructions?: {
+		/**
+		 * Global system-level instructions, applied to all tasks
+		 */
+		system?: string
 
+		/**
+		 * Dynamic page-level instructions callback
+		 * Called before each step to get instructions for the current page
+		 * @param url - Current page URL (window.location.href)
+		 * @returns Instructions string, or undefined/null to skip
+		 */
+		getPageInstructions?: (url: string) => string | undefined | null
+	}
 	/**
 	 * Whether to include the initial tab (that holds this main world script) in the task.
 	 * @default true
@@ -89,6 +105,7 @@ export default defineUnlistedScript(() => {
 						baseURL: config.baseURL,
 						model: config.model,
 						apiKey: config.apiKey,
+						instructions: config.instructions,
 						includeInitialTab: config.includeInitialTab,
 						experimentalIncludeAllTabs: config.experimentalIncludeAllTabs,
 					},
