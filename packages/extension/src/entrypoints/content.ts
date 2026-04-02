@@ -46,6 +46,8 @@ async function exposeAgentToPage() {
 	let multiPageAgent: InstanceType<typeof MultiPageAgent> | null = null
 
 	window.addEventListener('message', async (e) => {
+		if (e.source !== window) return
+
 		const data = e.data
 		if (typeof data !== 'object' || data === null) return
 		if (data.channel !== 'PAGE_AGENT_EXT_REQUEST') return

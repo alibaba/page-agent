@@ -45,6 +45,8 @@ export default defineUnlistedScript(() => {
 
 		const promise = new Promise<ExecutionResult>((resolve, reject) => {
 			function handleMessage(e: MessageEvent) {
+				if (e.source !== window) return
+
 				const data = e.data
 				if (typeof data !== 'object' || data === null) return
 				if (data.channel !== 'PAGE_AGENT_EXT_RESPONSE') return
