@@ -18,6 +18,7 @@
  * @edit improve `sampleRect`, filter out rects with 0 area
  * @edit exclude aria-hidden elements
  * @edit make sure attributes exist for interactive candidates.
+ * @edit fix "aria-*" attributes check
  */
 
 export default (
@@ -1143,6 +1144,31 @@ export default (
 	 * @param {HTMLElement} element - The element to check.
 	 * @returns {boolean} Whether the element is an interactive candidate.
 	 */
+
+	// @edit fix "aria-*" attributes check
+	const INTERACTIVE_ARIA_ATTRS = [
+		'aria-expanded',
+		'aria-checked',
+		'aria-selected',
+		'aria-pressed',
+		'aria-haspopup',
+		'aria-controls',
+		'aria-owns',
+		'aria-activedescendant',
+		'aria-valuenow',
+		'aria-valuetext',
+		'aria-valuemax',
+		'aria-valuemin',
+		'aria-autocomplete',
+	]
+
+	function hasInteractiveAria(el) {
+		for (let i = 0; i < INTERACTIVE_ARIA_ATTRS.length; i++) {
+			if (el.hasAttribute(INTERACTIVE_ARIA_ATTRS[i])) return true
+		}
+		return false
+	}
+
 	function isInteractiveCandidate(element) {
 		if (!element || element.nodeType !== Node.ELEMENT_NODE) return false
 
@@ -1167,7 +1193,7 @@ export default (
 			element.hasAttribute('onclick') ||
 			element.hasAttribute('role') ||
 			element.hasAttribute('tabindex') ||
-			element.hasAttribute('aria-') ||
+			hasInteractiveAria(element) ||
 			element.hasAttribute('data-action') ||
 			element.getAttribute('contenteditable') === 'true'
 
