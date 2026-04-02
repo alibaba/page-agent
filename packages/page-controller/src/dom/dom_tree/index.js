@@ -18,6 +18,7 @@
  * @edit improve `sampleRect`, filter out rects with 0 area
  * @edit exclude aria-hidden elements
  * @edit make sure attributes exist for interactive candidates.
+ * @edit fix "aria-*" attributes check
  */
 
 export default (
@@ -1143,6 +1144,8 @@ export default (
 	 * @param {HTMLElement} element - The element to check.
 	 * @returns {boolean} Whether the element is an interactive candidate.
 	 */
+
+	// @edit fix "aria-*" attributes check
 	const INTERACTIVE_ARIA_ATTRS = [
 		'aria-expanded',
 		'aria-checked',
