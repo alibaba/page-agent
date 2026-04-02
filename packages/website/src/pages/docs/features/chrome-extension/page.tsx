@@ -199,6 +199,7 @@ interface ExecuteConfig {
 	model: string     // Model name
 	apiKey?: string   // LLM AK
 
+	systemInstruction?: string // Global system-level instructions
 	includeInitialTab?: boolean
 	experimentalIncludeAllTabs?: boolean // Control all unpinned tabs in the window
 	onStatusChange?: (status: AgentStatus) => void
