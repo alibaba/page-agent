@@ -17,9 +17,10 @@ const DEMO_MODEL = 'qwen3.5-plus'
 const DEMO_BASE_URL = 'https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run'
 const DEMO_API_KEY = 'NA'
 
+const currentScript = document.currentScript as HTMLScriptElement | null
+
 // in case document.x is not ready yet
 setTimeout(() => {
-	const currentScript = document.currentScript as HTMLScriptElement | null
 	let config: PageAgentConfig
 
 	if (currentScript) {
