@@ -4,9 +4,7 @@ import type { TabsController } from './TabsController'
 
 const PREFIX = '[RemotePageController]'
 
-function debug(...messages: any[]) {
-	console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
-}
+const debug = console.debug.bind(console, `\x1b[90m${PREFIX}\x1b[0m`)
 
 function sendMessage(message: {
 	type: 'PAGE_CONTROL'

@@ -13,6 +13,7 @@ import ChromeExtension from './features/chrome-extension/page'
 import Instructions from './features/custom-instructions/page'
 import CustomTools from './features/custom-tools/page'
 import DataMasking from './features/data-masking/page'
+import McpServerPage from './features/mcp-server/page'
 import Models from './features/models/page'
 import ThirdPartyAgent from './features/third-party-agent/page'
 import Limitations from './introduction/limitations/page'
@@ -78,6 +79,11 @@ export default function DocsRouter() {
 			<Route path="/features/chrome-extension">
 				<DocsPage>
 					<ChromeExtension />
+				</DocsPage>
+			</Route>
+			<Route path="/features/mcp-server">
+				<DocsPage>
+					<McpServerPage />
 				</DocsPage>
 			</Route>
 			<Route path="/features/third-party-agent">

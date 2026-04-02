@@ -218,6 +218,7 @@ export class PageController extends EventTarget {
 	 * Clean up all element highlights
 	 */
 	async cleanUpHighlights(): Promise<void> {
+		console.log('[PageController] cleanUpHighlights')
 		dom.cleanUpHighlights()
 	}
 
@@ -424,3 +425,5 @@ export class PageController extends EventTarget {
 		this.mask = null
 	}
 }
+
+export * from './actions'

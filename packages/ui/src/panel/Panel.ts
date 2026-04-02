@@ -369,6 +369,7 @@ export class Panel {
 	}
 
 	#createWrapper(): HTMLElement {
+		const taskInputMaxLength = 1000
 		const wrapper = document.createElement('div')
 		wrapper.id = 'page-agent-runtime_agent-panel'
 		wrapper.className = styles.wrapper
@@ -406,7 +407,7 @@ export class Panel {
 					<input 
 						type="text" 
 						class="${styles.taskInput}" 
-						maxlength="200"
+						maxlength="${taskInputMaxLength}"
 					/>
 				</div>
 			</div>

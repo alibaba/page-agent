@@ -5,9 +5,7 @@ import type { TabAction } from './TabsController'
 
 const PREFIX = '[TabsController.background]'
 
-function debug(...messages: any[]) {
-	console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
-}
+const debug = console.debug.bind(console, `\x1b[90m${PREFIX}\x1b[0m`)
 
 export function handleTabControlMessage(
 	message: { type: 'TAB_CONTROL'; action: TabAction; payload: any },
@@ -20,11 +18,10 @@ export function handleTabControlMessage(
 		case 'get_active_tab': {
 			debug('get_active_tab')
 			chrome.tabs
-				.query({ active: true, currentWindow: true })
+				.query({ active: true })
 				.then((tabs) => {
-					const tabId = tabs.length > 0 ? tabs[0].id || null : null
-					debug('get_active_tab: success', tabId)
-					sendResponse({ success: true, tabId })
+					debug('get_active_tab: success', tabs)
+					sendResponse({ success: true, tab: tabs[0] })
 				})
 				.catch((error) => {
 					sendResponse({ error: error instanceof Error ? error.message : String(error) })
@@ -63,7 +60,7 @@ export function handleTabControlMessage(
 		case 'create_tab_group': {
 			debug('create_tab_group', payload)
 			chrome.tabs
-				.group({ tabIds: payload.tabIds })
+				.group({ tabIds: payload.tabIds, createProperties: { windowId: payload.windowId } })
 				.then((groupId) => {
 					debug('create_tab_group: success', groupId)
 					sendResponse({ success: true, groupId })
@@ -114,47 +111,59 @@ export function handleTabControlMessage(
 			return true // async response
 		}
 
+		case 'get_window_tabs': {
+			debug('get_window_tabs', payload)
+			chrome.tabs
+				.query({ windowId: payload.windowId })
+				.then((tabs) => {
+					sendResponse({ success: true, tabs })
+				})
+				.catch((error) => {
+					sendResponse({ error: error instanceof Error ? error.message : String(error) })
+				})
+			return true
+		}
+
 		default:
 			sendResponse({ error: `Unknown action: ${action}` })
 			return
 	}
 }
 
-export function setupTabChangeEvents() {
-	console.log('[TabsController.background] setupTabChangeEvents')
+const tabEventPorts = new Set<chrome.runtime.Port>()
+
+function broadcastTabEvent(message: object) {
+	for (const port of tabEventPorts) {
+		port.postMessage(message)
+	}
+}
+
+/**
+ * Port-based tab events: agents connect via `chrome.runtime.connect({ name: 'tab-events' })`
+ * and receive tab change events through the port. Works for both extension pages and content scripts.
+ */
+export function setupTabEventsPort() {
+	chrome.runtime.onConnect.addListener((port) => {
+		if (port.name !== 'tab-events') return
+
+		debug('port connected', port.sender?.tab?.id ?? port.sender?.url)
+		tabEventPorts.add(port)
+
+		port.onDisconnect.addListener(() => {
+			debug('port disconnected')
+			tabEventPorts.delete(port)
+		})
+	})
 
 	chrome.tabs.onCreated.addListener((tab) => {
-		debug('onCreated', tab)
-		chrome.runtime
-			.sendMessage({ type: 'TAB_CHANGE', action: 'created', payload: { tab } })
-			.catch((error) => {
-				debug('onCreated error:', error)
-			})
+		broadcastTabEvent({ action: 'created', payload: { tab } })
 	})
 
 	chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-		debug('onRemoved', tabId, removeInfo)
-		chrome.runtime
-			.sendMessage({
-				type: 'TAB_CHANGE',
-				action: 'removed',
-				payload: { tabId, removeInfo },
-			})
-			.catch((error) => {
-				debug('onRemoved error:', error)
-			})
+		broadcastTabEvent({ action: 'removed', payload: { tabId, removeInfo } })
 	})
 
 	chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-		debug('onUpdated', tabId, changeInfo)
-		chrome.runtime
-			.sendMessage({
-				type: 'TAB_CHANGE',
-				action: 'updated',
-				payload: { tabId, changeInfo, tab },
-			})
-			.catch((error) => {
-				debug('onUpdated error:', error)
-			})
+		broadcastTabEvent({ action: 'updated', payload: { tabId, changeInfo, tab } })
 	})
 }

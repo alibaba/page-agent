@@ -25,15 +25,16 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 - **📖 Text-based DOM manipulation**
     - No screenshots. No multi-modal LLMs or special permissions needed.
 - **🧠 Bring your own LLMs**
-- **🎨 Pretty UI with human-in-the-loop**
 - **🐙 Optional [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension) for multi-page tasks.**
+    - And an [MCP Server (Beta)](https://alibaba.github.io/page-agent/docs/features/mcp-server) to control it from outside
 
 ## 💡 Use Cases
 
 - **SaaS AI Copilot** — Ship an AI copilot in your product in lines of code. No backend rewrite.
 - **Smart Form Filling** — Turn 20-click workflows into one sentence. Perfect for ERP, CRM, and admin systems.
 - **Accessibility** — Make any web app accessible through natural language. Voice commands, screen readers, zero barrier.
-- **Multi-page Agent** — Extend your own agent's reach across browser tabs with the optional [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension).
+- **Multi-page Agent** — Extend your own web agent's reach across browser tabs [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension).
+- **MCP** - Allow your agent clients to control your browser.
 
 ## 🚀 Quick Start
 
@@ -49,8 +50,8 @@ Fastest way to try PageAgent with our free Demo LLM:
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.6.0/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.6.0/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.7.0/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.7.0/files/dist/iife/page-agent.demo.js |
 
 ### NPM Installation
 
@@ -75,11 +76,15 @@ For more programmatic usage, see [📖 Documentations](https://alibaba.github.io
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Follow our instructions in [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines.
+We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and [docs/developer-guide.md](docs/developer-guide.md) for local development workflows.
 
-Please read [Code of Conduct](docs/CODE_OF_CONDUCT.md) before contributing.
+Please read the [maintainer's note](https://github.com/alibaba/page-agent/issues/349) on principles and current state.
 
-Contributions generated entirely by bots or agents without substantial human involvement will not be accepted, and bot accounts may be blocked.
+Contributions generated entirely by **bots or AI** without substantial human involvement will **not be accepted**.
+
+## ⚖️ License
+
+[MIT License](LICENSE)
 
 ## 👏 Acknowledgments
 
@@ -97,23 +102,18 @@ Licensed under the MIT License
 We gratefully acknowledge the browser-use project and its contributors for their
 excellent work on web automation and DOM interaction patterns that helped make
 this project possible.
-
-Third-party dependencies and their licenses can be found in the package.json
-file and in the node_modules directory after installation.
 ```
 
-## 📄 License
+## 🌟 Awesome Page Agent
 
-[MIT License](LICENSE)
+Built something cool with PageAgent? Add it here! Open a PR to share your project.
+
+> These are community projects — not maintained or endorsed by us. Use at your own discretion.
+
+| Project  | Description                                                 |
+| -------- | ----------------------------------------------------------- |
+| _Yours?_ | [Open a PR](https://github.com/alibaba/page-agent/pulls) 🙌 |
 
 ---
 
 **⭐ Star this repo if you find PageAgent helpful!**
-
-<a href="https://www.star-history.com/?repos=alibaba%2Fpage-agent&type=date">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&theme=dark&legend=top-left&v=7" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=7" />
-   <img alt="Star History Chart" src="https://api.star-history.com/image?repos=alibaba/page-agent&type=date&legend=top-left&v=7" />
- </picture>
-</a>

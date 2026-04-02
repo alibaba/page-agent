@@ -31,17 +31,20 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [model, setModel] = useState(config?.model || DEMO_MODEL)
 	const [apiKey, setApiKey] = useState(config?.apiKey)
 	const [language, setLanguage] = useState<LanguagePreference>(config?.language)
-	const [maxSteps, setMaxSteps] = useState<number | undefined>(config?.maxSteps)
+	const [maxSteps, setMaxSteps] = useState(config?.maxSteps)
 	const [systemInstruction, setSystemInstruction] = useState(config?.systemInstruction ?? '')
 	const [experimentalLlmsTxt, setExperimentalLlmsTxt] = useState(
 		config?.experimentalLlmsTxt ?? false
+	)
+	const [experimentalIncludeAllTabs, setExperimentalIncludeAllTabs] = useState(
+		config?.experimentalIncludeAllTabs ?? false
 	)
 	const [disableNamedToolChoice, setDisableNamedToolChoice] = useState(
 		config?.disableNamedToolChoice ?? false
 	)
 	const [advancedOpen, setAdvancedOpen] = useState(false)
 	const [saving, setSaving] = useState(false)
-	const [userAuthToken, setUserAuthToken] = useState<string>('')
+	const [userAuthToken, setUserAuthToken] = useState('')
 	const [copied, setCopied] = useState(false)
 	const [showToken, setShowToken] = useState(false)
 	const [showApiKey, setShowApiKey] = useState(false)
@@ -54,6 +57,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		setMaxSteps(config?.maxSteps)
 		setSystemInstruction(config?.systemInstruction ?? '')
 		setExperimentalLlmsTxt(config?.experimentalLlmsTxt ?? false)
+		setExperimentalIncludeAllTabs(config?.experimentalIncludeAllTabs ?? false)
 		setDisableNamedToolChoice(config?.disableNamedToolChoice ?? false)
 	}, [config])
 
@@ -100,6 +104,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				maxSteps: maxSteps || undefined,
 				systemInstruction: systemInstruction || undefined,
 				experimentalLlmsTxt,
+				experimentalIncludeAllTabs,
 				disableNamedToolChoice,
 			})
 		} finally {
@@ -284,6 +289,14 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					<label className="flex items-center justify-between cursor-pointer">
 						<span className="text-xs text-muted-foreground">Experimental llms.txt support</span>
 						<Switch checked={experimentalLlmsTxt} onCheckedChange={setExperimentalLlmsTxt} />
+					</label>
+
+					<label className="flex items-center justify-between cursor-pointer">
+						<span className="text-xs text-muted-foreground">Experimental include all tabs</span>
+						<Switch
+							checked={experimentalIncludeAllTabs}
+							onCheckedChange={setExperimentalIncludeAllTabs}
+						/>
 					</label>
 				</>
 			)}

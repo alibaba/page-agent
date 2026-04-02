@@ -9,6 +9,7 @@ const BASELINE = new Set([
 	'claude-haiku-4.5',
 	'gemini-3-flash',
 	'deepseek-3.2',
+	'qwen3.6-plus',
 	'qwen3.5-plus',
 	'qwen3.5-flash',
 ])
@@ -16,6 +17,7 @@ const BASELINE = new Set([
 // Models grouped by brand, newest first
 const MODEL_GROUPS: Record<string, string[]> = {
 	Qwen: [
+		'qwen3.6-plus',
 		'qwen3.5-plus',
 		'qwen3.5-flash',
 		'qwen3-coder-next',
@@ -33,8 +35,8 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'claude-haiku-4.5',
 		'claude-sonnet-3.5',
 	],
-	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
 	MiniMax: ['MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed'],
+	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
 	MoonshotAI: ['kimi-k2.5'],
 	'Z.AI': ['glm-5', 'glm-4.7'],
 }
@@ -181,7 +183,7 @@ const pageAgent = new PageAgent({
 						</a>
 					</p>
 					<CodeEditor
-						code={`# qwen3.5-plus (default for demos) or qwen3.5-flash (lighter)
+						code={`# qwen3.5-plus / qwen3.5-flash
 LLM_BASE_URL="https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run"
 LLM_MODEL_NAME="qwen3.5-plus"
 LLM_API_KEY="NA"`}

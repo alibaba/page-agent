@@ -199,7 +199,9 @@ interface ExecuteConfig {
 	model: string     // Model name
 	apiKey?: string   // LLM AK
 
+	systemInstruction?: string // Global system-level instructions
 	includeInitialTab?: boolean
+	experimentalIncludeAllTabs?: boolean // Control all unpinned tabs in the window
 	onStatusChange?: (status: AgentStatus) => void
 	onActivity?: (activity: AgentActivity) => void
 	onHistoryUpdate?: (history: HistoricalEvent[]) => void
@@ -233,6 +235,7 @@ const result = await window.PAGE_AGENT_EXT.execute(
 		apiKey: 'your-api-key',
 		model: 'gpt-5.2',
 		// includeInitialTab: false, // 设为 false 排除初始标签页
+		// experimentalIncludeAllTabs: true, // 控制窗口内所有非固定标签页
 		onStatusChange: status => console.log('状态变化:', status),
 		onActivity: activity => console.log('活动:', activity),
 		onHistoryUpdate: history => console.log('历史更新:', history)
@@ -248,6 +251,7 @@ const result = await window.PAGE_AGENT_EXT.execute(
 		apiKey: 'your-api-key',
 		model: 'gpt-5.2',
 		// includeInitialTab: false, // Set to false to exclude initial tab
+		// experimentalIncludeAllTabs: true, // Control all unpinned tabs in the window
 		onStatusChange: status => console.log('Status change:', status),
 		onActivity: activity => console.log('Activity:', activity),
 		onHistoryUpdate: history => console.log('History update:', history)

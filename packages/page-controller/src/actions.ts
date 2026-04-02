@@ -4,6 +4,9 @@
  */
 import type { InteractiveElementDomNode } from './dom/dom_tree/type'
 import {
+	clickPointer,
+	disablePassThrough,
+	enablePassThrough,
 	getNativeValueSetter,
 	isHTMLElement,
 	isInputElement,
@@ -15,6 +18,7 @@ import {
 
 /**
  * Get the HTMLElement by index from a selectorMap.
+ * @private Internal method, subject to change at any time.
  */
 export function getElementByIndex(
 	selectorMap: Map<number, InteractiveElementDomNode>,
@@ -41,19 +45,21 @@ let lastClickedElement: HTMLElement | null = null
 
 function blurLastClickedElement() {
 	if (lastClickedElement) {
+		lastClickedElement.dispatchEvent(new PointerEvent('pointerout', { bubbles: true }))
+		lastClickedElement.dispatchEvent(new PointerEvent('pointerleave', { bubbles: false }))
+		lastClickedElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+		lastClickedElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
 		lastClickedElement.blur()
-		lastClickedElement.dispatchEvent(
-			new MouseEvent('mouseout', { bubbles: true, cancelable: true })
-		)
-		lastClickedElement.dispatchEvent(
-			new MouseEvent('mouseleave', { bubbles: false, cancelable: true })
-		)
 		lastClickedElement = null
 	}
 }
 
 /**
- * Simulate a click on the element
+ * Simulate a full click following W3C Pointer Events + UI Events spec order:
+ * pointerover/enter → mouseover/enter → pointerdown → mousedown → [focus] →
+ * pointerup → mouseup → click
+ *
+ * @private Internal method, subject to change at any time.
  */
 export async function clickElement(element: HTMLElement) {
 	blurLastClickedElement()
@@ -61,34 +67,67 @@ export async function clickElement(element: HTMLElement) {
 	lastClickedElement = element
 
 	await scrollIntoViewIfNeeded(element)
-	// Scroll the iframe element itself into view if needed
 	const frame = element.ownerDocument.defaultView?.frameElement
 	if (frame) await scrollIntoViewIfNeeded(frame)
 
-	await movePointerToElement(element)
-	window.dispatchEvent(new CustomEvent('PageAgent::ClickPointer'))
+	const rect = element.getBoundingClientRect()
+	const x = rect.left + rect.width / 2
+	const y = rect.top + rect.height / 2
+
+	await movePointerToElement(element, x, y)
+	await clickPointer()
 
 	await waitFor(0.1)
 
-	// hover it
-	element.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true, cancelable: true }))
-	element.dispatchEvent(new MouseEvent('mouseover', { bubbles: true, cancelable: true }))
+	// Hit-test to find the deepest element at click coordinates, matching
+	// real browser behavior where events target the innermost element.
+	// @note This may hit a element in the blacklist
+	// TODO: This is a temporary workaround. Should have been handled during dom extraction.
+	const doc = element.ownerDocument
+	await enablePassThrough()
+	const hitTarget = doc.elementFromPoint(x, y)
+	await disablePassThrough()
+	const target =
+		hitTarget instanceof HTMLElement && element.contains(hitTarget) ? hitTarget : element
 
-	// dispatch a sequence of events to ensure all listeners are triggered
-	element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }))
+	const pointerOpts = {
+		bubbles: true,
+		cancelable: true,
+		clientX: x,
+		clientY: y,
+		pointerType: 'mouse',
+	}
+	const mouseOpts = { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 }
 
-	// focus it to ensure it gets the click event
-	element.focus()
+	// Hover — pointer events first, then mouse events (spec order)
+	target.dispatchEvent(new PointerEvent('pointerover', pointerOpts))
+	target.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
+	target.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
+	target.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
 
-	element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }))
-	element.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+	// Press
+	target.dispatchEvent(new PointerEvent('pointerdown', pointerOpts))
+	target.dispatchEvent(new MouseEvent('mousedown', mouseOpts))
 
-	// dispatch a click event
-	// element.click()
+	// Focus is not part of the standard pointer/mouse event sequence
+	// "undefined and varies between user agents".
+	// We focus the original element (nearest focusable ancestor), not the hit-test target, matching browser behavior.
+	element.focus({ preventScroll: true })
 
-	await waitFor(0.2) // Wait to ensure click event processing completes
+	// Release
+	target.dispatchEvent(new PointerEvent('pointerup', pointerOpts))
+	target.dispatchEvent(new MouseEvent('mouseup', mouseOpts))
+
+	// Click — activation behavior (navigation, form submit, etc.) triggers
+	// via bubbling from target up to the interactive ancestor.
+	target.click()
+
+	await waitFor(0.2)
 }
 
+/**
+ * @private Internal method, subject to change at any time.
+ */
 export async function inputTextElement(element: HTMLElement, text: string) {
 	const isContentEditable = element.isContentEditable
 	if (!isInputElement(element) && !isTextAreaElement(element) && !isContentEditable) {
@@ -196,6 +235,7 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 
 /**
  * @todo browser-use version is very complex and supports menu tags, need to follow up
+ * @private Internal method, subject to change at any time.
  */
 export async function selectOptionElement(selectElement: HTMLSelectElement, optionText: string) {
 	if (!isSelectElement(selectElement)) {
@@ -219,6 +259,9 @@ interface ScrollableElement extends Element {
 	scrollIntoViewIfNeeded?: (centerIfNeeded?: boolean) => void
 }
 
+/**
+ * @private Internal method, subject to change at any time.
+ */
 export async function scrollIntoViewIfNeeded(element: Element) {
 	const el = element as ScrollableElement
 	if (typeof el.scrollIntoViewIfNeeded === 'function') {

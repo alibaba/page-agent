@@ -58,6 +58,22 @@ export default function OneMoreThingSection() {
 					</Link>
 				</div>
 
+				<div className="mb-10 rounded-2xl border border-blue-200/70 dark:border-blue-800/70 bg-linear-to-r from-blue-50 to-white dark:from-blue-950/30 dark:to-gray-900 px-5 py-4 max-w-3xl mx-auto text-left sm:text-center">
+					<p className="text-sm text-gray-700 dark:text-gray-300 leading-7">
+						{isZh
+							? '从 Claude Desktop、Copilot 或其他本地 Agent 直接发起浏览器任务？'
+							: 'Using Claude Desktop, Copilot, or another local agent? Connect it to the extension with the MCP server.'}
+					</p>
+					<p>
+						<Link
+							href="/docs/features/mcp-server"
+							className="font-medium text-blue-700 dark:text-blue-300 underline underline-offset-4"
+						>
+							{isZh ? '查看 MCP 文档' : 'Read the MCP docs'}
+						</Link>
+					</p>
+				</div>
+
 				<div className="grid sm:grid-cols-3 gap-5 text-left max-w-3xl mx-auto">
 					{[
 						{
@@ -67,16 +83,16 @@ export default function OneMoreThingSection() {
 								: 'Run tasks across multiple pages and tabs without being limited to a single page context',
 						},
 						{
-							title: isZh ? '页面内发起控制' : 'Control from Your Page',
+							title: isZh ? '从页面发起控制' : 'Control from a WebPage',
 							desc: isZh
 								? '在页面 JS 中发起任务，驱动整个浏览器完成跨标签操作'
-								: 'Trigger tasks from page JS to drive the entire browser across tabs',
+								: 'Trigger tasks from in-page JS to drive the entire browser across tabs',
 						},
 						{
-							title: isZh ? '外部发起任务' : 'External Triggers',
+							title: isZh ? '外部发起任务' : 'External Caller',
 							desc: isZh
 								? '页面 JS、本地 Agent 或云端 Agent 均可通过扩展发起任务'
-								: 'Page JS, local agents, or cloud agents can trigger tasks through the extension',
+								: 'Local agents and cloud agents can control user browser through the extension',
 						},
 					].map((item) => (
 						<MagicCard

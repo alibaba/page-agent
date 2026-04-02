@@ -118,8 +118,17 @@ export interface ExecuteConfig {
   model: string
   apiKey?: string
 
+  // Global system-level instructions for the agent.
+  // Equivalent to AgentConfig.instructions.system.
+  systemInstruction?: string
+
   // Include the initial tab where page JS starts. Default: true.
   includeInitialTab?: boolean
+
+  // Control all unpinned tabs in the window instead of only the tab group.
+  // When enabled, agent sees and can switch to every non-pinned tab.
+  // Default: false. Experimental.
+  experimentalIncludeAllTabs?: boolean
 
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
@@ -207,7 +216,11 @@ interface ExecuteConfig {
   baseURL: string
   model: string
   apiKey?: string
+
+  systemInstruction?: string
+
   includeInitialTab?: boolean
+  experimentalIncludeAllTabs?: boolean
   onStatusChange?: (status: AgentStatus) => void
   onActivity?: (activity: AgentActivity) => void
   onHistoryUpdate?: (history: HistoricalEvent[]) => void

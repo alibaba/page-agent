@@ -1,7 +1,7 @@
 {
     "name": "root",
     "private": true,
-    "version": "1.6.0",
+    "version": "1.7.0",
     "type": "module",
     "workspaces": [
         "packages/page-controller",
@@ -42,7 +42,7 @@
         "@commitlint/config-conventional": "^20.5.0",
         "@eslint/js": "^9.39.2",
         "@microsoft/api-extractor": "^7.57.7",
-        "@tailwindcss/vite": "^4.2.1",
+        "@tailwindcss/vite": "^4.2.2",
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
         "@types/node": "^25.5.0",
         "@vitejs/plugin-react-swc": "^4.3.0",
@@ -60,7 +60,7 @@
         "lint-staged": "^16.4.0",
         "prettier": "^3.8.0",
         "typescript": "^5.9.3",
-        "typescript-eslint": "^8.57.1",
+        "typescript-eslint": "^8.58.0",
         "unplugin-dts": "^1.0.0-beta.6",
         "vite": "^7.3.1",
         "vite-plugin-css-injected-by-js": "^4.0.1",

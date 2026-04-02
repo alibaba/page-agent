@@ -45,6 +45,7 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 				{ title: isZh ? '知识注入' : 'Instructions', path: '/features/custom-instructions' },
 				{ title: isZh ? '数据脱敏' : 'Data Masking', path: '/features/data-masking' },
 				{ title: isZh ? 'Chrome 扩展' : 'Chrome Extension', path: '/features/chrome-extension' },
+				{ title: 'MCP Server (Beta)', path: '/features/mcp-server' },
 				{
 					title: isZh ? '接入第三方 Agent' : 'Third-party Agent',
 					path: '/features/third-party-agent',
