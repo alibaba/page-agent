@@ -138,15 +138,18 @@ function isTextColorLight() {
  * @returns {boolean}
  */
 function isMainContentDark() {
+	const { innerWidth: vw, innerHeight: vh } = window
+	const minArea = vw * vh * 0.5
+
 	const selectors = ['main', '#app', '#root', '#__next', '[role="main"]']
 	for (const selector of selectors) {
 		const el = document.querySelector(selector)
 		if (!el) continue
 
-		const style = window.getComputedStyle(el)
-		if (isColorDark(style.backgroundColor)) {
-			return true
-		}
+		const rect = el.getBoundingClientRect()
+		if (rect.width * rect.height < minArea) continue
+
+		if (isColorDark(window.getComputedStyle(el).backgroundColor)) return true
 	}
 	return false
 }
