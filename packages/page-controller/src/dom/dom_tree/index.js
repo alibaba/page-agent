@@ -1378,6 +1378,12 @@ export default (
 			return true
 		}
 
+		// Scrollable containers are always distinct — the LLM needs their index for targeted scrolling.
+		// Check extraData (already set by isScrollableElement in isInteractiveElement) to avoid redundant layout reads.
+		if (extraData.get(element)?.scrollable) {
+			return true
+		}
+
 		// Default to false: if it's interactive but doesn't match above,
 		// assume it triggers the same action as the parent.
 		return false
