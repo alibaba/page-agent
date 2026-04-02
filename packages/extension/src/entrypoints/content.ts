@@ -70,11 +70,15 @@ async function exposeAgentToPage() {
 
 				try {
 					const { task, config } = payload
+					const { systemInstruction, ...agentConfig } = config
 
 					// Dispose old instance before creating new one
 					multiPageAgent?.dispose()
 
-					multiPageAgent = new MultiPageAgent(config)
+					multiPageAgent = new MultiPageAgent({
+						...agentConfig,
+						instructions: systemInstruction ? { system: systemInstruction } : undefined,
+					})
 
 					// events
 

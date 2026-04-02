@@ -118,6 +118,10 @@ export interface ExecuteConfig {
   model: string
   apiKey?: string
 
+  // Global system-level instructions for the agent.
+  // Equivalent to AgentConfig.instructions.system.
+  systemInstruction?: string
+
   // Include the initial tab where page JS starts. Default: true.
   includeInitialTab?: boolean
 
@@ -212,6 +216,9 @@ interface ExecuteConfig {
   baseURL: string
   model: string
   apiKey?: string
+
+  systemInstruction?: string
+
   includeInitialTab?: boolean
   experimentalIncludeAllTabs?: boolean
   onStatusChange?: (status: AgentStatus) => void

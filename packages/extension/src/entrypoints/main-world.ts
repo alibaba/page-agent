@@ -8,6 +8,12 @@ export interface ExecuteConfig {
 	apiKey?: string
 
 	/**
+	 * Global system-level instructions for the agent.
+	 * Equivalent to `AgentConfig.instructions.system`.
+	 */
+	systemInstruction?: string
+
+	/**
 	 * Whether to include the initial tab (that holds this main world script) in the task.
 	 * @default true
 	 */
@@ -89,6 +95,7 @@ export default defineUnlistedScript(() => {
 						baseURL: config.baseURL,
 						model: config.model,
 						apiKey: config.apiKey,
+						systemInstruction: config.systemInstruction,
 						includeInitialTab: config.includeInitialTab,
 						experimentalIncludeAllTabs: config.experimentalIncludeAllTabs,
 					},
