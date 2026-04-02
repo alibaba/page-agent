@@ -322,11 +322,11 @@ export class PageController extends EventTarget {
 
 			this.assertIndexed()
 
-			const scrollAmount = pixels ?? numPages * (down ? 1 : -1) * window.innerHeight
+			const scrollAmount = (pixels ?? numPages * window.innerHeight) * (down ? 1 : -1)
 
 			const element = index !== undefined ? getElementByIndex(this.selectorMap, index) : null
 
-			const message = await scrollVertically(down, scrollAmount, element)
+			const message = await scrollVertically(scrollAmount, element)
 
 			return {
 				success: true,
@@ -357,7 +357,7 @@ export class PageController extends EventTarget {
 
 			const element = index !== undefined ? getElementByIndex(this.selectorMap, index) : null
 
-			const message = await scrollHorizontally(right, scrollAmount, element)
+			const message = await scrollHorizontally(scrollAmount, element)
 
 			return {
 				success: true,
