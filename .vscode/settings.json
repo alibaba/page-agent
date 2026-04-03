@@ -35,5 +35,6 @@
         "blanks-around-lists": false,
         "ol-prefix": false,
         "no-duplicate-heading": false
-    }
+    },
+    "js/ts.tsdk.path": "node_modules/typescript/lib"
 }
