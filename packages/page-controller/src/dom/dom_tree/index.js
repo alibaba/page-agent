@@ -503,11 +503,16 @@ export default (
 		const overflowX = style.overflowX
 		const overflowY = style.overflowY
 
-		// Check scrollable distances
+		// scrollbar-width/scrollbar-gutter are only set on elements designed to scroll;
+		// their presence signals scroll intent even when overflow is hidden (e.g. overflow: auto on :hover)
+		const hasScrollbarSignal =
+			(style.scrollbarWidth && style.scrollbarWidth !== 'auto') ||
+			(style.scrollbarGutter && style.scrollbarGutter !== 'auto')
+
 		const scrollableX = overflowX === 'auto' || overflowX === 'scroll'
 		const scrollableY = overflowY === 'auto' || overflowY === 'scroll'
 
-		if (!scrollableX && !scrollableY) {
+		if (!scrollableX && !scrollableY && !hasScrollbarSignal) {
 			return null // Not scrollable in any direction
 		}
 
@@ -521,11 +526,11 @@ export default (
 			return null // Not scrollable
 		}
 
-		if (!scrollableY && scrollWidth < threshold) {
+		if (!scrollableY && !hasScrollbarSignal && scrollWidth < threshold) {
 			return null // Not scrollable horizontally
 		}
 
-		if (!scrollableX && scrollHeight < threshold) {
+		if (!scrollableX && !hasScrollbarSignal && scrollHeight < threshold) {
 			return null // Not scrollable vertically
 		}
 
@@ -546,6 +551,8 @@ export default (
 			scrollable: true,
 			scrollData: scrollData,
 		})
+
+		console.log('scrollData!!!', scrollData)
 
 		return scrollData
 	}
@@ -1375,6 +1382,12 @@ export default (
 
 		// if the element is not strictly interactive but appears clickable based on heuristic signals
 		if (isHeuristicallyInteractive(element)) {
+			return true
+		}
+
+		// Scrollable containers are always distinct — the LLM needs their index for targeted scrolling.
+		// Check extraData (already set by isScrollableElement in isInteractiveElement) to avoid redundant layout reads.
+		if (extraData.get(element)?.scrollable) {
 			return true
 		}
 

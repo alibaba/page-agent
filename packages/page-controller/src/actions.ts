@@ -287,7 +287,10 @@ export async function scrollVertically(scroll_amount: number, element?: HTMLElem
 
 		while (currentElement && attempts < 10) {
 			const computedStyle = window.getComputedStyle(currentElement)
-			const hasScrollableY = /(auto|scroll|overlay)/.test(computedStyle.overflowY)
+			const hasScrollableY =
+				/(auto|scroll|overlay)/.test(computedStyle.overflowY) ||
+				(computedStyle.scrollbarWidth && computedStyle.scrollbarWidth !== 'auto') ||
+				(computedStyle.scrollbarGutter && computedStyle.scrollbarGutter !== 'auto')
 			const canScrollVertically = currentElement.scrollHeight > currentElement.clientHeight
 
 			if (hasScrollableY && canScrollVertically) {
@@ -339,8 +342,19 @@ export async function scrollVertically(scroll_amount: number, element?: HTMLElem
 		el.scrollHeight > el.clientHeight &&
 		bigEnough(el)
 
+	// @deprecated Heuristic container search.
+	// Unreliable in multi-panel layouts. Should guide LLMs to use indexed scroll for consistency.
+	// TODO: remove this fallback
+
+	// try to find the nearest scrollable container
+	// document.activeElement is usually body.
+	// After a successful element.focus(), activeElement become the nearest focusable parent
+
 	let el: HTMLElement | null = document.activeElement as HTMLElement | null
 	while (el && !canScroll(el) && el !== document.body) el = el.parentElement
+
+	// Something is wrong if it falls back to global '*' search
+	// TODO: Return error message instead of global '*' search
 
 	el = canScroll(el)
 		? el
@@ -372,6 +386,10 @@ export async function scrollVertically(scroll_amount: number, element?: HTMLElem
 		return `✅ Scrolled page by ${scrolled}px.`
 	} else {
 		// Container scroll
+
+		const warningMsg = `The document is not scrollable. Falling back to container scroll.`
+		console.log(`[PageController] ${warningMsg}`)
+
 		const scrollBefore = el!.scrollTop
 		const scrollMax = el!.scrollHeight - el!.clientHeight
 
@@ -383,18 +401,18 @@ export async function scrollVertically(scroll_amount: number, element?: HTMLElem
 
 		if (Math.abs(scrolled) < 1) {
 			return dy > 0
-				? `⚠️ Already at the bottom of container (${el!.tagName}), cannot scroll down further.`
-				: `⚠️ Already at the top of container (${el!.tagName}), cannot scroll up further.`
+				? `⚠️ ${warningMsg} Already at the bottom of container (${el!.tagName}), cannot scroll down further.`
+				: `⚠️ ${warningMsg} Already at the top of container (${el!.tagName}), cannot scroll up further.`
 		}
 
 		const reachedBottom = dy > 0 && scrollAfter >= scrollMax - 1
 		const reachedTop = dy < 0 && scrollAfter <= 1
 
 		if (reachedBottom)
-			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the bottom.`
+			return `✅ ${warningMsg} Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the bottom.`
 		if (reachedTop)
-			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the top.`
-		return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px.`
+			return `✅ ${warningMsg} Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the top.`
+		return `✅ ${warningMsg} Scrolled container (${el!.tagName}) by ${scrolled}px.`
 	}
 }
 
@@ -411,7 +429,10 @@ export async function scrollHorizontally(scroll_amount: number, element?: HTMLEl
 
 		while (currentElement && attempts < 10) {
 			const computedStyle = window.getComputedStyle(currentElement)
-			const hasScrollableX = /(auto|scroll|overlay)/.test(computedStyle.overflowX)
+			const hasScrollableX =
+				/(auto|scroll|overlay)/.test(computedStyle.overflowX) ||
+				(computedStyle.scrollbarWidth && computedStyle.scrollbarWidth !== 'auto') ||
+				(computedStyle.scrollbarGutter && computedStyle.scrollbarGutter !== 'auto')
 			const canScrollHorizontally = currentElement.scrollWidth > currentElement.clientWidth
 
 			if (hasScrollableX && canScrollHorizontally) {
@@ -456,12 +477,16 @@ export async function scrollHorizontally(scroll_amount: number, element?: HTMLEl
 	// Page-level scrolling (default or fallback)
 
 	const dx = scroll_amount
+
 	const bigEnough = (el: HTMLElement) => el.clientWidth >= window.innerWidth * 0.5
 	const canScroll = (el: HTMLElement | null) =>
 		el &&
 		/(auto|scroll|overlay)/.test(getComputedStyle(el).overflowX) &&
 		el.scrollWidth > el.clientWidth &&
 		bigEnough(el)
+
+	// @deprecated Same heuristic container search as scrollVertically.
+	// TODO: Remove once LLMs reliably use indexed scrolling via data-scrollable.
 
 	let el: HTMLElement | null = document.activeElement as HTMLElement | null
 	while (el && !canScroll(el) && el !== document.body) el = el.parentElement
@@ -497,6 +522,9 @@ export async function scrollHorizontally(scroll_amount: number, element?: HTMLEl
 		return `✅ Scrolled page horizontally by ${scrolled}px.`
 	} else {
 		// Container scroll
+		const warningMsg = `The document is not scrollable. Falling back to container scroll.`
+		console.log(`[PageController] ${warningMsg}`)
+
 		const scrollBefore = el!.scrollLeft
 		const scrollMax = el!.scrollWidth - el!.clientWidth
 
@@ -508,17 +536,17 @@ export async function scrollHorizontally(scroll_amount: number, element?: HTMLEl
 
 		if (Math.abs(scrolled) < 1) {
 			return dx > 0
-				? `⚠️ Already at the right edge of container (${el!.tagName}), cannot scroll right further.`
-				: `⚠️ Already at the left edge of container (${el!.tagName}), cannot scroll left further.`
+				? `⚠️ ${warningMsg} Already at the right edge of container (${el!.tagName}), cannot scroll right further.`
+				: `⚠️ ${warningMsg} Already at the left edge of container (${el!.tagName}), cannot scroll left further.`
 		}
 
 		const reachedRight = dx > 0 && scrollAfter >= scrollMax - 1
 		const reachedLeft = dx < 0 && scrollAfter <= 1
 
 		if (reachedRight)
-			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the right edge.`
+			return `✅ ${warningMsg} Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the right edge.`
 		if (reachedLeft)
-			return `✅ Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the left edge.`
-		return `✅ Scrolled container (${el!.tagName}) horizontally by ${scrolled}px.`
+			return `✅ ${warningMsg} Scrolled container (${el!.tagName}) by ${scrolled}px. Reached the left edge.`
+		return `✅ ${warningMsg} Scrolled container (${el!.tagName}) horizontally by ${scrolled}px.`
 	}
 }
