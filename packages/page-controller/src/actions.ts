@@ -287,7 +287,10 @@ export async function scrollVertically(scroll_amount: number, element?: HTMLElem
 
 		while (currentElement && attempts < 10) {
 			const computedStyle = window.getComputedStyle(currentElement)
-			const hasScrollableY = /(auto|scroll|overlay)/.test(computedStyle.overflowY)
+			const hasScrollableY =
+				/(auto|scroll|overlay)/.test(computedStyle.overflowY) ||
+				(computedStyle.scrollbarWidth && computedStyle.scrollbarWidth !== 'auto') ||
+				(computedStyle.scrollbarGutter && computedStyle.scrollbarGutter !== 'auto')
 			const canScrollVertically = currentElement.scrollHeight > currentElement.clientHeight
 
 			if (hasScrollableY && canScrollVertically) {
@@ -426,7 +429,10 @@ export async function scrollHorizontally(scroll_amount: number, element?: HTMLEl
 
 		while (currentElement && attempts < 10) {
 			const computedStyle = window.getComputedStyle(currentElement)
-			const hasScrollableX = /(auto|scroll|overlay)/.test(computedStyle.overflowX)
+			const hasScrollableX =
+				/(auto|scroll|overlay)/.test(computedStyle.overflowX) ||
+				(computedStyle.scrollbarWidth && computedStyle.scrollbarWidth !== 'auto') ||
+				(computedStyle.scrollbarGutter && computedStyle.scrollbarGutter !== 'auto')
 			const canScrollHorizontally = currentElement.scrollWidth > currentElement.clientWidth
 
 			if (hasScrollableX && canScrollHorizontally) {
