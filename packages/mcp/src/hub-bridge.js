@@ -6,6 +6,7 @@ import { WebSocketServer } from 'ws'
 
 const EXT_ID = 'akldabonmimlicnjlflnapfeklbfemhj'
 const STORE_URL = `https://chromewebstore.google.com/detail/page-agent-ext/${EXT_ID}`
+const LOOPBACK_HOST = 'localhost'
 
 const launcherTemplate = readFileSync(
 	fileURLToPath(new URL('./launcher.html', import.meta.url)),
@@ -60,8 +61,8 @@ export class HubBridge {
 					reject(err)
 				}
 			})
-			this.#httpServer.listen(this.port, () => {
-				console.error(`[page-agent-mcp] HTTP + WS on http://localhost:${this.port}`)
+			this.#httpServer.listen(this.port, LOOPBACK_HOST, () => {
+				console.error(`[page-agent-mcp] HTTP + WS on http://${LOOPBACK_HOST}:${this.port}`)
 				resolve()
 			})
 		})
