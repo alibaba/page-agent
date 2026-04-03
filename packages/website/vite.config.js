@@ -26,6 +26,7 @@ const SPA_ROUTES = [
 	'docs/features/data-masking',
 	'docs/features/custom-instructions',
 	'docs/features/models',
+	'docs/features/local-llms',
 	'docs/features/chrome-extension',
 	'docs/features/mcp-server',
 	'docs/features/third-party-agent',

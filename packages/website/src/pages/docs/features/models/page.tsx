@@ -22,7 +22,6 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'qwen3-coder-next',
 		'qwen-3-max',
 		'qwen-3-plus',
-		'qwen3:14b (ollama)',
 	],
 	OpenAI: ['gpt-5.4', 'gpt-5.2', 'gpt-5.1', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'gpt-4.1-mini'],
 	DeepSeek: ['deepseek-3.2'],
@@ -65,7 +64,6 @@ export default function Models() {
 					: 'Supports models that comply with OpenAI API specification and support tool calls, including public cloud services and private deployments.'}
 			</p>
 
-			{/* Models Section */}
 			<section className="mb-10">
 				<Heading id="tested-models" className="text-2xl font-semibold mb-3">
 					{isZh ? '已测试模型' : 'Tested Models'}
@@ -88,9 +86,10 @@ export default function Models() {
 				</div>
 			</section>
 
-			{/* Tips Section */}
 			<section className="mb-10">
-				<h2 className="text-2xl font-semibold mb-4">{isZh ? '提示' : 'Tips'}</h2>
+				<Heading id="tips" level={3}>
+					Tips
+				</Heading>
 				<div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
 					<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
 						<li>
@@ -112,7 +111,6 @@ export default function Models() {
 				</div>
 			</section>
 
-			{/* Configuration Section */}
 			<section className="mb-10">
 				<Heading id="configuration">{isZh ? '配置方式' : 'Configuration'}</Heading>
 				<CodeEditor
@@ -122,18 +120,10 @@ const pageAgent = new PageAgent({
   apiKey: 'your-api-key',
   model: 'qwen3.5-plus'
 });
-
-// Self-hosted models (e.g., Ollama) — no apiKey needed
-const pageAgent = new PageAgent({
-  baseURL: 'http://localhost:11434/v1',
-  model: 'qwen3:14b'
-});
-
 `}
 				/>
 			</section>
 
-			{/* Production Authentication */}
 			<section className="mb-10">
 				<Heading id="production-authentication" className="text-2xl font-semibold mb-4">
 					{isZh ? '🔐 生产环境鉴权' : '🔐 Production Authentication'}
@@ -174,7 +164,6 @@ const pageAgent = new PageAgent({
 				</div>
 			</section>
 
-			{/* Free Testing API Section */}
 			<section className="mb-10">
 				<Heading id="free-testing-api">{isZh ? '免费测试接口' : 'Free Testing API'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -223,92 +212,136 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 				</div>
 			</section>
 
-			{/* Ollama Section */}
 			<section className="mb-10">
-				<Heading id="ollama">Ollama</Heading>
-				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+				<Heading id="local-runtimes">{isZh ? '本地运行时' : 'Local Runtimes'}</Heading>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
 					{isZh
-						? '已在 Ollama 0.15 + qwen3:14b (RTX3090 24GB) 上测试通过。'
-						: 'Tested on Ollama 0.15 with qwen3:14b (RTX3090 24GB).'}
+						? '通过 Ollama、LM Studio 等本地 OpenAI-compatible 运行时接入 PageAgent，实现离线或局域网部署。'
+						: 'Use local OpenAI-compatible runtimes such as Ollama and LM Studio with PageAgent for offline or LAN deployments.'}
 				</p>
-				<CodeEditor
-					code={`LLM_BASE_URL="http://localhost:11434/v1"
-LLM_MODEL_NAME="qwen3:14b"`}
-				/>
-				<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
-					<h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
-						{isZh ? '⚠️ 注意事项' : '⚠️ Important Notes'}
-					</h3>
-					<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
-						<li>
-							{isZh
-								? '确保 OLLAMA_ORIGINS 设置为 * 以避免 403 错误'
-								: 'Add * to OLLAMA_ORIGINS to avoid 403 errors'}
-						</li>
-						<li>
-							{isZh
-								? '小于 10B 参数的模型通常效果不佳'
-								: 'Models smaller than 10B are unlikely to be strong enough'}
-						</li>
-						<li>{isZh ? '需要支持 tool_call 的模型' : 'Requires tool_call capable models'}</li>
-						<li>
-							{isZh
-								? '确保上下文长度大于输入 token 数，否则 Ollama 会静默截断 prompt。普通页面约需 15k token，随步骤增加。默认 4k 上下文长度无法正常工作'
-								: 'Ensure context length exceeds input tokens, or Ollama will silently truncate prompts. ~15k tokens for a typical page, increases with steps. Default 4k context length will NOT work'}
-						</li>
-					</ul>
-				</div>
 
-				<div className="mt-4">
-					<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
-						{isZh ? '建议启动参数' : 'Recommended Startup'}
-					</h3>
-					<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-						{isZh
-							? '启动 Ollama 时建议配置以下环境变量：扩大上下文窗口、允许跨域访问、监听所有网络接口。'
-							: 'Start Ollama with these environment variables: larger context window, allow cross-origin access, and listen on all interfaces.'}
-					</p>
+				<div className="space-y-10">
+					<section>
+						<Heading id="requirements" level={3}>
+							Requirements
+						</Heading>
+						<div className="mt-4 p-5 bg-amber-50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-800">
+							<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
+								<li>
+									{isZh
+										? '务必打开 CORS，否则浏览器无法直接请求本地 LLM 服务。'
+										: 'Enable CORS, otherwise the browser cannot call your local LLM endpoint directly.'}
+								</li>
+								<li>
+									{isZh
+										? '将 context length 或 content length 至少设置为 8000。普通页面常常需要 15k token 左右，默认 4k 很容易被截断。'
+										: 'Set context length or content length to at least 8000. A typical page often needs around 15k tokens, so the default 4k usually truncates prompts.'}
+								</li>
+								<li>
+									{isZh ? '需要支持 tool_call 的模型。' : 'Use a model with tool_call support.'}
+								</li>
+								<li>
+									{isZh
+										? '小于 10B 参数的模型通常效果不佳。'
+										: 'Models smaller than 10B are usually not strong enough.'}
+								</li>
+							</ul>
+						</div>
+					</section>
 
-					<div className="space-y-2">
-						<p className="text-xs font-medium text-gray-500 dark:text-gray-400">macOS / Linux</p>
+					<section>
+						<Heading id="local-configuration" level={3}>
+							{isZh ? '基础配置' : 'Basic Configuration'}
+						</Heading>
 						<CodeEditor
-							code={`OLLAMA_CONTEXT_LENGTH=64000 OLLAMA_HOST=0.0.0.0:11434 OLLAMA_ORIGINS="*" ollama serve`}
-						/>
+							code={`// Local OpenAI-compatible runtime - no apiKey needed
+const pageAgent = new PageAgent({
+  baseURL: 'http://localhost:11434/v1',
+  model: 'qwen3:14b'
+});
 
-						<p className="text-xs font-medium text-gray-500 dark:text-gray-400 pt-2">
-							Windows (PowerShell)
+// Or connect to LM Studio
+const lmStudioAgent = new PageAgent({
+  baseURL: 'http://127.0.0.1:1234/v1',
+  model: 'qwen/qwen3.5-27b'
+});
+`}
+						/>
+					</section>
+
+					<section>
+						<Heading id="ollama" level={3}>
+							Ollama
+						</Heading>
+						<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+							{isZh
+								? '已在 Ollama 0.15 + qwen3:14b (RTX3090 24GB) 上测试通过。'
+								: 'Tested on Ollama 0.15 with qwen3:14b (RTX3090 24GB).'}
 						</p>
 						<CodeEditor
-							code={`$env:OLLAMA_CONTEXT_LENGTH=64000; $env:OLLAMA_HOST="0.0.0.0:11434"; $env:OLLAMA_ORIGINS="*"; ollama serve`}
+							code={`LLM_BASE_URL="http://localhost:11434/v1"
+LLM_MODEL_NAME="qwen3:14b"`}
 						/>
-					</div>
-				</div>
-			</section>
+						<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+							<h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
+								{isZh ? '⚠️ 注意事项' : '⚠️ Important Notes'}
+							</h3>
+							<p className="text-sm text-gray-700 dark:text-gray-300">
+								{isZh
+									? '如果浏览器侧请求失败，优先检查 Ollama 是否已按上面的要求开启 CORS。'
+									: 'If browser-side requests fail, check whether Ollama has CORS enabled as required above.'}
+							</p>
+						</div>
 
-			{/* LM Studio Section */}
-			<section className="mb-10">
-				<Heading id="lm-studio">LM Studio</Heading>
-				<CodeEditor
-					code={`LLM_BASE_URL="http://127.0.0.1:1234/v1"
+						<div className="mt-4">
+							<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">
+								{isZh ? '建议启动参数' : 'Recommended Startup'}
+							</h3>
+							<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+								{isZh
+									? '启动 Ollama 时建议同时放大上下文窗口并开启跨域访问。'
+									: 'When starting Ollama, increase the context window and enable cross-origin access.'}
+							</p>
+
+							<div className="space-y-2">
+								<p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+									macOS / Linux
+								</p>
+								<CodeEditor
+									code={`OLLAMA_CONTEXT_LENGTH=64000 OLLAMA_HOST=0.0.0.0:11434 OLLAMA_ORIGINS="*" ollama serve`}
+								/>
+
+								<p className="text-xs font-medium text-gray-500 dark:text-gray-400 pt-2">
+									Windows (PowerShell)
+								</p>
+								<CodeEditor
+									code={`$env:OLLAMA_CONTEXT_LENGTH=64000; $env:OLLAMA_HOST="0.0.0.0:11434"; $env:OLLAMA_ORIGINS="*"; ollama serve`}
+								/>
+							</div>
+						</div>
+					</section>
+
+					<section>
+						<Heading id="lm-studio" level={3}>
+							LM Studio
+						</Heading>
+						<CodeEditor
+							code={`LLM_BASE_URL="http://127.0.0.1:1234/v1"
 LLM_MODEL_NAME="qwen/qwen3.5-27b"`}
-				/>
-				<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
-					<h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
-						{isZh ? '⚠️ 注意事项' : '⚠️ Important Notes'}
-					</h3>
-					<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
-						<li>
-							{isZh
-								? 'Agent 必须启用 disableNamedToolChoice，否则 tool_choice 参数会报错'
-								: 'You must enable disableNamedToolChoice in agent config, otherwise tool_choice parameter will cause errors'}
-						</li>
-						<li>
-							{isZh
-								? '建议将上下文长度（Content Length）调至 8k 以上，默认值太小会导致截断'
-								: 'Set content length to 8k+ in LM Studio settings — the default is too small and will cause truncation'}
-						</li>
-						<li>{isZh ? '需要支持 tool_call 的模型' : 'Requires tool_call capable models'}</li>
-					</ul>
+						/>
+						<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+							<h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
+								{isZh ? '⚠️ 注意事项' : '⚠️ Important Notes'}
+							</h3>
+							<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
+								<li>
+									{isZh
+										? 'Agent 必须启用 disableNamedToolChoice，否则 tool_choice 参数会报错。'
+										: 'Enable disableNamedToolChoice in the agent config, otherwise the tool_choice parameter may fail.'}
+								</li>
+							</ul>
+						</div>
+					</section>
 				</div>
 			</section>
 		</div>
