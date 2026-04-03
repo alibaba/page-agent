@@ -274,10 +274,12 @@ function ApiErrorsContent(isZh: boolean) {
 					code={`const agent = new PageAgent({
   // ...
   customFetch: async (url, init) => {
-    const body = JSON.parse(init.body)
     // Adapt parameters for your provider
-    delete body.stream_options
-    return fetch(url, { ...init, body: JSON.stringify(body) })
+    const body = JSON.parse(init.body)
+    delete body.tool_choice
+    const bodyStr = JSON.stringify(body)
+
+    return fetch(url, { ...init, body: bodyStr })
   },
 })`}
 				/>
