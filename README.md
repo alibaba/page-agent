@@ -50,8 +50,8 @@ Fastest way to try PageAgent with our free Demo LLM:
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.7.0/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.7.0/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.7.1/files/dist/iife/page-agent.demo.js |
 
 ### NPM Installation
 
@@ -73,6 +73,16 @@ await agent.execute('Click the login button')
 ```
 
 For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/docs/introduction/overview).
+
+## 🌟 Awesome Page Agent
+
+Built something cool with PageAgent? Add it here! Open a PR to share your project.
+
+> These are community projects — not maintained or endorsed by us. Use at your own discretion.
+
+| Project  | Description                                                 |
+| -------- | ----------------------------------------------------------- |
+| _Yours?_ | [Open a PR](https://github.com/alibaba/page-agent/pulls) 🙌 |
 
 ## 🤝 Contributing
 
@@ -103,16 +113,6 @@ We gratefully acknowledge the browser-use project and its contributors for their
 excellent work on web automation and DOM interaction patterns that helped make
 this project possible.
 ```
-
-## 🌟 Awesome Page Agent
-
-Built something cool with PageAgent? Add it here! Open a PR to share your project.
-
-> These are community projects — not maintained or endorsed by us. Use at your own discretion.
-
-| Project  | Description                                                 |
-| -------- | ----------------------------------------------------------- |
-| _Yours?_ | [Open a PR](https://github.com/alibaba/page-agent/pulls) 🙌 |
 
 ---
 
