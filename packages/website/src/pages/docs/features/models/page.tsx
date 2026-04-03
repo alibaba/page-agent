@@ -9,7 +9,6 @@ const BASELINE = new Set([
 	'claude-haiku-4.5',
 	'gemini-3-flash',
 	'deepseek-3.2',
-	'qwen3.6-plus',
 	'qwen3.5-plus',
 	'qwen3.5-flash',
 ])
@@ -124,13 +123,6 @@ const pageAgent = new PageAgent({
   model: 'qwen3.5-plus'
 });
 
-// MiniMax
-const pageAgent = new PageAgent({
-  baseURL: 'https://api.minimax.io/v1',
-  apiKey: 'your-minimax-api-key',
-  model: 'MiniMax-M2.7'
-});
-
 // Self-hosted models (e.g., Ollama) — no apiKey needed
 const pageAgent = new PageAgent({
   baseURL: 'http://localhost:11434/v1',
@@ -139,6 +131,47 @@ const pageAgent = new PageAgent({
 
 `}
 				/>
+			</section>
+
+			{/* Production Authentication */}
+			<section className="mb-10">
+				<Heading id="production-authentication" className="text-2xl font-semibold mb-4">
+					{isZh ? '🔐 生产环境鉴权' : '🔐 Production Authentication'}
+				</Heading>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+					{isZh
+						? '如果你只是将它用作个人助手，可以直接连接你的 LLM 服务。'
+						: 'If you only use it as a personal assistant, you can connect to your LLM service directly.'}
+				</p>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+					{isZh ? (
+						<>
+							如果你计划将它集成到你的 Web 应用中，建议搭建一个后端代理来转发 LLM 请求，并使用{' '}
+							<code>customFetch</code> 携带 Cookie 或其他鉴权信息：
+						</>
+					) : (
+						<>
+							If you plan to integrate it into your web app, it's better to have a backend proxy for
+							the LLM and use <code>customFetch</code> to authenticate the request with cookies or
+							other methods:
+						</>
+					)}
+				</p>
+				<CodeEditor
+					code={`const agent = new PageAgent({
+  baseURL: '/api/llm-proxy',
+  model: 'gpt-5.1',
+  customFetch: (url, init) =>
+    fetch(url, { ...init, credentials: 'include' }),
+});`}
+				/>
+				<div className="mt-4 bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+					<p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
+						{isZh
+							? '⚠️ 永远不要把真实的 LLM API Key 提交到前端代码中'
+							: '⚠️ NEVER commit real LLM API keys to your frontend code'}
+					</p>
+				</div>
 			</section>
 
 			{/* Free Testing API Section */}
@@ -185,8 +218,7 @@ const pageAgent = new PageAgent({
 					<CodeEditor
 						code={`# qwen3.5-plus / qwen3.5-flash
 LLM_BASE_URL="https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run"
-LLM_MODEL_NAME="qwen3.5-plus"
-LLM_API_KEY="NA"`}
+LLM_MODEL_NAME="qwen3.5-plus"`}
 					/>
 				</div>
 			</section>
@@ -201,7 +233,6 @@ LLM_API_KEY="NA"`}
 				</p>
 				<CodeEditor
 					code={`LLM_BASE_URL="http://localhost:11434/v1"
-LLM_API_KEY="NA"
 LLM_MODEL_NAME="qwen3:14b"`}
 				/>
 				<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
@@ -254,44 +285,30 @@ LLM_MODEL_NAME="qwen3:14b"`}
 				</div>
 			</section>
 
-			{/* Production Authentication */}
+			{/* LM Studio Section */}
 			<section className="mb-10">
-				<Heading id="production-authentication" className="text-2xl font-semibold mb-4">
-					{isZh ? '🔐 生产环境鉴权' : '🔐 Production Authentication'}
-				</Heading>
-				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-					{isZh
-						? '如果你只是将它用作个人助手，可以直接连接你的 LLM 服务。'
-						: 'If you only use it as a personal assistant, you can connect to your LLM service directly.'}
-				</p>
-				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-					{isZh ? (
-						<>
-							如果你计划将它集成到你的 Web 应用中，建议搭建一个后端代理来转发 LLM 请求，并使用{' '}
-							<code>customFetch</code> 携带 Cookie 或其他鉴权信息：
-						</>
-					) : (
-						<>
-							If you plan to integrate it into your web app, it's better to have a backend proxy for
-							the LLM and use <code>customFetch</code> to authenticate the request with cookies or
-							other methods:
-						</>
-					)}
-				</p>
+				<Heading id="lm-studio">LM Studio</Heading>
 				<CodeEditor
-					code={`const agent = new PageAgent({
-  baseURL: '/api/llm-proxy',
-  model: 'gpt-5.1',
-  customFetch: (url, init) =>
-    fetch(url, { ...init, credentials: 'include' }),
-});`}
+					code={`LLM_BASE_URL="http://127.0.0.1:1234/v1"
+LLM_MODEL_NAME="qwen/qwen3.5-27b"`}
 				/>
-				<div className="mt-4 bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 p-4 rounded-r-lg">
-					<p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
-						{isZh
-							? '⚠️ 永远不要把真实的 LLM API Key 提交到前端代码中'
-							: '⚠️ NEVER commit real LLM API keys to your frontend code'}
-					</p>
+				<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+					<h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
+						{isZh ? '⚠️ 注意事项' : '⚠️ Important Notes'}
+					</h3>
+					<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
+						<li>
+							{isZh
+								? 'Agent 必须启用 disableNamedToolChoice，否则 tool_choice 参数会报错'
+								: 'You must enable disableNamedToolChoice in agent config, otherwise tool_choice parameter will cause errors'}
+						</li>
+						<li>
+							{isZh
+								? '建议将上下文长度（Content Length）调至 8k 以上，默认值太小会导致截断'
+								: 'Set content length to 8k+ in LM Studio settings — the default is too small and will cause truncation'}
+						</li>
+						<li>{isZh ? '需要支持 tool_call 的模型' : 'Requires tool_call capable models'}</li>
+					</ul>
 				</div>
 			</section>
 		</div>
