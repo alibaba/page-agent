@@ -1334,6 +1334,10 @@ export default (
 		if (element.hasAttribute('onclick') || typeof element.onclick === 'function') {
 			return true
 		}
+		// ARIA state attributes imply the element manages its own interaction state
+		if (hasInteractiveAria(element)) {
+			return true
+		}
 
 		// return false
 
