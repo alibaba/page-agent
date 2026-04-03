@@ -5,6 +5,56 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.1] - 2026-04-04
+
+### Features
+
+- **Optional `keepSemanticTags`** - Added an experimental `keepSemanticTags` config to preserve semantic structure in PageController output
+- **Per-task extension system instructions** - Extension `ExecuteConfig` now supports `systemInstruction`
+
+### Improvements
+
+- **Smarter scroll handling** - Scroll container detection and scroll direction handling are more reliable
+- **Better accessibility-aware element detection** - Interactive candidates with supported ARIA attributes and `role="listitem"` are recognized more accurately
+
+### Bug Fixes
+
+- Fixed iframe-origin filtering for extension `postMessage` listeners
+- Avoided a `currentScript` null pointer during deferred initialization
+
+## [1.7.0] - 2026-03-31
+
+- **More reliable click actions** - Click handling now reuses pointer coordinates, verifies targets with `elementFromPoint`, and behaves better on layered layouts
+- **Better mask event handling** - `SimulatorMask` now supports passthrough events when automation should not fully swallow input
+- Fixed a `SimulatorMask` memory leak
+
+## [1.6.3] - 2026-03-30
+
+### Features
+
+- **Experimental all-tabs control** - Extension can include and control all browser tabs via `experimentalIncludeAllTabs`
+
+### Improvements
+
+- **Calmer empty state motion** - Disabled the EmptyState auto-start animation in the extension UI
+- **Cleaner extension docs** - Simplified setup and tab-control documentation across the README and developer guide
+
+### Bug Fixes
+
+- Fixed new-tab detection from content scripts
+- Fixed tab deduplication and multi-window handling in the extension
+
+## [1.6.2] - 2026-03-25
+
+- **Longer task input** - The UI task input now accepts up to 1000 characters
+- **Contributor docs refresh** - Added a maintainer note and refreshed contributor-facing documentation
+- Fixed lint issues in the release pipeline
+
+## [1.6.1] - 2026-03-22
+
+- **Internal PageController action exports** - PageController actions are now exposed as internal methods for easier reuse across packages
+- **Expanded docs** - Added MCP docs and clarified project limitations and homepage details
+
 ## [1.6.0] - 2026-03-21
 
 ### Features
