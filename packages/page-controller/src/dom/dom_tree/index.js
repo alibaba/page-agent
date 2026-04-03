@@ -1218,8 +1218,9 @@ export default (
 		'details',
 		'label',
 		'option',
+		'li',
 	])
-	const INTERACTIVE_ROLES = new Set([
+	const DISTINCT_INTERACTIVE_ROLES = new Set([
 		'button',
 		'link',
 		'menuitem',
@@ -1235,6 +1236,9 @@ export default (
 		'searchbox',
 		'textbox',
 		'listbox',
+		'listitem',
+		'treeitem',
+		'row',
 		'option',
 		'scrollbar',
 	])
@@ -1311,7 +1315,7 @@ export default (
 			return true
 		}
 		// Check interactive roles
-		if (role && INTERACTIVE_ROLES.has(role)) {
+		if (role && DISTINCT_INTERACTIVE_ROLES.has(role)) {
 			return true
 		}
 		// Check contenteditable
