@@ -28,7 +28,26 @@ export interface DomConfig {
 	includeAttributes?: string[]
 	highlightOpacity?: number
 	highlightLabelOpacity?: number
+
+	/**
+	 * Preserve semantic landmark tags in dehydrated output even if not interactive
+	 * @note maybe confusing for LLM combining with page scrolling, use with caution
+	 **/
+	keepSemanticTags?: boolean
 }
+
+// TODO: corresponding roles
+const SEMANTIC_TAGS = new Set([
+	'nav',
+	'menu',
+	// 'main',
+	'header',
+	'footer',
+	'aside',
+	// 'article',
+	// 'form',
+	'dialog',
+])
 
 /**
  * 用于检测可交互元素是否是新出现的。
@@ -171,7 +190,11 @@ interface TreeNode {
  *
  * @todo 数据脱敏过滤器
  */
-export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: string[]): string {
+export function flatTreeToString(
+	flatTree: FlatDomTree,
+	includeAttributes: string[] = [],
+	keepSemanticTags = false
+): string {
 	const DEFAULT_INCLUDE_ATTRIBUTES = [
 		'title',
 		'type',
@@ -203,7 +226,7 @@ export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: stri
 		'contenteditable',
 	]
 
-	const includeAttrs = [...(includeAttributes || []), ...DEFAULT_INCLUDE_ATTRIBUTES]
+	const includeAttrs = [...includeAttributes, ...DEFAULT_INCLUDE_ATTRIBUTES]
 
 	// Helper function to cap text length
 	const capTextLength = (text: string, maxLength: number): string => {
@@ -294,6 +317,8 @@ export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: stri
 		const depthStr = '\t'.repeat(depth)
 
 		if (node.type === 'element') {
+			const isSemantic = keepSemanticTags && node.tagName && SEMANTIC_TAGS.has(node.tagName)
+
 			// Add element with highlight_index
 			if (node.highlightIndex !== undefined) {
 				nextDepth += 1
@@ -391,9 +416,29 @@ export function flatTreeToString(flatTree: FlatDomTree, includeAttributes?: stri
 				result.push(line)
 			}
 
-			// Process children regardless
+			// special treatment for semantic tags
+			// even if they are not interactive, we can keep them for clear context
+
+			const emitSemantic = isSemantic && node.highlightIndex === undefined
+			// to check if this tag is empty
+			const mark = emitSemantic ? result.length : -1
+
+			if (emitSemantic) {
+				result.push(`${depthStr}<${node.tagName}>`)
+				nextDepth += 1
+			}
+
 			for (const child of node.children) {
 				processNode(child, nextDepth, result)
+			}
+
+			if (emitSemantic) {
+				// empty tag should be removed
+				if (result.length === mark + 1) {
+					result.pop()
+				} else {
+					result.push(`${depthStr}</${node.tagName}>`)
+				}
 			}
 		} else if (node.type === 'text') {
 			// Add text only if it doesn't have a highlighted parent
