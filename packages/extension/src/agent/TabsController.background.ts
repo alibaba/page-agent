@@ -98,6 +98,32 @@ export function handleTabControlMessage(
 			return true // async response
 		}
 
+		case 'activate_tab': {
+			debug('activate_tab', payload)
+			chrome.tabs
+				.update(payload.tabId, { active: true })
+				.then(() => {
+					sendResponse({ success: true })
+				})
+				.catch((error) => {
+					sendResponse({ error: error instanceof Error ? error.message : String(error) })
+				})
+			return true // async response
+		}
+
+		case 'focus_window': {
+			debug('focus_window', payload)
+			chrome.windows
+				.update(payload.windowId, { focused: true })
+				.then(() => {
+					sendResponse({ success: true })
+				})
+				.catch((error) => {
+					sendResponse({ error: error instanceof Error ? error.message : String(error) })
+				})
+			return true // async response
+		}
+
 		case 'close_tab': {
 			debug('close_tab', payload)
 			chrome.tabs

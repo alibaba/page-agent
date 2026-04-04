@@ -1055,10 +1055,12 @@ export default (
 			{ x: rect.right - margin, y: rect.bottom - margin }, // bottom right
 		]
 
-		return checkPoints.some(({ x, y }) => {
+		let allNull = true
+		const result = checkPoints.some(({ x, y }) => {
 			try {
 				const topEl = document.elementFromPoint(x, y)
 				if (!topEl) return false
+				allNull = false
 
 				let current = topEl
 				while (current && current !== document.documentElement) {
@@ -1070,6 +1072,13 @@ export default (
 				return true
 			}
 		})
+
+		// When all elementFromPoint calls return null, the window is likely
+		// not focused or the tab is in the background. Assume the element
+		// is top-level rather than incorrectly hiding it.
+		if (allNull) return true
+
+		return result
 	}
 
 	/**

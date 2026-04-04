@@ -57,6 +57,11 @@ export class MultiPageAgent extends PageAgentCore {
 			onBeforeTask: async (agent) => {
 				await tabsController.init(agent.task, { includeInitialTab, experimentalIncludeAllTabs })
 
+				// Focus Chrome window so the target tab gets full rendering priority.
+				// Without this, elementFromPoint() may return null in background windows,
+				// causing element detection failures and spurious new-tab loops.
+				await tabsController.focusWindow()
+
 				heartBeatInterval = window.setInterval(() => {
 					chrome.storage.local.set({
 						agentHeartbeat: Date.now(),
