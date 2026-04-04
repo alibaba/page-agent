@@ -505,7 +505,6 @@ export class PageAgentCore extends EventTarget {
 
 	/**
 	 * Generate system observations before each step
-	 * @todo loop detection
 	 * @todo console error
 	 */
 	async #handleObservations(step: number): Promise<void> {
@@ -515,6 +514,24 @@ export class PageAgentCore extends EventTarget {
 				`You have waited ${this.#states.totalWaitTime} seconds accumulatively. ` +
 					`DO NOT wait any longer unless you have a good reason.`
 			)
+		}
+
+		// Loop detection: warn if the same action has been repeated consecutively
+		const LOOP_DETECTION_WINDOW = 4
+		const stepHistory = this.history.filter((e): e is AgentStepEvent => e.type === 'step')
+		if (stepHistory.length >= LOOP_DETECTION_WINDOW) {
+			const recentSteps = stepHistory.slice(-LOOP_DETECTION_WINDOW)
+			const actionKeys = recentSteps.map(
+				(e) => `${e.action.name}:${JSON.stringify(e.action.input)}`
+			)
+			if (actionKeys.every((key) => key === actionKeys[0])) {
+				const { name } = recentSteps[0].action
+				this.pushObservation(
+					`⚠️ Loop detected: "${name}" has been called ${LOOP_DETECTION_WINDOW} times in a row ` +
+						`with identical input. This approach is not working. ` +
+						`Try a completely different strategy to achieve your goal.`
+				)
+			}
 		}
 
 		// Detect URL change
