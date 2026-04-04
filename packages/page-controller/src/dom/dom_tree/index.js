@@ -1434,7 +1434,14 @@ export default (
 			shouldHighlight = true
 		} else {
 			// Parent *was* highlighted. Only highlight this node if it represents a distinct interaction.
-			if (isElementDistinctInteraction(node)) {
+			//
+			// Scrollable containers qualify as a distinct interaction even when nested inside a
+			// highlighted parent. Scrolling is a fundamentally different action from clicking — you
+			// cannot scroll a container by clicking its parent. Unlike `cursor: pointer`, the CSS
+			// `overflow` property is NOT inherited, so child elements cannot accidentally become
+			// scrollable by inheriting from a scrollable ancestor. This means allowing scrollable
+			// containers to bypass the parent-highlighted gate will never cause a hot-zone explosion.
+			if (isElementDistinctInteraction(node) || isScrollableElement(node) !== null) {
 				shouldHighlight = true
 			} else {
 				// console.log(`Skipping highlight for ${nodeData.tagName} (parent highlighted)`);
