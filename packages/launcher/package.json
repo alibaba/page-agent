@@ -1,0 +1,31 @@
+{
+    "name": "@page-agent/launcher",
+    "version": "1.0.0",
+    "description": "Native Messaging Host for page-agent - Enable remote AI agents to control browser via HTTP/WebSocket",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc --watch",
+        "start": "node dist/index.js",
+        "clean": "rm -rf dist",
+        "install": "node scripts/install.js"
+    },
+    "keywords": [
+        "page-agent",
+        "native-messaging",
+        "browser-automation",
+        "chrome-extension"
+    ],
+    "author": "Alibaba Group",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.21.2"
+    },
+    "devDependencies": {
+        "@types/express": "^5.0.0",
+        "@types/node": "^22.13.10",
+        "typescript": "^5.8.2"
+    }
+}
