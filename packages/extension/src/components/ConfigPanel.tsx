@@ -49,7 +49,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 	const [showToken, setShowToken] = useState(false)
 	const [showApiKey, setShowApiKey] = useState(false)
 
-	useEffect(() => {
+	const [prevConfig, setPrevConfig] = useState(config)
+	if (prevConfig !== config) {
+		setPrevConfig(config)
 		setBaseURL(config?.baseURL || DEMO_BASE_URL)
 		setModel(config?.model || DEMO_MODEL)
 		setApiKey(config?.apiKey)
@@ -59,7 +61,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		setExperimentalLlmsTxt(config?.experimentalLlmsTxt ?? false)
 		setExperimentalIncludeAllTabs(config?.experimentalIncludeAllTabs ?? false)
 		setDisableNamedToolChoice(config?.disableNamedToolChoice ?? false)
-	}, [config])
+	}
 
 	// Poll for user auth token every second until found
 	useEffect(() => {

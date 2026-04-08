@@ -206,9 +206,9 @@ export function useHubWs(
 	const [wsState, setWsState] = useState<HubWsState>(() => (wsPort ? 'connecting' : 'disconnected'))
 	const hubWsRef = useRef<HubWs | null>(null)
 
-	const latest = useRef({ execute, stop, configure, config })
+	const latestRef = useRef({ execute, stop, configure, config })
 	useEffect(() => {
-		latest.current = { execute, stop, configure, config }
+		latestRef.current = { execute, stop, configure, config }
 	})
 
 	useEffect(() => {
@@ -218,14 +218,14 @@ export function useHubWs(
 			Number(wsPort),
 			{
 				onExecute: async (task, incomingConfig) => {
-					const { execute, configure, config } = latest.current
+					const { execute, configure, config } = latestRef.current
 					if (incomingConfig) {
 						await configure({ ...config, ...incomingConfig } as ExtConfig)
 					}
 					const result = await execute(task)
 					return { success: result.success, data: result.data }
 				},
-				onStop: () => latest.current.stop(),
+				onStop: () => latestRef.current.stop(),
 			},
 			setWsState
 		)

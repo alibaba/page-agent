@@ -19,7 +19,7 @@ const log = console.log.bind(console, chalk.yellow('[autoFixer]'))
  * - etc.
  */
 export function normalizeResponse(response: any, tools?: Map<string, PageAgentTool>): any {
-	let resolvedArguments = null as any
+	let resolvedArguments: any
 
 	const choice = (response as { choices?: Choice[] }).choices?.[0]
 	if (!choice) throw new Error('No choices in response')
