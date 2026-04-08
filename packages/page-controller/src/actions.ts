@@ -16,6 +16,14 @@ import {
 	waitFor,
 } from './utils'
 
+const COMBOBOX_OPTION_SELECTORS = [
+	'[role="option"]',
+	'[role="menuitemradio"]',
+	'[role="radio"]',
+	'.ant-select-item-option',
+	'.el-select-dropdown__item',
+]
+
 /**
  * Get the HTMLElement by index from a selectorMap.
  * @private Internal method, subject to change at any time.
@@ -237,22 +245,89 @@ export async function inputTextElement(element: HTMLElement, text: string) {
  * @todo browser-use version is very complex and supports menu tags, need to follow up
  * @private Internal method, subject to change at any time.
  */
-export async function selectOptionElement(selectElement: HTMLSelectElement, optionText: string) {
-	if (!isSelectElement(selectElement)) {
-		throw new Error('Element is not a select element')
+function normalizeOptionText(text: string | null | undefined) {
+	return (text ?? '').replace(/\s+/g, ' ').trim().toLowerCase()
+}
+
+function isVisibleOption(element: HTMLElement) {
+	const rect = element.getBoundingClientRect()
+	return rect.width > 0 && rect.height > 0 && element.getAttribute('aria-hidden') !== 'true'
+}
+
+function findPopupRoots(element: HTMLElement): HTMLElement[] {
+	const doc = element.ownerDocument
+	const popupIds = [
+		element.getAttribute('aria-controls'),
+		element.getAttribute('aria-owns'),
+	].filter((id): id is string => !!id)
+
+	const roots = popupIds
+		.map((id) => doc.getElementById(id))
+		.filter((node): node is HTMLElement => node instanceof HTMLElement)
+
+	if (roots.length > 0) return roots
+
+	return Array.from(
+		doc.querySelectorAll(
+			'[role="listbox"], [role="menu"], .ant-select-dropdown, .el-select-dropdown'
+		)
+	)
+		.filter((node): node is HTMLElement => node instanceof HTMLElement)
+		.filter(isVisibleOption)
+}
+
+function findComboboxOption(element: HTMLElement, optionText: string): HTMLElement | null {
+	const wanted = normalizeOptionText(optionText)
+	if (!wanted) return null
+
+	const roots = findPopupRoots(element)
+	const candidates = roots.flatMap((root) =>
+		COMBOBOX_OPTION_SELECTORS.flatMap((selector) =>
+			Array.from(root.querySelectorAll(selector)).filter(
+				(node): node is HTMLElement => node instanceof HTMLElement
+			)
+		)
+	)
+
+	const visibleCandidates = candidates.filter(isVisibleOption)
+	return (
+		visibleCandidates.find((candidate) => normalizeOptionText(candidate.textContent) === wanted) ??
+		visibleCandidates.find((candidate) =>
+			normalizeOptionText(candidate.textContent).includes(wanted)
+		) ??
+		null
+	)
+}
+
+export async function selectOptionElement(selectElement: HTMLElement, optionText: string) {
+	if (isSelectElement(selectElement)) {
+		const options = Array.from(selectElement.options)
+		const option = options.find((opt) => opt.textContent?.trim() === optionText.trim())
+
+		if (!option) {
+			throw new Error(`Option with text "${optionText}" not found in select element`)
+		}
+
+		selectElement.value = option.value
+		selectElement.dispatchEvent(new Event('change', { bubbles: true }))
+		await waitFor(0.1)
+		return
 	}
 
-	const options = Array.from(selectElement.options)
-	const option = options.find((opt) => opt.textContent?.trim() === optionText.trim())
+	await clickElement(selectElement)
 
-	if (!option) {
-		throw new Error(`Option with text "${optionText}" not found in select element`)
+	for (let attempt = 0; attempt < 5; attempt++) {
+		const option = findComboboxOption(selectElement, optionText)
+		if (option) {
+			await clickElement(option)
+			return
+		}
+		await waitFor(0.1)
 	}
 
-	selectElement.value = option.value
-	selectElement.dispatchEvent(new Event('change', { bubbles: true }))
-
-	await waitFor(0.1) // Wait to ensure change event processing completes
+	throw new Error(
+		`Option with text "${optionText}" not found after opening dropdown. Native <select> and common ARIA combobox popups are supported.`
+	)
 }
 
 interface ScrollableElement extends Element {
