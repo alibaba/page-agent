@@ -54,7 +54,7 @@ function ResultCard({
 					Result: {success ? 'Success' : 'Failed'}
 				</span>
 			</div>
-			<p className="text-xs text-[11px] text-muted-foreground pl-5 whitespace-pre-wrap">{text}</p>
+			<p className="text-[12px] text-foreground pl-5 whitespace-pre-wrap">{text}</p>
 			{children}
 		</div>
 	)
