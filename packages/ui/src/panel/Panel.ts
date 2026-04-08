@@ -210,7 +210,13 @@ export class Panel {
 	hide(): void {
 		this.wrapper.style.opacity = '0'
 		this.wrapper.style.transform = 'translateX(-50%) translateY(20px)'
-		this.wrapper.style.display = 'none'
+		this.wrapper.addEventListener(
+			'transitionend',
+			() => {
+				this.wrapper.style.display = 'none'
+			},
+			{ once: true }
+		)
 	}
 
 	reset(): void {
