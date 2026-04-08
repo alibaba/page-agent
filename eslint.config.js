@@ -1,6 +1,5 @@
 import eslintReact from '@eslint-react/eslint-plugin'
 import js from '@eslint/js'
-import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
@@ -18,7 +17,6 @@ export default defineConfig([
 		extends: [
 			js.configs.recommended,
 			tseslint.configs.recommended,
-			reactRefresh.configs.vite,
 			...tseslint.configs.recommendedTypeChecked,
 			...tseslint.configs.strictTypeChecked,
 			...tseslint.configs.stylisticTypeChecked,
