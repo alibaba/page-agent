@@ -1,4 +1,3 @@
-/* eslint-disable react-dom/no-dangerously-set-innerhtml */
 import type { PageAgent as PageAgentType } from 'page-agent'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'wouter'
@@ -46,10 +45,11 @@ export default function HeroSection() {
 		: 'Goto docs in navigation bar, find Quick-Start section, and summarize in markdown'
 
 	const [task, setTask] = useState(() => defaultTask)
-
-	useEffect(() => {
+	const [prevDefaultTask, setPrevDefaultTask] = useState(defaultTask)
+	if (prevDefaultTask !== defaultTask) {
+		setPrevDefaultTask(defaultTask)
 		setTask(defaultTask)
-	}, [defaultTask])
+	}
 
 	const [params] = useSearchParams()
 	const isOther = params.has('try_other')

@@ -22,7 +22,7 @@
     },
     "homepage": "https://alibaba.github.io/page-agent/",
     "engines": {
-        "node": "^20.19.0 || ^22.13.0 || >=24"
+        "node": "^22.13.0 || >=24"
     },
     "scripts": {
         "start": "npm run dev --workspace=@page-agent/website",
@@ -40,7 +40,8 @@
     "devDependencies": {
         "@commitlint/cli": "^20.5.0",
         "@commitlint/config-conventional": "^20.5.0",
-        "@eslint/js": "^9.39.2",
+        "@eslint-react/eslint-plugin": "^4.2.1",
+        "@eslint/js": "^10.0.0",
         "@microsoft/api-extractor": "^7.58.1",
         "@tailwindcss/vite": "^4.2.2",
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
@@ -49,12 +50,9 @@
         "chalk": "^5.6.2",
         "concurrently": "^9.2.1",
         "dotenv": "^17.4.1",
-        "eslint": "^9.39.2",
+        "eslint": "^10.0.0",
         "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-react-dom": "^2.13.0",
-        "eslint-plugin-react-hooks": "^7.0.1",
         "eslint-plugin-react-refresh": "^0.5.2",
-        "eslint-plugin-react-x": "^2.13.0",
         "globals": "^17.4.0",
         "husky": "^9.1.7",
         "lint-staged": "^16.4.0",

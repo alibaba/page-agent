@@ -1,8 +1,6 @@
+import eslintReact from '@eslint-react/eslint-plugin'
 import js from '@eslint/js'
-import reactDom from 'eslint-plugin-react-dom'
-import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
-import reactX from 'eslint-plugin-react-x'
 import { defineConfig, globalIgnores } from 'eslint/config'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
@@ -16,43 +14,24 @@ export default defineConfig([
 		'**/.output',
 	]),
 	{
-		plugins: {
-			'react-hooks': reactHooks,
-		},
-		rules: reactHooks.configs.recommended.rules,
-	},
-	{
 		files: ['**/*.{ts,tsx}'],
 		extends: [
 			js.configs.recommended,
 			tseslint.configs.recommended,
-			// reactHooks.configs['recommended-latest'],
 			reactRefresh.configs.vite,
-
-			// Remove tseslint.configs.recommended and replace with this
 			...tseslint.configs.recommendedTypeChecked,
-			// Alternatively, use this for stricter rules
 			...tseslint.configs.strictTypeChecked,
-			// Optionally, add this for stylistic rules
 			...tseslint.configs.stylisticTypeChecked,
-
-			// Enable lint rules for React
-			reactX.configs['recommended-typescript'],
-			// Enable lint rules for React DOM
-			reactDom.configs.recommended,
+			eslintReact.configs['recommended-typescript'],
 		],
 		languageOptions: {
 			parserOptions: {
-				// project: ['./tsconfig.json'],
-				// project: ['./packages/*/tsconfig.json'],
-				// tsconfigRootDir: import.meta.dirname,
 				projectService: true,
 			},
 			ecmaVersion: 2020,
 			globals: globals.browser,
 		},
 		rules: {
-			// Add any additional rules here
 			'@typescript-eslint/no-non-null-assertion': 'off',
 			'@typescript-eslint/no-unsafe-assignment': 'off',
 			'@typescript-eslint/no-unsafe-member-access': 'off',
@@ -72,14 +51,14 @@ export default defineConfig([
 			'@typescript-eslint/no-unsafe-argument': 'off',
 			'@typescript-eslint/no-unsafe-return': 'off',
 			'@typescript-eslint/restrict-plus-operands': 'off',
-			'react-dom/no-missing-button-type': 'off',
-			'react-x/no-nested-component-definitions': 'off',
 			'@typescript-eslint/prefer-optional-chain': 'off',
 			'@typescript-eslint/use-unknown-in-catch-callback-variable': 'off',
 			'@typescript-eslint/no-unnecessary-type-parameters': 'off',
-
-			// 'require-await': 'off',
 			'@typescript-eslint/require-await': 'off',
+			'@eslint-react/dom-no-missing-button-type': 'off',
+			'@eslint-react/no-nested-component-definitions': 'off',
+			'@eslint-react/no-array-index-key': 'off',
+			'@eslint-react/dom-no-dangerously-set-innerhtml': 'off',
 		},
 	},
 ])

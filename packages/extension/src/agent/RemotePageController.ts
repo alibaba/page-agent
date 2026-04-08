@@ -56,7 +56,7 @@ export class RemotePageController {
 	}
 
 	async getBrowserState(): Promise<BrowserState> {
-		let browserState = {} as BrowserState
+		let browserState: BrowserState
 		debug('getBrowserState', this.currentTabId)
 
 		const currentUrl = await this.getCurrentUrl()

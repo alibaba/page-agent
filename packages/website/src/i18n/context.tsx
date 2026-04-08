@@ -9,19 +9,19 @@ const LanguageContext = createContext<{
 } | null>(null)
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-	const [language, setLang] = useState<Lang>(() => {
+	const [language, setLanguage] = useState<Lang>(() => {
 		const stored = localStorage.getItem('language') as Lang
 		if (stored === 'zh-CN' || stored === 'en-US') return stored
 		return navigator.language.startsWith('zh') ? 'zh-CN' : 'en-US'
 	})
 
-	const setLanguage = (lang: Lang) => {
-		setLang(lang)
+	const switchLanguage = (lang: Lang) => {
+		setLanguage(lang)
 		localStorage.setItem('language', lang)
 	}
 
 	return (
-		<LanguageContext value={{ language, isZh: language === 'zh-CN', setLanguage }}>
+		<LanguageContext value={{ language, isZh: language === 'zh-CN', setLanguage: switchLanguage }}>
 			{children}
 		</LanguageContext>
 	)
