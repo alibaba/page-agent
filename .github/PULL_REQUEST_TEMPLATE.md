@@ -2,23 +2,21 @@
 
 Brief description of changes.
 
+Closes #(issue)
+
 ## Type
 
+- [ ] Breaking change
 - [ ] Bug fix
 - [ ] Feature / Improvement
-- [ ] Refactor
-- [ ] Documentation
-- [ ] Website
-- [ ] Demo / Testing
-- [ ] Breaking change
+- [ ] Refactor / Chores
+- [ ] Documentation / Website / Demo / Testing
 
 ## Testing
 
 - [ ] Tested in modern browsers
 - [ ] No console errors
 - [ ] Types/doc added
-
-Closes #(issue)
 
 ## Requirements / 要求
 

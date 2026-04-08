@@ -1,32 +1,28 @@
 name: Feature Request
 description: Suggest a feature
 title: '[Feature] '
-labels: ['enhancement']
+type: Feature
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for your interest in improving the project! Before submitting, please read our guidelines.
-        感谢您对改进项目的兴趣！提交前请阅读我们的指南。
+        Thanks for your interest in improving the project! Before submitting, please search for existing issues.
+        感谢参与我们的社区！请先搜索现有 Issue，避免重复提交。
 
         - [Code of Conduct](https://github.com/alibaba/page-agent/blob/main/docs/CODE_OF_CONDUCT.md)
         - [Contributing Guide](https://github.com/alibaba/page-agent/blob/main/CONTRIBUTING.md)
+
+        > 为了让更多人参与讨论，请尽量使用英文提交 Issue，感谢理解 🙏
 
   - type: textarea
     id: description
     attributes:
       label: Feature Description / 功能描述
-      description: Describe the problem, solution, and any API changes. / 描述问题、解决方案以及 API 变更。
+      description: Describe the problem, solution, and any API changes.
       placeholder: |
         **Problem**:
-        What problem does this solve?
-
         **Solution**:
-        How should this work?
-
         **Proposed API**:
-        ```typescript
-        // code here
         ```
     validations:
       required: true
@@ -34,14 +30,13 @@ body:
   - type: checkboxes
     id: community
     attributes:
-      label: Community Communication / 社区沟通
-      description: Confirm you will communicate respectfully and constructively / 确认将以礼貌、建设性的方式沟通
+      label: Before submitting
       options:
         - label: I will be polite and respectful. / 我会保持礼貌与尊重。
           required: true
-        - label: I will share constructive, actionable suggestions. / 我会提供建设性、可行动的建议。
-          required: true
         - label: I have read the CODE_OF_CONDUCT.md and CONTRIBUTING.md. / 我已阅读行为准则。
+          required: true
+        - label: I have searched existing issues and this is not a duplicate.
           required: true
     validations:
       required: true
