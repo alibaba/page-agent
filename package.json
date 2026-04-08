@@ -35,7 +35,7 @@
         "version": "node scripts/sync-version.js",
         "lint": "eslint .",
         "cleanup": "rm -rf packages/*/dist",
-        "prepare": "husky"
+        "prepare": "husky || true"
     },
     "devDependencies": {
         "@commitlint/cli": "^20.5.0",
@@ -65,7 +65,8 @@
         "vite-bundle-analyzer": "^1.3.7"
     },
     "overrides": {
-        "typescript": "^5.9.3"
+        "typescript": "^5.9.3",
+        "@vitejs/plugin-react": "^5.2.0"
     },
     "lint-staged": {
         "*.{js,ts,cjs,cts,mjs,mts}": [
