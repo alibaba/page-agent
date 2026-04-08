@@ -5,22 +5,25 @@ updates:
     schedule:
       interval: 'weekly'
     groups:
-      # 生产依赖 - 小版本更新
       production-dependencies:
         dependency-type: 'production'
         update-types:
           - 'minor'
           - 'patch'
 
-      # 开发依赖 - 小版本更新
       development-dependencies:
         dependency-type: 'development'
         update-types:
           - 'minor'
           - 'patch'
 
-      # Major 更新单独处理（不分组，需要人工审查）
-      # 安全更新也不分组，Dependabot 会自动优先创建独立 PR
+      development-major:
+        dependency-type: 'development'
+        update-types:
+          - 'major'
+
+      # Production major updates are intentionally ungrouped for individual review.
+      # Security updates are also ungrouped — Dependabot prioritizes them automatically.
 
   - package-ecosystem: 'github-actions'
     directory: '/'
