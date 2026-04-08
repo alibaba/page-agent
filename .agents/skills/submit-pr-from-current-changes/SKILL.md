@@ -30,21 +30,21 @@ Before attempting to push or open a PR, verify that the necessary tools are avai
 2. **Inspect the diff.** Review changed files, scope, and impact. Understand what the change does before writing anything.
 3. **Inspect repo conventions.** Check recent branch names (`git branch -r --sort=-committerdate | head -20`), recent commit messages (`git log --oneline -20`), and the PR template.
 4. **Pre-submission health checks** (run all before creating the PR):
-   - **Unified theme**: All changes should serve one purpose. If unrelated changes are mixed in, ask the user to split or confirm.
-   - **Commit hygiene**: Every new commit must follow the repo's conventional commit style. Squash or reword if needed.
-   - **Author identity**: Verify `git config user.name` and `git config user.email` are set and the email looks real (not empty, not `noreply` unless intentional). Warn the user if not.
-   - **No leftover artifacts**: Check for debug logs, `.only` in tests, conflict markers, or temp files in the diff.
-   - **Lint and build**: Run lint/build for the affected area. Record results honestly.
+    - **Unified theme**: All changes should serve one purpose. If unrelated changes are mixed in, ask the user to split or confirm.
+    - **Commit hygiene**: Every new commit must follow the repo's conventional commit style. Squash or reword if needed.
+    - **Author identity**: Verify `git config user.name` and `git config user.email` are set and the email looks real (not empty, not `noreply` unless intentional). Warn the user if not.
+    - **No leftover artifacts**: Check for debug logs, `.only` in tests, conflict markers, or temp files in the diff.
+    - **Lint and build**: Run lint/build for the affected area. Record results honestly.
 5. **Warn if the PR looks too hasty.** If any of these are true, pause and warn the user before proceeding:
-   - Large diff with no description of intent provided
-   - Changes touch core lib or extension (where vibe coding is prohibited per `CONTRIBUTING.md`)
-   - Multiple unrelated concerns in one diff
-   - No validation has been run at all
-   - Remind the user: *"This project does not accept low-quality or AI-generated PRs without meaningful human review. Please review your changes carefully."*
+    - Large diff with no description of intent provided
+    - Changes touch core lib or extension (where vibe coding is prohibited per `CONTRIBUTING.md`)
+    - Multiple unrelated concerns in one diff
+    - No validation has been run at all
+    - Remind the user: _"This project does not accept low-quality or AI-generated PRs without meaningful human review. Please review your changes carefully."_
 6. **Branch.** Check the current branch first:
-   - If already on a non-main feature branch with a valid name (matching `type/topic` convention), reuse it.
-   - If the branch name does not follow repo conventions (e.g. missing prefix, unclear topic), ask the user whether to rename or create a new one.
-   - If on `main` or a default branch, create a new branch from it with a short kebab-case name: prefix (`fix/`, `feat/`, `docs/`, `refactor/`, `chore/`) + concrete topic words.
+    - If already on a non-main feature branch with a valid name (matching `type/topic` convention), reuse it.
+    - If the branch name does not follow repo conventions (e.g. missing prefix, unclear topic), ask the user whether to rename or create a new one.
+    - If on `main` or a default branch, create a new branch from it with a short kebab-case name: prefix (`fix/`, `feat/`, `docs/`, `refactor/`, `chore/`) + concrete topic words.
 7. **Stage and commit.** Stage only the intended files. Use `type(scope): subject` format. Keep the subject specific and compact.
 8. **Push.** Push with `-u origin HEAD`.
 9. **Open PR.** Use `gh pr create` with the full PR template structure. Fill in "What" and "Type" sections based on the actual diff. Leave all "Testing" and "Requirements" checkboxes unchecked.
@@ -52,14 +52,12 @@ Before attempting to push or open a PR, verify that the necessary tools are avai
 
 ## Post-Submission Reminder
 
-After successfully opening the PR, ALWAYS remind the user:
+After successfully opening the PR, ALWAYS give a brief reminder in the user's language. Keep it concise and natural, but make sure it clearly tells the user:
 
-> **This project requires human authorship declarations.** Please:
-> 1. Test your changes in the browser yourself
-> 2. Go to the PR page on GitHub and check the Testing and Requirements checkboxes after you've verified each item
-> 3. The PR will not enter the review process until all checkboxes are checked
->
-> This project does not accept PRs generated autonomously by AI. Make sure you can truthfully check the AI declaration.
+1. They need to test the changes themselves in the browser.
+2. They need to go to the PR page and check the Testing and Requirements checkboxes only after verifying each item.
+3. The PR will not enter review until those checkboxes are checked.
+4. The project does not accept autonomously AI-generated PRs, so they should only check the AI declaration if it is truthful.
 
 ## Branch Naming
 
@@ -101,4 +99,4 @@ After successfully opening the PR, ALWAYS remind the user:
 - The PR body follows the template structure completely.
 - All "Requirements" and "Testing" checkboxes are unchecked (`- [ ]`) in the PR body. Double-check: if any `- [x]` appears in these sections, it is a violation — fix it before submitting.
 - The reported validation is accurate — nothing fabricated.
-- The post-submission reminder has been printed verbatim to the user.
+- The post-submission reminder was delivered in the user's language, concisely and accurately.
