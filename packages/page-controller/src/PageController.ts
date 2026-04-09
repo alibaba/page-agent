@@ -9,6 +9,7 @@
 import {
 	clickElement,
 	getElementByIndex,
+	hoverElement,
 	inputTextElement,
 	scrollHorizontally,
 	scrollVertically,
@@ -264,6 +265,28 @@ export class PageController extends EventTarget {
 			return {
 				success: false,
 				message: `❌ Failed to click element: ${error}`,
+			}
+		}
+	}
+
+	/**
+	 * Hover element by index
+	 */
+	async hoverElement(index: number): Promise<ActionResult> {
+		try {
+			this.assertIndexed()
+			const element = getElementByIndex(this.selectorMap, index)
+			const elemText = this.elementTextMap.get(index)
+			await hoverElement(element)
+
+			return {
+				success: true,
+				message: `✅ Hovered element (${elemText ?? index}).`,
+			}
+		} catch (error) {
+			return {
+				success: false,
+				message: `❌ Failed to hover element: ${error}`,
 			}
 		}
 	}

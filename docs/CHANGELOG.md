@@ -242,7 +242,7 @@ PageAgent is now ready for production use. The API is stable and breaking change
 
 - Single-page application only (cannot navigate across pages)
 - No visual recognition (relies on DOM structure)
-- Limited interaction support (no hover, drag-drop, canvas operations)
+- Limited interaction support (no drag-drop, canvas operations)
 - See [Limitations](https://alibaba.github.io/page-agent/docs/introduction/limitations) for details
 
 ### Acknowledgments

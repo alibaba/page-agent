@@ -19,6 +19,7 @@ const enUS = {
 		},
 		tools: {
 			clicking: 'Clicking element [{{index}}]...',
+			hovering: 'Hovering element [{{index}}]...',
 			inputting: 'Inputting text to element [{{index}}]...',
 			selecting: 'Selecting option "{{text}}"...',
 			scrolling: 'Scrolling page...',
@@ -67,6 +68,7 @@ const zhCN = {
 		},
 		tools: {
 			clicking: '正在点击元素 [{{index}}]...',
+			hovering: '正在悬停元素 [{{index}}]...',
 			inputting: '正在输入文本到元素 [{{index}}]...',
 			selecting: '正在选择选项 "{{text}}"...',
 			scrolling: '正在滚动页面...',

@@ -116,6 +116,7 @@ function ReflectionSection({
 function ActionIcon({ name, className }: { name: string; className?: string }) {
 	const icons: Record<string, React.ReactNode> = {
 		click_element_by_index: <Mouse className={className} />,
+		hover_element_by_index: <Mouse className={className} />,
 		input: <Keyboard className={className} />,
 		scroll: <MoveVertical className={className} />,
 		go_to_url: <Globe className={className} />,

@@ -256,6 +256,8 @@ export class Panel {
 		switch (toolName) {
 			case 'click_element_by_index':
 				return this.#i18n.t('ui.tools.clicking', { index: a.index })
+			case 'hover_element_by_index':
+				return this.#i18n.t('ui.tools.hovering', { index: a.index })
 			case 'input_text':
 				return this.#i18n.t('ui.tools.inputting', { index: a.index })
 			case 'select_dropdown_option':
