@@ -18,6 +18,16 @@ dotenvConfig({ path: resolve(__dirname, '../../.env'), quiet: true })
 export default defineConfig(() => ({
 	plugins: [
 		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
+		{
+			name: 'wrap-demo-bundle-scope',
+			generateBundle(_options, bundle) {
+				for (const chunk of Object.values(bundle)) {
+					if (chunk.type === 'chunk' && chunk.fileName.endsWith('.js')) {
+						chunk.code = `(() => {\n${chunk.code}\n})()\n`
+					}
+				}
+			},
+		},
 		// analyzer()
 	],
 	publicDir: false,
@@ -43,10 +53,6 @@ export default defineConfig(() => ({
 		cssCodeSplit: true,
 		// minify: false,
 		rollupOptions: {
-			// output: {
-			// 	// force use .js as extension
-			// 	entryFileNames: 'page-agent.js',
-			// },
 			onwarn: function (message, handler) {
 				if (message.code === 'EVAL') return
 				handler(message)
