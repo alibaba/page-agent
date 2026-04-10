@@ -1,5 +1,6 @@
 // @ts-check
 import { config as dotenvConfig } from 'dotenv'
+import { readFileSync, writeFileSync } from 'fs'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
@@ -7,6 +8,19 @@ import { defineConfig } from 'vite'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
+const IIFE_BUNDLE_PATH = resolve(__dirname, 'dist', 'iife', 'page-agent.demo.js')
+
+function isolateBookmarkletBundle() {
+	return {
+		name: 'isolate-bookmarklet-bundle',
+		apply: 'build',
+		closeBundle() {
+			const code = readFileSync(IIFE_BUNDLE_PATH, 'utf8')
+			const wrappedCode = `(function(){\n${code}\n})();\n`
+			writeFileSync(IIFE_BUNDLE_PATH, wrappedCode)
+		},
+	}
+}
 
 // Load .env from repo root
 dotenvConfig({ path: resolve(__dirname, '../../.env'), quiet: true })
@@ -18,6 +32,7 @@ dotenvConfig({ path: resolve(__dirname, '../../.env'), quiet: true })
 export default defineConfig(() => ({
 	plugins: [
 		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
+		isolateBookmarkletBundle(),
 		// analyzer()
 	],
 	publicDir: false,
