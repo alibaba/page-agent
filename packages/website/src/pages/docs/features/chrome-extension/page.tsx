@@ -290,7 +290,28 @@ window.PAGE_AGENT_EXT.stop()`
 							? '将 MultiPageAgent 集成你自己的插件'
 							: 'Integrate MultiPageAgent into Your Extension'}
 					</Heading>
-					<p>@TODO</p>
+					<p className="text-gray-600 dark:text-gray-300 mb-4">
+						{isZh
+							? '推荐把扩展当作浏览器侧执行层：由你的页面或本地服务负责组装任务和 LLM 配置，再通过 `window.PAGE_AGENT_EXT` 发起执行。一个最小可用接入通常分为三步：'
+							: 'Treat the extension as the browser-side execution layer. Your page or local service should prepare the task and LLM config, then trigger execution through `window.PAGE_AGENT_EXT`. A minimal integration usually has three steps:'}
+					</p>
+					<ol className="list-decimal pl-6 space-y-2 text-gray-600 dark:text-gray-300 mb-4">
+						<li>
+							{isZh
+								? '引导用户安装扩展，并从扩展侧边栏复制授权 token。'
+								: 'Ask the user to install the extension and copy the auth token from the side panel.'}
+						</li>
+						<li>
+							{isZh
+								? '仅在可信页面中写入 token，等待扩展暴露 `window.PAGE_AGENT_EXT`。'
+								: 'Store the token only on trusted pages, then wait for the extension to expose `window.PAGE_AGENT_EXT`.'}
+						</li>
+						<li>
+							{isZh
+								? '调用 `execute()` 发起任务，并根据 `onStatusChange`、`onActivity`、`onHistoryUpdate` 同步 UI。'
+								: 'Call `execute()` to start the task, and wire `onStatusChange`, `onActivity`, and `onHistoryUpdate` into your UI.'}
+						</li>
+					</ol>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
 							? '建议先阅读扩展 API 文档，再参考 background entry implementation。'
