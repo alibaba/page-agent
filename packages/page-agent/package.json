@@ -3,14 +3,24 @@
     "private": false,
     "version": "1.7.1",
     "type": "module",
-    "main": "./dist/esm/page-agent.js",
-    "module": "./dist/esm/page-agent.js",
-    "types": "./dist/esm/PageAgent.d.ts",
+    "main": "./src/PageAgent.ts",
+    "types": "./src/PageAgent.ts",
     "exports": {
         ".": {
-            "types": "./dist/esm/PageAgent.d.ts",
-            "import": "./dist/esm/page-agent.js",
-            "default": "./dist/esm/page-agent.js"
+            "types": "./src/PageAgent.ts",
+            "default": "./src/PageAgent.ts"
+        }
+    },
+    "publishConfig": {
+        "main": "./dist/esm/page-agent.js",
+        "module": "./dist/esm/page-agent.js",
+        "types": "./dist/esm/PageAgent.d.ts",
+        "exports": {
+            ".": {
+                "types": "./dist/esm/PageAgent.d.ts",
+                "import": "./dist/esm/page-agent.js",
+                "default": "./dist/esm/page-agent.js"
+            }
         }
     },
     "files": [
@@ -40,8 +50,8 @@
         "build": "vite build && npm run build:demo",
         "build:demo": "vite build --config vite.iife.config.js",
         "dev:demo": "concurrently \"vite build --config vite.iife.config.js --watch\" \"npx serve dist/iife -p 5174\"",
-        "prepublishOnly": "node -e \"const fs=require('fs');['README.md','LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
-        "postpublish": "node -e \"['README.md','LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
+        "prepublishOnly": "node ../../scripts/prepare-publish.js",
+        "postpublish": "node ../../scripts/restore-dev.js"
     },
     "dependencies": {
         "@page-agent/core": "1.7.1",

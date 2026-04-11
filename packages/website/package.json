@@ -6,8 +6,7 @@
     "scripts": {
         "dev": "vite --host 0.0.0.0",
         "build:website": "vite build",
-        "preview": "vite preview",
-        "typecheck": "tsc --noEmit"
+        "preview": "vite preview"
     },
     "devDependencies": {
         "@radix-ui/react-icons": "^1.3.2",

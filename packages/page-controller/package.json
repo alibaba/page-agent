@@ -2,14 +2,24 @@
     "name": "@page-agent/page-controller",
     "version": "1.7.1",
     "type": "module",
-    "main": "./dist/lib/page-controller.js",
-    "module": "./dist/lib/page-controller.js",
-    "types": "./dist/lib/PageController.d.ts",
+    "main": "./src/PageController.ts",
+    "types": "./src/PageController.ts",
     "exports": {
         ".": {
-            "types": "./dist/lib/PageController.d.ts",
-            "import": "./dist/lib/page-controller.js",
-            "default": "./dist/lib/page-controller.js"
+            "types": "./src/PageController.ts",
+            "default": "./src/PageController.ts"
+        }
+    },
+    "publishConfig": {
+        "main": "./dist/lib/page-controller.js",
+        "module": "./dist/lib/page-controller.js",
+        "types": "./dist/lib/PageController.d.ts",
+        "exports": {
+            ".": {
+                "types": "./dist/lib/PageController.d.ts",
+                "import": "./dist/lib/page-controller.js",
+                "default": "./dist/lib/page-controller.js"
+            }
         }
     },
     "files": [
@@ -32,8 +42,8 @@
     "homepage": "https://alibaba.github.io/page-agent/",
     "scripts": {
         "build": "vite build",
-        "prepublishOnly": "node -e \"const fs=require('fs');['LICENSE'].forEach(f=>fs.copyFileSync('../../'+f,f))\"",
-        "postpublish": "node -e \"['LICENSE'].forEach(f=>{try{require('fs').unlinkSync(f)}catch{}})\""
+        "prepublishOnly": "node ../../scripts/prepare-publish.js",
+        "postpublish": "node ../../scripts/restore-dev.js"
     },
     "dependencies": {
         "ai-motion": "^0.4.8"
