@@ -42,7 +42,7 @@
     "homepage": "https://alibaba.github.io/page-agent/",
     "scripts": {
         "build": "vite build",
-        "prepublishOnly": "node ../../scripts/prepare-publish.js",
-        "postpublish": "node ../../scripts/restore-dev.js"
+        "prepublishOnly": "node ../../scripts/pre-publish.js",
+        "postpublish": "node ../../scripts/post-publish.js"
     }
 }

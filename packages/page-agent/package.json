@@ -50,8 +50,8 @@
         "build": "vite build && npm run build:demo",
         "build:demo": "vite build --config vite.iife.config.js",
         "dev:demo": "concurrently \"vite build --config vite.iife.config.js --watch\" \"npx serve dist/iife -p 5174\"",
-        "prepublishOnly": "node ../../scripts/prepare-publish.js",
-        "postpublish": "node ../../scripts/restore-dev.js"
+        "prepublishOnly": "node ../../scripts/pre-publish.js",
+        "postpublish": "node ../../scripts/post-publish.js"
     },
     "dependencies": {
         "@page-agent/core": "1.7.1",

@@ -33,6 +33,7 @@
         "build:website": "npm run build:website --workspace=@page-agent/website",
         "build:ext": "npm run build:libs && npm run zip -w @page-agent/ext",
         "version": "node scripts/sync-version.js",
+        "postpublish": "npm run postpublish --workspaces --if-present",
         "typecheck": "tsc --noEmit -p tsconfig.typecheck.json && tsc --noEmit -p packages/extension/tsconfig.json",
         "lint": "eslint .",
         "cleanup": "rm -rf packages/*/dist && rm -rf packages/*/.output",

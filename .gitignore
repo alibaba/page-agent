@@ -25,6 +25,9 @@ dist-ssr
 *.sw?
 .qoder
 
+# publish backup
+package.json.bak
+
 # env files
 .env
 .env.*
