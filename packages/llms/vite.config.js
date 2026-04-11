@@ -11,7 +11,17 @@ console.log(chalk.cyan(`📦 Building @page-agent/llms`))
 
 export default defineConfig({
 	clearScreen: false,
-	plugins: [dts({ tsconfigPath: './tsconfig.dts.json', bundleTypes: true })],
+	plugins: [
+		dts({
+			bundleTypes: true,
+			compilerOptions: {
+				composite: true,
+				noEmit: false,
+				emitDeclarationOnly: true,
+				declaration: true,
+			},
+		}),
+	],
 	publicDir: false,
 	esbuild: {
 		keepNames: true,

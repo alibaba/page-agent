@@ -24,7 +24,7 @@ export class TabsController {
 	currentTabId: number | null = null
 
 	private disposed = false
-	private port: chrome.runtime.Port | null = null
+	private port?: chrome.runtime.Port
 	private portRetries = 0
 
 	private windowId: number | null = null
@@ -44,7 +44,7 @@ export class TabsController {
 
 		this.currentTabId = null
 		this.disposed = false
-		this.port = null
+		this.port = undefined
 		this.portRetries = 0
 
 		this.windowId = null
@@ -338,7 +338,7 @@ export class TabsController {
 		})
 
 		this.port.onDisconnect.addListener(() => {
-			this.port = null
+			this.port = undefined
 			if (this.disposed) return
 			if (this.portRetries >= 7) {
 				console.error(PREFIX, 'tab events port failed after 7 retries, giving up')
@@ -354,7 +354,7 @@ export class TabsController {
 		debug('dispose')
 		this.disposed = true
 		this.port?.disconnect()
-		this.port = null
+		this.port = undefined
 	}
 }
 

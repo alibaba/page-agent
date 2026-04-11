@@ -1,16 +1,13 @@
 {
     "compilerOptions": {
-        "composite": true,
         "target": "ES2024",
         "useDefineForClassFields": true,
-        "lib": ["ES2024", "DOM", "DOM.Iterable"],
+        "lib": ["ES2024", "DOM"],
         "module": "ESNext",
         "skipLibCheck": true,
         "allowJs": true,
 
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
-        // "baseUrl": "src",
-        "baseUrl": ".",
         "outDir": "dist",
         // "incremental": true,
 
@@ -27,6 +24,8 @@
         "noUnusedParameters": false,
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true,
-        "noUncheckedSideEffectImports": true
+        "noUncheckedSideEffectImports": true,
+
+        "types": ["node"]
     }
 }

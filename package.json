@@ -33,8 +33,10 @@
         "build:website": "npm run build:website --workspace=@page-agent/website",
         "build:ext": "npm run build:libs && npm run zip -w @page-agent/ext",
         "version": "node scripts/sync-version.js",
+        "postpublish": "npm run postpublish --workspaces --if-present",
+        "typecheck": "tsc --noEmit -p tsconfig.typecheck.json && tsc --noEmit -p packages/extension/tsconfig.json",
         "lint": "eslint .",
-        "cleanup": "rm -rf packages/*/dist",
+        "cleanup": "rm -rf packages/*/dist && rm -rf packages/*/.output",
         "prepare": "husky || true"
     },
     "devDependencies": {
@@ -55,7 +57,7 @@
         "husky": "^9.1.7",
         "lint-staged": "^16.4.0",
         "prettier": "^3.8.1",
-        "typescript": "^5.9.3",
+        "typescript": "^6.0.2",
         "typescript-eslint": "^8.58.1",
         "unplugin-dts": "^1.0.0-beta.6",
         "vite": "^7.3.2",
@@ -63,7 +65,7 @@
         "vite-plugin-css-injected-by-js": "^4.0.1"
     },
     "overrides": {
-        "typescript": "^5.9.3",
+        "typescript": "^6.0.2",
         "@vitejs/plugin-react": "^5.2.0"
     },
     "lint-staged": {

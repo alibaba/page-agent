@@ -24,14 +24,7 @@ export default defineConfig(() => ({
 	esbuild: {
 		keepNames: true,
 	},
-	resolve: {
-		alias: {
-			'@page-agent/page-controller': resolve(__dirname, '../page-controller/src/PageController.ts'),
-			'@page-agent/llms': resolve(__dirname, '../llms/src/index.ts'),
-			'@page-agent/core': resolve(__dirname, '../core/src/PageAgentCore.ts'),
-			'@page-agent/ui': resolve(__dirname, '../ui/src/index.ts'),
-		},
-	},
+	resolve: {},
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/demo.ts'),

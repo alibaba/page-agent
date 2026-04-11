@@ -21,7 +21,7 @@ Internal packages:
 npm start                    # Start website dev server
 npm run build                # Build all packages
 npm run build:libs           # Build all libraries
-npm run lint                 # ESLint with TypeScript strict rules
+npm run lint                 # ESLint
 npm run zip -w @page-agent/ext # Zip the extension package
 ```
 
