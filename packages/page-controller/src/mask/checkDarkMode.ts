@@ -88,8 +88,16 @@ function isBackgroundDark() {
 }
 
 /**
+ * Checks the prefers-color-scheme media query for dark mode.
+ * @returns {boolean} - True if the system prefers a dark color scheme.
+ */
+function prefersDarkColorScheme() {
+	return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+}
+
+/**
  * A comprehensive function to determine if the page is currently in a dark theme.
- * It combines class checking and background color analysis.
+ * It combines class checking, system preference, and background color analysis.
  * @returns {boolean} - True if the page is likely dark.
  */
 export function isPageDark() {
@@ -99,13 +107,15 @@ export function isPageDark() {
 			return true
 		}
 
-		// Strategy 2: Analyze the computed background color
-		if (isBackgroundDark()) {
+		// Strategy 2: Check system-level prefers-color-scheme
+		if (prefersDarkColorScheme()) {
 			return true
 		}
 
-		// @TODO add more checks here, e.g., analyzing text color,
-		// or checking the background of major layout elements like <main> or #app.
+		// Strategy 3: Analyze the computed background color
+		if (isBackgroundDark()) {
+			return true
+		}
 
 		return false
 	} catch (error) {
