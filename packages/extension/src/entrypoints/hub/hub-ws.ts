@@ -12,6 +12,11 @@
  *   { type: "ready" }
  *   { type: "result", success: boolean, data: string }
  *   { type: "error", message: string }
+ *   { type: "heartbeat", at: number }   // periodic, only while a task is running
+ *
+ * Heartbeats let the caller distinguish a long-running task from a dead hub
+ * (e.g. throttled tab, blocked main thread) without relying on a fixed
+ * wall-clock timeout. Callers that don't care may safely ignore this type.
  */
 import type { ExecutionResult } from '@page-agent/core'
 import { useEffect, useRef, useState } from 'react'
@@ -47,9 +52,16 @@ interface ErrorMessage {
 	message: string
 }
 
-type OutboundMessage = ReadyMessage | ResultMessage | ErrorMessage
+interface HeartbeatMessage {
+	type: 'heartbeat'
+	at: number
+}
+
+type OutboundMessage = ReadyMessage | ResultMessage | ErrorMessage | HeartbeatMessage
 
 export type HubWsState = 'connecting' | 'connected' | 'disconnected'
+
+const HEARTBEAT_INTERVAL_MS = 5000
 
 // --- HubWs class ---
 
@@ -179,12 +191,16 @@ export class HubWs {
 		}
 
 		this.#busy = true
+		const heartbeat = setInterval(() => {
+			this.#send({ type: 'heartbeat', at: Date.now() })
+		}, HEARTBEAT_INTERVAL_MS)
 		try {
 			const result = await this.#handlers.onExecute(msg.task, msg.config)
 			this.#send({ type: 'result', success: result.success, data: result.data })
 		} catch (err) {
 			this.#send({ type: 'error', message: err instanceof Error ? err.message : String(err) })
 		} finally {
+			clearInterval(heartbeat)
 			this.#busy = false
 		}
 	}
