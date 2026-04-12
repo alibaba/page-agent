@@ -43,7 +43,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 Fastest way to try PageAgent with our free Demo LLM:
 
 ```html
-<script src="{URL}" crossorigin="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.demo.js" crossorigin="true"></script>
 ```
 
 > **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api). By using it, you agree to its [terms](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md).
