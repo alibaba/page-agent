@@ -72,7 +72,7 @@ const agent = new PageAgent({
 await agent.execute('Click the login button')
 ```
 
-For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/docs/introduction/overview).
+For more programmatic usage, see [📖 Documentation](https://alibaba.github.io/page-agent/docs/introduction/overview).
 
 ## 🌟 Awesome Page Agent
 
