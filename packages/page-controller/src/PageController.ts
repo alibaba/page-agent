@@ -246,13 +246,30 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
-			await clickElement(element)
+			const opensNewTab = isAnchorElement(element) && element.target === '_blank'
+
+			if (opensNewTab) {
+				// Keep navigation in the current tab so agent state remains consistent.
+				const originalTarget = element.getAttribute('target')
+				element.setAttribute('target', '_self')
+				try {
+					await clickElement(element)
+				} finally {
+					if (originalTarget === null) {
+						element.removeAttribute('target')
+					} else {
+						element.setAttribute('target', originalTarget)
+					}
+				}
+			} else {
+				await clickElement(element)
+			}
 
 			// Handle links that open in new tabs
-			if (isAnchorElement(element) && element.target === '_blank') {
+			if (opensNewTab) {
 				return {
 					success: true,
-					message: `✅ Clicked element (${elemText ?? index}). ⚠️ Link opened in a new tab.`,
+					message: `✅ Clicked element (${elemText ?? index}). Opened link in current tab.`,
 				}
 			}
 
