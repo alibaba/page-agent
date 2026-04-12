@@ -38,6 +38,8 @@ export interface UseAgentResult {
 	execute: (task: string) => Promise<ExecutionResult>
 	stop: () => void
 	configure: (config: ExtConfig) => Promise<void>
+	/** Id of the tab group created for the current task, or null if none yet. */
+	getTabGroupId: () => number | null
 }
 
 export function useAgent(): UseAgentResult {
@@ -120,6 +122,8 @@ export function useAgent(): UseAgentResult {
 		agentRef.current?.stop()
 	}, [])
 
+	const getTabGroupId = useCallback(() => agentRef.current?.tabGroupId ?? null, [])
+
 	const configure = useCallback(
 		async ({
 			language,
@@ -158,5 +162,6 @@ export function useAgent(): UseAgentResult {
 		execute,
 		stop,
 		configure,
+		getTabGroupId,
 	}
 }
