@@ -47,10 +47,26 @@
 
 > **⚠️ 仅用于技术评估。** 该 Demo CDN 使用了免费的[测试 LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api)，使用即表示您同意其[条款](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md)。
 
-| Mirrors | URL                                                                                |
-| ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.7.1/files/dist/iife/page-agent.demo.js |
+| Bundle | 用途 | Global | China |
+| ------ | ---- | ------ | ----- |
+| Demo bundle (`page-agent.demo.js`) | 自动挂载面板，并使用内置 Demo API，适合快速体验 | https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.demo.js | https://registry.npmmirror.com/page-agent/1.7.1/files/dist/iife/page-agent.demo.js |
+| Standard bundle (`page-agent.js`) | 只暴露 `window.PageAgent`，不会自动运行 Demo 实例 | https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.js | https://registry.npmmirror.com/page-agent/1.7.1/files/dist/iife/page-agent.js |
+
+标准 CDN bundle 示例：
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.js" crossorigin="true"></script>
+<script>
+  const agent = new window.PageAgent({
+    model: 'qwen3.5-plus',
+    baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    apiKey: 'YOUR_API_KEY',
+    language: 'zh-CN',
+  })
+
+  agent.panel.show()
+</script>
+```
 
 ### NPM 安装
 

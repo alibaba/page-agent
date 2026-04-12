@@ -19,9 +19,9 @@ export default defineConfig({
 	build: {
 		emptyOutDir: false,
 		lib: {
-			entry: resolve(__dirname, 'src/cdn.ts'),
+			entry: resolve(__dirname, 'src/demo.ts'),
 			name: 'PageAgent',
-			fileName: () => 'page-agent.js',
+			fileName: () => 'page-agent.demo.js',
 			formats: ['iife'],
 		},
 		outDir: resolve(__dirname, 'dist', 'iife'),

@@ -48,8 +48,8 @@
     "homepage": "https://alibaba.github.io/page-agent/",
     "scripts": {
         "build": "vite build && npm run build:demo",
-        "build:demo": "vite build --config vite.iife.config.js",
-        "dev:demo": "concurrently \"vite build --config vite.iife.config.js --watch\" \"npx serve dist/iife -p 5174\"",
+        "build:demo": "rm -rf dist/iife && vite build --config vite.iife.config.js && vite build --config vite.iife.demo.config.js",
+        "dev:demo": "concurrently \"vite build --config vite.iife.config.js --watch\" \"vite build --config vite.iife.demo.config.js --watch\" \"npx serve dist/iife -p 5174\"",
         "prepublishOnly": "node ../../scripts/pre-publish.js",
         "postpublish": "node ../../scripts/post-publish.js"
     },

@@ -94,11 +94,15 @@ npm run zip -w @page-agent/ext
 
 ### Testing on Other Websites
 
-- Start and serve a local `iife` script
+- Start and serve local `iife` scripts
 
     ```bash
-    npm run dev:demo # Serving IIFE with auto rebuild at http://localhost:5174/page-agent.demo.js
+    npm run dev:demo # Serving IIFE bundles with auto rebuild at http://localhost:5174/
     ```
+
+    This produces both:
+    - `http://localhost:5174/page-agent.demo.js` for the auto-start demo bundle
+    - `http://localhost:5174/page-agent.js` for the standard CDN bundle that only exposes `window.PageAgent`
 
 - Add a new bookmark
 

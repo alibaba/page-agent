@@ -48,10 +48,26 @@ Fastest way to try PageAgent with our free Demo LLM:
 
 > **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api). By using it, you agree to its [terms](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md).
 
-| Mirrors | URL                                                                                |
-| ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.7.1/files/dist/iife/page-agent.demo.js |
+| Bundle | Use case | Global | China |
+| ------ | -------- | ------ | ----- |
+| Demo bundle (`page-agent.demo.js`) | Auto-mounts the panel and uses the built-in demo API for quick evaluation | https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.demo.js | https://registry.npmmirror.com/page-agent/1.7.1/files/dist/iife/page-agent.demo.js |
+| Standard bundle (`page-agent.js`) | Exposes `window.PageAgent` without auto-running a demo instance | https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.js | https://registry.npmmirror.com/page-agent/1.7.1/files/dist/iife/page-agent.js |
+
+Example with the standard CDN bundle:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.7.1/dist/iife/page-agent.js" crossorigin="true"></script>
+<script>
+  const agent = new window.PageAgent({
+    model: 'qwen3.5-plus',
+    baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    apiKey: 'YOUR_API_KEY',
+    language: 'en-US',
+  })
+
+  agent.panel.show()
+</script>
+```
 
 ### NPM Installation
 
