@@ -1,15 +1,14 @@
 {
     "compilerOptions": {
-        "target": "ES2024",
+        "target": "es2025",
         "useDefineForClassFields": true,
-        "lib": ["ES2024", "DOM"],
-        "module": "ESNext",
+        "lib": ["ESNext", "DOM"],
+        "module": "esnext",
         "skipLibCheck": true,
         "allowJs": true,
 
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
         "outDir": "dist",
-        // "incremental": true,
 
         /* Bundler mode */
         "moduleResolution": "bundler",
