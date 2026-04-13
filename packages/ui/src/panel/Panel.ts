@@ -46,6 +46,7 @@ export class Panel {
 	#headerUpdateTimer: ReturnType<typeof setInterval> | null = null
 	#pendingHeaderText: string | null = null
 	#isAnimating = false
+	#isStopping = false
 
 	// Event handlers (bound for removal)
 	#onStatusChange = () => this.#handleStatusChange()
@@ -99,6 +100,7 @@ export class Panel {
 	/** Handle agent status change */
 	#handleStatusChange(): void {
 		const status = this.#agent.status
+		this.#isStopping = false
 
 		// Map agent status to UI indicator type
 		const indicatorType =
@@ -218,6 +220,7 @@ export class Panel {
 		this.#updateStatusIndicator('thinking')
 		this.#renderHistory()
 		this.#collapse()
+		this.#isStopping = false
 		// Reset user input state
 		this.#isWaitingForUserAnswer = false
 		this.#userAnswerResolver = null
@@ -279,11 +282,16 @@ export class Panel {
 	 * Action button handler: stop when running, close (dispose) when idle
 	 */
 	#handleActionButton(): void {
-		if (this.#agent.status === 'running') {
+		if (this.#agent.status === 'running' && !this.#isStopping) {
+			this.#isStopping = true
+			this.#actionButton.textContent = 'X'
+			this.#actionButton.title = this.#i18n.t('ui.panel.close')
+			this.#pendingHeaderText = this.#i18n.t('ui.panel.close')
 			this.#agent.stop()
-		} else {
-			this.#agent.dispose()
+			return
 		}
+
+		this.#agent.dispose()
 	}
 
 	/**
