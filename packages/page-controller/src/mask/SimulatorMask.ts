@@ -10,6 +10,8 @@ export class SimulatorMask extends EventTarget {
 	wrapper = document.createElement('div')
 	motion: Motion | null = null
 
+	#disposed = false
+
 	#cursor = document.createElement('div')
 
 	#currentCursorX = 0
@@ -129,6 +131,8 @@ export class SimulatorMask extends EventTarget {
 	}
 
 	#moveCursorToTarget() {
+		if (this.#disposed) return
+
 		const newX = this.#currentCursorX + (this.#targetCursorX - this.#currentCursorX) * 0.2
 		const newY = this.#currentCursorY + (this.#targetCursorY - this.#currentCursorY) * 0.2
 
@@ -156,11 +160,15 @@ export class SimulatorMask extends EventTarget {
 	}
 
 	setCursorPosition(x: number, y: number) {
+		if (this.#disposed) return
+
 		this.#targetCursorX = x
 		this.#targetCursorY = y
 	}
 
 	triggerClickAnimation() {
+		if (this.#disposed) return
+
 		this.#cursor.classList.remove(cursorStyles.clicking)
 		// Force reflow to restart animation
 		void this.#cursor.offsetHeight
@@ -168,7 +176,7 @@ export class SimulatorMask extends EventTarget {
 	}
 
 	show() {
-		if (this.shown) return
+		if (this.shown || this.#disposed) return
 
 		this.shown = true
 		this.motion?.start()
@@ -186,7 +194,7 @@ export class SimulatorMask extends EventTarget {
 	}
 
 	hide() {
-		if (!this.shown) return
+		if (!this.shown || this.#disposed) return
 
 		this.shown = false
 		this.motion?.fadeOut()
@@ -200,6 +208,7 @@ export class SimulatorMask extends EventTarget {
 	}
 
 	dispose() {
+		this.#disposed = true
 		console.log('dispose SimulatorMask')
 		this.motion?.dispose()
 		this.wrapper.remove()
