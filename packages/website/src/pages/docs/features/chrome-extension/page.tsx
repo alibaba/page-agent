@@ -89,6 +89,121 @@ export default function ChromeExtension() {
 					</div>
 				</section>
 
+				{/* Quick Start */}
+				<section>
+					<Heading id="quick-start" className="text-2xl font-bold mb-4">
+						{isZh ? '快速开始' : 'Quick Start'}
+					</Heading>
+					<div className="p-5 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-4 text-gray-600 dark:text-gray-300">
+						<ol className="list-decimal pl-5 space-y-2">
+							<li>
+								{isZh
+									? '安装扩展，然后打开侧边栏。'
+									: 'Install the extension, then open the side panel.'}
+							</li>
+							<li>
+								{isZh
+									? '在扩展设置中填入你自己的模型配置，或继续使用测试接口做体验。'
+									: 'Fill in your own model configuration in the extension settings, or keep the testing endpoint for evaluation.'}
+							</li>
+							<li>
+								{isZh
+									? '首次推荐先在一个简单网页上执行短任务，确认模型、权限和响应速度都正常。'
+									: 'Start with a short task on a simple page first, so you can verify model access, permissions, and response speed.'}
+							</li>
+							<li>
+								{isZh
+									? '当你需要从 Claude Desktop、Codex 或其他本地 Agent 发起浏览器任务时，再接入 MCP。'
+									: 'Add MCP only when you want Claude Desktop, Codex, or another local agent to trigger browser tasks.'}
+							</li>
+						</ol>
+					</div>
+				</section>
+
+				{/* Provider setup */}
+				<section>
+					<Heading id="provider-setup" className="text-2xl font-bold mb-4">
+						{isZh ? '模型与 Provider 配置' : 'Model and Provider Setup'}
+					</Heading>
+					<div className="grid md:grid-cols-2 gap-4">
+						<div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+							<h3 className="font-semibold mb-2">OpenAI-compatible</h3>
+							<p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
+								{isZh
+									? '适用于 OpenAI、兼容 OpenAI 的网关、Ollama、LM Studio 等。只要能提供 baseURL + model，通常就能接入。'
+									: 'Works for OpenAI, OpenAI-compatible gateways, Ollama, LM Studio, and similar runtimes. If you have a baseURL and model name, it usually fits here.'}
+							</p>
+							<CodeEditor
+								code={`baseURL: 'http://127.0.0.1:11434/v1'
+model: 'qwen3:14b'
+apiKey: '' // optional for local runtimes`}
+								language="typescript"
+							/>
+						</div>
+						<div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+							<h3 className="font-semibold mb-2">{isZh ? '通过 MCP 接入本地 Agent' : 'Use MCP for local agents'}</h3>
+							<p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
+								{isZh
+									? '如果你想从 Claude Desktop、Codex、Copilot 等桌面 Agent 发起浏览器任务，推荐走 MCP。扩展负责浏览器控制，Agent 负责自然语言编排。'
+									: 'If you want Claude Desktop, Codex, Copilot, or another desktop agent to drive the browser, use MCP. The extension handles browser control, while the agent handles natural-language orchestration.'}
+							</p>
+							<a
+								href="/docs/features/mcp-server"
+								className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+							>
+								{isZh ? '查看 MCP Server 文档' : 'Read the MCP Server docs'}
+							</a>
+						</div>
+					</div>
+					<p className="text-gray-600 dark:text-gray-300 mt-4">
+						{isZh
+							? '更完整的模型配置示例（OpenAI、Claude、Gemini、Ollama、LM Studio）见模型文档。扩展本身不限制供应商，只要求请求参数与目标 API 兼容。'
+							: 'For more complete model examples, including OpenAI, Claude, Gemini, Ollama, and LM Studio, see the models docs. The extension itself is provider-agnostic as long as the request format matches the target API.'}
+						<a
+							href="/docs/features/models"
+							className="ml-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+						>
+							{isZh ? '查看模型配置文档' : 'Read the model setup guide'}
+						</a>
+					</p>
+				</section>
+
+				{/* Large pages and menu-heavy sites */}
+				<section>
+					<Heading id="large-pages-and-heavy-menus" className="text-2xl font-bold mb-4">
+						{isZh ? '菜单很多的页面怎么处理' : 'Handling pages with many menus'}
+					</Heading>
+					<div className="p-5 bg-amber-50 dark:bg-amber-900/20 rounded-lg space-y-3 text-gray-700 dark:text-gray-300">
+						<p>
+							{isZh
+								? '当页面里有大量菜单、下拉层或复杂组件时，问题通常不是“扩展没装好”，而是单次上下文过大、模型推理不稳定，或者任务描述太宽泛。'
+								: 'When a page has many menus, dropdown layers, or complex widgets, the bottleneck is usually not extension installation. It is more often context size, model quality, or prompts that are too broad.'}
+						</p>
+						<ul className="list-disc pl-5 space-y-2">
+							<li>
+								{isZh
+									? '优先使用更强的模型，或使用上下文窗口更大的本地模型。'
+									: 'Prefer a stronger model, or a local model with a larger context window.'}
+							</li>
+							<li>
+								{isZh
+									? '把任务拆成更短的步骤，例如先打开一级菜单，再继续下一步。'
+									: 'Break the task into shorter steps, for example opening the first menu level before asking for the next action.'}
+							</li>
+							<li>
+								{isZh
+									? '如果任务需要跨标签页、弹出新页或从桌面 Agent 发起，使用扩展或 MCP，而不是纯页面内模式。'
+									: 'Use the extension or MCP, rather than pure in-page mode, when the task spans tabs, opens new pages, or starts from a desktop agent.'}
+							</li>
+							<li>
+								{isZh
+									? '若你使用 Ollama 或 LM Studio，请确认跨域配置和上下文大小已经按模型文档设置好。'
+									: 'If you use Ollama or LM Studio, confirm that CORS and context settings are configured as described in the model docs.'}
+							</li>
+						</ul>
+					</div>
+				</section>
+
 				{/* Relationship with PageAgent.js */}
 				<section>
 					<Heading id="how-it-relates-to-page-agent-js" className="text-2xl font-bold mb-4">
@@ -290,7 +405,18 @@ window.PAGE_AGENT_EXT.stop()`
 							? '将 MultiPageAgent 集成你自己的插件'
 							: 'Integrate MultiPageAgent into Your Extension'}
 					</Heading>
-					<p>@TODO</p>
+					<div className="p-5 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3 text-gray-600 dark:text-gray-300 mb-4">
+						<p>
+							{isZh
+								? '如果你在做自己的浏览器扩展或桌面壳，可以把 MultiPageAgent 当成浏览器控制层。一个常见结构是：侧边栏收集配置，background 转发消息，content script 负责页面侧执行。'
+								: 'If you are building your own browser extension or desktop shell, treat MultiPageAgent as the browser-control layer. A common structure is: side panel for configuration, background entry for routing, and content scripts for page-side execution.'}
+						</p>
+						<p>
+							{isZh
+								? '建议先复用 Page Agent 现有 background entry 和 extension API，再根据自己的产品需求替换 UI、授权方式或任务来源。'
+								: 'Start by reusing Page Agent’s current background entry and extension API, then swap in your own UI, auth flow, or task source as needed.'}
+						</p>
+					</div>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
 							? '建议先阅读扩展 API 文档，再参考 background entry implementation。'
