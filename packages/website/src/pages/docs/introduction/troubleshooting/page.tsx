@@ -103,25 +103,25 @@ function FormatErrorsContent(isZh: boolean) {
 						<>
 							如果以上步骤无法解决问题，欢迎在{' '}
 							<a
-								href="https://github.com/alibaba/page-agent/discussions"
+								href="https://github.com/alibaba/page-agent/issues"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-blue-600 dark:text-blue-400 underline underline-offset-2"
 							>
-								GitHub Discussions
+								GitHub Issues
 							</a>{' '}
 							中反馈，附上模型名称和错误信息。
 						</>
 					) : (
 						<>
-							If the above steps don't help, join the{' '}
+							If the above steps don't help, open a{' '}
 							<a
-								href="https://github.com/alibaba/page-agent/discussions"
+								href="https://github.com/alibaba/page-agent/issues"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-blue-600 dark:text-blue-400 underline underline-offset-2"
 							>
-								GitHub Discussions
+								GitHub Issue
 							</a>{' '}
 							with your model name and error details.
 						</>
