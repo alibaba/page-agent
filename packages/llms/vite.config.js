@@ -23,9 +23,6 @@ export default defineConfig({
 		}),
 	],
 	publicDir: false,
-	esbuild: {
-		keepNames: true,
-	},
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),

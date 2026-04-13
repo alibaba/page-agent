@@ -21,10 +21,6 @@ export default defineConfig(() => ({
 		// analyzer()
 	],
 	publicDir: false,
-	esbuild: {
-		keepNames: true,
-	},
-	resolve: {},
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/demo.ts'),
