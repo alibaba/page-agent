@@ -93,7 +93,7 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
 	// fix incomplete formats
 	if (!resolvedArguments.action) {
 		log(`#5: fixing tool_call`)
-		resolvedArguments.action = { name: 'wait', input: { seconds: 1 } }
+		resolvedArguments.action = { wait: { seconds: 1 } }
 	}
 
 	// pack back to standard format
