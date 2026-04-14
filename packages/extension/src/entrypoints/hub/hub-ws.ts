@@ -7,16 +7,21 @@
  * Inbound (Caller → Hub):
  *   { type: "execute", task: string, config?: object }
  *   { type: "stop" }
+ *   { type: "get_status" }   // query whether a task is currently running
  *
  * Outbound (Hub → Caller):
  *   { type: "ready" }
  *   { type: "result", success: boolean, data: string }
  *   { type: "error", message: string }
- *   { type: "heartbeat", at: number }   // periodic, only while a task is running
+ *   { type: "status", busy: boolean }   // reply to `get_status`
  *
- * Heartbeats let the caller distinguish a long-running task from a dead hub
- * (e.g. throttled tab, blocked main thread) without relying on a fixed
- * wall-clock timeout. Callers that don't care may safely ignore this type.
+ * `get_status` lets a caller confirm the hub's own view of whether a task is
+ * still in flight — useful to detect state drift (e.g. the `result` message
+ * was lost while both sides believe the task is still running). This is an
+ * application-level check: WS-level liveness is already guaranteed by the
+ * protocol's ping/pong frames, which browsers auto-respond to, so callers
+ * should rely on those for dead-connection detection and use `get_status`
+ * only when in doubt.
  */
 import type { ExecutionResult } from '@page-agent/core'
 import { useEffect, useRef, useState } from 'react'
@@ -35,7 +40,11 @@ interface StopMessage {
 	type: 'stop'
 }
 
-type InboundMessage = ExecuteMessage | StopMessage
+interface GetStatusMessage {
+	type: 'get_status'
+}
+
+type InboundMessage = ExecuteMessage | StopMessage | GetStatusMessage
 
 interface ReadyMessage {
 	type: 'ready'
@@ -52,16 +61,14 @@ interface ErrorMessage {
 	message: string
 }
 
-interface HeartbeatMessage {
-	type: 'heartbeat'
-	at: number
+interface StatusMessage {
+	type: 'status'
+	busy: boolean
 }
 
-type OutboundMessage = ReadyMessage | ResultMessage | ErrorMessage | HeartbeatMessage
+type OutboundMessage = ReadyMessage | ResultMessage | ErrorMessage | StatusMessage
 
 export type HubWsState = 'connecting' | 'connected' | 'disconnected'
-
-const HEARTBEAT_INTERVAL_MS = 5000
 
 // --- HubWs class ---
 
@@ -165,6 +172,9 @@ export class HubWs {
 			case 'stop':
 				this.#handlers.onStop()
 				break
+			case 'get_status':
+				this.#send({ type: 'status', busy: this.#busy })
+				break
 		}
 	}
 
@@ -191,16 +201,12 @@ export class HubWs {
 		}
 
 		this.#busy = true
-		const heartbeat = setInterval(() => {
-			this.#send({ type: 'heartbeat', at: Date.now() })
-		}, HEARTBEAT_INTERVAL_MS)
 		try {
 			const result = await this.#handlers.onExecute(msg.task, msg.config)
 			this.#send({ type: 'result', success: result.success, data: result.data })
 		} catch (err) {
 			this.#send({ type: 'error', message: err instanceof Error ? err.message : String(err) })
 		} finally {
-			clearInterval(heartbeat)
 			this.#busy = false
 		}
 	}
