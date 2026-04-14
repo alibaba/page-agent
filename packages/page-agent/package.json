@@ -1,7 +1,7 @@
 {
     "name": "page-agent",
     "private": false,
-    "version": "1.7.1",
+    "version": "1.8.0",
     "type": "module",
     "main": "./src/PageAgent.ts",
     "types": "./src/PageAgent.ts",
@@ -54,10 +54,10 @@
         "postpublish": "node ../../scripts/post-publish.js"
     },
     "dependencies": {
-        "@page-agent/core": "1.7.1",
-        "@page-agent/llms": "1.7.1",
-        "@page-agent/page-controller": "1.7.1",
-        "@page-agent/ui": "1.7.1",
+        "@page-agent/core": "1.8.0",
+        "@page-agent/llms": "1.8.0",
+        "@page-agent/page-controller": "1.8.0",
+        "@page-agent/ui": "1.8.0",
         "chalk": "^5.6.2"
     },
     "peerDependencies": {

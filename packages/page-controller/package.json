@@ -1,6 +1,6 @@
 {
     "name": "@page-agent/page-controller",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "type": "module",
     "main": "./src/PageController.ts",
     "types": "./src/PageController.ts",

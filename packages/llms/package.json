@@ -1,6 +1,6 @@
 {
     "name": "@page-agent/llms",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "type": "module",
     "main": "./src/index.ts",
     "types": "./src/index.ts",
