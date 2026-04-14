@@ -85,9 +85,8 @@ If your AI assistant does not support [AGENTS.md](https://agents.md/). Add an al
 ### Extension Development
 
 ```bash
-# make sure you ran `npm run build:libs` first and every time you changed the core libs
-npm run dev -w @page-agent/ext
-npm run zip -w @page-agent/ext
+npm run dev:ext
+npm run build:ext
 ```
 
 - Update `packages/extension/docs/extension_api.md` for API integration details

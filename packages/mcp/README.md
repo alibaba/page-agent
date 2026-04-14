@@ -88,7 +88,6 @@ src/
 ## Dev
 
 ```bash
-npm run build:libs
 npm run dev:ext
 npx @modelcontextprotocol/inspector node packages/mcp/src/index.js
 ```
