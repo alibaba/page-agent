@@ -25,9 +25,6 @@ export default defineConfig({
 		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
 	],
 	publicDir: false,
-	esbuild: {
-		keepNames: true,
-	},
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
