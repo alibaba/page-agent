@@ -4,6 +4,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    labels:
+      - 'dependencies'
     groups:
       production-dependencies:
         dependency-type: 'production'
@@ -29,6 +31,8 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    labels:
+      - 'dependencies'
     groups:
       github-actions:
         patterns:
