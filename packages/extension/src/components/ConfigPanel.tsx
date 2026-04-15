@@ -123,6 +123,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					size="icon-sm"
 					onClick={onClose}
 					className="absolute top-2 right-3 cursor-pointer"
+					aria-label="Back"
 				>
 					<CornerUpLeft className="size-3.5" />
 				</Button>
@@ -130,12 +131,13 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 
 			{/* User Auth Token Section */}
 			<div className="flex flex-col gap-1.5 p-3 bg-muted/50 rounded-md border">
-				<label className="text-xs font-medium text-muted-foreground">User Auth Token</label>
+				<label htmlFor="user-auth-token" className="text-xs font-medium text-muted-foreground">User Auth Token</label>
 				<p className="text-[10px] text-muted-foreground mb-1">
 					Give a website the ability to call this extension.
 				</p>
 				<div className="flex gap-2 items-center">
 					<Input
+						id="user-auth-token"
 						readOnly
 						value={
 							userAuthToken
@@ -152,6 +154,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						className="h-8 w-8 shrink-0 cursor-pointer"
 						onClick={() => setShowToken(!showToken)}
 						disabled={!userAuthToken}
+						aria-label={showToken ? 'Hide token' : 'Show token'}
 					>
 						{showToken ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
 					</Button>
@@ -161,6 +164,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						className="h-8 w-8 shrink-0 cursor-pointer"
 						onClick={handleCopyToken}
 						disabled={!userAuthToken}
+						aria-label={copied ? 'Copied' : 'Copy token'}
 					>
 						{copied ? <span className="">✓</span> : <Copy className="size-3" />}
 					</Button>
@@ -178,8 +182,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			</a>
 
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">Base URL</label>
+				<label htmlFor="base-url" className="text-xs text-muted-foreground">Base URL</label>
 				<Input
+					id="base-url"
 					placeholder="https://api.openai.com/v1"
 					value={baseURL}
 					onChange={(e) => setBaseURL(e.target.value)}
@@ -204,8 +209,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			)}
 
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">Model</label>
+				<label htmlFor="model" className="text-xs text-muted-foreground">Model</label>
 				<Input
+					id="model"
 					placeholder="gpt-5.1"
 					value={model}
 					onChange={(e) => setModel(e.target.value)}
@@ -214,9 +220,10 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			</div>
 
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">API Key</label>
+				<label htmlFor="api-key" className="text-xs text-muted-foreground">API Key</label>
 				<div className="flex gap-2 items-center">
 					<Input
+						id="api-key"
 						type={showApiKey ? 'text' : 'password'}
 						// placeholder="sk-..."
 						value={apiKey}
@@ -228,6 +235,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						size="icon"
 						className="h-8 w-8 shrink-0 cursor-pointer"
 						onClick={() => setShowApiKey(!showApiKey)}
+						aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
 					>
 						{showApiKey ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
 					</Button>
@@ -260,8 +268,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			{advancedOpen && (
 				<>
 					<div className="flex flex-col gap-1.5">
-						<label className="text-xs text-muted-foreground">Max Steps</label>
+						<label htmlFor="max-steps" className="text-xs text-muted-foreground">Max Steps</label>
 						<Input
+							id="max-steps"
 							type="number"
 							placeholder="40"
 							min={1}
