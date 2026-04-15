@@ -165,10 +165,13 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						className="h-8 w-8 shrink-0 cursor-pointer"
 						onClick={handleCopyToken}
 						disabled={!userAuthToken}
-						aria-label={copied ? 'Copied' : 'Copy token'}
+						aria-label="Copy token"
 					>
 						{copied ? <span className="">✓</span> : <Copy className="size-3" />}
 					</Button>
+					<span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+						{copied ? 'Token copied' : ''}
+					</span>
 				</div>
 			</div>
 
