@@ -147,6 +147,8 @@ export default function App() {
 						size="icon-sm"
 						onClick={() => setView({ name: 'history' })}
 						className="cursor-pointer"
+						aria-label="History"
+						title="History"
 					>
 						<History className="size-3.5" />
 					</Button>
@@ -155,6 +157,8 @@ export default function App() {
 						size="icon-sm"
 						onClick={() => setView({ name: 'config' })}
 						className="cursor-pointer"
+						aria-label="Settings"
+						title="Settings"
 					>
 						<Settings className="size-3.5" />
 					</Button>
@@ -205,6 +209,8 @@ export default function App() {
 								variant="destructive"
 								onClick={handleStop}
 								className="size-7"
+								aria-label="Stop task"
+								title="Stop task"
 							>
 								<Square className="size-3" />
 							</InputGroupButton>
@@ -215,6 +221,8 @@ export default function App() {
 								onClick={() => handleSubmit()}
 								disabled={!inputValue.trim()}
 								className="size-7 cursor-pointer"
+								aria-label="Send"
+								title="Send"
 							>
 								<Send className="size-3" />
 							</InputGroupButton>
