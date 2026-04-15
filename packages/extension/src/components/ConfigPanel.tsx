@@ -155,6 +155,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						onClick={() => setShowToken(!showToken)}
 						disabled={!userAuthToken}
 						aria-label={showToken ? 'Hide token' : 'Show token'}
+						aria-pressed={showToken}
 					>
 						{showToken ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
 					</Button>
