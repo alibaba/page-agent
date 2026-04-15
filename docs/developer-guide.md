@@ -10,32 +10,37 @@ For contribution rules and expectations, see [../CONTRIBUTING.md](../CONTRIBUTIN
 
 1. **Prerequisites**
     - `macOS` / `Linux` / `WSL`
-    - `node.js >= 24` with `npm >= 11`
+    - `node.js ^22.13 || >=24` with `npm >= 11`
     - An editor that supports `ts/eslint/prettier`
     - Make sure `eslint`, `prettier` and `commitlint` work well. Un-linted code won't pass the CI.
 
 2. **Setup**
 
     ```bash
-    npm i
-    npm start          # Start demo and documentation site
-    npm run build      # Build libs and website
+    npm i            # Or `npm ci` if you don't want to change the lockfile
+    npm start        # Start website dev server
+    npm run build    # Build everything
     ```
 
 ## 📦 Project Structure
 
-This is a **monorepo** with npm workspaces containing **4 main packages**:
+This is a **monorepo** with npm workspaces. 
 
-- **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
+Published packages:
+
+- **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel (npm: `page-agent`)
+- **MCP** (`packages/mcp/`) - MCP server for browser control via Page Agent extension (npm: `@page-agent/mcp`)
 - **Core** (`packages/core/`) - Core agent logic without UI (npm: `@page-agent/core`)
-- **Extension** (`packages/extension/`) - Chrome extension for multi-page tasks and browser-level automation
-- **Website** (`packages/website/`) - React documentation and landing page. Also as demo and test page for the core lib. private package `@page-agent/website`
+- **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
+- **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback, independent of LLM
+- **UI** (`packages/ui/`) - Panel and i18n, decoupled from PageAgent
 
-> We use a simplified monorepo solution with `native npm-workspace + ts reference + vite alias`. No fancy tooling. Hoisting is required.
->
-> - When developing. Use alias so that we don't have to pre-build.
-> - When bundling. Use external and disable ts `paths` alias.
-> - When bundling `IIFE` and `Website`. Bundle everything together.
+Applications:
+
+- **Extension** (`packages/extension/`) - Browser extension (WXT + React)
+- **Website** (`packages/website/`) - React docs, landing page, and dev playground (private)
+
+> Source-first monorepo with `npm workspaces + ts references + vite alias`. Library `package.json` exports point to `src/*.ts` during development, and point to `dist/*.js` when published. `workspaces` in root `package.json` must be in topological order.
 
 ## 🤖 AGENTS.md Alias
 
