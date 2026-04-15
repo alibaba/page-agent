@@ -131,7 +131,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 
 			{/* User Auth Token Section */}
 			<div className="flex flex-col gap-1.5 p-3 bg-muted/50 rounded-md border">
-				<label htmlFor="user-auth-token" className="text-xs font-medium text-muted-foreground">User Auth Token</label>
+				<label htmlFor="user-auth-token" className="text-xs font-medium text-muted-foreground">
+					User Auth Token
+				</label>
 				<p className="text-[10px] text-muted-foreground mb-1">
 					Give a website the ability to call this extension.
 				</p>
@@ -186,7 +188,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			</a>
 
 			<div className="flex flex-col gap-1.5">
-				<label htmlFor="base-url" className="text-xs text-muted-foreground">Base URL</label>
+				<label htmlFor="base-url" className="text-xs text-muted-foreground">
+					Base URL
+				</label>
 				<Input
 					id="base-url"
 					placeholder="https://api.openai.com/v1"
@@ -213,7 +217,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			)}
 
 			<div className="flex flex-col gap-1.5">
-				<label htmlFor="model" className="text-xs text-muted-foreground">Model</label>
+				<label htmlFor="model" className="text-xs text-muted-foreground">
+					Model
+				</label>
 				<Input
 					id="model"
 					placeholder="gpt-5.1"
@@ -224,7 +230,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			</div>
 
 			<div className="flex flex-col gap-1.5">
-				<label htmlFor="api-key" className="text-xs text-muted-foreground">API Key</label>
+				<label htmlFor="api-key" className="text-xs text-muted-foreground">
+					API Key
+				</label>
 				<div className="flex gap-2 items-center">
 					<Input
 						id="api-key"
@@ -272,7 +280,9 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			{advancedOpen && (
 				<>
 					<div className="flex flex-col gap-1.5">
-						<label htmlFor="max-steps" className="text-xs text-muted-foreground">Max Steps</label>
+						<label htmlFor="max-steps" className="text-xs text-muted-foreground">
+							Max Steps
+						</label>
 						<Input
 							id="max-steps"
 							type="number"
