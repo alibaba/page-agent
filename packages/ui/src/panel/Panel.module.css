@@ -362,6 +362,11 @@
 				background: linear-gradient(135deg, rgba(255, 159, 67, 0.15), rgba(255, 159, 67, 0.08));
 			}
 
+			&.tokenStats {
+				border-left-color: rgb(56, 189, 248);
+				background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(56, 189, 248, 0.05));
+			}
+
 			/* 突出显示 done 成功结果 */
 			&.doneSuccess {
 				background: linear-gradient(
