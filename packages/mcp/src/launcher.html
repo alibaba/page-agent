@@ -3,7 +3,10 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="icon" href="https://img.alicdn.com/imgextra/i1/O1CN01mRGret1QrKiu7CFJI_!!6000000002029-2-tps-64-64.png" />
+		<link
+			rel="icon"
+			href="https://img.alicdn.com/imgextra/i1/O1CN01mRGret1QrKiu7CFJI_!!6000000002029-2-tps-64-64.png"
+		/>
 		<title>Page Agent MCP Launcher</title>
 		<style>
 			* {
@@ -172,16 +175,26 @@
 						If the extension is outdated, please update it to the latest version.
 					</li>
 					<li data-i18n="tip_other_browser">
-						If the extension is not installed in this browser, open this page from the
-						browser that has it installed.
+						If the extension is not installed in this browser, open this page from the browser that
+						has it installed.
 					</li>
 					<li data-i18n="tip_refresh">Refresh this page after installing or updating.</li>
 				</ul>
 			</div>
 
 			<div class="links">
-				<a href="https://alibaba.github.io/page-agent/docs/introduction/overview" target="_blank" data-i18n="link_docs">Docs</a>
-				<a href="https://github.com/alibaba/page-agent/issues" target="_blank" data-i18n="link_issues">Report an Issue</a>
+				<a
+					href="https://alibaba.github.io/page-agent/docs/introduction/overview"
+					target="_blank"
+					data-i18n="link_docs"
+					>Docs</a
+				>
+				<a
+					href="https://github.com/alibaba/page-agent/issues"
+					target="_blank"
+					data-i18n="link_issues"
+					>Report an Issue</a
+				>
 			</div>
 		</div>
 
@@ -197,8 +210,7 @@
 					install_sub: 'Page Agent 需要安装最新版浏览器插件才能运行。',
 					install_btn: '从 Chrome 应用商店安装',
 					tip_outdated: '如果插件版本过旧，请更新到最新版本。',
-					tip_other_browser:
-						'如果该浏览器中未安装插件，请从装有插件的浏览器打开此页面。',
+					tip_other_browser: '如果该浏览器中未安装插件，请从装有插件的浏览器打开此页面。',
 					tip_refresh: '安装或更新后，请刷新此页面。',
 					link_docs: '文档',
 					link_issues: '问题反馈',
@@ -220,13 +232,9 @@
 					if (!globalThis.chrome?.runtime?.sendMessage) {
 						showInstall()
 					} else {
-						chrome.runtime.sendMessage(
-							EXT_ID,
-							{ type: 'OPEN_HUB', wsPort },
-							(response) => {
-								if (chrome.runtime.lastError || !response?.ok) showInstall()
-							}
-						)
+						chrome.runtime.sendMessage(EXT_ID, { type: 'OPEN_HUB', wsPort }, (response) => {
+							if (chrome.runtime.lastError || !response?.ok) showInstall()
+						})
 					}
 				} catch {
 					showInstall()

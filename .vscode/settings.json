@@ -22,7 +22,7 @@
         "packages/*/node_modules": true
     },
     "markdownlint.config": {
-        // "comment": "Relaxed rules",
+        // Relaxed rules
         "default": true,
         "whitespace": false,
         "line_length": false,
@@ -36,6 +36,7 @@
         "ol-prefix": false,
         "no-duplicate-heading": false
     },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
     "js/ts.tsdk.path": "node_modules/typescript/lib",
     "typescript.tsdk": "node_modules/typescript/lib",
     "typescript.enablePromptUseWorkspaceTsdk": true

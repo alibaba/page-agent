@@ -36,11 +36,11 @@ Same format — add the config to the MCP settings of your client.
 
 ## MCP Tools
 
-| Tool           | Input              | Description                                          |
-| -------------- | ------------------ | ---------------------------------------------------- |
+| Tool           | Input              | Description                                           |
+| -------------- | ------------------ | ----------------------------------------------------- |
 | `execute_task` | `{ task: string }` | Execute a browser task in natural language. Blocking. |
-| `get_status`   | —                  | Returns `{ connected, busy }`                        |
-| `stop_task`    | —                  | Stop the currently running task.                     |
+| `get_status`   | —                  | Returns `{ connected, busy }`                         |
+| `stop_task`    | —                  | Stop the currently running task.                      |
 
 ## Environment Variables
 

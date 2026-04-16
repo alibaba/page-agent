@@ -36,6 +36,7 @@
         "postpublish": "npm run postpublish --workspaces --if-present",
         "typecheck": "tsc --noEmit -p tsconfig.typecheck.json && tsc --noEmit -p packages/extension/tsconfig.json",
         "lint": "eslint .",
+        "ci": "node scripts/ci.js",
         "cleanup": "rm -rf packages/*/dist && rm -rf packages/*/.output",
         "prepare": "husky || true"
     },

@@ -1,7 +1,7 @@
 ---
 name: pre-impl-discussion
 description: "Conduct a thorough pre-implementation discussion before making significant changes. Use when the user wants to discuss, plan, or evaluate a change before implementing it — especially when they say words like 'discuss', 'evaluate', 'plan', or 'let's talk about'."
-argument-hint: "Describe the change to evaluate"
+argument-hint: 'Describe the change to evaluate'
 ---
 
 # Pre-Implementation Discussion
@@ -40,6 +40,7 @@ Do NOT skip this step. Do NOT rely on assumptions about what "most projects" do.
 - **Search in parallel** to save time — batch independent queries
 
 Common pitfalls:
+
 - Assuming compatibility without checking actual version constraints
 - Confusing roadmap/aspirations with actual released state
 - Missing transitive constraints (a dependency of a dependency)
@@ -53,6 +54,7 @@ Share a **brief** assessment. Tables work well for comparisons. Highlight **bloc
 Surface the decisions the user needs to make. Present them as clear choices with trade-offs, not as a recommendation monologue.
 
 For each decision point:
+
 - What are the options? (2-3 max)
 - What does each option cost or give up?
 - What's your lean and why? (one sentence)
@@ -66,6 +68,7 @@ The user will ask follow-up questions, raise concerns, or challenge assumptions.
 - **Update your mental model** based on user feedback
 
 Common mistakes in this phase:
+
 - Repeating the full plan after every small clarification
 - Answering a narrow question with a broad redesign
 - Treating user questions as confirmation to proceed
@@ -84,17 +87,18 @@ Keep it terse. Tables over paragraphs. No explanations the user already heard du
 ### 7. Wait for Confirmation
 
 After presenting the final plan, **stop and wait**. The user will either:
+
 - Confirm → then (and only then) proceed to implementation
 - Ask more questions → go back to step 5
 - Modify scope → update the plan and re-present
 
 ## Anti-Patterns
 
-| Don't | Do Instead |
-|-------|------------|
-| Start implementation "to test" without confirmation | Present findings and wait |
-| Repeat the full plan in every response | Answer the specific question asked |
-| Say "X should work" without checking | Say "I need to verify X" and research it |
-| Assume project structure or constraints | Read the actual files |
-| Present one recommendation as the only option | Present 2-3 options with trade-offs |
-| Write long paragraphs explaining trade-offs | Use tables and bullet points |
+| Don't                                               | Do Instead                               |
+| --------------------------------------------------- | ---------------------------------------- |
+| Start implementation "to test" without confirmation | Present findings and wait                |
+| Repeat the full plan in every response              | Answer the specific question asked       |
+| Say "X should work" without checking                | Say "I need to verify X" and research it |
+| Assume project structure or constraints             | Read the actual files                    |
+| Present one recommendation as the only option       | Present 2-3 options with trade-offs      |
+| Write long paragraphs explaining trade-offs         | Use tables and bullet points             |

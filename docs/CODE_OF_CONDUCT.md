@@ -16,22 +16,22 @@ appearance, race, religion, or sexual identity and orientation.
 Examples of behavior that contributes to creating a positive environment
 include:
 
-* Using welcoming and inclusive language
-* Being respectful of differing viewpoints and experiences
-* Gracefully accepting constructive criticism
-* Focusing on what is best for the community
-* Showing empathy towards other community members
+- Using welcoming and inclusive language
+- Being respectful of differing viewpoints and experiences
+- Gracefully accepting constructive criticism
+- Focusing on what is best for the community
+- Showing empathy towards other community members
 
 Examples of unacceptable behavior by participants include:
 
-* The use of sexualized language or imagery and unwelcome sexual attention or
- advances
-* Trolling, insulting/derogatory comments, and personal or political attacks
-* Public or private harassment
-* Publishing others' private information, such as a physical or electronic
- address, without explicit permission
-* Other conduct which could reasonably be considered inappropriate in a
- professional setting
+- The use of sexualized language or imagery and unwelcome sexual attention or
+  advances
+- Trolling, insulting/derogatory comments, and personal or political attacks
+- Public or private harassment
+- Publishing others' private information, such as a physical or electronic
+  address, without explicit permission
+- Other conduct which could reasonably be considered inappropriate in a
+  professional setting
 
 ## Our Responsibilities
 
@@ -85,19 +85,19 @@ available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.ht
 
 有助于创造正面环境的行为包括但不限于：
 
-* 使用友好和包容性语言
-* 尊重不同的观点和经历
-* 耐心地接受建设性批评
-* 关注对社区最有利的事情
-* 友善对待其他社区成员
+- 使用友好和包容性语言
+- 尊重不同的观点和经历
+- 耐心地接受建设性批评
+- 关注对社区最有利的事情
+- 友善对待其他社区成员
 
 身为参与者不能接受的行为包括但不限于：
 
-* 使用与性有关的言语或是图像，以及不受欢迎的性骚扰
-* 捣乱/煽动/造谣的行为或进行侮辱/贬损的评论，人身攻击及政治攻击
-* 公开或私下的骚扰
-* 未经许可地发布他人的个人资料，例如住址或是电子地址
-* 其他可以被合理地认定为不恰当或者违反职业操守的行为
+- 使用与性有关的言语或是图像，以及不受欢迎的性骚扰
+- 捣乱/煽动/造谣的行为或进行侮辱/贬损的评论，人身攻击及政治攻击
+- 公开或私下的骚扰
+- 未经许可地发布他人的个人资料，例如住址或是电子地址
+- 其他可以被合理地认定为不恰当或者违反职业操守的行为
 
 ## 我们的责任
 
