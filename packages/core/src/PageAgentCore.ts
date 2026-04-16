@@ -190,6 +190,9 @@ export class PageAgentCore extends EventTarget {
 	stop() {
 		this.pageController.cleanUpHighlights()
 		this.pageController.hideMask()
+		if (this.#status === 'running') {
+			this.#setStatus('error')
+		}
 		this.#abortController.abort()
 	}
 
