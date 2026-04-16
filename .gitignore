@@ -37,8 +37,6 @@ package.json.bak
 .wxt
 
 # AI
-.agent
 .claude
 .cursor
 .gemini
-CLAUDE.md

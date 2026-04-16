@@ -44,23 +44,7 @@ Applications:
 
 ## 🤖 AGENTS.md Alias
 
-If your AI assistant does not support [AGENTS.md](https://agents.md/). Add an alias for it:
-
-- claude-code (`CLAUDE.md`)
-
-    ```markdown
-    @AGENTS.md
-    ```
-
-- antigravity (`.agent/rules/alias.md`)
-
-    ```markdown
-    ---
-    trigger: always_on
-    ---
-
-    @../../AGENTS.md
-    ```
+If your AI assistant does not support [AGENTS.md](https://agents.md/). Add an alias for it.
 
 ## 🔧 Development Workflows
 
