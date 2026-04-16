@@ -24,7 +24,7 @@ For contribution rules and expectations, see [../CONTRIBUTING.md](../CONTRIBUTIN
 
 ## 📦 Project Structure
 
-This is a **monorepo** with npm workspaces. 
+This is a **monorepo** with npm workspaces.
 
 Published packages:
 

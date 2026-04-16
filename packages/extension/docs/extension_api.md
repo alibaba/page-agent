@@ -42,33 +42,28 @@ localStorage.setItem('PageAgentExtUserAuthToken', 'your-token')
 ## Quick Start
 
 ```typescript
-import type {
-  AgentActivity,
-  AgentStatus,
-  ExecutionResult,
-  HistoricalEvent,
-} from '@page-agent/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-agent/core'
 
 // Wait for extension injection (up to 1 second)
 async function waitForExtension(timeout = 1000): Promise<boolean> {
-  const start = Date.now()
-  while (Date.now() - start < timeout) {
-    if (window.PAGE_AGENT_EXT) return true
-    await new Promise((r) => setTimeout(r, 100))
-  }
-  return false
+    const start = Date.now()
+    while (Date.now() - start < timeout) {
+        if (window.PAGE_AGENT_EXT) return true
+        await new Promise((r) => setTimeout(r, 100))
+    }
+    return false
 }
 
 // Usage
 if (await waitForExtension()) {
-  const result = await window.PAGE_AGENT_EXT!.execute('Click the login button', {
-    baseURL: 'https://api.openai.com/v1',
-    apiKey: 'your-api-key',
-    model: 'gpt-5.2',
-    onStatusChange: (status) => console.log('Status:', status),
-    onActivity: (activity) => console.log('Activity:', activity),
-  })
-  console.log('Result:', result)
+    const result = await window.PAGE_AGENT_EXT!.execute('Click the login button', {
+        baseURL: 'https://api.openai.com/v1',
+        apiKey: 'your-api-key',
+        model: 'gpt-5.2',
+        onStatusChange: (status) => console.log('Status:', status),
+        onActivity: (activity) => console.log('Activity:', activity),
+    })
+    console.log('Result:', result)
 }
 ```
 
@@ -90,10 +85,10 @@ Execute one agent task.
 
 Parameters:
 
-| Name | Type | Required | Description |
-| ---- | ---- | -------- | ----------- |
-| `task` | `string` | Yes | Task description |
-| `config` | `ExecuteConfig` | Yes | LLM settings, options, and callbacks |
+| Name     | Type            | Required | Description                          |
+| -------- | --------------- | -------- | ------------------------------------ |
+| `task`   | `string`        | Yes      | Task description                     |
+| `config` | `ExecuteConfig` | Yes      | LLM settings, options, and callbacks |
 
 Returns: `Promise<ExecutionResult>`
 
@@ -106,33 +101,28 @@ Stop the current task.
 Install `@page-agent/core` for complete types:
 
 ```typescript
-import type {
-  AgentActivity,
-  AgentStatus,
-  ExecutionResult,
-  HistoricalEvent,
-} from '@page-agent/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-agent/core'
 
 export interface ExecuteConfig {
-  baseURL: string
-  model: string
-  apiKey?: string
+    baseURL: string
+    model: string
+    apiKey?: string
 
-  // Global system-level instructions for the agent.
-  // Equivalent to AgentConfig.instructions.system.
-  systemInstruction?: string
+    // Global system-level instructions for the agent.
+    // Equivalent to AgentConfig.instructions.system.
+    systemInstruction?: string
 
-  // Include the initial tab where page JS starts. Default: true.
-  includeInitialTab?: boolean
+    // Include the initial tab where page JS starts. Default: true.
+    includeInitialTab?: boolean
 
-  // Control all unpinned tabs in the window instead of only the tab group.
-  // When enabled, agent sees and can switch to every non-pinned tab.
-  // Default: false. Experimental.
-  experimentalIncludeAllTabs?: boolean
+    // Control all unpinned tabs in the window instead of only the tab group.
+    // When enabled, agent sees and can switch to every non-pinned tab.
+    // Default: false. Experimental.
+    experimentalIncludeAllTabs?: boolean
 
-  onStatusChange?: (status: AgentStatus) => void
-  onActivity?: (activity: AgentActivity) => void
-  onHistoryUpdate?: (history: HistoricalEvent[]) => void
+    onStatusChange?: (status: AgentStatus) => void
+    onActivity?: (activity: AgentActivity) => void
+    onHistoryUpdate?: (history: HistoricalEvent[]) => void
 }
 
 export type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
@@ -148,31 +138,31 @@ type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
 
 ```typescript
 type AgentActivity =
-  | { type: 'thinking' }
-  | { type: 'executing'; tool: string; input: unknown }
-  | { type: 'executed'; tool: string; input: unknown; output: string; duration: number }
-  | { type: 'retrying'; attempt: number; maxAttempts: number }
-  | { type: 'error'; message: string }
+    | { type: 'thinking' }
+    | { type: 'executing'; tool: string; input: unknown }
+    | { type: 'executed'; tool: string; input: unknown; output: string; duration: number }
+    | { type: 'retrying'; attempt: number; maxAttempts: number }
+    | { type: 'error'; message: string }
 ```
 
 `HistoricalEvent`
 
 ```typescript
 type HistoricalEvent =
-  | { type: 'step'; stepIndex: number; reflection: AgentReflection; action: Action }
-  | { type: 'observation'; content: string }
-  | { type: 'user_takeover' }
-  | { type: 'retry'; message: string; attempt: number; maxAttempts: number }
-  | { type: 'error'; message: string; rawResponse?: unknown }
+    | { type: 'step'; stepIndex: number; reflection: AgentReflection; action: Action }
+    | { type: 'observation'; content: string }
+    | { type: 'user_takeover' }
+    | { type: 'retry'; message: string; attempt: number; maxAttempts: number }
+    | { type: 'error'; message: string; rawResponse?: unknown }
 ```
 
 `ExecutionResult`
 
 ```typescript
 interface ExecutionResult {
-  success: boolean
-  data: string
-  history: HistoricalEvent[]
+    success: boolean
+    data: string
+    history: HistoricalEvent[]
 }
 ```
 
@@ -182,15 +172,15 @@ interface ExecutionResult {
 
 ```typescript
 const result = await window.PAGE_AGENT_EXT!.execute(
-  'Fill in the email field with test@example.com and click Submit',
-  {
-    baseURL: 'https://api.openai.com/v1',
-    apiKey: process.env.OPENAI_API_KEY!,
-    model: 'gpt-5.2',
-    includeInitialTab: false, // Optional: exclude current tab
-    onStatusChange: (status) => console.log(status),
-    onActivity: (activity) => console.log(activity),
-  }
+    'Fill in the email field with test@example.com and click Submit',
+    {
+        baseURL: 'https://api.openai.com/v1',
+        apiKey: process.env.OPENAI_API_KEY!,
+        model: 'gpt-5.2',
+        includeInitialTab: false, // Optional: exclude current tab
+        onStatusChange: (status) => console.log(status),
+        onActivity: (activity) => console.log(activity),
+    }
 )
 ```
 
@@ -205,35 +195,30 @@ window.PAGE_AGENT_EXT!.stop()
 If you are not importing `@page-agent/core`, add:
 
 ```typescript
-import type {
-  AgentActivity,
-  AgentStatus,
-  ExecutionResult,
-  HistoricalEvent,
-} from '@page-agent/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-agent/core'
 
 interface ExecuteConfig {
-  baseURL: string
-  model: string
-  apiKey?: string
+    baseURL: string
+    model: string
+    apiKey?: string
 
-  systemInstruction?: string
+    systemInstruction?: string
 
-  includeInitialTab?: boolean
-  experimentalIncludeAllTabs?: boolean
-  onStatusChange?: (status: AgentStatus) => void
-  onActivity?: (activity: AgentActivity) => void
-  onHistoryUpdate?: (history: HistoricalEvent[]) => void
+    includeInitialTab?: boolean
+    experimentalIncludeAllTabs?: boolean
+    onStatusChange?: (status: AgentStatus) => void
+    onActivity?: (activity: AgentActivity) => void
+    onHistoryUpdate?: (history: HistoricalEvent[]) => void
 }
 
 declare global {
-  interface Window {
-    PAGE_AGENT_EXT_VERSION?: string
-    PAGE_AGENT_EXT?: {
-      version: string
-      execute: Execute
-      stop: () => void
+    interface Window {
+        PAGE_AGENT_EXT_VERSION?: string
+        PAGE_AGENT_EXT?: {
+            version: string
+            execute: Execute
+            stop: () => void
+        }
     }
-  }
 }
 ```
