@@ -1,4 +1,12 @@
-import { ArrowDownToLine, ArrowLeft, CheckCircle, History, RotateCcw, Trash2, XCircle } from 'lucide-react'
+import {
+	ArrowDownToLine,
+	ArrowLeft,
+	CheckCircle,
+	History,
+	RotateCcw,
+	Trash2,
+	XCircle,
+} from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -29,8 +37,13 @@ export function HistoryList({
 	const [loading, setLoading] = useState(true)
 
 	const load = useCallback(async () => {
-		setSessions(await listSessions())
-		setLoading(false)
+		try {
+			setSessions(await listSessions())
+		} catch (err) {
+			console.error('[HistoryList] Failed to load sessions:', err)
+		} finally {
+			setLoading(false)
+		}
 	}, [])
 
 	useEffect(() => {
@@ -57,7 +70,14 @@ export function HistoryList({
 		<div className="flex flex-col h-screen bg-background">
 			{/* Header */}
 			<header className="flex items-center gap-2 border-b px-3 py-2">
-				<Button variant="ghost" size="icon-sm" onClick={onBack} className="cursor-pointer" aria-label="Back" title="Back">
+				<Button
+					variant="ghost"
+					size="icon-sm"
+					onClick={onBack}
+					className="cursor-pointer"
+					aria-label="Back"
+					title="Back"
+				>
 					<ArrowLeft className="size-3.5" />
 				</Button>
 				<span className="text-sm font-medium flex-1">History</span>
