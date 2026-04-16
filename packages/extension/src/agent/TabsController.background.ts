@@ -18,7 +18,7 @@ export function handleTabControlMessage(
 		case 'get_active_tab': {
 			debug('get_active_tab')
 			chrome.tabs
-				.query({ active: true })
+				.query({ active: true, lastFocusedWindow: true })
 				.then((tabs) => {
 					debug('get_active_tab: success', tabs)
 					sendResponse({ success: true, tab: tabs[0] })
