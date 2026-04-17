@@ -30,7 +30,8 @@ setTimeout(() => {
 		const baseURL = url.searchParams.get('baseURL') || DEMO_BASE_URL
 		const apiKey = url.searchParams.get('apiKey') || DEMO_API_KEY
 		const language = (url.searchParams.get('lang') as 'zh-CN' | 'en-US') || 'zh-CN'
-		config = { model, baseURL, apiKey, language }
+		const showPanel = url.searchParams.get('showPanel') === 'true'
+		config = { model, baseURL, apiKey, language, showPanel }
 	} else {
 		console.log('🚀 page-agent.js no current script detected, using default demo config')
 		config = {
@@ -42,7 +43,9 @@ setTimeout(() => {
 
 	// Create agent
 	window.pageAgent = new PageAgent(config)
-	window.pageAgent.panel.show()
+	if (config.showPanel) {
+		window.pageAgent.panel.show()
+	}
 
 	console.log('🚀 page-agent.js initialized with config:', window.pageAgent.config)
 })
