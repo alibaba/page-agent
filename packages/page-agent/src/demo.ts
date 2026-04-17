@@ -30,7 +30,7 @@ setTimeout(() => {
 		const baseURL = url.searchParams.get('baseURL') || DEMO_BASE_URL
 		const apiKey = url.searchParams.get('apiKey') || DEMO_API_KEY
 		const language = (url.searchParams.get('lang') as 'zh-CN' | 'en-US') || 'zh-CN'
-		const showPanel = url.searchParams.get('showPanel') === 'true'
+		const showPanel = ((url.searchParams.get('showPanel') as 'true' | 'false') || 'true') === 'true'
 		config = { model, baseURL, apiKey, language, showPanel }
 	} else {
 		console.log('🚀 page-agent.js no current script detected, using default demo config')
@@ -38,6 +38,7 @@ setTimeout(() => {
 			model: import.meta.env.LLM_MODEL_NAME ? import.meta.env.LLM_MODEL_NAME : DEMO_MODEL,
 			baseURL: import.meta.env.LLM_BASE_URL ? import.meta.env.LLM_BASE_URL : DEMO_BASE_URL,
 			apiKey: import.meta.env.LLM_API_KEY ? import.meta.env.LLM_API_KEY : DEMO_API_KEY,
+			showPanel: true,
 		}
 	}
 
