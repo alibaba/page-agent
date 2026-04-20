@@ -10,8 +10,18 @@ import { Switch } from '@/components/ui/switch'
 import { useHubWs } from './hub-ws'
 
 export default function App() {
-	const { status, history, activity, currentTask, config, execute, stop, configure } = useAgent()
-	const { wsState } = useHubWs(execute, stop, configure, config)
+	const {
+		status,
+		history,
+		activity,
+		currentTask,
+		config,
+		execute,
+		stop,
+		configure,
+		getTabGroupId,
+	} = useAgent()
+	const { wsState } = useHubWs(execute, stop, configure, config, getTabGroupId)
 
 	const historyRef = useRef<HTMLDivElement>(null)
 

@@ -7,11 +7,29 @@
  * Inbound (Caller → Hub):
  *   { type: "execute", task: string, config?: object }
  *   { type: "stop" }
+ *   { type: "tab_group",
+ *       groupId: number,
+ *       action: "close" | "ungroup" | "collapse" | "expand" }
+ *     // Operate on a tab group (typically the one returned in a prior `result`).
+ *     // "close"    - close every tab in the group (group disappears)
+ *     // "ungroup"  - detach tabs from the group, keep them open
+ *     // "collapse" - collapse the group
+ *     // "expand"   - expand the group
+ *     // Fire-and-forget: the hub applies the action best-effort and does not
+ *     // respond. Failures are logged on the hub side only.
  *
  * Outbound (Hub → Caller):
  *   { type: "ready" }
- *   { type: "result", success: boolean, data: string }
+ *   { type: "result",
+ *       success: boolean,
+ *       data: string,
+ *       tabGroupId?: number }   // id of the tab group created for this task, if any
  *   { type: "error", message: string }
+ *
+ * Policy is intentionally left to the caller: the hub never cleans up tab
+ * groups on its own. Callers that care about cleanup read `tabGroupId` from
+ * `result` and send a `tab_group` action based on their own policy
+ * (e.g. close on success, keep on failure).
  */
 import type { ExecutionResult } from '@page-agent/core'
 import { useEffect, useRef, useState } from 'react'
@@ -30,7 +48,15 @@ interface StopMessage {
 	type: 'stop'
 }
 
-type InboundMessage = ExecuteMessage | StopMessage
+export type TabGroupAction = 'close' | 'ungroup' | 'collapse' | 'expand'
+
+interface TabGroupMessage {
+	type: 'tab_group'
+	groupId: number
+	action: TabGroupAction
+}
+
+type InboundMessage = ExecuteMessage | StopMessage | TabGroupMessage
 
 interface ReadyMessage {
 	type: 'ready'
@@ -40,6 +66,7 @@ interface ResultMessage {
 	type: 'result'
 	success: boolean
 	data: string
+	tabGroupId?: number
 }
 
 interface ErrorMessage {
@@ -57,8 +84,9 @@ export interface HubWsHandlers {
 	onExecute: (
 		task: string,
 		config?: Record<string, unknown>
-	) => Promise<{ success: boolean; data: string }>
+	) => Promise<{ success: boolean; data: string; tabGroupId?: number }>
 	onStop: () => void
+	onTabGroupAction: (groupId: number, action: TabGroupAction) => Promise<void>
 }
 
 /**
@@ -153,6 +181,13 @@ export class HubWs {
 			case 'stop':
 				this.#handlers.onStop()
 				break
+			case 'tab_group':
+				// Fire-and-forget. Surface failures in the hub console but do not
+				// emit `error` (reserved for task-scoped errors).
+				this.#handlers.onTabGroupAction(msg.groupId, msg.action).catch((err) => {
+					console.error('[HubWs] tab_group action failed', msg, err)
+				})
+				break
 		}
 	}
 
@@ -181,12 +216,42 @@ export class HubWs {
 		this.#busy = true
 		try {
 			const result = await this.#handlers.onExecute(msg.task, msg.config)
-			this.#send({ type: 'result', success: result.success, data: result.data })
+			this.#send({
+				type: 'result',
+				success: result.success,
+				data: result.data,
+				tabGroupId: result.tabGroupId,
+			})
 		} catch (err) {
 			this.#send({ type: 'error', message: err instanceof Error ? err.message : String(err) })
 		} finally {
 			this.#busy = false
 		}
+	}
+}
+
+// --- Tab group actions (hub page has direct chrome API access) ---
+
+async function applyTabGroupAction(groupId: number, action: TabGroupAction): Promise<void> {
+	switch (action) {
+		case 'close': {
+			const tabs = await chrome.tabs.query({ groupId })
+			const ids = tabs.map((t) => t.id).filter((id): id is number => id != null)
+			if (ids.length) await chrome.tabs.remove(ids)
+			return
+		}
+		case 'ungroup': {
+			const tabs = await chrome.tabs.query({ groupId })
+			const ids = tabs.map((t) => t.id).filter((id): id is number => id != null)
+			if (ids.length) await chrome.tabs.ungroup(ids as [number, ...number[]])
+			return
+		}
+		case 'collapse':
+			await chrome.tabGroups.update(groupId, { collapsed: true })
+			return
+		case 'expand':
+			await chrome.tabGroups.update(groupId, { collapsed: false })
+			return
 	}
 }
 
@@ -200,15 +265,16 @@ export function useHubWs(
 	execute: (task: string) => Promise<ExecutionResult>,
 	stop: () => void,
 	configure: (config: ExtConfig) => Promise<void>,
-	config: ExtConfig | null
+	config: ExtConfig | null,
+	getTabGroupId: () => number | null
 ): { wsState: HubWsState } {
 	const wsPort = new URLSearchParams(location.search).get('ws')
 	const [wsState, setWsState] = useState<HubWsState>(() => (wsPort ? 'connecting' : 'disconnected'))
 	const hubWsRef = useRef<HubWs | null>(null)
 
-	const latestRef = useRef({ execute, stop, configure, config })
+	const latestRef = useRef({ execute, stop, configure, config, getTabGroupId })
 	useEffect(() => {
-		latestRef.current = { execute, stop, configure, config }
+		latestRef.current = { execute, stop, configure, config, getTabGroupId }
 	})
 
 	useEffect(() => {
@@ -218,14 +284,19 @@ export function useHubWs(
 			Number(wsPort),
 			{
 				onExecute: async (task, incomingConfig) => {
-					const { execute, configure, config } = latestRef.current
+					const { execute, configure, config, getTabGroupId } = latestRef.current
 					if (incomingConfig) {
 						await configure({ ...config, ...incomingConfig } as ExtConfig)
 					}
 					const result = await execute(task)
-					return { success: result.success, data: result.data }
+					return {
+						success: result.success,
+						data: result.data,
+						tabGroupId: getTabGroupId() ?? undefined,
+					}
 				},
 				onStop: () => latestRef.current.stop(),
+				onTabGroupAction: applyTabGroupAction,
 			},
 			setWsState
 		)
