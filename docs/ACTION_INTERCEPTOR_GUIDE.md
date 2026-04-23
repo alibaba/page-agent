@@ -51,7 +51,8 @@ const agent = new PageAgent({
     const index = action.input.index
     
     // 从 pageController 获取元素文本
-    const elementText = await this.pageController.getElementText(index)
+    const ele = await this.pageController.getElementInfo(action.input.index)
+    const elementText = ele.text || '';
     
     // 检查是否是危险操作
     const dangerWords = /保存|提交|删除|移除|清空|确认|下单|支付|审批|驳回/
@@ -89,7 +90,8 @@ const agent = new PageAgent({
       const index = action.input.index
       
       // 从 pageController 获取元素文本
-      const elementText = await this.pageController.getElementText(index)
+      const ele = await this.pageController.getElementInfo(action.input.index)
+      const elementText = ele.text || '';
       
       if (!elementText) {
         return next() // 没有文本，直接放行
@@ -171,12 +173,13 @@ const agent = new PageAgent({
 
 ## PageController 辅助方法
 
-### `getElementText(index: number): Promise<string | undefined>`
+### `getElementInfo(index: number): Promise<string | undefined>`
 
 获取指定索引元素的文本内容。
 
 ```typescript
-const text = await this.pageController.getElementText(42)
+const ele = await this.pageController.getElementInfo(action.input.index)
+const text = ele.text || '';
 console.log('Element text:', text)
 ```
 
@@ -187,7 +190,7 @@ console.log('Element text:', text)
 ```typescript
 const info = await this.pageController.getElementInfo(42)
 console.log('Text:', info?.text)
-console.log('Element:', info?.element)
+console.log('Element:', info)
 ```
 
 ## 高级用法
@@ -270,7 +273,8 @@ async actionInterceptor(action, next) {
   
   // 否则，根据规则自动判断是否需要确认
   if (action.name === 'click_element_by_index') {
-    const elementText = await this.pageController.getElementText(action.input.index)
+    const ele = await this.pageController.getElementInfo(action.input.index)
+const elementText = ele.text || '';
     if (elementText && /delete|remove/i.test(elementText)) {
       const confirmed = confirm('此操作可能删除数据，是否继续？')
       if (!confirmed) return false
@@ -445,4 +449,4 @@ const agent = new PageAgent({
 ✅ **易于集成**：只需一个回调函数  
 ✅ **异步支持**：支持异步检查和确认  
 
-结合 `requireConfirmation` 参数和 `PageController.getElementText()` 方法，可以构建一个**多层次的安全保障体系**，确保 AI Agent 的操作既智能又安全！
+结合 `requireConfirmation` 参数和 `PageController.getElement()` 方法，可以构建一个**多层次的安全保障体系**，确保 AI Agent 的操作既智能又安全！
