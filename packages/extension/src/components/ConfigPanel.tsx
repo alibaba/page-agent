@@ -248,6 +248,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						className="h-8 w-8 shrink-0 cursor-pointer"
 						onClick={() => setShowApiKey(!showApiKey)}
 						aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
+						aria-pressed={showApiKey}
 					>
 						{showApiKey ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
 					</Button>
