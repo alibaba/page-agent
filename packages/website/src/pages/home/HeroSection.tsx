@@ -77,9 +77,7 @@ export default function HeroSection() {
 				instructions: {
 					system: 'You are a helpful assistant on PageAgent website.',
 					getPageInstructions: (url: string) => {
-						const hint = url.includes('page-agent') ? 'This is PageAgent demo page.' : undefined
-						console.log('[instructions] getPageInstructions:', url, '->', hint)
-						return hint
+						return url.includes('page-agent') ? 'This is PageAgent demo page.' : undefined
 					},
 				},
 
@@ -98,8 +96,7 @@ export default function HeroSection() {
 			})
 		}
 
-		const result = await win.pageAgent.execute(task)
-		console.log(result)
+		await win.pageAgent.execute(task)
 	}
 
 	return (
