@@ -45,6 +45,17 @@ export class OpenAIClient implements LLMClient {
 		}
 
 		modelPatch(requestBody)
+		let transformedBody: Record<string, unknown> | undefined
+		try {
+			transformedBody = this.config.transformRequestBody(requestBody)
+		} catch (error) {
+			throw new InvokeError(
+				InvokeErrorType.CONFIG_ERROR,
+				`transformRequestBody failed: ${(error as Error).message}`,
+				error
+			)
+		}
+		const finalRequestBody = transformedBody ?? requestBody
 
 		// 2. Call API
 		let response: Response
@@ -55,7 +66,7 @@ export class OpenAIClient implements LLMClient {
 					'Content-Type': 'application/json',
 					...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
 				},
-				body: JSON.stringify(requestBody),
+				body: JSON.stringify(finalRequestBody),
 				signal: abortSignal,
 			})
 		} catch (error: unknown) {
@@ -225,7 +236,7 @@ export class OpenAIClient implements LLMClient {
 				reasoningTokens: data.usage?.completion_tokens_details?.reasoning_tokens,
 			},
 			rawResponse: data,
-			rawRequest: requestBody,
+			rawRequest: finalRequestBody,
 		}
 	}
 }

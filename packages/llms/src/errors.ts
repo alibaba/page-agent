@@ -14,6 +14,7 @@ export const InvokeErrorType = {
 	UNKNOWN: 'unknown',
 
 	// Non-retryable
+	CONFIG_ERROR: 'config_error', // Invalid local configuration or hook
 	AUTH_ERROR: 'auth_error', // Authentication failed
 	CONTEXT_LENGTH: 'context_length', // Prompt too long
 	CONTENT_FILTER: 'content_filter', // Content filtered

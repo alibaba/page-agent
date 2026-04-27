@@ -96,6 +96,16 @@ export interface LLMConfig {
 	maxRetries?: number
 
 	/**
+	 * Transform the final request body before sending it to the provider.
+	 * Use this to implement provider-specific request tweaks such as caching hints or custom flags.
+	 *
+	 * Return a new object, or mutate the input object and return undefined.
+	 */
+	transformRequestBody?: (
+		requestBody: Record<string, unknown>
+	) => Record<string, unknown> | undefined
+
+	/**
 	 * remove the tool_choice field from the request.
 	 * @note fix "Invalid tool_choice type: 'object'" for some LLMs.
 	 */
