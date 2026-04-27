@@ -2,6 +2,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { exec } from 'node:child_process'
+import { readFileSync } from 'node:fs'
 import { platform } from 'node:os'
 import * as z from 'zod/v4'
 
@@ -9,6 +10,7 @@ import { HubBridge } from './hub-bridge.js'
 
 const env = process.env
 const port = parseInt(env.PORT || '38401')
+const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 
 /** @type {Record<string, string>} */
 const llmConfig = {}
@@ -30,7 +32,7 @@ exec(`${cmd} "${url}"`, (err) => {
 
 // --- MCP server (stdio) ---
 
-const mcpServer = new McpServer({ name: 'page-agent', version: '1.5.8' })
+const mcpServer = new McpServer({ name: 'page-agent', version })
 
 mcpServer.registerTool(
 	'execute_task',
