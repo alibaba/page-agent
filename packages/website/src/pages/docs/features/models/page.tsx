@@ -9,7 +9,7 @@ const BASELINE = new Set([
 	'gpt-5.1',
 	'claude-haiku-4.5',
 	'gemini-3-flash',
-	'deepseek-3.2',
+	'deepseek-v4-flash',
 	'qwen3.5-plus',
 	'qwen3.5-flash',
 ])
