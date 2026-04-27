@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import { Link } from 'wouter'
 
 import CodeEditor from '@/components/CodeEditor'
 import { Heading } from '@/components/Heading'
@@ -127,46 +128,6 @@ const pageAgent = new PageAgent({
 			</section>
 
 			<section className="mb-10">
-				<Heading id="production-authentication" className="text-2xl font-semibold mb-4">
-					{isZh ? '🔐 生产环境鉴权' : '🔐 Production Authentication'}
-				</Heading>
-				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-					{isZh
-						? '如果你只是将它用作个人助手，可以直接连接你的 LLM 服务。'
-						: 'If you only use it as a personal assistant, you can connect to your LLM service directly.'}
-				</p>
-				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-					{isZh ? (
-						<>
-							如果你计划将它集成到你的 Web 应用中，建议搭建一个后端代理来转发 LLM 请求，并使用{' '}
-							<code>customFetch</code> 携带 Cookie 或其他鉴权信息：
-						</>
-					) : (
-						<>
-							If you plan to integrate it into your web app, it's better to have a backend proxy for
-							the LLM and use <code>customFetch</code> to authenticate the request with cookies or
-							other methods:
-						</>
-					)}
-				</p>
-				<CodeEditor
-					code={`const agent = new PageAgent({
-  baseURL: '/api/llm-proxy',
-  model: 'gpt-5.1',
-  customFetch: (url, init) =>
-    fetch(url, { ...init, credentials: 'include' }),
-});`}
-				/>
-				<div className="mt-4 bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 p-4 rounded-r-lg">
-					<p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
-						{isZh
-							? '⚠️ 永远不要把真实的 LLM API Key 提交到前端代码中'
-							: '⚠️ NEVER commit real LLM API keys to your frontend code'}
-					</p>
-				</div>
-			</section>
-
-			<section className="mb-10">
 				<Heading id="free-testing-api">{isZh ? '免费测试接口' : 'Free Testing API'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
@@ -215,7 +176,139 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 			</section>
 
 			<section className="mb-10">
-				<Heading id="local-runtimes">{isZh ? '本地运行时' : 'Local Runtimes'}</Heading>
+				<Heading id="production-authentication" className="text-2xl font-semibold mb-4">
+					{isZh ? '🔐 生产环境鉴权' : '🔐 Production Authentication'}
+				</Heading>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+					{isZh
+						? '如果你只是将它用作个人助手，可以直接连接你的 LLM 服务。'
+						: 'If you only use it as a personal assistant, you can connect to your LLM service directly.'}
+				</p>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
+					{isZh ? (
+						<>
+							如果你计划将它集成到你的 Web 应用中，建议搭建一个后端代理来转发 LLM 请求，并使用{' '}
+							<code>customFetch</code> 携带 Cookie 或其他鉴权信息：
+						</>
+					) : (
+						<>
+							If you plan to integrate it into your web app, it's better to have a backend proxy for
+							the LLM and use <code>customFetch</code> to authenticate the request with cookies or
+							other methods:
+						</>
+					)}
+				</p>
+				<CodeEditor
+					code={`const agent = new PageAgent({
+  baseURL: '/api/llm-proxy',
+  model: 'gpt-5.1',
+  customFetch: (url, init) =>
+    fetch(url, { ...init, credentials: 'include' }),
+});`}
+				/>
+				<div className="mt-4 bg-yellow-50 dark:bg-yellow-950/20 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+					<p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200">
+						{isZh
+							? '⚠️ 永远不要把真实的 LLM API Key 提交到前端代码中'
+							: '⚠️ NEVER commit real LLM API keys to your frontend code'}
+					</p>
+				</div>
+			</section>
+
+			<section className="mb-10">
+				<Heading id="prompt-caching">{isZh ? '主动缓存' : 'Prompt Caching'}</Heading>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+					{isZh ? (
+						<>
+							一些 LLM 能从主动缓存中受益很多。由于各个供应商的主动缓存接口不同，推荐使用{' '}
+							<Link
+								href="/advanced/page-agent-core#configuration"
+								className="text-blue-600 dark:text-blue-400 hover:underline"
+							>
+								transformRequestBody
+							</Link>{' '}
+							为你的模型供应商配置缓存提示。
+						</>
+					) : (
+						<>
+							Some LLMs benefit significantly from prompt caching. Because each provider exposes
+							caching differently, use{' '}
+							<Link
+								href="/advanced/page-agent-core#configuration"
+								className="text-blue-600 dark:text-blue-400 hover:underline"
+							>
+								transformRequestBody
+							</Link>{' '}
+							to add provider-specific cache hints.
+						</>
+					)}
+				</p>
+
+				<div className="space-y-6">
+					<section>
+						<Heading id="prompt-caching-claude" level={3}>
+							Claude
+						</Heading>
+						<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+							{isZh
+								? 'Claude 支持全局 Automatic prompt caching。使用兼容 Claude 的代理时，只需要在请求体顶层添加 cache_control。'
+								: 'Claude supports global Automatic prompt caching. When using a Claude-compatible proxy, add cache_control at the top level of the request body.'}
+						</p>
+						<CodeEditor
+							language="typescript"
+							code={`const pageAgent = new PageAgent({
+  baseURL: 'https://your-claude-proxy.example/v1',
+  apiKey: 'your-api-key',
+  model: 'claude-sonnet-4.5',
+  transformRequestBody: (requestBody) => ({
+    ...requestBody,
+    cache_control: { type: 'ephemeral' },
+  }),
+});`}
+						/>
+					</section>
+					<section>
+						<Heading id="prompt-caching-qwen" level={3}>
+							{isZh ? '阿里云百炼 Qwen' : 'Alibaba Cloud Bailian Qwen'}
+						</Heading>
+						<CodeEditor
+							language="typescript"
+							code={`const pageAgent = new PageAgent({
+  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+  apiKey: 'your-api-key',
+  model: 'qwen3.5-plus',
+  transformRequestBody: (requestBody) => {
+    const [systemMessage, ...restMessages] = requestBody.messages
+
+    if (systemMessage.role !== 'system' || typeof systemMessage.content !== 'string') {
+      return requestBody
+    }
+
+    return {
+      ...requestBody,
+      messages: [
+        {
+          ...systemMessage,
+          content: [
+            {
+              type: 'text',
+              text: systemMessage.content,
+              cache_control: { type: 'ephemeral' },
+            },
+          ],
+        },
+        ...restMessages,
+      ],
+    }
+  },
+});`}
+						/>
+					</section>
+				</div>
+			</section>
+
+			<section className="mb-10">
+				<Heading id="local-runtimes">{isZh ? '本地 LLMs' : 'Local LLMs'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
 					{isZh
 						? '通过 Ollama、LM Studio 等本地 OpenAI-compatible 运行时接入 PageAgent，实现离线或局域网部署。'
