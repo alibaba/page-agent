@@ -157,6 +157,13 @@ const result = await agent.execute('Fill in the form with test data')`}
 							description: isZh ? 'API 调用失败时的最大重试次数' : 'Maximum retries on API failure',
 						},
 						{
+							name: 'transformRequestBody',
+							type: '(requestBody, context) => Record<string, unknown> | undefined',
+							description: isZh
+								? '在请求发送前转换最终 request body。可用于处理供应商特定的缓存提示或私有参数。'
+								: 'Transform the final request body before sending it. Useful for provider-specific cache hints or private request parameters.',
+						},
+						{
 							name: 'disableNamedToolChoice',
 							type: 'boolean',
 							defaultValue: 'false',
@@ -172,6 +179,42 @@ const result = await agent.execute('Fill in the form with test data')`}
 								: 'Custom fetch function for customizing headers, credentials, proxy, etc.',
 						},
 					]}
+				/>
+
+				<h3 className="text-lg font-semibold mt-6 mb-3 text-gray-800 dark:text-gray-200">
+					{isZh ? 'transformRequestBody 示例' : 'transformRequestBody Example'}
+				</h3>
+				<p className="text-gray-600 dark:text-gray-400 mb-4">
+					{isZh
+						? '如果某个供应商需要私有字段或缓存提示，可以通过 transformRequestBody 在发送前透传请求体，而不需要把供应商逻辑写进 PageAgent 内部。'
+						: 'If a provider needs private fields or cache hints, use transformRequestBody to tweak the request body before sending it instead of baking provider-specific logic into PageAgent.'}
+				</p>
+				<CodeEditor
+					language="typescript"
+					code={`const agent = new PageAgentCore({
+  pageController: new PageController({ enableMask: true }),
+  baseURL: 'https://your-provider.example/v1',
+  apiKey: 'your-api-key',
+  model: 'qwen3.5-plus',
+  transformRequestBody: (requestBody) => {
+    const messages = requestBody.messages
+    if (!Array.isArray(messages)) return
+
+    const systemMessage = messages.find(
+      (message) => message && typeof message === 'object' && message.role === 'system'
+    ) as { role: string; content?: unknown } | undefined
+
+    if (!systemMessage || typeof systemMessage.content !== 'string') return
+
+    systemMessage.content = [
+      {
+        type: 'text',
+        text: systemMessage.content,
+        cache_control: { type: 'ephemeral' },
+      },
+    ]
+  },
+})`}
 				/>
 
 				{/* Agent Config */}
