@@ -3,17 +3,9 @@
  */
 import type * as z from 'zod/v4'
 
-/**
- * Message format - OpenAI standard (industry standard)
- */
-export interface MessageCacheControl {
-	type: 'ephemeral'
-}
-
 export interface MessageTextPart {
 	type: 'text'
 	text: string
-	cache_control?: MessageCacheControl
 }
 
 export type MessageContent = string | MessageTextPart[] | null
@@ -96,6 +88,11 @@ export interface InvokeResult<TResult = unknown> {
 	rawRequest?: unknown // Raw request for debugging
 }
 
+export interface TransformRequestContext {
+	model: string
+	baseURL: string
+}
+
 /**
  * LLM configuration
  */
@@ -108,11 +105,15 @@ export interface LLMConfig {
 	maxRetries?: number
 
 	/**
-	 * Emit Anthropic-style prompt cache hints on the system message.
-	 * This adds `cache_control: { type: 'ephemeral' }` to a system text content part.
-	 * Non-standard extension: only enable when your OpenAI-compatible provider explicitly supports it.
+	 * Transform the final request body before sending it to the provider.
+	 * Use this to implement provider-specific request tweaks such as caching hints or custom flags.
+	 *
+	 * Return a new object, or mutate the input object and return nothing.
 	 */
-	experimentalSystemPromptCache?: boolean
+	transformRequestBody?: (
+		requestBody: Record<string, unknown>,
+		context: TransformRequestContext
+	) => Record<string, unknown> | void
 
 	/**
 	 * remove the tool_choice field from the request.
