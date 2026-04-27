@@ -27,7 +27,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'qwen-3-plus',
 	],
 	OpenAI: ['gpt-5.4', 'gpt-5.2', 'gpt-5.1', 'gpt-5', 'gpt-5-mini', 'gpt-4.1', 'gpt-4.1-mini'],
-	DeepSeek: ['deepseek-3.2'],
+	DeepSeek: ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-3.2'],
 	Google: ['gemini-3-pro', 'gemini-3-flash', 'gemini-2.5'],
 	Anthropic: [
 		'claude-opus-4.6',
