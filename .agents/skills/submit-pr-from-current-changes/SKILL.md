@@ -75,7 +75,7 @@ After successfully opening the PR, ALWAYS give a brief reminder in the user's la
 ## Validation Strategy
 
 - Default to enough validation to defend the PR, not the absolute minimum.
-- Prefer area-specific build, lint, or test commands when they exist.
+- Run `npm run ci` to run all build and lint checks.
 - Escalate to broader validation when the diff crosses packages, changes shared code, or affects release behavior.
 - Never claim checks that did not actually run.
 - You MAY note what you ran and the results below the Testing section in the PR body, but do NOT check the template checkboxes.
