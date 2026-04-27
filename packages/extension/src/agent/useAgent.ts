@@ -128,7 +128,6 @@ export function useAgent(): UseAgentResult {
 			experimentalLlmsTxt,
 			experimentalIncludeAllTabs,
 			disableNamedToolChoice,
-			transformRequestBody,
 			...llmConfig
 		}: ExtConfig) => {
 			await chrome.storage.local.set({ llmConfig })
@@ -145,7 +144,7 @@ export function useAgent(): UseAgentResult {
 				disableNamedToolChoice,
 			}
 			await chrome.storage.local.set({ advancedConfig })
-			setConfig({ ...llmConfig, transformRequestBody, ...advancedConfig, language })
+			setConfig({ ...llmConfig, ...advancedConfig, language })
 		},
 		[]
 	)
