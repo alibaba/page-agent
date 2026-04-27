@@ -27,6 +27,9 @@ export class OpenAIClient implements LLMClient {
 	): Promise<InvokeResult> {
 		// 1. Convert tools to OpenAI format
 		const openaiTools = Object.entries(tools).map(([name, t]) => zodToOpenAITool(name, t))
+		const requestMessages = this.config.experimentalSystemPromptCache
+			? messages.map((message) => this.#withSystemPromptCache(message))
+			: messages
 
 		// Build request body
 
@@ -38,7 +41,7 @@ export class OpenAIClient implements LLMClient {
 		const requestBody: Record<string, unknown> = {
 			model: this.config.model,
 			temperature: this.config.temperature,
-			messages,
+			messages: requestMessages,
 			tools: openaiTools,
 			parallel_tool_calls: false,
 			tool_choice: toolChoice,
@@ -226,6 +229,23 @@ export class OpenAIClient implements LLMClient {
 			},
 			rawResponse: data,
 			rawRequest: requestBody,
+		}
+	}
+
+	#withSystemPromptCache(message: Message): Message {
+		if (message.role !== 'system' || typeof message.content !== 'string') {
+			return message
+		}
+
+		return {
+			...message,
+			content: [
+				{
+					type: 'text',
+					text: message.content,
+					cache_control: { type: 'ephemeral' },
+				},
+			],
 		}
 	}
 }

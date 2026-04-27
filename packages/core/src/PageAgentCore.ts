@@ -446,17 +446,18 @@ export class PageAgentCore extends EventTarget {
 	 * Get system prompt, dynamically replace language settings based on configured language
 	 */
 	#getSystemPrompt(): string {
-		if (this.config.customSystemPrompt) {
-			return this.config.customSystemPrompt
-		}
-
 		const targetLanguage = this.config.language === 'zh-CN' ? '中文' : 'English'
-		const systemPrompt = SYSTEM_PROMPT.replace(
-			/Default working language: \*\*.*?\*\*/,
-			`Default working language: **${targetLanguage}**`
-		)
+		const systemInstructions = this.config.instructions?.system?.trim()
+		const systemPrompt =
+			this.config.customSystemPrompt ??
+			SYSTEM_PROMPT.replace(
+				/Default working language: \*\*.*?\*\*/,
+				`Default working language: **${targetLanguage}**`
+			)
 
-		return systemPrompt
+		return systemInstructions
+			? `${systemPrompt}\n\n<system_instructions>\n${systemInstructions}\n</system_instructions>`
+			: systemPrompt
 	}
 
 	/**
@@ -465,7 +466,6 @@ export class PageAgentCore extends EventTarget {
 	async #getInstructions(): Promise<string> {
 		const { instructions, experimentalLlmsTxt } = this.config
 
-		const systemInstructions = instructions?.system?.trim()
 		let pageInstructions: string | undefined
 
 		const url = this.#states.browserState?.url || ''
@@ -482,13 +482,9 @@ export class PageAgentCore extends EventTarget {
 
 		const llmsTxt = experimentalLlmsTxt && url ? await fetchLlmsTxt(url) : undefined
 
-		if (!systemInstructions && !pageInstructions && !llmsTxt) return ''
+		if (!pageInstructions && !llmsTxt) return ''
 
 		let result = '<instructions>\n'
-
-		if (systemInstructions) {
-			result += `<system_instructions>\n${systemInstructions}\n</system_instructions>\n`
-		}
 
 		if (pageInstructions) {
 			result += `<page_instructions>\n${pageInstructions}\n</page_instructions>\n`

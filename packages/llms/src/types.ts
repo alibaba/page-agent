@@ -6,9 +6,21 @@ import type * as z from 'zod/v4'
 /**
  * Message format - OpenAI standard (industry standard)
  */
+export interface MessageCacheControl {
+	type: 'ephemeral'
+}
+
+export interface MessageTextPart {
+	type: 'text'
+	text: string
+	cache_control?: MessageCacheControl
+}
+
+export type MessageContent = string | MessageTextPart[] | null
+
 export interface Message {
 	role: 'system' | 'user' | 'assistant' | 'tool'
-	content?: string | null
+	content?: MessageContent
 	tool_calls?: {
 		id: string
 		type: 'function'
@@ -94,6 +106,13 @@ export interface LLMConfig {
 
 	temperature?: number
 	maxRetries?: number
+
+	/**
+	 * Emit Anthropic-style prompt cache hints on the system message.
+	 * This adds `cache_control: { type: 'ephemeral' }` to a system text content part.
+	 * Non-standard extension: only enable when your OpenAI-compatible provider explicitly supports it.
+	 */
+	experimentalSystemPromptCache?: boolean
 
 	/**
 	 * remove the tool_choice field from the request.
