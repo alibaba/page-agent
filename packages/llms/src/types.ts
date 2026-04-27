@@ -3,12 +3,16 @@
  */
 import type * as z from 'zod/v4'
 
-/**
- * Message format - OpenAI standard (industry standard)
- */
+export interface MessageTextPart {
+	type: 'text'
+	text: string
+}
+
+export type MessageContent = string | MessageTextPart[] | null
+
 export interface Message {
 	role: 'system' | 'user' | 'assistant' | 'tool'
-	content?: string | null
+	content?: MessageContent
 	tool_calls?: {
 		id: string
 		type: 'function'
@@ -84,6 +88,11 @@ export interface InvokeResult<TResult = unknown> {
 	rawRequest?: unknown // Raw request for debugging
 }
 
+export interface TransformRequestContext {
+	model: string
+	baseURL: string
+}
+
 /**
  * LLM configuration
  */
@@ -94,6 +103,17 @@ export interface LLMConfig {
 
 	temperature?: number
 	maxRetries?: number
+
+	/**
+	 * Transform the final request body before sending it to the provider.
+	 * Use this to implement provider-specific request tweaks such as caching hints or custom flags.
+	 *
+	 * Return a new object, or mutate the input object and return undefined.
+	 */
+	transformRequestBody?: (
+		requestBody: Record<string, unknown>,
+		context: TransformRequestContext
+	) => Record<string, unknown> | undefined
 
 	/**
 	 * remove the tool_choice field from the request.
