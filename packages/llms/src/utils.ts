@@ -53,6 +53,13 @@ export function modelPatch(body: Record<string, any>) {
 			debug('Applying Claude patch: convert tool_choice format')
 			body.tool_choice = { type: 'tool', name: body.tool_choice.function.name }
 		}
+
+		// TODO: Claude naming pattern has changed
+		// needs proper handling
+		if (modelName.startsWith('claude-opus-4-7') || modelName.startsWith('claude-opus-47')) {
+			debug('Applying Claude-4.7 patch: remove temperature')
+			delete body.temperature
+		}
 	}
 
 	if (modelName.startsWith('grok')) {
@@ -74,10 +81,12 @@ export function modelPatch(body: Record<string, any>) {
 			debug('Applying GPT-51 patch: disable reasoning')
 			body.reasoning_effort = 'none'
 		} else if (modelName.startsWith('gpt-54')) {
-			debug(
-				'Applying GPT-5.4 patch: skip reasoning_effort because chat/completions rejects it with function tools'
-			)
+			debug('Applying GPT-5.4 patch: remove reasoning_effort')
 			delete body.reasoning_effort
+		} else if (modelName.startsWith('gpt-55')) {
+			debug('Applying GPT-5.4 patch: remove reasoning_effort and temperature')
+			delete body.reasoning_effort
+			delete body.temperature
 		} else if (modelName.startsWith('gpt-5-mini')) {
 			debug('Applying GPT-5-mini patch: set reasoning effort to low, temperature to 1')
 			body.reasoning_effort = 'low'
