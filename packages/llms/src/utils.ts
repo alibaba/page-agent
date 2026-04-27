@@ -93,6 +93,11 @@ export function modelPatch(body: Record<string, any>) {
 		body.reasoning_effort = 'minimal'
 	}
 
+	if (modelName.startsWith('deepseek')) {
+		debug('Applying DeepSeek patch: remove tool_choice')
+		delete body.tool_choice
+	}
+
 	if (modelName.startsWith('minimax')) {
 		debug('Applying MiniMax patch: clamp temperature to (0, 1]')
 		// MiniMax API rejects temperature = 0; clamp to a small positive value
