@@ -95,7 +95,7 @@ body {
 	line-height: 1.6;
 }
 
-/* 标题使用中等字重（相对细体更重，但比默认 bold 更轻） */
+/* 文档标题层级需要比正文标题更清晰，避免 h2/h3/h4 视觉差异过小。 */
 .prose h1,
 .prose h2,
 .prose h3,
@@ -103,6 +103,33 @@ body {
 .prose h5,
 .prose h6 {
 	font-weight: 480;
+	line-height: 1.25;
+	letter-spacing: -0.015em;
+}
+
+.prose h2[id] {
+	margin-bottom: 1rem;
+	padding-bottom: 0.45rem;
+	border-bottom: 1px solid rgba(23, 23, 23, 0.12);
+	font-size: 1.875rem;
+	font-weight: 650;
+}
+
+.prose h3[id] {
+	margin-bottom: 0.75rem;
+	font-size: 1.375rem;
+	font-weight: 600;
+}
+
+.prose h4[id] {
+	margin-bottom: 0.5rem;
+	font-size: 1.0625rem;
+	font-weight: 560;
+	letter-spacing: -0.005em;
+}
+
+.dark .prose h2[id] {
+	border-bottom-color: rgba(255, 255, 255, 0.14);
 }
 
 /* strong/b 也用中等字重 */
