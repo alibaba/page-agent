@@ -157,6 +157,14 @@ const result = await agent.execute('Fill in the form with test data')`}
 							description: isZh ? 'API 调用失败时的最大重试次数' : 'Maximum retries on API failure',
 						},
 						{
+							name: 'experimentalSystemPromptCache',
+							type: 'boolean',
+							defaultValue: 'false',
+							description: isZh
+								? '为系统消息添加 cache_control: { type: "ephemeral" } 缓存提示。仅在提供商明确支持时启用（如 Claude API 兼容端点）。'
+								: 'Add cache_control: { type: "ephemeral" } to the system message for prompt caching. Only enable when your provider explicitly supports it (e.g. Claude-compatible endpoints).',
+						},
+						{
 							name: 'disableNamedToolChoice',
 							type: 'boolean',
 							defaultValue: 'false',
