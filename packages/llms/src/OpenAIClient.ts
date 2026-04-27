@@ -45,10 +45,19 @@ export class OpenAIClient implements LLMClient {
 		}
 
 		modelPatch(requestBody)
-		const transformedBody = this.config.transformRequestBody?.(requestBody, {
-			model: this.config.model,
-			baseURL: this.config.baseURL,
-		})
+		let transformedBody: Record<string, unknown> | void
+		try {
+			transformedBody = this.config.transformRequestBody?.(requestBody, {
+				model: this.config.model,
+				baseURL: this.config.baseURL,
+			})
+		} catch (error) {
+			throw new InvokeError(
+				InvokeErrorType.CONFIG_ERROR,
+				`transformRequestBody failed: ${(error as Error).message}`,
+				error
+			)
+		}
 		const finalRequestBody = transformedBody ?? requestBody
 
 		// 2. Call API
