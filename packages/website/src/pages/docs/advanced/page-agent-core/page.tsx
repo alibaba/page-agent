@@ -158,7 +158,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 						},
 						{
 							name: 'transformRequestBody',
-							type: '(requestBody, context) => Record<string, unknown> | undefined',
+							type: '(requestBody) => Record<string, unknown> | undefined',
 							description: isZh
 								? '在请求发送前转换最终 request body。可用于处理供应商特定的缓存提示或私有参数。'
 								: 'Transform the final request body before sending it. Useful for provider-specific cache hints or private request parameters.',

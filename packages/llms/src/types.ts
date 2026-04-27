@@ -3,16 +3,12 @@
  */
 import type * as z from 'zod/v4'
 
-export interface MessageTextPart {
-	type: 'text'
-	text: string
-}
-
-export type MessageContent = string | MessageTextPart[] | null
-
+/**
+ * Message format - OpenAI standard (industry standard)
+ */
 export interface Message {
 	role: 'system' | 'user' | 'assistant' | 'tool'
-	content?: MessageContent
+	content?: string | null
 	tool_calls?: {
 		id: string
 		type: 'function'
@@ -88,11 +84,6 @@ export interface InvokeResult<TResult = unknown> {
 	rawRequest?: unknown // Raw request for debugging
 }
 
-export interface TransformRequestContext {
-	model: string
-	baseURL: string
-}
-
 /**
  * LLM configuration
  */
@@ -111,8 +102,7 @@ export interface LLMConfig {
 	 * Return a new object, or mutate the input object and return undefined.
 	 */
 	transformRequestBody?: (
-		requestBody: Record<string, unknown>,
-		context: TransformRequestContext
+		requestBody: Record<string, unknown>
 	) => Record<string, unknown> | undefined
 
 	/**

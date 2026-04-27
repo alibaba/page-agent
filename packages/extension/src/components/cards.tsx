@@ -143,34 +143,16 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 }
 
 // Extract message content by role from raw request
-function stringifyMessageContent(content: unknown): string | null {
-	if (content == null) return null
-	if (typeof content === 'string') return content
-
-	if (Array.isArray(content)) {
-		const textParts = content
-			.map((part) => {
-				if (!part || typeof part !== 'object') return null
-				if ((part as { type?: unknown }).type !== 'text') return null
-				const text = (part as { text?: unknown }).text
-				return typeof text === 'string' ? text : null
-			})
-			.filter((text): text is string => Boolean(text))
-
-		return textParts.length > 0 ? textParts.join('\n\n') : JSON.stringify(content, null, 2)
-	}
-
-	return JSON.stringify(content, null, 2)
-}
-
 function extractPrompt(rawRequest: unknown, role: 'system' | 'user'): string | null {
 	const messages = (rawRequest as { messages?: { role: string; content?: unknown }[] })?.messages
 	if (!messages) return null
+	if (!Array.isArray(messages)) return null
 	const msg =
 		role === 'system'
 			? messages.find((m) => m.role === role)
 			: messages.findLast((m) => m.role === role)
-	return stringifyMessageContent(msg?.content)
+	if (!msg?.content) return null
+	return typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content, null, 2)
 }
 
 // Raw request/response section (collapsible tabs, for debugging)
