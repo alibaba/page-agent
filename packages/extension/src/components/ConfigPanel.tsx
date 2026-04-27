@@ -181,6 +181,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			<a
 				href="/hub.html"
 				target="_blank"
+				rel="noopener noreferrer"
 				className="flex items-center justify-between p-3 rounded-md border bg-muted/50 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
 			>
 				Manage Page Agent Hub
