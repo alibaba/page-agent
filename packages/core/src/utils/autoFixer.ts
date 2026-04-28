@@ -1,4 +1,4 @@
-import { InvokeError, InvokeErrorType } from '@page-agent/llms'
+import { InvokeError, InvokeErrorTypes } from '@page-agent/llms'
 import chalk from 'chalk'
 import * as z from 'zod/v4'
 
@@ -137,7 +137,7 @@ function validateAction(action: any, tools: Map<string, PageAgentTool>): any {
 	if (!tool) {
 		const available = Array.from(tools.keys()).join(', ')
 		throw new InvokeError(
-			InvokeErrorType.INVALID_TOOL_ARGS,
+			InvokeErrorTypes.INVALID_TOOL_ARGS,
 			`Unknown action "${toolName}". Available: ${available}`
 		)
 	}
@@ -159,7 +159,7 @@ function validateAction(action: any, tools: Map<string, PageAgentTool>): any {
 	const result = schema.safeParse(value)
 	if (!result.success) {
 		throw new InvokeError(
-			InvokeErrorType.INVALID_TOOL_ARGS,
+			InvokeErrorTypes.INVALID_TOOL_ARGS,
 			`Invalid input for action "${toolName}": ${z.prettifyError(result.error)}`
 		)
 	}

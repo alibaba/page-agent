@@ -1,9 +1,9 @@
 import { OpenAIClient } from './OpenAIClient'
 import { DEFAULT_TEMPERATURE, LLM_MAX_RETRIES } from './constants'
-import { InvokeError, InvokeErrorType } from './errors'
+import { InvokeError, InvokeErrorTypes } from './errors'
 import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
 
-export { InvokeError, InvokeErrorType }
+export { InvokeError, InvokeErrorTypes }
 export type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
 
 export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
