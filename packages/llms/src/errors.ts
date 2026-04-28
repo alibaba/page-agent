@@ -2,7 +2,7 @@
  * Error types and error handling for LLM invocations
  */
 
-export const InvokeErrorType = {
+export const InvokeErrorTypes = {
 	// Retryable
 	NETWORK_ERROR: 'network_error', // Network error, retry
 	RATE_LIMIT: 'rate_limit', // Rate limit, retry
@@ -20,7 +20,7 @@ export const InvokeErrorType = {
 	CONTENT_FILTER: 'content_filter', // Content filtered
 } as const
 
-export type InvokeErrorType = (typeof InvokeErrorType)[keyof typeof InvokeErrorType]
+type InvokeErrorType = (typeof InvokeErrorTypes)[keyof typeof InvokeErrorTypes]
 
 export class InvokeError extends Error {
 	type: InvokeErrorType
@@ -45,13 +45,13 @@ export class InvokeError extends Error {
 		if (isAbortError) return false
 
 		const retryableTypes: InvokeErrorType[] = [
-			InvokeErrorType.NETWORK_ERROR,
-			InvokeErrorType.RATE_LIMIT,
-			InvokeErrorType.SERVER_ERROR,
-			InvokeErrorType.NO_TOOL_CALL,
-			InvokeErrorType.INVALID_TOOL_ARGS,
-			InvokeErrorType.TOOL_EXECUTION_ERROR,
-			InvokeErrorType.UNKNOWN,
+			InvokeErrorTypes.NETWORK_ERROR,
+			InvokeErrorTypes.RATE_LIMIT,
+			InvokeErrorTypes.SERVER_ERROR,
+			InvokeErrorTypes.NO_TOOL_CALL,
+			InvokeErrorTypes.INVALID_TOOL_ARGS,
+			InvokeErrorTypes.TOOL_EXECUTION_ERROR,
+			InvokeErrorTypes.UNKNOWN,
 		]
 		return retryableTypes.includes(type)
 	}
