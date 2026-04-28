@@ -3,7 +3,6 @@ import { config as dotenvConfig } from 'dotenv'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
-// import { analyzer } from 'vite-bundle-analyzer'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
