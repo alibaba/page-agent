@@ -82,8 +82,10 @@ export default defineConfig(({ mode }) => ({
 				handler(message)
 			},
 			output: {
-				manualChunks: {
-					vendor: ['react', 'react-dom', 'wouter'],
+				manualChunks(id) {
+					if (/[\\/]node_modules[\\/](react|react-dom|wouter)([\\/]|$)/.test(id)) {
+						return 'vendor'
+					}
 				},
 			},
 		},
