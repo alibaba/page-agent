@@ -1,5 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
-import react from '@vitejs/plugin-react-swc'
+import react from '@vitejs/plugin-react'
 import { config as dotenvConfig } from 'dotenv'
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import process from 'node:process'
