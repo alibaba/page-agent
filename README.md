@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/alibaba-page-agent-badge.png)](https://mseep.ai/app/alibaba-page-agent)
+
 # Page Agent
 
 <picture>
