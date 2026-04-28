@@ -15,10 +15,15 @@ function hasDarkModeClass() {
 		}
 	}
 
-	// Some sites use data attributes
-	const darkThemeAttribute = htmlElement.getAttribute('data-theme')
-	if (darkThemeAttribute?.toLowerCase().includes('dark')) {
-		return true
+	// Some sites use data attributes (data-theme, data-color-mode, data-bs-theme, etc.)
+	const dataAttrs = ['data-theme', 'data-color-mode', 'data-bs-theme', 'data-color-scheme']
+	for (const attr of dataAttrs) {
+		const bodyValue = bodyElement?.getAttribute(attr)
+		const htmlValue = htmlElement.getAttribute(attr)
+
+		if (bodyValue?.toLowerCase().includes('dark') || htmlValue?.toLowerCase().includes('dark')) {
+			return true
+		}
 	}
 
 	return false
@@ -88,24 +93,99 @@ function isBackgroundDark() {
 }
 
 /**
+ * Checks the CSS `color-scheme` property and `<meta name="color-scheme">` tag.
+ * @returns {boolean | null} - True/false if deterministic, null if inconclusive.
+ */
+function getColorSchemePreference(): boolean | null {
+	// Check <meta name="color-scheme" content="dark">
+	const meta = document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]')
+	if (meta) {
+		const content = meta.content.toLowerCase()
+		// "dark" or "only dark" → dark; "light dark" is ambiguous so skip
+		if (content === 'dark' || content === 'only dark') return true
+		if (content === 'light' || content === 'only light') return false
+	}
+
+	// Check the computed color-scheme CSS property on :root
+	const rootStyle = window.getComputedStyle(document.documentElement)
+	const colorScheme = rootStyle.getPropertyValue('color-scheme').trim().toLowerCase()
+	if (colorScheme === 'dark' || colorScheme === 'only dark') return true
+	if (colorScheme === 'light' || colorScheme === 'only light') return false
+
+	return null
+}
+
+/**
+ * Checks if the text color on the body is light, which implies a dark background.
+ * @returns {boolean}
+ */
+function isTextColorLight() {
+	const bodyStyle = window.getComputedStyle(document.body || document.documentElement)
+	const textColor = bodyStyle.color
+
+	const rgb = parseRgbColor(textColor)
+	if (!rgb) return false
+
+	// Light text has high luminance (e.g. white text on dark bg)
+	const luminance = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b
+	return luminance > 180
+}
+
+/**
+ * Checks the background color of major layout elements (<main>, #app, #root, etc.).
+ * Many SPAs render into a container that may have its own dark background while
+ * <body> remains transparent.
+ * @returns {boolean}
+ */
+function isMainContentDark() {
+	const { innerWidth: vw, innerHeight: vh } = window
+	const minArea = vw * vh * 0.5
+
+	const selectors = ['main', '#app', '#root', '#__next', '[role="main"]']
+	for (const selector of selectors) {
+		const el = document.querySelector(selector)
+		if (!el) continue
+
+		const rect = el.getBoundingClientRect()
+		if (rect.width * rect.height < minArea) continue
+
+		if (isColorDark(window.getComputedStyle(el).backgroundColor)) return true
+	}
+	return false
+}
+
+/**
  * A comprehensive function to determine if the page is currently in a dark theme.
  * It combines class checking and background color analysis.
  * @returns {boolean} - True if the page is likely dark.
  */
 export function isPageDark() {
 	try {
-		// Strategy 1: Check for common dark mode classes
+		// Strategy 1: Check for common dark mode classes and data attributes
 		if (hasDarkModeClass()) {
 			return true
 		}
 
-		// Strategy 2: Analyze the computed background color
+		// Strategy 2: Check CSS color-scheme property and meta tag
+		const colorScheme = getColorSchemePreference()
+		if (colorScheme !== null) {
+			return colorScheme
+		}
+
+		// Strategy 3: Analyze the computed background color of <html>/<body>
 		if (isBackgroundDark()) {
 			return true
 		}
 
-		// @TODO add more checks here, e.g., analyzing text color,
-		// or checking the background of major layout elements like <main> or #app.
+		// Strategy 4: Check background of major layout containers (<main>, #app, etc.)
+		if (isMainContentDark()) {
+			return true
+		}
+
+		// Strategy 5: Check if text color is light (implies dark background)
+		if (isTextColorLight()) {
+			return true
+		}
 
 		return false
 	} catch (error) {
