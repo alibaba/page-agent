@@ -22,7 +22,8 @@
     },
     "homepage": "https://alibaba.github.io/page-agent/",
     "engines": {
-        "node": "^22.13.0 || >=24"
+        "node": "^22.13.0 || >=24",
+        "npm": "^11.6.3"
     },
     "scripts": {
         "start": "npm run dev --workspace=@page-agent/website",
