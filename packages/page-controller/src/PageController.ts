@@ -239,6 +239,17 @@ export class PageController extends EventTarget {
 	}
 
 	/**
+	 * Get element info by index (text and other details)
+	 * @param index - Element index
+	 * @returns Element information object
+	 */
+	async getElementInfo(index: number): Promise<HTMLElement | undefined> {
+		this.assertIndexed()
+		const element = getElementByIndex(this.selectorMap, index)
+		return element
+	}
+
+	/**
 	 * Click element by index
 	 */
 	async clickElement(index: number): Promise<ActionResult> {
