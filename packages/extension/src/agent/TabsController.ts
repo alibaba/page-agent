@@ -163,9 +163,27 @@ export class TabsController {
 			throw new Error(`Tab ID ${tabId} not found in tab list.`)
 		}
 
+		// Activate the tab in Chrome so it gets full rendering priority.
+		// Without this, background tabs have throttled rendering and
+		// DOM APIs like elementFromPoint() may return null.
+		await sendMessage({
+			type: 'TAB_CONTROL',
+			action: 'activate_tab',
+			payload: { tabId },
+		})
+
 		await this.updateCurrentTabId(tabId)
 
 		return `✅ Switched to tab ID ${tabId}.`
+	}
+
+	async focusWindow(): Promise<void> {
+		if (!this.windowId) return
+		await sendMessage({
+			type: 'TAB_CONTROL',
+			action: 'focus_window',
+			payload: { windowId: this.windowId },
+		})
 	}
 
 	async closeTab(tabId: number): Promise<string> {
@@ -367,6 +385,8 @@ export type TabAction =
 	| 'get_active_tab'
 	| 'get_tab_info'
 	| 'open_new_tab'
+	| 'activate_tab'
+	| 'focus_window'
 	| 'create_tab_group'
 	| 'update_tab_group'
 	| 'add_tab_to_group'
