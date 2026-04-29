@@ -22,6 +22,13 @@ interface MultiPageAgentConfig extends AgentConfig {
  * - can be used from a side panel or a content script
  */
 export class MultiPageAgent extends PageAgentCore {
+	private readonly tabsController: TabsController
+
+	/** Id of the tab group created for the current task, or null if none yet. */
+	get tabGroupId(): number | null {
+		return this.tabsController.activeTabGroupId
+	}
+
 	constructor(config: MultiPageAgentConfig) {
 		// multi page controller
 		const tabsController = new TabsController()
@@ -98,5 +105,7 @@ export class MultiPageAgent extends PageAgentCore {
 				tabsController.dispose()
 			},
 		})
+
+		this.tabsController = tabsController
 	}
 }
