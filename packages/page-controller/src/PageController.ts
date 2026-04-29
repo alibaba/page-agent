@@ -196,7 +196,8 @@ export class PageController extends EventTarget {
 		this.simplifiedHTML = dom.flatTreeToString(
 			this.flatTree,
 			this.config.includeAttributes,
-			this.config.keepSemanticTags
+			this.config.keepSemanticTags,
+			this.config.maxSiblingElements
 		)
 
 		this.selectorMap.clear()
