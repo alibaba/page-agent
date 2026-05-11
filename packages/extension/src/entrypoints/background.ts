@@ -20,7 +20,10 @@ export default defineBackground(() => {
 	// message proxy
 
 	chrome.runtime.onMessage.addListener((message, sender, sendResponse): true | undefined => {
-		if (message.type === 'TAB_CONTROL') {
+		if (message.type === 'EXT_HEALTH_CHECK') {
+			sendResponse({ ok: true })
+			return
+		} else if (message.type === 'TAB_CONTROL') {
 			return handleTabControlMessage(message, sender, sendResponse)
 		} else if (message.type === 'PAGE_CONTROL') {
 			return handlePageControlMessage(message, sender, sendResponse)
