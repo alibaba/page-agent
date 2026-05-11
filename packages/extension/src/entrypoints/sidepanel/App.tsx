@@ -1,4 +1,4 @@
-import { History, Send, Settings, Square } from 'lucide-react'
+import { AlertTriangle, History, Send, Settings, Square } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { ConfigPanel } from '@/components/ConfigPanel'
@@ -26,6 +26,7 @@ type View =
 export default function App() {
 	const [view, setView] = useState<View>({ name: 'chat' })
 	const [inputValue, setInputValue] = useState('')
+	const [startupError, setStartupError] = useState<string | null>(null)
 	const historyRef = useRef<HTMLDivElement>(null)
 	const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -62,10 +63,12 @@ export default function App() {
 			if (!normalizedTask || status === 'running') return
 
 			setInputValue('')
+			setStartupError(null)
 			setView({ name: 'chat' })
 
 			execute(normalizedTask).catch((error) => {
 				console.error('[SidePanel] Failed to execute task:', error)
+				setStartupError(error instanceof Error ? error.message : String(error))
 			})
 		},
 		[execute, status]
@@ -129,7 +132,7 @@ export default function App() {
 	// --- Chat view ---
 
 	const isRunning = status === 'running'
-	const showEmptyState = !currentTask && history.length === 0 && !isRunning
+	const showEmptyState = !startupError && !currentTask && history.length === 0 && !isRunning
 
 	return (
 		<div className="relative flex flex-col h-screen bg-background">
@@ -145,7 +148,10 @@ export default function App() {
 					<Button
 						variant="ghost"
 						size="icon-sm"
-						onClick={() => setView({ name: 'history' })}
+						onClick={() => {
+							setStartupError(null)
+							setView({ name: 'history' })
+						}}
 						className="cursor-pointer"
 						aria-label="History"
 						title="History"
@@ -155,7 +161,10 @@ export default function App() {
 					<Button
 						variant="ghost"
 						size="icon-sm"
-						onClick={() => setView({ name: 'config' })}
+						onClick={() => {
+							setStartupError(null)
+							setView({ name: 'config' })
+						}}
 						className="cursor-pointer"
 						aria-label="Settings"
 						title="Settings"
@@ -180,6 +189,38 @@ export default function App() {
 				{/* History */}
 				<div ref={historyRef} className="flex-1 overflow-y-auto p-3 space-y-2">
 					{showEmptyState && <EmptyState />}
+
+					{startupError && (
+						<div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3">
+							<div className="flex items-center gap-2 text-xs font-medium text-destructive">
+								<AlertTriangle className="size-3.5" />
+								Page Agent could not start this task.
+							</div>
+							<p className="mt-2 text-[12px] text-foreground/80">
+								The extension side panel can stop receiving messages when Chrome MV3 service-worker
+								updates stall.
+							</p>
+							<ul className="mt-2 list-disc pl-5 text-[11px] text-muted-foreground space-y-1">
+								<li>Quit and restart the browser completely.</li>
+								<li>
+									Or right-click the side panel, choose Inspect, open the Application tab, and
+									update the service worker.
+								</li>
+								<li>If the service worker is stuck, unregister it and reload the extension.</li>
+							</ul>
+							<div className="mt-2 text-[11px] text-muted-foreground">
+								Error: <span className="font-mono">{startupError}</span>
+							</div>
+							<a
+								href="https://github.com/alibaba/page-agent/issues/452"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="mt-2 inline-flex text-[11px] text-primary underline-offset-2 hover:underline"
+							>
+								See issue #452 for details and to share diagnostics.
+							</a>
+						</div>
+					)}
 
 					{history.map((event, index) => (
 						<EventCard key={index} event={event} />
