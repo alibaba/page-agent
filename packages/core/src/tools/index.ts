@@ -95,6 +95,20 @@ tools.set(
 )
 
 tools.set(
+	'hover_element_by_index',
+	tool({
+		description: 'Hover over an element by index without clicking or focusing it',
+		inputSchema: z.object({
+			index: z.int().min(0),
+		}),
+		execute: async function (this: PageAgentCore, input) {
+			const result = await this.pageController.hoverElement(input.index)
+			return result.message
+		},
+	})
+)
+
+tools.set(
 	'input_text',
 	tool({
 		description: 'Click and type text into an interactive input element',
