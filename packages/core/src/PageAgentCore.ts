@@ -411,8 +411,48 @@ export class PageAgentCore extends EventTarget {
 
 				const startTime = Date.now()
 
-				// Execute tool, bind `this` to PageAgent
-				const result = await tool.execute.bind(this)(toolInput)
+				// Execute tool with interceptor
+				let result: any
+				if (this.config.actionInterceptor) {
+					// Call interceptor
+					const action = { name: toolName, input: toolInput }
+					const shouldProceed = await this.config.actionInterceptor(action, async () => {
+						// Original execution wrapped in next()
+						return await tool.execute.bind(this)(toolInput)
+					})
+
+					// If interceptor returns false, cancel the action
+					if (shouldProceed === false) {
+						const duration = Date.now() - startTime
+						const cancelMessage = `Action ${toolName} was cancelled by user`
+						console.log(chalk.yellow.bold(cancelMessage))
+
+						// Add to history as an observation
+						this.history.push({
+							type: 'observation',
+							content: `⚠️ ${cancelMessage}`,
+						})
+						this.#emitHistoryChange()
+
+						// Emit cancelled activity
+						this.#emitActivity({
+							type: 'executed',
+							tool: toolName,
+							input: toolInput,
+							output: cancelMessage,
+							duration,
+							cancelled: true,
+						})
+
+						result = cancelMessage
+					} else {
+						// Interceptor returned true/undefined or didn't return, proceed normally
+						result = await tool.execute.bind(this)(toolInput)
+					}
+				} else {
+					// No interceptor, execute normally
+					result = await tool.execute.bind(this)(toolInput)
+				}
 
 				const duration = Date.now() - startTime
 				console.log(chalk.green.bold(`Tool (${toolName}) executed for ${duration}ms`), result)

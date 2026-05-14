@@ -49,6 +49,42 @@ export interface AgentConfig extends LLMConfig {
 	customTools?: Record<string, PageAgentTool | null>
 
 	/**
+	 * Action interceptor for intercepting and controlling tool execution.
+	 * Allows you to add custom logic before any action is executed.
+	 *
+	 * @param action - The action object containing tool name and input
+	 * @param next - Function to proceed with the original action execution
+	 * @returns Promise<boolean | undefined> - Return false to cancel the action, true/undefined to proceed
+	 *
+	 * @example
+	 * // Intercept click actions for confirmation
+	 * async actionInterceptor(action, next) {
+	 *   if (action.name !== 'click_element_by_index') {
+	 *     return next();
+	 *   }
+	 *
+	 *   // Get element info
+	 *   const index = action.input.index;
+	 *   const elementText = await this.pageController.getElementText(index);
+	 *
+	 *   // Check if it's a dangerous action
+	 *   const dangerWords = /delete|remove|submit|confirm/i;
+	 *   if (dangerWords.test(elementText)) {
+	 *     const confirmed = window.confirm(`Are you sure you want to: ${elementText}?`);
+	 *     if (!confirmed) {
+	 *       return false; // Cancel the action
+	 *     }
+	 *   }
+	 *
+	 *   return next(); // Proceed with the action
+	 * }
+	 */
+	actionInterceptor?: (
+		action: { name: string; input: any },
+		next: () => Promise<any>
+	) => Promise<boolean | undefined>
+
+	/**
 	 * Instructions to guide the agent's behavior
 	 */
 	instructions?: {
@@ -278,7 +314,14 @@ export type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
 export type AgentActivity =
 	| { type: 'thinking' }
 	| { type: 'executing'; tool: string; input: unknown }
-	| { type: 'executed'; tool: string; input: unknown; output: string; duration: number }
+	| {
+			type: 'executed'
+			tool: string
+			input: unknown
+			output: string
+			duration: number
+			cancelled?: boolean
+	  }
 	| { type: 'retrying'; attempt: number; maxAttempts: number }
 	| { type: 'error'; message: string }
 
