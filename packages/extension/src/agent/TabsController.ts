@@ -34,6 +34,11 @@ export class TabsController {
 	private experimentalIncludeAllTabs = false
 	private task: string = ''
 
+	/** Id of the tab group created for the current task, or null if none yet. */
+	get activeTabGroupId(): number | null {
+		return this.tabGroupId
+	}
+
 	async init(task: string, options: TabsInitOptions = {}) {
 		const { includeInitialTab = true, experimentalIncludeAllTabs = false } = options
 		debug('init', task, options)
