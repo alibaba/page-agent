@@ -20,6 +20,7 @@ import type {
 	HistoricalEvent,
 	MacroToolInput,
 	MacroToolResult,
+	TokenUsageStats,
 } from './types'
 import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
 
@@ -193,6 +194,29 @@ export class PageAgentCore extends EventTarget {
 		this.#abortController.abort()
 	}
 
+	/** Aggregate token usage from all step events in history */
+	getTokenUsageStats(): TokenUsageStats {
+		const stats: TokenUsageStats = {
+			totalPromptTokens: 0,
+			totalCompletionTokens: 0,
+			totalTokens: 0,
+			cachedTokens: 0,
+			reasoningTokens: 0,
+			steps: 0,
+		}
+		for (const event of this.history) {
+			if (event.type === 'step' && event.usage) {
+				stats.totalPromptTokens += event.usage.promptTokens
+				stats.totalCompletionTokens += event.usage.completionTokens
+				stats.totalTokens += event.usage.totalTokens
+				stats.cachedTokens += event.usage.cachedTokens ?? 0
+				stats.reasoningTokens += event.usage.reasoningTokens ?? 0
+				stats.steps++
+			}
+		}
+		return stats
+	}
+
 	async execute(task: string): Promise<ExecutionResult> {
 		if (this.disposed) throw new Error('PageAgent has been disposed. Create a new instance.')
 		if (!task) throw new Error('Task is required')
@@ -300,12 +324,23 @@ export class PageAgentCore extends EventTarget {
 				if (actionName === 'done') {
 					const success = action.input?.success ?? false
 					const text = action.input?.text || 'no text provided'
+					const tokenUsage = this.getTokenUsageStats()
 					console.log(chalk.green.bold('Task completed'), success, text)
+					console.log(
+						chalk.cyan.bold('📊 Token Usage:'),
+						`${tokenUsage.steps} steps |`,
+						`Prompt: ${tokenUsage.totalPromptTokens} |`,
+						`Completion: ${tokenUsage.totalCompletionTokens} |`,
+						`Total: ${tokenUsage.totalTokens}`,
+						tokenUsage.cachedTokens ? `| Cached: ${tokenUsage.cachedTokens}` : '',
+						tokenUsage.reasoningTokens ? `| Reasoning: ${tokenUsage.reasoningTokens}` : ''
+					)
 					this.#onDone(success)
 					const result: ExecutionResult = {
 						success,
 						data: text,
 						history: this.history,
+						tokenUsage,
 					}
 					await onAfterTask?.(this, result)
 					return result
@@ -324,6 +359,7 @@ export class PageAgentCore extends EventTarget {
 					success: false,
 					data: errorMessage,
 					history: this.history,
+					tokenUsage: this.getTokenUsageStats(),
 				}
 				await onAfterTask?.(this, result)
 				return result
@@ -339,6 +375,7 @@ export class PageAgentCore extends EventTarget {
 					success: false,
 					data: errorMessage,
 					history: this.history,
+					tokenUsage: this.getTokenUsageStats(),
 				}
 				await onAfterTask?.(this, result)
 				return result

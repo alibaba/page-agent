@@ -267,6 +267,18 @@ export type HistoricalEvent =
 export type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
 
 /**
+ * Aggregated token usage statistics across all steps in a task
+ */
+export interface TokenUsageStats {
+	totalPromptTokens: number
+	totalCompletionTokens: number
+	totalTokens: number
+	cachedTokens: number
+	reasoningTokens: number
+	steps: number
+}
+
+/**
  * Agent activity - transient state for immediate UI feedback.
  *
  * Unlike historical events (which are persisted), activities are ephemeral
@@ -286,4 +298,5 @@ export interface ExecutionResult {
 	success: boolean
 	data: string
 	history: HistoricalEvent[]
+	tokenUsage: TokenUsageStats
 }
