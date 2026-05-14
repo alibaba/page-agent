@@ -42,6 +42,7 @@ export class Panel {
 	#isExpanded = false
 	#i18n: I18n
 	#userAnswerResolver: ((input: string) => void) | null = null
+	#userAnswerRejecter: ((error: Error) => void) | null = null
 	#isWaitingForUserAnswer: boolean = false
 	#headerUpdateTimer: ReturnType<typeof setInterval> | null = null
 	#pendingHeaderText: string | null = null
@@ -172,10 +173,11 @@ export class Panel {
 	 * Ask for user input (internal, called by agent via onAskUser)
 	 */
 	#askUser(question: string): Promise<string> {
-		return new Promise((resolve) => {
+		return new Promise((resolve, reject) => {
 			// Set `waiting for user answer` state
 			this.#isWaitingForUserAnswer = true
 			this.#userAnswerResolver = resolve
+			this.#userAnswerRejecter = reject
 
 			// Expand history panel
 			if (!this.#isExpanded) {
@@ -221,6 +223,7 @@ export class Panel {
 		// Reset user input state
 		this.#isWaitingForUserAnswer = false
 		this.#userAnswerResolver = null
+		this.#userAnswerRejecter = null
 		// Show input area
 		this.#showInputArea()
 	}
@@ -243,8 +246,12 @@ export class Panel {
 		this.#agent.removeEventListener('activity', this.#onActivity)
 		this.#agent.removeEventListener('dispose', this.#onAgentDispose)
 
+		// Cancel any pending user-answer promise to prevent memory leaks.
+		// Listeners are already removed above, so status-change events from the
+		// resulting abort will not cause any further UI updates.
+		this.#cancelUserAnswer()
+
 		// Clean up UI
-		this.#isWaitingForUserAnswer = false
 		this.#stopHeaderUpdateLoop()
 		this.wrapper.remove()
 	}
@@ -278,6 +285,12 @@ export class Panel {
 	 */
 	#handleActionButton(): void {
 		if (this.#agent.status === 'running') {
+			// Unblock any pending ask_user promise before stopping,
+			// otherwise the agent's execute() loop stays stuck and the panel
+			// never transitions to a closeable state.
+			if (this.#isWaitingForUserAnswer) {
+				this.#cancelUserAnswer()
+			}
 			this.#agent.stop()
 		} else {
 			this.#agent.dispose()
@@ -321,7 +334,34 @@ export class Panel {
 		if (this.#userAnswerResolver) {
 			this.#userAnswerResolver(input)
 			this.#userAnswerResolver = null
+			this.#userAnswerRejecter = null
 		}
+	}
+
+	/**
+	 * Cancel a pending user-answer prompt (e.g. when the user clicks Stop).
+	 *
+	 * Rejects the Promise returned by #askUser with an AbortError-shaped error so
+	 * that the LLM layer treats it the same as a user-initiated abort (no retries,
+	 * error message = "Task stopped").
+	 */
+	#cancelUserAnswer(): void {
+		if (this.#userAnswerRejecter) {
+			const abortError = new Error('Task stopped by user')
+			abortError.name = 'AbortError'
+			this.#userAnswerRejecter(abortError)
+		}
+
+		// Remove temporary question cards
+		Array.from(this.#historySection.children).forEach((child) => {
+			if (child.getAttribute('data-temp-card') === 'true') {
+				child.remove()
+			}
+		})
+
+		this.#isWaitingForUserAnswer = false
+		this.#userAnswerResolver = null
+		this.#userAnswerRejecter = null
 	}
 
 	/**
