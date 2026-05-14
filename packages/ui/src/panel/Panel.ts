@@ -173,9 +173,37 @@ export class Panel {
 	 */
 	#askUser(question: string): Promise<string> {
 		return new Promise((resolve) => {
+			const cleanup = () => {
+				this.#agent.removeEventListener('statuschange', onCancel)
+				this.#agent.removeEventListener('dispose', onCancel)
+			}
+			const resolveAndCleanup = (input: string) => {
+				cleanup()
+				resolve(input)
+			}
+			const onCancel = (event: Event) => {
+				if (!this.#isWaitingForUserAnswer) {
+					cleanup()
+					return
+				}
+				if (event.type === 'statuschange' && this.#agent.status === 'running') {
+					return
+				}
+
+				this.#clearPendingQuestionCard()
+				this.#isWaitingForUserAnswer = false
+				this.#userAnswerResolver = null
+				if (this.#shouldShowInputArea()) {
+					this.#showInputArea()
+				}
+				resolveAndCleanup('')
+			}
+
 			// Set `waiting for user answer` state
 			this.#isWaitingForUserAnswer = true
-			this.#userAnswerResolver = resolve
+			this.#userAnswerResolver = resolveAndCleanup
+			this.#agent.addEventListener('statuschange', onCancel)
+			this.#agent.addEventListener('dispose', onCancel)
 
 			// Expand history panel
 			if (!this.#isExpanded) {
@@ -307,12 +335,7 @@ export class Panel {
 	 * Handle user answer
 	 */
 	#handleUserAnswer(input: string): void {
-		// Remove temporary question cards (only direct children for safety)
-		Array.from(this.#historySection.children).forEach((child) => {
-			if (child.getAttribute('data-temp-card') === 'true') {
-				child.remove()
-			}
-		})
+		this.#clearPendingQuestionCard()
 
 		// Reset state
 		this.#isWaitingForUserAnswer = false
@@ -322,6 +345,15 @@ export class Panel {
 			this.#userAnswerResolver(input)
 			this.#userAnswerResolver = null
 		}
+	}
+
+	#clearPendingQuestionCard(): void {
+		// Remove temporary question cards (only direct children for safety)
+		Array.from(this.#historySection.children).forEach((child) => {
+			if (child.getAttribute('data-temp-card') === 'true') {
+				child.remove()
+			}
+		})
 	}
 
 	/**
