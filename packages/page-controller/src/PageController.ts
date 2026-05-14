@@ -414,7 +414,23 @@ export class PageController extends EventTarget {
 		await this.maskReady
 		this.mask?.hide()
 	}
-
+	/**
+	 * Navigate back to the previous page (browser back button)
+	 */
+	async goBack(): Promise<ActionResult> {
+		try {
+			window.history.back()
+			return {
+				success: true,
+				message: '✅ Navigated back to the previous page.',
+			}
+		} catch (error) {
+			return {
+				success: false,
+				message: `❌ Failed to navigate back: ${error}`,
+			}
+		}
+	}
 	/**
 	 * Dispose and clean up resources
 	 */
