@@ -34,6 +34,15 @@ export interface DomConfig {
 	 * @note maybe confusing for LLM combining with page scrolling, use with caution
 	 **/
 	keepSemanticTags?: boolean
+
+	/**
+	 * Maximum number of same-tag siblings to include per parent node.
+	 * Useful to prevent HTTP 413 Payload Too Large errors when dropdowns
+	 * with many options are open (e.g., a country selector with 200 entries).
+	 * Truncated items are replaced with a summary line.
+	 * @default undefined (no limit)
+	 */
+	maxSiblingElements?: number
 }
 
 // TODO: corresponding roles
@@ -193,7 +202,8 @@ interface TreeNode {
 export function flatTreeToString(
 	flatTree: FlatDomTree,
 	includeAttributes: string[] = [],
-	keepSemanticTags = false
+	keepSemanticTags = false,
+	maxSiblingElements?: number
 ): string {
 	const DEFAULT_INCLUDE_ATTRIBUTES = [
 		'title',
@@ -428,8 +438,30 @@ export function flatTreeToString(
 				nextDepth += 1
 			}
 
-			for (const child of node.children) {
-				processNode(child, nextDepth, result)
+			if (maxSiblingElements !== undefined && node.children.length > maxSiblingElements) {
+				// Count per-tag occurrences to truncate large groups of same-tag siblings
+				const tagCount = new Map<string, number>()
+				const skipped = new Map<string, number>()
+				for (const child of node.children) {
+					const tag =
+						child.type === 'element' ? (child.tagName ?? '__text__') : '__text__'
+					const count = tagCount.get(tag) ?? 0
+					if (count >= maxSiblingElements) {
+						skipped.set(tag, (skipped.get(tag) ?? 0) + 1)
+						continue
+					}
+					tagCount.set(tag, count + 1)
+					processNode(child, nextDepth, result)
+				}
+				for (const [tag, count] of skipped) {
+					result.push(
+						`${'\t'.repeat(nextDepth)}... ${count} more <${tag}> items not shown (maxSiblingElements=${maxSiblingElements})`
+					)
+				}
+			} else {
+				for (const child of node.children) {
+					processNode(child, nextDepth, result)
+				}
 			}
 
 			if (emitSemantic) {
