@@ -22,7 +22,8 @@ interface NavSection {
 
 export default function DocsLayout({ children }: DocsLayoutProps) {
 	const { isZh } = useLanguage()
-	const [location] = useLocation()
+	const [rawLocation] = useLocation()
+	const location = rawLocation.replace(/\/+$/, '')
 
 	const navigationSections: NavSection[] = [
 		{
