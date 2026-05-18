@@ -53,11 +53,17 @@ tools.set(
 		execute: async function (this: PageAgentCore, input) {
 			// try to subtract LLM calling time from the actual wait time
 			const lastTimeUpdate = await this.pageController.getLastUpdateTime()
-			const actualWaitTime = Math.max(0, input.seconds - (Date.now() - lastTimeUpdate) / 1000)
+			const secondsSinceLastUpdate = (Date.now() - lastTimeUpdate) / 1000
+			const actualWaitTime = Math.max(0, input.seconds - secondsSinceLastUpdate)
 			console.log(`actualWaitTime: ${actualWaitTime} seconds`)
 			await waitFor(actualWaitTime)
 
-			return `✅ Waited for ${input.seconds} seconds.`
+			const waitedSeconds = Number(actualWaitTime.toFixed(2))
+			if (waitedSeconds === input.seconds) {
+				return `✅ Waited for ${input.seconds} seconds.`
+			}
+
+			return `✅ Waited for ${waitedSeconds} seconds. ${secondsSinceLastUpdate.toFixed(2)} seconds had already passed since the last page update.`
 		},
 	})
 )
