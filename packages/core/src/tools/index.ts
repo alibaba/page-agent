@@ -170,6 +170,18 @@ tools.set(
 )
 
 tools.set(
+	'go_back',
+	tool({
+		description: 'Navigate to the previous page in browser history.',
+		inputSchema: z.object({}),
+		execute: async function (this: PageAgentCore) {
+			const result = await this.pageController.goBack()
+			return result.message
+		},
+	})
+)
+
+tools.set(
 	'execute_javascript',
 	tool({
 		description:
@@ -186,5 +198,4 @@ tools.set(
 
 // @todo send_keys
 // @todo upload_file
-// @todo go_back
 // @todo extract_structured_data

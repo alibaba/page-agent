@@ -9,6 +9,7 @@
 import {
 	clickElement,
 	getElementByIndex,
+	goBack,
 	inputTextElement,
 	scrollHorizontally,
 	scrollVertically,
@@ -371,6 +372,25 @@ export class PageController extends EventTarget {
 			return {
 				success: false,
 				message: `❌ Failed to scroll horizontally: ${error}`,
+			}
+		}
+	}
+
+	/**
+	 * Navigate to the previous page in browser history
+	 */
+	async goBack(): Promise<ActionResult> {
+		try {
+			const message = await goBack()
+
+			return {
+				success: true,
+				message,
+			}
+		} catch (error) {
+			return {
+				success: false,
+				message: `❌ Failed to go back: ${error}`,
 			}
 		}
 	}
