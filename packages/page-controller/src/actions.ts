@@ -338,11 +338,13 @@ export async function scrollVertically(
 
 	const dy = scroll_amount
 	const bigEnough = (el: HTMLElement) => el.clientHeight >= window.innerHeight * 0.5
-	const canScroll = (el: HTMLElement | null) =>
-		el &&
-		/(auto|scroll|overlay)/.test(getComputedStyle(el).overflowY) &&
-		el.scrollHeight > el.clientHeight &&
-		bigEnough(el)
+	const canScroll = (el: HTMLElement | null): boolean =>
+		Boolean(
+			el &&
+			/(auto|scroll|overlay)/.test(getComputedStyle(el).overflowY) &&
+			el.scrollHeight > el.clientHeight &&
+			bigEnough(el)
+		)
 
 	let el: HTMLElement | null = document.activeElement as HTMLElement | null
 	while (el && !canScroll(el) && el !== document.body) el = el.parentElement
@@ -466,11 +468,13 @@ export async function scrollHorizontally(
 
 	const dx = right ? scroll_amount : -scroll_amount
 	const bigEnough = (el: HTMLElement) => el.clientWidth >= window.innerWidth * 0.5
-	const canScroll = (el: HTMLElement | null) =>
-		el &&
-		/(auto|scroll|overlay)/.test(getComputedStyle(el).overflowX) &&
-		el.scrollWidth > el.clientWidth &&
-		bigEnough(el)
+	const canScroll = (el: HTMLElement | null): boolean =>
+		Boolean(
+			el &&
+			/(auto|scroll|overlay)/.test(getComputedStyle(el).overflowX) &&
+			el.scrollWidth > el.clientWidth &&
+			bigEnough(el)
+		)
 
 	let el: HTMLElement | null = document.activeElement as HTMLElement | null
 	while (el && !canScroll(el) && el !== document.body) el = el.parentElement
