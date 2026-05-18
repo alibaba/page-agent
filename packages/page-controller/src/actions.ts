@@ -259,6 +259,17 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 	await waitFor(0.1) // Wait to ensure change event processing completes
 }
 
+export async function goBack() {
+	if (window.history.length <= 1) {
+		return '⚠️ No previous page in browser history.'
+	}
+
+	const currentUrl = window.location.href
+	window.history.back()
+
+	return `✅ Navigating back from ${currentUrl}.`
+}
+
 interface ScrollableElement extends HTMLElement {
 	scrollIntoViewIfNeeded?: (centerIfNeeded?: boolean) => void
 }
