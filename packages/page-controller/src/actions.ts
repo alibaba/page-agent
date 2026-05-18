@@ -336,11 +336,13 @@ export async function scrollVertically(scroll_amount: number, element?: HTMLElem
 
 	const dy = scroll_amount
 	const bigEnough = (el: HTMLElement) => el.clientHeight >= window.innerHeight * 0.5
-	const canScroll = (el: HTMLElement | null) =>
-		el &&
-		/(auto|scroll|overlay)/.test(getComputedStyle(el).overflowY) &&
-		el.scrollHeight > el.clientHeight &&
-		bigEnough(el)
+	const canScroll = (el: HTMLElement | null): boolean =>
+		Boolean(
+			el &&
+			/(auto|scroll|overlay)/.test(getComputedStyle(el).overflowY) &&
+			el.scrollHeight > el.clientHeight &&
+			bigEnough(el)
+		)
 
 	// @deprecated Heuristic container search.
 	// Unreliable in multi-panel layouts. Should guide LLMs to use indexed scroll for consistency.
@@ -479,11 +481,13 @@ export async function scrollHorizontally(scroll_amount: number, element?: HTMLEl
 	const dx = scroll_amount
 
 	const bigEnough = (el: HTMLElement) => el.clientWidth >= window.innerWidth * 0.5
-	const canScroll = (el: HTMLElement | null) =>
-		el &&
-		/(auto|scroll|overlay)/.test(getComputedStyle(el).overflowX) &&
-		el.scrollWidth > el.clientWidth &&
-		bigEnough(el)
+	const canScroll = (el: HTMLElement | null): boolean =>
+		Boolean(
+			el &&
+			/(auto|scroll|overlay)/.test(getComputedStyle(el).overflowX) &&
+			el.scrollWidth > el.clientWidth &&
+			bigEnough(el)
+		)
 
 	// @deprecated Same heuristic container search as scrollVertically.
 	// TODO: Remove once LLMs reliably use indexed scrolling via data-scrollable.
