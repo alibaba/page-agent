@@ -31,7 +31,7 @@ export function randomID(existingIDs?: string[]): string {
 		id = Math.random().toString(36).substring(2, 11)
 		tryCount++
 		if (tryCount > MAX_TRY) {
-			throw new Error('randomID: too many try')
+			throw new Error('randomID: too many tries')
 		}
 	}
 

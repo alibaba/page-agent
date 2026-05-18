@@ -11,13 +11,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
 	clearScreen: false,
 	plugins: [
-		dts({ tsconfigPath: './tsconfig.dts.json', bundleTypes: true }),
+		dts({
+			bundleTypes: true,
+			compilerOptions: {
+				composite: true,
+				noEmit: false,
+				emitDeclarationOnly: true,
+				declaration: true,
+			},
+		}),
 		cssInjectedByJsPlugin({ relativeCSSInjection: true }),
 	],
 	publicDir: false,
-	esbuild: {
-		keepNames: true,
-	},
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/PageAgent.ts'),

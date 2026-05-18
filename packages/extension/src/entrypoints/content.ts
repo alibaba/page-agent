@@ -46,6 +46,8 @@ async function exposeAgentToPage() {
 	let multiPageAgent: InstanceType<typeof MultiPageAgent> | null = null
 
 	window.addEventListener('message', async (e) => {
+		if (e.source !== window) return
+
 		const data = e.data
 		if (typeof data !== 'object' || data === null) return
 		if (data.channel !== 'PAGE_AGENT_EXT_REQUEST') return
@@ -70,11 +72,15 @@ async function exposeAgentToPage() {
 
 				try {
 					const { task, config } = payload
+					const { systemInstruction, ...agentConfig } = config
 
 					// Dispose old instance before creating new one
 					multiPageAgent?.dispose()
 
-					multiPageAgent = new MultiPageAgent(config)
+					multiPageAgent = new MultiPageAgent({
+						...agentConfig,
+						instructions: systemInstruction ? { system: systemInstruction } : undefined,
+					})
 
 					// events
 

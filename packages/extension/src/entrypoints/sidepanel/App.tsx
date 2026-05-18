@@ -1,6 +1,11 @@
 import { History, Send, Settings, Square } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { ConfigPanel } from '@/components/ConfigPanel'
+import { HistoryDetail } from '@/components/HistoryDetail'
+import { HistoryList } from '@/components/HistoryList'
+import { ActivityCard, EventCard } from '@/components/cards'
+import { EmptyState, Logo, MotionOverlay, StatusDot } from '@/components/misc'
 import { Button } from '@/components/ui/button'
 import {
 	InputGroup,
@@ -11,11 +16,6 @@ import {
 import { saveSession } from '@/lib/db'
 
 import { useAgent } from '../../agent/useAgent'
-import { ConfigPanel } from './components/ConfigPanel'
-import { HistoryDetail } from './components/HistoryDetail'
-import { HistoryList } from './components/HistoryList'
-import { ActivityCard, EventCard } from './components/cards'
-import { EmptyState, Logo, MotionOverlay, StatusDot } from './components/misc'
 
 type View =
 	| { name: 'chat' }
@@ -56,19 +56,27 @@ export default function App() {
 		}
 	}, [history, activity])
 
-	const handleSubmit = useCallback(
-		(e?: React.SyntheticEvent) => {
-			e?.preventDefault()
-			if (!inputValue.trim() || status === 'running') return
+	const runTask = useCallback(
+		(task: string) => {
+			const normalizedTask = task.trim()
+			if (!normalizedTask || status === 'running') return
 
-			const taskToExecute = inputValue.trim()
 			setInputValue('')
+			setView({ name: 'chat' })
 
-			execute(taskToExecute).catch((error) => {
+			execute(normalizedTask).catch((error) => {
 				console.error('[SidePanel] Failed to execute task:', error)
 			})
 		},
-		[inputValue, status, execute]
+		[execute, status]
+	)
+
+	const handleSubmit = useCallback(
+		(e?: React.SyntheticEvent) => {
+			e?.preventDefault()
+			runTask(inputValue)
+		},
+		[inputValue, runTask]
 	)
 
 	const handleStop = useCallback(() => {
@@ -103,12 +111,19 @@ export default function App() {
 			<HistoryList
 				onSelect={(id) => setView({ name: 'history-detail', sessionId: id })}
 				onBack={() => setView({ name: 'chat' })}
+				onRerun={runTask}
 			/>
 		)
 	}
 
 	if (view.name === 'history-detail') {
-		return <HistoryDetail sessionId={view.sessionId} onBack={() => setView({ name: 'history' })} />
+		return (
+			<HistoryDetail
+				sessionId={view.sessionId}
+				onBack={() => setView({ name: 'history' })}
+				onRerun={runTask}
+			/>
+		)
 	}
 
 	// --- Chat view ---
@@ -132,6 +147,8 @@ export default function App() {
 						size="icon-sm"
 						onClick={() => setView({ name: 'history' })}
 						className="cursor-pointer"
+						aria-label="History"
+						title="History"
 					>
 						<History className="size-3.5" />
 					</Button>
@@ -140,6 +157,8 @@ export default function App() {
 						size="icon-sm"
 						onClick={() => setView({ name: 'config' })}
 						className="cursor-pointer"
+						aria-label="Settings"
+						title="Settings"
 					>
 						<Settings className="size-3.5" />
 					</Button>
@@ -163,7 +182,6 @@ export default function App() {
 					{showEmptyState && <EmptyState />}
 
 					{history.map((event, index) => (
-						// eslint-disable-next-line react-x/no-array-index-key
 						<EventCard key={index} event={event} />
 					))}
 
@@ -191,6 +209,8 @@ export default function App() {
 								variant="destructive"
 								onClick={handleStop}
 								className="size-7"
+								aria-label="Stop task"
+								title="Stop task"
 							>
 								<Square className="size-3" />
 							</InputGroupButton>
@@ -201,6 +221,8 @@ export default function App() {
 								onClick={() => handleSubmit()}
 								disabled={!inputValue.trim()}
 								className="size-7 cursor-pointer"
+								aria-label="Send"
+								title="Send"
 							>
 								<Send className="size-3" />
 							</InputGroupButton>

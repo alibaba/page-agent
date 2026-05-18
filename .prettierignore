@@ -1,0 +1,8 @@
+# Prompt templates (formatted manually for LLM readability)
+*prompt.md
+
+# Generated
+packages/extension/.wxt
+
+# Vendored
+**/components/ui

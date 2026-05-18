@@ -3,26 +3,11 @@
     "compilerOptions": {
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
         "useDefineForClassFields": true,
-        "noEmit": false,
-        "allowImportingTsExtensions": false,
         "strictNullChecks": true,
         "jsx": "react-jsx",
-        "baseUrl": ".",
+        "types": ["node", "chrome"],
         "paths": {
-            // Self root
-            "@/*": ["src/*"],
-
-            "@page-agent/llms": ["../llms/src/index.ts"],
-            "@page-agent/page-controller": ["../page-controller/src/PageController.ts"],
-            "@page-agent/core": ["../core/src/PageAgentCore.ts"],
-            "@page-agent/ui": ["../ui/src/index.ts"]
+            "@/*": ["./src/*"]
         }
-    },
-    "references": [
-        //
-        { "path": "../llms" },
-        { "path": "../page-controller" },
-        { "path": "../core" },
-        { "path": "../ui" }
-    ]
+    }
 }

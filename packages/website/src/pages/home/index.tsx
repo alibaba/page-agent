@@ -1,5 +1,7 @@
 import { Suspense, lazy } from 'react'
 
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
+
 import HeroSection from './HeroSection'
 
 const FeaturesSection = lazy(() => import('./FeaturesSection'))
@@ -7,6 +9,8 @@ const ScenariosSection = lazy(() => import('./ScenariosSection'))
 const OneMoreThingSection = lazy(() => import('./OneMoreThingSection'))
 
 export default function HomePage() {
+	useDocumentTitle()
+
 	return (
 		<>
 			<HeroSection />

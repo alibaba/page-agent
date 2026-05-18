@@ -130,18 +130,18 @@ const result = await agent.execute('Fill in the form with test data')`}
 								: 'Base URL of the LLM API (e.g., https://api.openai.com/v1)',
 						},
 						{
-							name: 'apiKey',
-							type: 'string',
-							required: true,
-							description: isZh ? 'API 密钥' : 'API key for authentication',
-						},
-						{
 							name: 'model',
 							type: 'string',
 							required: true,
 							description: isZh
 								? '模型名称（如 gpt-5.2, anthropic/claude-4.5-haiku）'
 								: 'Model name (e.g., gpt-5.2, anthropic/claude-4.5-haiku)',
+						},
+						{
+							name: 'apiKey',
+							type: 'string',
+							required: false,
+							description: 'LLM AK',
 						},
 						{
 							name: 'temperature',
@@ -155,6 +155,42 @@ const result = await agent.execute('Fill in the form with test data')`}
 							type: 'number',
 							defaultValue: '3',
 							description: isZh ? 'API 调用失败时的最大重试次数' : 'Maximum retries on API failure',
+						},
+						{
+							name: 'transformRequestBody',
+							type: '(requestBody) => Record<string, unknown> | undefined',
+							description: isZh ? (
+								<>
+									在请求发送前转换最终 request body。可用于处理供应商特定的缓存提示或私有参数。查看{' '}
+									<Link
+										href="/features/models#prompt-caching"
+										className="text-blue-600 dark:text-blue-400 hover:underline"
+									>
+										主动缓存示例
+									</Link>
+									。
+								</>
+							) : (
+								<>
+									Transform the final request body before sending it. Useful for provider-specific
+									cache hints or private request parameters. See{' '}
+									<Link
+										href="/features/models#prompt-caching"
+										className="text-blue-600 dark:text-blue-400 hover:underline"
+									>
+										prompt caching examples
+									</Link>
+									.
+								</>
+							),
+						},
+						{
+							name: 'disableNamedToolChoice',
+							type: 'boolean',
+							defaultValue: 'false',
+							description: isZh
+								? '禁用命名 tool_choice，始终使用 "required" 字符串。适用于不支持 tool_choice 对象格式的 LLM 服务。'
+								: 'Disable named tool_choice, always use "required" string. For LLM services that don\'t support the object format of tool_choice.',
 						},
 						{
 							name: 'customFetch',

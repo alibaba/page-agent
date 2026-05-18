@@ -58,6 +58,11 @@ export default function QuickStart() {
 						code={`<script src="DEMO_CDN_URL" crossorigin="true"></script>`}
 						language="html"
 					/>
+					<p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+						{isZh
+							? '在 URL 后添加 ?autoInit=false 可只加载脚本，不自动创建 Demo Agent；之后可通过 new window.PageAgent(...) 手动初始化。'
+							: 'Add ?autoInit=false to load the script without creating the demo agent automatically. You can then instantiate it with new window.PageAgent(...).'}
+					</p>
 					<table className="w-full border-collapse text-sm">
 						<thead>
 							<tr className="border-b border-gray-200 dark:border-gray-700">

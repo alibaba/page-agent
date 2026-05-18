@@ -108,6 +108,14 @@ const agent = new PageAgentCore({
 								? '在 DOM 提取中包含的额外 HTML 属性。支持通配符 *（如 data-* 匹配所有 data- 开头的属性）。默认已包含常见属性如 role, aria-label 等。'
 								: 'Additional HTML attributes to include in DOM extraction. Supports wildcard * (e.g. data-* matches all data- prefixed attributes). Common attributes like role, aria-label are included by default.',
 						},
+						{
+							name: 'keepSemanticTags',
+							type: 'boolean',
+							defaultValue: 'false',
+							description: isZh
+								? '在简化输出中保留语义标签（如 nav, main, header, footer, aside 等），即使它们不可交互。帮助 LLM 理解页面结构。'
+								: 'Preserve semantic landmark tags (e.g. nav, main, header, footer, aside) in dehydrated output even if not interactive. Helps LLM understand page structure.',
+						},
 					]}
 				/>
 			</section>

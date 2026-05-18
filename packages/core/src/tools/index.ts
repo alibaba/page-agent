@@ -131,7 +131,8 @@ tools.set(
 tools.set(
 	'scroll',
 	tool({
-		description: 'Scroll the page vertically. Use index for scroll elements (dropdowns/custom UI).',
+		description:
+			'Scroll vertically. Without index: scrolls the document. With index: scrolls the container at that index (or its nearest scrollable ancestor). Use index of a data-scrollable element to scroll a specific area.',
 		inputSchema: z.object({
 			down: z.boolean().default(true),
 			num_pages: z.number().min(0).max(10).optional().default(0.1),
@@ -155,7 +156,7 @@ tools.set(
 	'scroll_horizontally',
 	tool({
 		description:
-			'Scroll the page horizontally, or within a specific element by index. Useful for wide tables.',
+			'Scroll horizontally. Without index: scrolls the document. With index: scrolls the container at that index (or its nearest scrollable ancestor). Use index of a data-scrollable element to scroll a specific area.',
 		inputSchema: z.object({
 			right: z.boolean().default(true),
 			pixels: z.number().int().min(0),

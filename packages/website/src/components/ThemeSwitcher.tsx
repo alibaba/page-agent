@@ -52,7 +52,7 @@ export default function ThemeSwitcher() {
 	return (
 		<button
 			onClick={toggleTheme}
-			className="relative inline-flex items-center h-8 w-16 rounded-full transition-colors duration-300 ease-in-out focus:outline-none"
+			className="relative inline-flex h-8 w-16 cursor-pointer items-center rounded-full transition-colors duration-300 ease-in-out focus:outline-none"
 			style={{
 				backgroundColor: theme === 'dark' ? '#1e293b' : '#e0f2fe',
 			}}
@@ -62,10 +62,11 @@ export default function ThemeSwitcher() {
 		>
 			{/* 滑块 */}
 			<span
-				className="inline-block h-6 w-6 transform rounded-full transition-all duration-300 ease-in-out shadow-md"
+				className={`inline-block h-6 w-6 rounded-full transition-all duration-300 ease-in-out shadow-md ${
+					theme === 'dark' ? 'translate-x-9' : 'translate-x-1'
+				}`}
 				style={{
 					backgroundColor: theme === 'dark' ? '#475569' : '#fbbf24',
-					transform: theme === 'dark' ? 'translateX(2.25rem)' : 'translateX(0.25rem)',
 				}}
 			>
 				{/* 图标 */}

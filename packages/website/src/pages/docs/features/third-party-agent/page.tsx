@@ -16,17 +16,6 @@ export default function ThirdPartyAgentPage() {
 					: 'Integrate pageAgent as a tool in your support assistant or Agent system, becoming the eyes and hands of your Agent.'}
 			</p>
 
-			<div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mb-6">
-				<h3 className="text-lg font-semibold mb-2 text-blue-900 dark:text-blue-300">
-					{isZh ? '💡 核心价值' : '💡 Core Value'}
-				</h3>
-				<p className="text-blue-800 dark:text-blue-200">
-					{isZh
-						? '让你的答疑机器人不再只是"嘴巴"，而是拥有"眼睛"和"手"的完整智能体。'
-						: 'Transform your support bot from just a "mouth" into a complete intelligent agent with "eyes" and "hands".'}
-				</p>
-			</div>
-
 			<Heading id="integration-method" className="text-2xl font-bold mb-4">
 				{isZh ? '集成方式' : 'Integration Method'}
 			</Heading>

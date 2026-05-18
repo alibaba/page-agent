@@ -1,61 +1,59 @@
 name: Bug Report
 description: Report a bug
 title: '[Bug] '
-labels: ['bug']
+type: Bug
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for your interest in improving the project! Before submitting, please read our guidelines.
-        感谢您对改进项目的兴趣！提交前请阅读我们的指南。
+        Thanks for your interest in improving the project! Before submitting, please search for existing issues.
+        感谢参与我们的社区！请先搜索现有 Issue，避免重复提交。
 
         - [Code of Conduct](https://github.com/alibaba/page-agent/blob/main/docs/CODE_OF_CONDUCT.md)
         - [Contributing Guide](https://github.com/alibaba/page-agent/blob/main/CONTRIBUTING.md)
 
+        > 为了让更多人参与讨论，请尽量使用英文提交 Issue，感谢理解 🙏
+
   - type: textarea
     id: description
     attributes:
-      label: What happened?
-      placeholder: Describe the bug and expected behavior
+      label: What happened? / 问题描述
+      description: Describe what you expected vs what actually happened.
+      placeholder: 'A clear description of the bug.'
     validations:
       required: true
 
   - type: textarea
-    id: code
+    id: reproduction
     attributes:
-      label: Code
-      render: typescript
-      placeholder: Minimal reproduction code
+      label: How to reproduce / 如何复现
+      description: Provide steps, URL, config or code snippet to reproduce the bug.
+      placeholder: '1. Open URL: https://...'
     validations:
-      required: false
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: '0.0.0'
 
   - type: input
     id: browser
     attributes:
       label: Browser
-      placeholder: 'Chrome 120, Firefox 119, etc.'
-    validations:
-      required: false
-
-  - type: input
-    id: version
-    attributes:
-      label: version
-      placeholder: '0.0.0'
-    validations:
-      required: false
+      placeholder: 'e.g. Chrome 130'
 
   - type: checkboxes
-    id: community
+    id: checklist
     attributes:
-      label: Community Communication / 社区沟通
-      description: Confirm you will communicate respectfully and constructively / 确认将以礼貌、建设性的方式沟通
+      label: Before submitting
       options:
         - label: I will be polite and respectful. / 我会保持礼貌与尊重。
           required: true
-        - label: I will share constructive, actionable suggestions. / 我会提供建设性、可行动的建议。
-          required: true
         - label: I have read the Code of Conduct. / 我已阅读行为准则。
+          required: true
+        - label: I have searched existing issues and this is not a duplicate.
           required: true
     validations:
       required: true

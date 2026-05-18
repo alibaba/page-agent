@@ -5,10 +5,12 @@ import { isPageDark } from './checkDarkMode'
 import styles from './SimulatorMask.module.css'
 import cursorStyles from './cursor.module.css'
 
-export class SimulatorMask {
+export class SimulatorMask extends EventTarget {
 	shown: boolean = false
 	wrapper = document.createElement('div')
 	motion: Motion | null = null
+
+	#disposed = false
 
 	#cursor = document.createElement('div')
 
@@ -19,6 +21,8 @@ export class SimulatorMask {
 	#targetCursorY = 0
 
 	constructor() {
+		super()
+
 		this.wrapper.id = 'page-agent-runtime_simulator-mask'
 		this.wrapper.className = styles.wrapper
 		this.wrapper.setAttribute('data-browser-use-ignore', 'true')
@@ -74,13 +78,34 @@ export class SimulatorMask {
 
 		this.#moveCursorToTarget()
 
-		window.addEventListener('PageAgent::MovePointerTo', (event: Event) => {
+		// global events
+		// @note Mask should be isolated from the rest of the code.
+		// Global events are easier to manage and cleanup.
+
+		const movePointerToListener = (event: Event) => {
 			const { x, y } = (event as CustomEvent).detail
 			this.setCursorPosition(x, y)
-		})
-
-		window.addEventListener('PageAgent::ClickPointer', (event: Event) => {
+		}
+		const clickPointerListener = () => {
 			this.triggerClickAnimation()
+		}
+		const enablePassThroughListener = () => {
+			this.wrapper.style.pointerEvents = 'none'
+		}
+		const disablePassThroughListener = () => {
+			this.wrapper.style.pointerEvents = 'auto'
+		}
+
+		window.addEventListener('PageAgent::MovePointerTo', movePointerToListener)
+		window.addEventListener('PageAgent::ClickPointer', clickPointerListener)
+		window.addEventListener('PageAgent::EnablePassThrough', enablePassThroughListener)
+		window.addEventListener('PageAgent::DisablePassThrough', disablePassThroughListener)
+
+		this.addEventListener('dispose', () => {
+			window.removeEventListener('PageAgent::MovePointerTo', movePointerToListener)
+			window.removeEventListener('PageAgent::ClickPointer', clickPointerListener)
+			window.removeEventListener('PageAgent::EnablePassThrough', enablePassThroughListener)
+			window.removeEventListener('PageAgent::DisablePassThrough', disablePassThroughListener)
 		})
 	}
 
@@ -106,6 +131,8 @@ export class SimulatorMask {
 	}
 
 	#moveCursorToTarget() {
+		if (this.#disposed) return
+
 		const newX = this.#currentCursorX + (this.#targetCursorX - this.#currentCursorX) * 0.2
 		const newY = this.#currentCursorY + (this.#targetCursorY - this.#currentCursorY) * 0.2
 
@@ -133,11 +160,15 @@ export class SimulatorMask {
 	}
 
 	setCursorPosition(x: number, y: number) {
+		if (this.#disposed) return
+
 		this.#targetCursorX = x
 		this.#targetCursorY = y
 	}
 
 	triggerClickAnimation() {
+		if (this.#disposed) return
+
 		this.#cursor.classList.remove(cursorStyles.clicking)
 		// Force reflow to restart animation
 		void this.#cursor.offsetHeight
@@ -145,7 +176,7 @@ export class SimulatorMask {
 	}
 
 	show() {
-		if (this.shown) return
+		if (this.shown || this.#disposed) return
 
 		this.shown = true
 		this.motion?.start()
@@ -163,7 +194,7 @@ export class SimulatorMask {
 	}
 
 	hide() {
-		if (!this.shown) return
+		if (!this.shown || this.#disposed) return
 
 		this.shown = false
 		this.motion?.fadeOut()
@@ -177,7 +208,10 @@ export class SimulatorMask {
 	}
 
 	dispose() {
+		this.#disposed = true
+		console.log('dispose SimulatorMask')
 		this.motion?.dispose()
 		this.wrapper.remove()
+		this.dispatchEvent(new Event('dispose'))
 	}
 }

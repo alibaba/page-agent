@@ -103,25 +103,25 @@ function FormatErrorsContent(isZh: boolean) {
 						<>
 							如果以上步骤无法解决问题，欢迎在{' '}
 							<a
-								href="https://github.com/alibaba/page-agent/discussions"
+								href="https://github.com/alibaba/page-agent/issues"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-blue-600 dark:text-blue-400 underline underline-offset-2"
 							>
-								GitHub Discussions
+								GitHub Issues
 							</a>{' '}
 							中反馈，附上模型名称和错误信息。
 						</>
 					) : (
 						<>
-							If the above steps don't help, join the{' '}
+							If the above steps don't help, open a{' '}
 							<a
-								href="https://github.com/alibaba/page-agent/discussions"
+								href="https://github.com/alibaba/page-agent/issues"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-blue-600 dark:text-blue-400 underline underline-offset-2"
 							>
-								GitHub Discussions
+								GitHub Issue
 							</a>{' '}
 							with your model name and error details.
 						</>
@@ -274,10 +274,12 @@ function ApiErrorsContent(isZh: boolean) {
 					code={`const agent = new PageAgent({
   // ...
   customFetch: async (url, init) => {
-    const body = JSON.parse(init.body)
     // Adapt parameters for your provider
-    delete body.stream_options
-    return fetch(url, { ...init, body: JSON.stringify(body) })
+    const body = JSON.parse(init.body)
+    delete body.tool_choice
+    const bodyStr = JSON.stringify(body)
+
+    return fetch(url, { ...init, body: bodyStr })
   },
 })`}
 				/>
@@ -410,7 +412,7 @@ export default function TroubleshootingPage() {
 											.getElementById(section.id)
 											?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 									}
-									className={`block text-sm py-1 text-left transition-colors ${
+									className={`block cursor-pointer py-1 text-left text-sm transition-colors ${
 										activeId === section.id
 											? 'text-blue-600 dark:text-blue-400 font-medium'
 											: 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'

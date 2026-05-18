@@ -19,7 +19,10 @@ export function initPageController() {
 
 	function getPC(): PageController {
 		if (!pageController) {
-			pageController = new PageController({ enableMask: false, viewportExpansion: 400 })
+			pageController = new PageController({
+				enableMask: false,
+				viewportExpansion: 400,
+			})
 		}
 		return pageController
 	}

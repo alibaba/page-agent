@@ -54,7 +54,7 @@ function ResultCard({
 					Result: {success ? 'Success' : 'Failed'}
 				</span>
 			</div>
-			<p className="text-xs text-[11px] text-muted-foreground pl-5 whitespace-pre-wrap">{text}</p>
+			<p className="text-[12px] text-foreground pl-5 whitespace-pre-wrap">{text}</p>
 			{children}
 		</div>
 	)
@@ -146,6 +146,7 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 function extractPrompt(rawRequest: unknown, role: 'system' | 'user'): string | null {
 	const messages = (rawRequest as { messages?: { role: string; content?: unknown }[] })?.messages
 	if (!messages) return null
+	if (!Array.isArray(messages)) return null
 	const msg =
 		role === 'system'
 			? messages.find((m) => m.role === role)

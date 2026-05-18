@@ -140,6 +140,7 @@ function JSConsole({
 	// 全局console拦截处理
 	useEffect(() => {
 		const interceptor = ConsoleInterceptor.getInstance()
+		let scrollTimer: ReturnType<typeof setTimeout>
 
 		const handleGlobalConsole = (type: string, args: unknown[]) => {
 			const content = args.map((arg) => formatResult(arg)).join(' ')
@@ -152,8 +153,8 @@ function JSConsole({
 
 			setOutputs((prev) => [...prev, outputItem])
 
-			// 自动滚动到底部
-			setTimeout(() => {
+			clearTimeout(scrollTimer)
+			scrollTimer = setTimeout(() => {
 				if (outputRef.current) {
 					outputRef.current.scrollTop = outputRef.current.scrollHeight
 				}
@@ -164,6 +165,7 @@ function JSConsole({
 
 		return () => {
 			interceptor.unsubscribe(handleGlobalConsole)
+			clearTimeout(scrollTimer)
 		}
 	}, [])
 

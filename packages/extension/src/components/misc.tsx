@@ -84,7 +84,7 @@ export function MotionOverlay({ active }: { active: boolean }) {
 	return (
 		<div
 			ref={containerRef}
-			className="pointer-events-none absolute inset-0 z-10 opacity-60"
+			className="pointer-events-none absolute inset-0 z-10 opacity-60 overflow-hidden"
 			style={{ display: active ? undefined : 'none' }}
 		/>
 	)
@@ -111,6 +111,7 @@ export function EmptyState() {
 					]}
 					cursorStyle="underscore"
 					loop
+					startOnView={false}
 					typeSpeed={20}
 					deleteSpeed={10}
 					pauseDelay={3000}

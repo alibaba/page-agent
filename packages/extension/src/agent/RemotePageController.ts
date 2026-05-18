@@ -4,9 +4,7 @@ import type { TabsController } from './TabsController'
 
 const PREFIX = '[RemotePageController]'
 
-function debug(...messages: any[]) {
-	console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
-}
+const debug = console.debug.bind(console, `\x1b[90m${PREFIX}\x1b[0m`)
 
 function sendMessage(message: {
 	type: 'PAGE_CONTROL'
@@ -58,9 +56,7 @@ export class RemotePageController {
 	}
 
 	async getBrowserState(): Promise<BrowserState> {
-		if (!this.currentTabId) throw new Error('tabsController not initialized.')
-
-		let browserState = {} as BrowserState
+		let browserState: BrowserState
 		debug('getBrowserState', this.currentTabId)
 
 		const currentUrl = await this.getCurrentUrl()
@@ -178,7 +174,7 @@ interface DomActionReturn {
 /**
  * Check if a URL can run content scripts.
  */
-function isContentScriptAllowed(url: string | undefined): boolean {
+export function isContentScriptAllowed(url: string | undefined): boolean {
 	if (!url) return false
 
 	const restrictedPatterns = [

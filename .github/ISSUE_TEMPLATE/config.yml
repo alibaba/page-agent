@@ -1,11 +1,5 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Questions & Ideas / 问题与想法（Discussions）
-    url: https://github.com/alibaba/page-agent/discussions
-    about: Use Discussions for Q&A and ideation. 使用 Discussions 进行问答与想法交流。
-  - name: Security Report / 安全问题报告
-    url: https://github.com/alibaba/page-agent/security/policy
-    about: Report security vulnerabilities responsibly. 通过安全页面报告漏洞。
   - name: Contributing Guide / 贡献指南
     url: https://github.com/alibaba/page-agent/blob/main/CONTRIBUTING.md
     about: How to contribute code and ideas. 如何进行贡献与提交代码。

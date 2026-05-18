@@ -169,7 +169,6 @@ function highlightSyntax(code: string): string {
 const HighlightSyntaxClient: React.FC<HighlightSyntaxProps> = ({ code }) => {
 	const htmlContent = highlightSyntax(code)
 
-	// eslint-disable-next-line react-dom/no-dangerously-set-innerhtml
 	return <code className={styles.syntax} dangerouslySetInnerHTML={{ __html: htmlContent }} />
 }
 

@@ -4,14 +4,23 @@ export type Execute = (task: string, config: ExecuteConfig) => Promise<Execution
 
 export interface ExecuteConfig {
 	baseURL: string
-	apiKey: string
 	model: string
+	apiKey?: string
+
+	/**
+	 * Global system-level instructions for the agent.
+	 * Equivalent to `AgentConfig.instructions.system`.
+	 */
+	systemInstruction?: string
 
 	/**
 	 * Whether to include the initial tab (that holds this main world script) in the task.
 	 * @default true
 	 */
 	includeInitialTab?: boolean
+
+	/** Control all unpinned tabs in the window instead of only the tab group. */
+	experimentalIncludeAllTabs?: boolean
 
 	onStatusChange?: (status: AgentStatus) => void
 	onActivity?: (activity: AgentActivity) => void
@@ -30,13 +39,14 @@ export default defineUnlistedScript(() => {
 		if (task.trim().length === 0) throw new Error('Task cannot be empty')
 		if (!config) throw new Error('Config is required')
 		if (!config.baseURL) throw new Error('Config must have a baseURL')
-		if (!config.apiKey) throw new Error('Config must have an apiKey')
 		if (!config.model) throw new Error('Config must have a model')
 
 		const id = getId()
 
 		const promise = new Promise<ExecutionResult>((resolve, reject) => {
 			function handleMessage(e: MessageEvent) {
+				if (e.source !== window) return
+
 				const data = e.data
 				if (typeof data !== 'object' || data === null) return
 				if (data.channel !== 'PAGE_AGENT_EXT_RESPONSE') return
@@ -85,9 +95,11 @@ export default defineUnlistedScript(() => {
 					task,
 					config: {
 						baseURL: config.baseURL,
-						apiKey: config.apiKey,
 						model: config.model,
+						apiKey: config.apiKey,
+						systemInstruction: config.systemInstruction,
 						includeInitialTab: config.includeInitialTab,
+						experimentalIncludeAllTabs: config.experimentalIncludeAllTabs,
 					},
 				},
 			},

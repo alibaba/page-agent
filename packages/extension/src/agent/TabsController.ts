@@ -1,8 +1,8 @@
+import { isContentScriptAllowed } from './RemotePageController'
+
 const PREFIX = '[TabsController]'
 
-function debug(...messages: any[]) {
-	console.debug(`\x1b[90m${PREFIX}\x1b[0m`, ...messages)
-}
+const debug = console.debug.bind(console, `\x1b[90m${PREFIX}\x1b[0m`)
 
 function sendMessage(message: {
 	type: 'TAB_CONTROL'
@@ -20,102 +20,102 @@ function sendMessage(message: {
  * - live in the agent env (extension page or content script)
  * - no chrome apis. call sw for tab operations
  */
-export class TabsController extends EventTarget {
+export class TabsController {
 	currentTabId: number | null = null
 
+	private disposed = false
+	private port?: chrome.runtime.Port
+	private portRetries = 0
+
+	private windowId: number | null = null
 	private tabs: TabMeta[] = []
 	private initialTabId: number | null = null
 	private tabGroupId: number | null = null
+	private experimentalIncludeAllTabs = false
 	private task: string = ''
-	private windowId: number | null = null
 
-	async init(task: string, includeInitialTab: boolean = true) {
-		debug('init', task, includeInitialTab)
+	async init(task: string, options: TabsInitOptions = {}) {
+		const { includeInitialTab = true, experimentalIncludeAllTabs = false } = options
+		debug('init', task, options)
 
-		this.task = task
-		this.tabs = []
+		if (this.disposed) {
+			throw new Error('TabsController already disposed')
+		}
+
 		this.currentTabId = null
+		this.disposed = false
+		this.port = undefined
+		this.portRetries = 0
+
+		this.windowId = null
+		this.tabs = []
 		this.tabGroupId = null
 		this.initialTabId = null
-		this.windowId = null
+		this.experimentalIncludeAllTabs = experimentalIncludeAllTabs
+		this.task = task
 
-		const result = await sendMessage({
+		const activeTabResult = await sendMessage({
 			type: 'TAB_CONTROL',
 			action: 'get_active_tab',
 		})
 
-		this.initialTabId = result.tabId
+		this.initialTabId = activeTabResult.tab?.id
+		this.windowId = activeTabResult.tab?.windowId
 
-		if (!this.initialTabId) {
-			throw new Error('Failed to get initial tab ID')
+		if (!this.initialTabId || !this.windowId) {
+			if (activeTabResult.error) {
+				throw new Error(activeTabResult.error)
+			} else {
+				throw new Error('Failed to get active tab')
+			}
 		}
 
-		if (includeInitialTab) {
-			this.currentTabId = this.initialTabId
+		this.connectTabEvents()
 
-			// update tab status immediately
+		if (experimentalIncludeAllTabs) {
+			const allTabs = await sendMessage({
+				type: 'TAB_CONTROL',
+				action: 'get_window_tabs',
+				payload: { windowId: this.windowId },
+			})
+			for (const tab of allTabs.tabs as chrome.tabs.Tab[]) {
+				if (tab.id && !tab.pinned && isContentScriptAllowed(tab.url)) {
+					this.addTab({
+						id: tab.id,
+						isInitial: tab.id === this.initialTabId,
+						url: tab.url,
+						title: tab.title,
+						status: tab.status,
+					})
+				}
+			}
+			if (this.tabs.find((t) => t.id === this.initialTabId)) {
+				this.currentTabId = this.initialTabId
+				await this.createTabGroup([this.initialTabId])
+			}
+		} else if (includeInitialTab) {
 			const info = await sendMessage({
 				type: 'TAB_CONTROL',
 				action: 'get_tab_info',
 				payload: { tabId: this.initialTabId },
 			})
 
-			this.tabs.push({
-				id: result.tabId,
-				isInitial: true,
-				url: info.url,
-				title: info.title,
-				status: info.status,
-			})
+			if (isContentScriptAllowed(info.url) && !info.pinned) {
+				this.currentTabId = this.initialTabId
+
+				this.addTab({
+					id: this.initialTabId,
+					isInitial: true,
+					url: info.url,
+					title: info.title,
+					status: info.status,
+				})
+
+				await this.createTabGroup([this.initialTabId])
+			}
 		}
 
 		await this.updateCurrentTabId(this.currentTabId)
-
-		const tabChangeHandler = (message: any): void => {
-			if (message.type !== 'TAB_CHANGE') {
-				// throw new Error(`[TabsController]: Invalid message type: ${message.type}`)
-				return
-			}
-
-			if (message.action === 'created') {
-				const tab = message.payload.tab as chrome.tabs.Tab
-				if (tab.groupId === this.tabGroupId && tab.id != null) {
-					// Tab created in our controlled group
-					if (!this.tabs.find((t) => t.id === tab.id)) {
-						this.tabs.push({ id: tab.id, isInitial: false })
-					}
-					this.switchToTab(tab.id)
-				}
-			} else if (message.action === 'removed') {
-				const { tabId } = message.payload as { tabId: number }
-				const targetTab = this.tabs.find((t) => t.id === tabId)
-				if (targetTab) {
-					this.tabs = this.tabs.filter((t) => t.id !== tabId)
-					if (this.currentTabId === tabId) {
-						const newCurrentTab = this.tabs[this.tabs.length - 1] || null
-						if (newCurrentTab) {
-							this.switchToTab(newCurrentTab.id)
-						} else {
-							this.updateCurrentTabId(null)
-						}
-					}
-				}
-			} else if (message.action === 'updated') {
-				const { tabId, tab } = message.payload as { tabId: number; tab: chrome.tabs.Tab }
-				const targetTab = this.tabs.find((t) => t.id === tabId)
-				if (targetTab) {
-					targetTab.url = tab.url
-					targetTab.title = tab.title
-					targetTab.status = tab.status
-				}
-			}
-		}
-
-		chrome.runtime.onMessage.addListener(tabChangeHandler)
-
-		this.addEventListener('dispose', () => {
-			chrome.runtime.onMessage.removeListener(tabChangeHandler)
-		})
 	}
 
 	async openNewTab(url: string): Promise<string> {
@@ -132,11 +132,8 @@ export class TabsController extends EventTarget {
 		}
 
 		const tabId = result.tabId as number
-		const windowId = result.windowId as number
 
-		this.windowId = windowId
-
-		this.tabs.push({
+		this.addTab({
 			id: tabId,
 			isInitial: false,
 		})
@@ -144,32 +141,7 @@ export class TabsController extends EventTarget {
 		await this.switchToTab(tabId)
 
 		if (!this.tabGroupId) {
-			const result = await sendMessage({
-				type: 'TAB_CONTROL',
-				action: 'create_tab_group',
-				payload: { tabIds: [tabId], windowId: this.windowId },
-			})
-
-			if (!result.success) {
-				throw new Error(`Failed to create tab group: ${result.error}`)
-			}
-
-			const groupId = result.groupId as number
-
-			this.tabGroupId = groupId
-
-			await sendMessage({
-				type: 'TAB_CONTROL',
-				action: 'update_tab_group',
-				payload: {
-					groupId: this.tabGroupId,
-					properties: {
-						title: `PageAgent(${this.task})`,
-						color: randomColor(),
-						collapsed: false,
-					},
-				},
-			})
+			await this.createTabGroup([tabId])
 		} else {
 			await sendMessage({
 				type: 'TAB_CONTROL',
@@ -230,6 +202,38 @@ export class TabsController extends EventTarget {
 		}
 	}
 
+	private async createTabGroup(tabIds: number[]) {
+		const result = await sendMessage({
+			type: 'TAB_CONTROL',
+			action: 'create_tab_group',
+			payload: { tabIds, windowId: this.windowId },
+		})
+
+		if (!result?.success) {
+			throw new Error(`Failed to create tab group: ${result?.error}`)
+		}
+
+		this.tabGroupId = result.groupId as number
+
+		await sendMessage({
+			type: 'TAB_CONTROL',
+			action: 'update_tab_group',
+			payload: {
+				groupId: this.tabGroupId,
+				properties: {
+					title: `PageAgent(${this.task})`,
+					color: randomColor(),
+					collapsed: false,
+				},
+			},
+		})
+	}
+
+	private addTab(meta: TabMeta) {
+		if (this.tabs.find((t) => t.id === meta.id)) return
+		this.tabs.push(meta)
+	}
+
 	async updateCurrentTabId(tabId: number | null) {
 		debug('updateCurrentTabId', tabId)
 
@@ -286,9 +290,77 @@ export class TabsController extends EventTarget {
 		await waitUntil(() => tab.status === 'complete', 4_000)
 	}
 
-	dispose() {
-		this.dispatchEvent(new Event('dispose'))
+	/**
+	 * Connect to background SW via port to receive tab change events.
+	 *
+	 * @note Port is 1:1 (runtime.connect → background SW has no frames),
+	 * so onDisconnect fires exactly once and we can safely reconnect.
+	 * Reconnection may miss events during the gap.
+	 * TODO: refresh this.tabs from background after reconnect to stay consistent.
+	 */
+	private connectTabEvents() {
+		this.port = chrome.runtime.connect({ name: 'tab-events' })
+
+		this.port.onMessage.addListener((message: any) => {
+			if (this.disposed) return
+			this.portRetries = 0
+
+			if (message.action === 'created') {
+				const tab = message.payload.tab as chrome.tabs.Tab
+				const shouldTrack = this.experimentalIncludeAllTabs || tab.groupId === this.tabGroupId
+				if (shouldTrack && tab.id != null) {
+					this.addTab({ id: tab.id, isInitial: false })
+					this.switchToTab(tab.id)
+				}
+			} else if (message.action === 'removed') {
+				const { tabId } = message.payload as { tabId: number }
+				const targetTab = this.tabs.find((t) => t.id === tabId)
+				if (targetTab) {
+					this.tabs = this.tabs.filter((t) => t.id !== tabId)
+					if (this.currentTabId === tabId) {
+						const newCurrentTab = this.tabs[this.tabs.length - 1] || null
+						if (newCurrentTab) {
+							this.switchToTab(newCurrentTab.id)
+						} else {
+							this.updateCurrentTabId(null)
+						}
+					}
+				}
+			} else if (message.action === 'updated') {
+				const { tabId, tab } = message.payload as { tabId: number; tab: chrome.tabs.Tab }
+				const targetTab = this.tabs.find((t) => t.id === tabId)
+				if (targetTab) {
+					targetTab.url = tab.url
+					targetTab.title = tab.title
+					targetTab.status = tab.status
+				}
+			}
+		})
+
+		this.port.onDisconnect.addListener(() => {
+			this.port = undefined
+			if (this.disposed) return
+			if (this.portRetries >= 7) {
+				console.error(PREFIX, 'tab events port failed after 7 retries, giving up')
+				return
+			}
+			debug('port disconnected, reconnecting...')
+			this.portRetries++
+			this.connectTabEvents()
+		})
 	}
+
+	dispose() {
+		debug('dispose')
+		this.disposed = true
+		this.port?.disconnect()
+		this.port = undefined
+	}
+}
+
+export interface TabsInitOptions {
+	includeInitialTab?: boolean
+	experimentalIncludeAllTabs?: boolean
 }
 
 export type TabAction =
@@ -300,6 +372,7 @@ export type TabAction =
 	| 'add_tab_to_group'
 	| 'close_tab'
 	| 'get_tab_title'
+	| 'get_window_tabs'
 
 interface TabMeta {
 	id: number
@@ -309,16 +382,7 @@ interface TabMeta {
 	status?: 'loading' | 'unloaded' | 'complete'
 }
 
-const TAB_GROUP_COLORS = [
-	'grey',
-	'blue',
-	'red',
-	'yellow',
-	'green',
-	'pink',
-	'purple',
-	'cyan',
-] as const
+const TAB_GROUP_COLORS = ['blue', 'red', 'yellow', 'green', 'pink', 'purple', 'cyan'] as const
 
 type TabGroupColor = (typeof TAB_GROUP_COLORS)[number]
 

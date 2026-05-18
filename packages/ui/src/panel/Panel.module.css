@@ -291,7 +291,7 @@
 		transition: max-height 0.2s;
 
 		.expanded & {
-			max-height: 400px;
+			max-height: min(500px, calc(100vh - 200px - var(--height)));
 		}
 
 		.historyItem {

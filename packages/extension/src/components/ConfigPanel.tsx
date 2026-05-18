@@ -1,18 +1,20 @@
 import {
-	ChevronDown,
 	Copy,
 	CornerUpLeft,
+	ExternalLink,
 	Eye,
 	EyeOff,
+	FoldVertical,
 	HatGlasses,
 	Home,
 	Loader2,
 	Scale,
+	UnfoldVertical,
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { siGithub } from 'simple-icons'
 
-import { DEMO_API_KEY, DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/agent/constants'
+import { DEMO_BASE_URL, DEMO_MODEL, isTestingEndpoint } from '@/agent/constants'
 import type { ExtConfig, LanguagePreference } from '@/agent/useAgent'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,31 +27,41 @@ interface ConfigPanelProps {
 }
 
 export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
-	const [apiKey, setApiKey] = useState(config?.apiKey || DEMO_API_KEY)
 	const [baseURL, setBaseURL] = useState(config?.baseURL || DEMO_BASE_URL)
 	const [model, setModel] = useState(config?.model || DEMO_MODEL)
+	const [apiKey, setApiKey] = useState(config?.apiKey)
 	const [language, setLanguage] = useState<LanguagePreference>(config?.language)
-	const [maxSteps, setMaxSteps] = useState<number | undefined>(config?.maxSteps)
+	const [maxSteps, setMaxSteps] = useState(config?.maxSteps)
 	const [systemInstruction, setSystemInstruction] = useState(config?.systemInstruction ?? '')
 	const [experimentalLlmsTxt, setExperimentalLlmsTxt] = useState(
 		config?.experimentalLlmsTxt ?? false
 	)
+	const [experimentalIncludeAllTabs, setExperimentalIncludeAllTabs] = useState(
+		config?.experimentalIncludeAllTabs ?? false
+	)
+	const [disableNamedToolChoice, setDisableNamedToolChoice] = useState(
+		config?.disableNamedToolChoice ?? false
+	)
 	const [advancedOpen, setAdvancedOpen] = useState(false)
 	const [saving, setSaving] = useState(false)
-	const [userAuthToken, setUserAuthToken] = useState<string>('')
+	const [userAuthToken, setUserAuthToken] = useState('')
 	const [copied, setCopied] = useState(false)
 	const [showToken, setShowToken] = useState(false)
 	const [showApiKey, setShowApiKey] = useState(false)
 
-	useEffect(() => {
-		setApiKey(config?.apiKey || DEMO_API_KEY)
+	const [prevConfig, setPrevConfig] = useState(config)
+	if (prevConfig !== config) {
+		setPrevConfig(config)
 		setBaseURL(config?.baseURL || DEMO_BASE_URL)
 		setModel(config?.model || DEMO_MODEL)
+		setApiKey(config?.apiKey)
 		setLanguage(config?.language)
 		setMaxSteps(config?.maxSteps)
 		setSystemInstruction(config?.systemInstruction ?? '')
 		setExperimentalLlmsTxt(config?.experimentalLlmsTxt ?? false)
-	}, [config])
+		setExperimentalIncludeAllTabs(config?.experimentalIncludeAllTabs ?? false)
+		setDisableNamedToolChoice(config?.disableNamedToolChoice ?? false)
+	}
 
 	// Poll for user auth token every second until found
 	useEffect(() => {
@@ -94,6 +106,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				maxSteps: maxSteps || undefined,
 				systemInstruction: systemInstruction || undefined,
 				experimentalLlmsTxt,
+				experimentalIncludeAllTabs,
+				disableNamedToolChoice,
 			})
 		} finally {
 			setSaving(false)
@@ -109,6 +123,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					size="icon-sm"
 					onClick={onClose}
 					className="absolute top-2 right-3 cursor-pointer"
+					aria-label="Back"
 				>
 					<CornerUpLeft className="size-3.5" />
 				</Button>
@@ -116,12 +131,15 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 
 			{/* User Auth Token Section */}
 			<div className="flex flex-col gap-1.5 p-3 bg-muted/50 rounded-md border">
-				<label className="text-xs font-medium text-muted-foreground">User Auth Token</label>
+				<label htmlFor="user-auth-token" className="text-xs font-medium text-muted-foreground">
+					User Auth Token
+				</label>
 				<p className="text-[10px] text-muted-foreground mb-1">
 					Give a website the ability to call this extension.
 				</p>
 				<div className="flex gap-2 items-center">
 					<Input
+						id="user-auth-token"
 						readOnly
 						value={
 							userAuthToken
@@ -138,6 +156,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						className="h-8 w-8 shrink-0 cursor-pointer"
 						onClick={() => setShowToken(!showToken)}
 						disabled={!userAuthToken}
+						aria-label={showToken ? 'Hide token' : 'Show token'}
+						aria-pressed={showToken}
 					>
 						{showToken ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
 					</Button>
@@ -147,15 +167,33 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						className="h-8 w-8 shrink-0 cursor-pointer"
 						onClick={handleCopyToken}
 						disabled={!userAuthToken}
+						aria-label="Copy token"
 					>
 						{copied ? <span className="">✓</span> : <Copy className="size-3" />}
 					</Button>
+					<span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+						{copied ? 'Token copied' : ''}
+					</span>
 				</div>
 			</div>
 
+			{/* Hub link */}
+			<a
+				href="/hub.html"
+				target="_blank"
+				rel="noopener noreferrer"
+				className="flex items-center justify-between p-3 rounded-md border bg-muted/50 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
+			>
+				Manage Page Agent Hub
+				<ExternalLink className="size-3" />
+			</a>
+
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">Base URL</label>
+				<label htmlFor="base-url" className="text-xs text-muted-foreground">
+					Base URL
+				</label>
 				<Input
+					id="base-url"
 					placeholder="https://api.openai.com/v1"
 					value={baseURL}
 					onChange={(e) => setBaseURL(e.target.value)}
@@ -167,7 +205,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			{isTestingEndpoint(baseURL) && (
 				<div className="p-2.5 rounded-md border border-amber-500/30 bg-amber-500/5 text-[11px] text-muted-foreground leading-relaxed">
 					<Scale className="size-3 inline-block mr-1 -mt-0.5 text-amber-600" />
-					You are using the free testing API. By using this service you agree to the{' '}
+					You are using our testing API. By using this you agree to the{' '}
 					<a
 						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
 						target="_blank"
@@ -176,14 +214,16 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					>
 						Terms of Use & Privacy Policy
 					</a>
-					. No sensitive data. No guaranteed availability.
 				</div>
 			)}
 
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">Model</label>
+				<label htmlFor="model" className="text-xs text-muted-foreground">
+					Model
+				</label>
 				<Input
-					placeholder="gpt-5.2"
+					id="model"
+					placeholder="gpt-5.1"
 					value={model}
 					onChange={(e) => setModel(e.target.value)}
 					className="text-xs h-8"
@@ -191,11 +231,14 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			</div>
 
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">API Key</label>
+				<label htmlFor="api-key" className="text-xs text-muted-foreground">
+					API Key
+				</label>
 				<div className="flex gap-2 items-center">
 					<Input
+						id="api-key"
 						type={showApiKey ? 'text' : 'password'}
-						placeholder="sk-..."
+						// placeholder="sk-..."
 						value={apiKey}
 						onChange={(e) => setApiKey(e.target.value)}
 						className="text-xs h-8"
@@ -205,6 +248,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						size="icon"
 						className="h-8 w-8 shrink-0 cursor-pointer"
 						onClick={() => setShowApiKey(!showApiKey)}
+						aria-label={showApiKey ? 'Hide API key' : 'Show API key'}
 					>
 						{showApiKey ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
 					</Button>
@@ -212,7 +256,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 			</div>
 
 			<div className="flex flex-col gap-1.5">
-				<label className="text-xs text-muted-foreground">Language</label>
+				<label className="text-xs text-muted-foreground">Response Language</label>
 				<select
 					value={language ?? ''}
 					onChange={(e) => setLanguage((e.target.value || undefined) as LanguagePreference)}
@@ -231,17 +275,17 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer mt-1 font-bold"
 			>
 				Advanced
-				<ChevronDown
-					className="size-3 transition-transform"
-					style={{ transform: advancedOpen ? 'rotate(0deg)' : 'rotate(90deg)' }}
-				/>
+				{advancedOpen ? <FoldVertical className="size-3" /> : <UnfoldVertical className="size-3" />}
 			</button>
 
 			{advancedOpen && (
 				<>
 					<div className="flex flex-col gap-1.5">
-						<label className="text-xs text-muted-foreground">Max Steps</label>
+						<label htmlFor="max-steps" className="text-xs text-muted-foreground">
+							Max Steps
+						</label>
 						<Input
+							id="max-steps"
 							type="number"
 							placeholder="40"
 							min={1}
@@ -264,8 +308,21 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					</div>
 
 					<label className="flex items-center justify-between cursor-pointer">
+						<span className="text-xs text-muted-foreground">Disable named tool_choice</span>
+						<Switch checked={disableNamedToolChoice} onCheckedChange={setDisableNamedToolChoice} />
+					</label>
+
+					<label className="flex items-center justify-between cursor-pointer">
 						<span className="text-xs text-muted-foreground">Experimental llms.txt support</span>
 						<Switch checked={experimentalLlmsTxt} onCheckedChange={setExperimentalLlmsTxt} />
+					</label>
+
+					<label className="flex items-center justify-between cursor-pointer">
+						<span className="text-xs text-muted-foreground">Experimental include all tabs</span>
+						<Switch
+							checked={experimentalIncludeAllTabs}
+							onCheckedChange={setExperimentalIncludeAllTabs}
+						/>
 					</label>
 				</>
 			)}

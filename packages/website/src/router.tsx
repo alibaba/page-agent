@@ -18,10 +18,12 @@ function ScrollToTop() {
 
 export default function Router() {
 	useEffect(() => {
-		const schedule = globalThis.requestIdleCallback ?? ((cb: () => void) => setTimeout(cb, 1))
-		const cancel = globalThis.cancelIdleCallback ?? clearTimeout
-		const id = schedule(() => docsImport())
-		return () => cancel(id)
+		if ('requestIdleCallback' in globalThis) {
+			const id = requestIdleCallback(() => docsImport())
+			return () => cancelIdleCallback(id)
+		}
+		const id = setTimeout(() => docsImport(), 1)
+		return () => clearTimeout(id)
 	}, [])
 
 	return (

@@ -5,7 +5,7 @@
 This is a **monorepo** with npm workspaces:
 
 - **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
-- **Extension** (`packages/extension/`) - Browser extension (WXT + React) 🚧 WIP
+- **Extension** (`packages/extension/`) - Browser extension (WXT + React)
 - **Website** (`packages/website/`) - React docs and landing page. **When working on website, follow `packages/website/AGENTS.md`**
 
 Internal packages:
@@ -18,18 +18,19 @@ Internal packages:
 ## Development Commands
 
 ```bash
-npm start                    # Start website dev server
-npm run build                # Build all packages
-npm run build:libs           # Build all libraries
-npm run lint                 # ESLint with TypeScript strict rules
-npm run zip -w @page-agent/ext # Zip the extension package
+npm start                      # Start website dev server
+npm run build                  # Build all packages
+npm run build:libs             # Build all libraries
+npm run build:ext              # Build and zip the extension package
+npm run typecheck              # Typecheck all packages
+npm run lint                   # ESLint
 ```
 
 ## Architecture
 
 ### Monorepo Structure
 
-Simple monorepo solution: TypeScript references + Vite aliases. Update tsconfig and vite config when adding/removing packages.
+Source-first monorepo: library `package.json` exports point to `src/*.ts` during development. At publish time, `scripts/pre-publish.js` promotes `publishConfig` fields to top-level (swapping to `dist/`), and `scripts/post-publish.js` restores the originals.
 
 ```
 packages/
@@ -37,7 +38,7 @@ packages/
 ├── page-agent/              # npm: "page-agent" entry class (with UI + controller + demo builds)
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
-├── extension/               # Browser extension (WXT + React)
+├── extension/               # Browser extension
 ├── page-controller/         # @page-agent/page-controller
 └── ui/                      # @page-agent/ui
 ```
