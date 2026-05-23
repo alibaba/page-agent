@@ -94,6 +94,30 @@ Please read the [maintainer's note](https://github.com/alibaba/page-agent/issues
 
 Contributions generated entirely by **bots or AI** without substantial human involvement will **not be accepted**.
 
+## Troubleshooting
+
+**Extension not responding?**
+- Check the browser console (F12) for error messages
+- Reload the extension: go to `chrome://extensions/`, find PageAgent, click reload
+- Make sure you have at least one LLM provider configured
+
+**PageAgent doesn't click elements correctly?**
+- Ensure the page has loaded fully before running commands
+- Some single-page apps may require additional wait time
+- Try using more specific instructions like "Click the red submit button in the form"
+
+**Missing API key or connection errors?**
+- PageAgent needs a valid LLM API key to work
+- Set `apiKey` in your PageAgent configuration
+- For Alibaba models: `baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1'`
+- For OpenAI compatible providers: set appropriate `baseURL` (e.g., `https://api.openai.com/v1`)
+- For local models: ensure the server is running and `baseURL` points to the correct endpoint
+
+**Chrome extension issues?**
+- After installation, refresh any open tabs to activate the extension
+- The extension icon should turn blue when active
+- Check that your API key has sufficient quota for the provider
+
 ## ⚖️ License
 
 [MIT License](LICENSE)
