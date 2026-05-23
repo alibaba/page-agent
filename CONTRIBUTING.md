@@ -4,6 +4,44 @@
 
 For local development workflows, setup, local LLM config, extension development, testing on other websites, and more details, see [docs/developer-guide.md](docs/developer-guide.md).
 
+## First Run Demo
+
+To run the demo locally:
+
+```bash
+npm install page-agent
+```
+
+Then add the demo script to any webpage:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.8.2/dist/iife/page-agent.demo.js" crossorigin="true"></script>
+```
+
+Or use npm for programmatic access:
+
+```bash
+npm install page-agent
+```
+
+```javascript
+import { PageAgent } from 'page-agent'
+
+const agent = new PageAgent({
+    model: 'qwen3.5-plus',
+    baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    apiKey: 'YOUR_API_KEY',
+    language: 'en-US',
+})
+
+await agent.execute('Click the login button')
+```
+
+**Common first-run issues:**
+- If the extension doesn't respond, check that your browser has service workers enabled
+- If API calls fail, verify your API key is valid and has appropriate permissions
+- For Chinese users, use the npmmirror CDN: `https://registry.npmmirror.com/page-agent/1.8.2/files/dist/iife/page-agent.demo.js`
+
 ## 🤝 How to Contribute
 
 > **[Maintainer's Note](https://github.com/alibaba/page-agent/issues/349)**
