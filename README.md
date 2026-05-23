@@ -76,6 +76,27 @@ await agent.execute('Click the login button')
 
 For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/docs/introduction/overview).
 
+## Troubleshooting
+
+**Extension not responding?**
+- Check the browser console (F12) for error messages
+- Reload the extension: go to `chrome://extensions/`, find PageAgent, click reload
+- Make sure you have at least one LLM provider configured
+
+**PageAgent doesn't click elements correctly?**
+- Ensure the page has loaded fully before running commands
+- Some single-page apps may require additional wait time
+- Try using more specific instructions like "Click the red submit button in the form"
+
+**Missing API key errors?**
+- PageAgent needs a valid LLM API key to work
+- Set `apiKey` in your PageAgent configuration
+- For Alibaba models, use `baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1'`
+
+**Chrome extension issues?**
+- After installation, refresh any open tabs to activate the extension
+- The extension icon should turn blue when active
+
 ## 🌟 Awesome Page Agent
 
 Built something cool with PageAgent? Add it here! Open a PR to share your project.
