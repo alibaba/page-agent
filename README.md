@@ -61,6 +61,18 @@ Add `?autoInit=false` to load the script without creating the demo agent automat
 npm install page-agent
 ```
 
+For monorepo contributors, install and build from source:
+
+```bash
+git clone https://github.com/alibaba/page-agent.git
+cd page-agent
+npm install
+npm run build
+```
+
+### Basic Usage Examples
+
+**Browser Extension (recommended for multi-page tasks)**
 ```javascript
 import { PageAgent } from 'page-agent'
 
@@ -68,10 +80,18 @@ const agent = new PageAgent({
     model: 'qwen3.5-plus',
     baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     apiKey: 'YOUR_API_KEY',
-    language: 'en-US',
 })
 
 await agent.execute('Click the login button')
+```
+
+**Standalone (client-side only, no extension)**
+```javascript
+// Use directly in browser - everything runs in-page
+import { PageAgent } from 'page-agent'
+
+const agent = new PageAgent({ apiKey: 'your-key' })
+await agent.execute('Fill in the contact form')
 ```
 
 For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/docs/introduction/overview).
