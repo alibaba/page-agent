@@ -61,6 +61,15 @@ Add `?autoInit=false` to load the script without creating the demo agent automat
 npm install page-agent
 ```
 
+For monorepo contributors, install and build from source:
+
+```bash
+git clone https://github.com/alibaba/page-agent.git
+cd page-agent
+npm install
+npm run build
+```
+
 ```javascript
 import { PageAgent } from 'page-agent'
 
