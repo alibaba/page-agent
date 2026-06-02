@@ -22,7 +22,7 @@
     },
     "homepage": "https://alibaba.github.io/page-agent/",
     "engines": {
-        "node": "^22.13.0 || >=24",
+        "node": "^22.22.1 || >=24",
         "npm": "^11.6.3"
     },
     "scripts": {
