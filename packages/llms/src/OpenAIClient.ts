@@ -25,6 +25,8 @@ export class OpenAIClient implements LLMClient {
 		abortSignal?: AbortSignal,
 		options?: InvokeOptions
 	): Promise<InvokeResult> {
+		abortSignal?.throwIfAborted()
+
 		// 1. Convert tools to OpenAI format
 		const openaiTools = Object.entries(tools).map(([name, t]) => zodToOpenAITool(name, t))
 
@@ -70,17 +72,20 @@ export class OpenAIClient implements LLMClient {
 				signal: abortSignal,
 			})
 		} catch (error: unknown) {
-			const isAbortError = (error as any)?.name === 'AbortError'
-			const errorMessage = isAbortError ? 'Network request aborted' : 'Network request failed'
-			if (!isAbortError) console.error(error)
-			throw new InvokeError(InvokeErrorTypes.NETWORK_ERROR, errorMessage, error)
+			if ((error as any)?.name === 'AbortError') throw error
+			console.error(error)
+			throw new InvokeError(InvokeErrorTypes.NETWORK_ERROR, 'Network request failed', error)
 		}
 
 		// 3. Handle HTTP errors
 		if (!response.ok) {
-			const errorData = await response.json().catch()
-			const errorMessage =
-				(errorData as { error?: { message?: string } }).error?.message || response.statusText
+			let errorData: any
+			try {
+				errorData = await response.json()
+			} catch (error) {
+				if ((error as any)?.name === 'AbortError') throw error
+			}
+			const errorMessage = errorData?.error?.message || response.statusText
 
 			if (response.status === 401 || response.status === 403) {
 				throw new InvokeError(
@@ -111,11 +116,21 @@ export class OpenAIClient implements LLMClient {
 		}
 
 		// 4. Parse and validate response
-		const data = await response.json()
+		let data: any
+		try {
+			data = await response.json()
+		} catch (error) {
+			if ((error as any)?.name === 'AbortError') throw error
+			throw new InvokeError(
+				InvokeErrorTypes.INVALID_RESPONSE,
+				'Response body is not valid JSON',
+				error
+			)
+		}
 
 		const choice = data.choices?.[0]
 		if (!choice) {
-			throw new InvokeError(InvokeErrorTypes.UNKNOWN, 'No choices in response', data)
+			throw new InvokeError(InvokeErrorTypes.INVALID_SCHEMA, 'No choices in response', data)
 		}
 
 		// Check finish_reason
@@ -140,7 +155,7 @@ export class OpenAIClient implements LLMClient {
 				)
 			default:
 				throw new InvokeError(
-					InvokeErrorTypes.UNKNOWN,
+					InvokeErrorTypes.INVALID_SCHEMA,
 					`Unexpected finish_reason: ${choice.finish_reason}`,
 					undefined,
 					data
@@ -212,11 +227,12 @@ export class OpenAIClient implements LLMClient {
 		let toolResult: unknown
 		try {
 			toolResult = await tool.execute(toolInput)
-		} catch (e) {
+		} catch (error: unknown) {
+			if ((error as any)?.name === 'AbortError') throw error
 			throw new InvokeError(
 				InvokeErrorTypes.TOOL_EXECUTION_ERROR,
-				`Tool execution failed: ${(e as Error).message}`,
-				e,
+				`Tool execution failed: ${(error as Error)?.message}`,
+				error,
 				data
 			)
 		}
