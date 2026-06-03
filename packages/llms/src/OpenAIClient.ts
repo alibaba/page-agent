@@ -25,6 +25,9 @@ export class OpenAIClient implements LLMClient {
 		abortSignal?: AbortSignal,
 		options?: InvokeOptions
 	): Promise<InvokeResult> {
+		// in case user aborted before invoking
+		if (abortSignal?.aborted) throw new InvokeError(InvokeErrorTypes.ABORTED, 'Aborted')
+
 		// 1. Convert tools to OpenAI format
 		const openaiTools = Object.entries(tools).map(([name, t]) => zodToOpenAITool(name, t))
 
@@ -70,10 +73,11 @@ export class OpenAIClient implements LLMClient {
 				signal: abortSignal,
 			})
 		} catch (error: unknown) {
-			const isAbortError = (error as any)?.name === 'AbortError'
-			const errorMessage = isAbortError ? 'Network request aborted' : 'Network request failed'
-			if (!isAbortError) console.error(error)
-			throw new InvokeError(InvokeErrorTypes.NETWORK_ERROR, errorMessage, error)
+			if ((error as any)?.name === 'AbortError') {
+				throw new InvokeError(InvokeErrorTypes.ABORTED, 'Aborted', error)
+			}
+			console.error(error)
+			throw new InvokeError(InvokeErrorTypes.NETWORK_ERROR, 'Network request failed', error)
 		}
 
 		// 3. Handle HTTP errors
@@ -212,11 +216,14 @@ export class OpenAIClient implements LLMClient {
 		let toolResult: unknown
 		try {
 			toolResult = await tool.execute(toolInput)
-		} catch (e) {
+		} catch (error: unknown) {
+			if ((error as any)?.name === 'AbortError') {
+				throw new InvokeError(InvokeErrorTypes.ABORTED, 'Aborted', error)
+			}
 			throw new InvokeError(
 				InvokeErrorTypes.TOOL_EXECUTION_ERROR,
-				`Tool execution failed: ${(e as Error).message}`,
-				e,
+				`Tool execution failed: ${(error as Error)?.message}`,
+				error,
 				data
 			)
 		}

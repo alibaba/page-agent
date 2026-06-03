@@ -50,65 +50,42 @@ export class LLM extends EventTarget {
 		abortSignal: AbortSignal,
 		options?: InvokeOptions
 	): Promise<InvokeResult> {
-		return await withRetry(
-			async () => {
-				// in case user aborted before invoking
-				if (abortSignal.aborted) throw new Error('AbortError')
-
-				const result = await this.client.invoke(messages, tools, abortSignal, options)
-
-				return result
+		return await withRetry(async () => this.client.invoke(messages, tools, abortSignal, options), {
+			maxRetries: this.config.maxRetries,
+			onRetry: (attempt, lastError) => {
+				this.dispatchEvent(
+					new CustomEvent('retry', {
+						detail: { attempt, maxAttempts: this.config.maxRetries, lastError },
+					})
+				)
 			},
-			// retry settings
-			{
-				maxRetries: this.config.maxRetries,
-				onRetry: (attempt: number) => {
-					this.dispatchEvent(
-						new CustomEvent('retry', { detail: { attempt, maxAttempts: this.config.maxRetries } })
-					)
-				},
-				onError: (error: Error) => {
-					this.dispatchEvent(new CustomEvent('error', { detail: { error } }))
-				},
-			}
-		)
+		})
 	}
 }
 
+/**
+ * Retry a function until it succeeds or reaches the maximum number of retries.
+ */
 async function withRetry<T>(
 	fn: () => Promise<T>,
 	settings: {
 		maxRetries: number
-		onRetry: (attempt: number) => void
-		onError: (error: Error) => void
+		onRetry: (attempt: number, lastError: Error) => void
 	}
 ): Promise<T> {
 	let attempt = 0
-	let lastError: Error | null = null
-	while (attempt <= settings.maxRetries) {
-		if (attempt > 0) {
-			settings.onRetry(attempt)
-			await new Promise((resolve) => setTimeout(resolve, 100))
-		}
-
+	while (true) {
 		try {
 			return await fn()
 		} catch (error: unknown) {
-			// do not retry if aborted by user
-			if ((error as any)?.rawError?.name === 'AbortError') throw error
-
-			console.error(error)
-			settings.onError(error as Error)
-
-			// do not retry if error is not retryable (InvokeError)
 			if (error instanceof InvokeError && !error.retryable) throw error
-
-			lastError = error as Error
 			attempt++
+			if (attempt > settings.maxRetries) throw error
+
+			console.debug('[LLM] retryable failure, will retry:', error)
+			settings.onRetry(attempt, error as Error)
 
 			await new Promise((resolve) => setTimeout(resolve, 100))
 		}
 	}
-
-	throw lastError!
 }

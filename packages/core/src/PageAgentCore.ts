@@ -103,29 +103,19 @@ export class PageAgentCore extends EventTarget {
 		this.tools = new Map(tools)
 		this.pageController = config.pageController
 
-		// Listen to LLM retry events
 		this.#llm.addEventListener('retry', (e) => {
-			const { attempt, maxAttempts } = (e as CustomEvent).detail
+			const { attempt, maxAttempts, lastError } = (e as CustomEvent).detail
 			this.#emitActivity({ type: 'retrying', attempt, maxAttempts })
-			// Also push to history for panel rendering
+			this.history.push({
+				type: 'error',
+				message: String(lastError),
+				rawResponse: (lastError as InvokeError).rawResponse,
+			})
 			this.history.push({
 				type: 'retry',
 				message: `LLM retry attempt ${attempt} of ${maxAttempts}`,
 				attempt,
 				maxAttempts,
-			})
-			this.#emitHistoryChange()
-		})
-		this.#llm.addEventListener('error', (e) => {
-			const error = (e as CustomEvent).detail.error as Error | InvokeError
-			if ((error as any)?.rawError?.name === 'AbortError') return
-			const message = String(error)
-			this.#emitActivity({ type: 'error', message })
-			// Also push to history for panel rendering
-			this.history.push({
-				type: 'error',
-				message,
-				rawResponse: (error as InvokeError).rawResponse,
 			})
 			this.#emitHistoryChange()
 		})
@@ -312,9 +302,9 @@ export class PageAgentCore extends EventTarget {
 				}
 			} catch (error: unknown) {
 				console.groupEnd() // to prevent nested groups
-				const isAbortError = (error as any)?.rawError?.name === 'AbortError'
+				const isAbortError = (error as any)?.name === 'AbortError'
 
-				console.error('Task failed', error)
+				if (!isAbortError) console.error('Task failed', error)
 				const errorMessage = isAbortError ? 'Task stopped' : String(error)
 				this.#emitActivity({ type: 'error', message: errorMessage })
 				this.history.push({ type: 'error', message: errorMessage, rawResponse: error })
@@ -378,8 +368,8 @@ export class PageAgentCore extends EventTarget {
 			description: 'You MUST call this tool every step!',
 			inputSchema: macroToolSchema as z.ZodType<MacroToolInput>,
 			execute: async (input: MacroToolInput): Promise<MacroToolResult> => {
-				// abort
-				if (this.#abortController.signal.aborted) throw new Error('AbortError')
+				// abort — throws DOMException whose .name === 'AbortError'
+				this.#abortController.signal.throwIfAborted()
 
 				console.log(chalk.blue.bold('MacroTool input'), input)
 				const action = input.action

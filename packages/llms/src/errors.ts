@@ -14,6 +14,7 @@ export const InvokeErrorTypes = {
 	UNKNOWN: 'unknown',
 
 	// Non-retryable
+	ABORTED: 'aborted', // User aborted via AbortSignal — instance has name='AbortError'
 	CONFIG_ERROR: 'config_error', // Invalid local configuration or hook
 	AUTH_ERROR: 'auth_error', // Authentication failed
 	CONTEXT_LENGTH: 'context_length', // Prompt too long
@@ -21,6 +22,16 @@ export const InvokeErrorTypes = {
 } as const
 
 type InvokeErrorType = (typeof InvokeErrorTypes)[keyof typeof InvokeErrorTypes]
+
+const RETRYABLE_TYPES: readonly InvokeErrorType[] = [
+	InvokeErrorTypes.NETWORK_ERROR,
+	InvokeErrorTypes.RATE_LIMIT,
+	InvokeErrorTypes.SERVER_ERROR,
+	InvokeErrorTypes.NO_TOOL_CALL,
+	InvokeErrorTypes.INVALID_TOOL_ARGS,
+	InvokeErrorTypes.TOOL_EXECUTION_ERROR,
+	InvokeErrorTypes.UNKNOWN,
+]
 
 export class InvokeError extends Error {
 	type: InvokeErrorType
@@ -33,26 +44,12 @@ export class InvokeError extends Error {
 
 	constructor(type: InvokeErrorType, message: string, rawError?: unknown, rawResponse?: unknown) {
 		super(message)
-		this.name = 'InvokeError'
+		// ABORTED conforms to the web platform convention so any consumer using
+		// `err.name === 'AbortError'` (including native DOMException handlers) Just Works.
+		this.name = type === InvokeErrorTypes.ABORTED ? 'AbortError' : 'InvokeError'
 		this.type = type
-		this.retryable = this.isRetryable(type, rawError)
+		this.retryable = RETRYABLE_TYPES.includes(type)
 		this.rawError = rawError
 		this.rawResponse = rawResponse
-	}
-
-	private isRetryable(type: InvokeErrorType, rawError?: unknown): boolean {
-		const isAbortError = (rawError as any)?.name === 'AbortError'
-		if (isAbortError) return false
-
-		const retryableTypes: InvokeErrorType[] = [
-			InvokeErrorTypes.NETWORK_ERROR,
-			InvokeErrorTypes.RATE_LIMIT,
-			InvokeErrorTypes.SERVER_ERROR,
-			InvokeErrorTypes.NO_TOOL_CALL,
-			InvokeErrorTypes.INVALID_TOOL_ARGS,
-			InvokeErrorTypes.TOOL_EXECUTION_ERROR,
-			InvokeErrorTypes.UNKNOWN,
-		]
-		return retryableTypes.includes(type)
 	}
 }
