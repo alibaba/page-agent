@@ -356,8 +356,8 @@ const result = await agent.execute('Fill in the form with test data')`}
 							name: 'onAskUser',
 							type: '(question: string) => Promise<string>',
 							description: isZh
-								? 'Agent 需要用户输入时的回调。未设置则禁用 ask_user 工具。'
-								: 'Callback when agent needs user input. If not set, ask_user tool is disabled.',
+								? '当 agent 需要向用户提问时调用。未设置则禁用 `ask_user` 工具。'
+								: 'Called when the agent needs to ask the user questions. If unset, the `ask_user` tool will be disabled.',
 						},
 					]}
 				/>
