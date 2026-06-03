@@ -66,7 +66,13 @@
         "vite-plugin-css-injected-by-js": "^5.0.1"
     },
     "overrides": {
-        "typescript": "^6.0.3"
+        "typescript": "^6.0.3",
+        "node-notifier": {
+            "uuid": "11.1.1"
+        },
+        "web-ext-run": {
+            "tmp": "0.2.7"
+        }
     },
     "lint-staged": {
         "*.{js,ts,cjs,cts,mjs,mts}": [
