@@ -79,9 +79,13 @@ export class OpenAIClient implements LLMClient {
 
 		// 3. Handle HTTP errors
 		if (!response.ok) {
-			const errorData = await response.json().catch()
-			const errorMessage =
-				(errorData as { error?: { message?: string } }).error?.message || response.statusText
+			let errorData: any
+			try {
+				errorData = await response.json()
+			} catch (error) {
+				if ((error as any)?.name === 'AbortError') throw error
+			}
+			const errorMessage = errorData?.error?.message || response.statusText
 
 			if (response.status === 401 || response.status === 403) {
 				throw new InvokeError(
@@ -116,6 +120,7 @@ export class OpenAIClient implements LLMClient {
 		try {
 			data = await response.json()
 		} catch (error) {
+			if ((error as any)?.name === 'AbortError') throw error
 			throw new InvokeError(
 				InvokeErrorTypes.INVALID_RESPONSE,
 				'Response body is not valid JSON',
