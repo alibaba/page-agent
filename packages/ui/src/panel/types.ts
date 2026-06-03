@@ -60,7 +60,8 @@ export interface PanelAgentAdapter extends EventTarget {
 	readonly task: string
 
 	/**
-	 * Callback for when agent needs user input.
+	 * Called when the agent needs to ask the user questions.
+	 * If unset, the `ask_user` tool will be disabled.
 	 * Panel will set this to handle user questions via its UI.
 	 */
 	onAskUser?: (question: string) => Promise<string>

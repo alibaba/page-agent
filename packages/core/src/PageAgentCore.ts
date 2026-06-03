@@ -73,8 +73,8 @@ export class PageAgentCore extends EventTarget {
 	disposed = false
 
 	/**
-	 * Callback for when agent needs user input (ask_user tool)
-	 * If not set, ask_user tool will be disabled
+	 * Called when the agent needs to ask the user questions.
+	 * If unset, the `ask_user` tool will be disabled.
 	 * @example onAskUser: (q) => window.prompt(q) || ''
 	 */
 	onAskUser?: (question: string) => Promise<string>
