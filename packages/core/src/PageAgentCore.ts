@@ -368,7 +368,6 @@ export class PageAgentCore extends EventTarget {
 			description: 'You MUST call this tool every step!',
 			inputSchema: macroToolSchema as z.ZodType<MacroToolInput>,
 			execute: async (input: MacroToolInput): Promise<MacroToolResult> => {
-				// abort — throws DOMException whose .name === 'AbortError'
 				this.#abortController.signal.throwIfAborted()
 
 				console.log(chalk.blue.bold('MacroTool input'), input)

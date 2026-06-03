@@ -78,6 +78,7 @@ async function withRetry<T>(
 		try {
 			return await fn()
 		} catch (error: unknown) {
+			if ((error as any)?.name === 'AbortError') throw error
 			if (error instanceof InvokeError && !error.retryable) throw error
 			attempt++
 			if (attempt > settings.maxRetries) throw error

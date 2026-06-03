@@ -1,5 +1,5 @@
 /**
- * Error types and error handling for LLM invocations
+ * Error types and error handling for LLM invocations.
  */
 
 export const InvokeErrorTypes = {
@@ -14,7 +14,6 @@ export const InvokeErrorTypes = {
 	UNKNOWN: 'unknown',
 
 	// Non-retryable
-	ABORTED: 'aborted', // User aborted via AbortSignal — instance has name='AbortError'
 	CONFIG_ERROR: 'config_error', // Invalid local configuration or hook
 	AUTH_ERROR: 'auth_error', // Authentication failed
 	CONTEXT_LENGTH: 'context_length', // Prompt too long
@@ -44,9 +43,7 @@ export class InvokeError extends Error {
 
 	constructor(type: InvokeErrorType, message: string, rawError?: unknown, rawResponse?: unknown) {
 		super(message)
-		// ABORTED conforms to the web platform convention so any consumer using
-		// `err.name === 'AbortError'` (including native DOMException handlers) Just Works.
-		this.name = type === InvokeErrorTypes.ABORTED ? 'AbortError' : 'InvokeError'
+		this.name = 'InvokeError'
 		this.type = type
 		this.retryable = RETRYABLE_TYPES.includes(type)
 		this.rawError = rawError
