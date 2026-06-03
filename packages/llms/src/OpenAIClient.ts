@@ -112,11 +112,20 @@ export class OpenAIClient implements LLMClient {
 		}
 
 		// 4. Parse and validate response
-		const data = await response.json()
+		let data: any
+		try {
+			data = await response.json()
+		} catch (error) {
+			throw new InvokeError(
+				InvokeErrorTypes.INVALID_RESPONSE,
+				'Response body is not valid JSON',
+				error
+			)
+		}
 
 		const choice = data.choices?.[0]
 		if (!choice) {
-			throw new InvokeError(InvokeErrorTypes.UNKNOWN, 'No choices in response', data)
+			throw new InvokeError(InvokeErrorTypes.INVALID_SCHEMA, 'No choices in response', data)
 		}
 
 		// Check finish_reason
@@ -141,7 +150,7 @@ export class OpenAIClient implements LLMClient {
 				)
 			default:
 				throw new InvokeError(
-					InvokeErrorTypes.UNKNOWN,
+					InvokeErrorTypes.INVALID_SCHEMA,
 					`Unexpected finish_reason: ${choice.finish_reason}`,
 					undefined,
 					data

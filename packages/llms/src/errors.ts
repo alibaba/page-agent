@@ -10,6 +10,8 @@ export const InvokeErrorTypes = {
 	NO_TOOL_CALL: 'no_tool_call', // Model did not call tool
 	INVALID_TOOL_ARGS: 'invalid_tool_args', // Tool args don't match schema
 	TOOL_EXECUTION_ERROR: 'tool_execution_error', // Tool execution error
+	INVALID_RESPONSE: 'invalid_response', // Response body is not valid JSON
+	INVALID_SCHEMA: 'invalid_schema', // Response is valid JSON but doesn't match expected shape
 
 	UNKNOWN: 'unknown',
 
@@ -29,6 +31,8 @@ const RETRYABLE_TYPES: readonly InvokeErrorType[] = [
 	InvokeErrorTypes.NO_TOOL_CALL,
 	InvokeErrorTypes.INVALID_TOOL_ARGS,
 	InvokeErrorTypes.TOOL_EXECUTION_ERROR,
+	InvokeErrorTypes.INVALID_RESPONSE,
+	InvokeErrorTypes.INVALID_SCHEMA,
 	InvokeErrorTypes.UNKNOWN,
 ]
 
