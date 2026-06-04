@@ -131,7 +131,7 @@ const pageInfo = await this.pageController.getPageInfo()
 - **Framework**: Vitest (unit tests only for now; future E2E goes to `packages/e2e/` with Playwright)
 - **Location**: co-located, `src/foo.test.ts` next to `src/foo.ts`
 - **Coverage today**: `packages/llms` only — other packages will follow incrementally
-- **Adding tests to a new package**: create `vitest.config.ts` in the package and add a `"test": "vitest run"` script. `scripts/test.js` auto-discovers and `node scripts/ci.js` picks it up — no further wiring needed.
+- **Adding tests to a new package**: create `vitest.config.ts` in the package and add a `"test": "vitest run"` script. Root `npm test` and `node scripts/ci.js` pick it up through npm workspaces.
 - **Template**: See @page-agent/llms
 
 ```bash
