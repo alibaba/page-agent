@@ -36,6 +36,7 @@
         "version": "node scripts/sync-version.js",
         "postpublish": "npm run postpublish --workspaces --if-present",
         "typecheck": "tsc --noEmit -p tsconfig.typecheck.json && tsc --noEmit -p packages/extension/tsconfig.json",
+        "test": "npm test --workspaces --if-present",
         "lint": "eslint .",
         "ci": "node scripts/ci.js",
         "cleanup": "rm -rf packages/*/dist && rm -rf packages/*/.output",
@@ -63,7 +64,8 @@
         "typescript-eslint": "^8.60.0",
         "unplugin-dts": "^1.0.1",
         "vite": "^8.0.14",
-        "vite-plugin-css-injected-by-js": "^5.0.1"
+        "vite-plugin-css-injected-by-js": "^5.0.1",
+        "vitest": "^4.1.8"
     },
     "overrides": {
         "typescript": "^6.0.3",
