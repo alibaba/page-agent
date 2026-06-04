@@ -36,13 +36,14 @@ if (isMainBranch()) {
 	run('commitlint', `npx commitlint --from ${from} --to HEAD`)
 }
 
-// 2. Lint + Format + Typecheck in parallel
-console.log(chalk.bgBlue.white.bold(' ▸ lint + format + typecheck '))
+// 2. Lint + Format + Typecheck + Test in parallel
+console.log(chalk.bgBlue.white.bold(' ▸ lint + format + typecheck + test '))
 await parallelTask(
 	[
 		{ label: 'lint', command: 'npm run lint' },
 		{ label: 'format', command: 'npx prettier --check .' },
 		{ label: 'typecheck', command: 'npm run typecheck' },
+		{ label: 'test', command: 'npm test' },
 	],
 	{ timeoutMs: 120_000 }
 )

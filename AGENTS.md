@@ -23,6 +23,7 @@ npm run build                  # Build all packages
 npm run build:libs             # Build all libraries
 npm run build:ext              # Build and zip the extension package
 npm run typecheck              # Typecheck all packages
+npm run test                   # Run unit tests across all workspaces
 npm run lint                   # ESLint
 ```
 
@@ -124,6 +125,20 @@ const pageInfo = await this.pageController.getPageInfo()
 1. Add implementation in `packages/page-controller/src/actions.ts`
 2. Expose via async method in `PageController.ts`
 3. Export from `packages/page-controller/src/index.ts`
+
+## Testing
+
+- **Framework**: Vitest (unit tests only for now; future E2E goes to `packages/e2e/` with Playwright)
+- **Location**: co-located, `src/foo.test.ts` next to `src/foo.ts`
+- **Coverage today**: `packages/llms` only — other packages will follow incrementally
+- **Adding tests to a new package**: create `vitest.config.ts` in the package and add a `"test": "vitest run"` script. `scripts/test.js` auto-discovers and `node scripts/ci.js` picks it up — no further wiring needed.
+- **Template**: See @page-agent/llms
+
+```bash
+npm test                            # all packages with a test script
+npm test -w @page-agent/llms        # single package
+cd packages/llms && npx vitest      # watch mode in one package
+```
 
 ## Code Standards
 
