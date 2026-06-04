@@ -13,6 +13,8 @@ export default defineConfig({
 	clearScreen: false,
 	plugins: [
 		dts({
+			include: ['src/**/*.ts'],
+			exclude: ['src/**/*.test.ts'],
 			bundleTypes: true,
 			compilerOptions: {
 				composite: true,
