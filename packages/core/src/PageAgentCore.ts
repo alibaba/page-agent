@@ -21,7 +21,7 @@ import type {
 	MacroToolInput,
 	MacroToolResult,
 } from './types'
-import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
+import { assert, fetchLlmsTxt, normalizeResponse, onAbortTimeout, uid, waitFor } from './utils'
 
 export { tool, type PageAgentTool } from './tools'
 export type * from './types'
@@ -75,12 +75,20 @@ export class PageAgentCore extends EventTarget {
 	/**
 	 * Called when the agent needs to ask the user questions.
 	 * If unset, the `ask_user` tool will be disabled.
+	 * The optional `signal` aborts when the task is stopped or disposed —
+	 * implementations should reject the promise when it fires.
 	 * @example onAskUser: (q) => window.prompt(q) || ''
 	 */
-	onAskUser?: (question: string) => Promise<string>
+	onAskUser?: (question: string, options?: { signal: AbortSignal }) => Promise<string>
 
 	#status: AgentStatus = 'idle'
 	#llm: LLM
+	/**
+	 * Task cancellation primitive: its signal reaches the LLM fetch, tools
+	 * (via `ctx.signal`) and async callbacks. Aborted only by `stop`/`dispose`
+	 * (during a task) or task setup, always WITHOUT a reason so `signal.reason`
+	 * stays a standard `AbortError`. Never abort as a cleanup/error shortcut.
+	 */
 	#abortController = new AbortController()
 	#observations: string[] = []
 
@@ -138,6 +146,11 @@ export class PageAgentCore extends EventTarget {
 	/** Get current agent status */
 	get status(): AgentStatus {
 		return this.#status
+	}
+
+	/** Abort signal for the current task. Tools get it via `ctx.signal`. */
+	get abortSignal(): AbortSignal {
+		return this.#abortController.signal
 	}
 
 	/** Emit statuschange event */
@@ -302,7 +315,8 @@ export class PageAgentCore extends EventTarget {
 				}
 			} catch (error: unknown) {
 				console.groupEnd() // to prevent nested groups
-				const isAbortError = (error as any)?.name === 'AbortError'
+				// Canonical abort check, independent of how the error was wrapped.
+				const isAbortError = this.#abortController.signal.aborted
 
 				if (!isAbortError) console.error('Task failed', error)
 				const errorMessage = isAbortError ? 'Task stopped' : String(error)
@@ -400,8 +414,24 @@ export class PageAgentCore extends EventTarget {
 
 				const startTime = Date.now()
 
-				// Execute tool, bind `this` to PageAgent
-				const result = await tool.execute.bind(this)(toolInput)
+				// Run the tool with `this` = agent and the abort signal exposed.
+				// The deadline warning surfaces tools that ignore the signal
+				// without unblocking the loop, keeping the bug visible.
+				const signal = this.#abortController.signal
+				const unsubscribe = onAbortTimeout(signal, 3000, () => {
+					console.warn(
+						`[PageAgent] Tool "${toolName}" did not respond to abort signal within 3s. ` +
+							`Tools MUST honor ctx.signal for proper cancellation. ` +
+							`See: https://page-agent.dev/docs/custom-tools#abort`
+					)
+				})
+
+				let result: string
+				try {
+					result = await tool.execute.bind(this)(toolInput, { signal })
+				} finally {
+					unsubscribe()
+				}
 
 				const duration = Date.now() - startTime
 				console.log(chalk.green.bold(`Tool (${toolName}) executed for ${duration}ms`), result)

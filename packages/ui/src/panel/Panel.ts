@@ -68,7 +68,7 @@ export class Panel {
 		this.#i18n = new I18n(config.language ?? 'en-US')
 
 		// Set up askUser callback on agent
-		this.#agent.onAskUser = (question) => this.#askUser(question)
+		this.#agent.onAskUser = (question, options) => this.#askUser(question, options?.signal)
 
 		// Create UI elements
 		this.#wrapper = this.#createWrapper()
@@ -169,10 +169,12 @@ export class Panel {
 	}
 
 	/**
-	 * Ask for user input (internal, called by agent via onAskUser)
+	 * Ask for user input (internal, called by agent via onAskUser).
+	 * Rejects when `signal` aborts (task stopped or disposed), cleaning up the
+	 * question card and pending state so the agent loop can settle.
 	 */
-	#askUser(question: string): Promise<string> {
-		return new Promise((resolve) => {
+	#askUser(question: string, signal?: AbortSignal): Promise<string> {
+		return new Promise((resolve, reject) => {
 			// Set `waiting for user answer` state
 			this.#isWaitingForUserAnswer = true
 			this.#userAnswerResolver = resolve
@@ -195,6 +197,27 @@ export class Panel {
 			this.#scrollToBottom()
 
 			this.#showInputArea(this.#i18n.t('ui.panel.userAnswerPrompt'))
+
+			signal?.addEventListener(
+				'abort',
+				() => {
+					this.#removeTempCards()
+					this.#isWaitingForUserAnswer = false
+					this.#userAnswerResolver = null
+					// reason is a DOMException AbortError (abort() takes no args).
+					reject(signal.reason as DOMException)
+				},
+				{ once: true }
+			)
+		})
+	}
+
+	/** Remove temporary question cards (only direct children for safety) */
+	#removeTempCards(): void {
+		Array.from(this.#historySection.children).forEach((child) => {
+			if (child.getAttribute('data-temp-card') === 'true') {
+				child.remove()
+			}
 		})
 	}
 
@@ -307,12 +330,7 @@ export class Panel {
 	 * Handle user answer
 	 */
 	#handleUserAnswer(input: string): void {
-		// Remove temporary question cards (only direct children for safety)
-		Array.from(this.#historySection.children).forEach((child) => {
-			if (child.getAttribute('data-temp-card') === 'true') {
-				child.remove()
-			}
-		})
+		this.#removeTempCards()
 
 		// Reset state
 		this.#isWaitingForUserAnswer = false
