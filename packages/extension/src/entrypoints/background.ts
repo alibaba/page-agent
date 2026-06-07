@@ -1,8 +1,26 @@
 import { handlePageControlMessage } from '@/agent/RemotePageController.background'
 import { handleTabControlMessage, setupTabEventsPort } from '@/agent/TabsController.background'
 
+const KEEP_ALIVE_ALARM = 'keepAlive'
+
 export default defineBackground(() => {
 	console.log('[Background] Service Worker started')
+
+	// Recreate the keepalive alarm on install/update — Chrome clears alarms on extension update,
+	// which is exactly when the SW goes AWOL (issue #452).
+	chrome.runtime.onInstalled.addListener(() => {
+		chrome.alarms.create(KEEP_ALIVE_ALARM, { periodInMinutes: 1 })
+	})
+
+	// Ensure the alarm exists even if the SW restarted without an install event
+	chrome.alarms.get(KEEP_ALIVE_ALARM).then((alarm) => {
+		if (!alarm) chrome.alarms.create(KEEP_ALIVE_ALARM, { periodInMinutes: 1 })
+	})
+
+	// Alarm handler: waking up is enough — Chrome won't let the SW sleep mid-alarm
+	chrome.alarms.onAlarm.addListener((alarm) => {
+		if (alarm.name === KEEP_ALIVE_ALARM) console.debug('[Background] keepAlive tick')
+	})
 
 	// tab change events
 
