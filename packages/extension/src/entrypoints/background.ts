@@ -9,12 +9,12 @@ export default defineBackground(() => {
 	// Recreate the keepalive alarm on install/update — Chrome clears alarms on extension update,
 	// which is exactly when the SW goes AWOL (issue #452).
 	chrome.runtime.onInstalled.addListener(() => {
-		chrome.alarms.create(KEEP_ALIVE_ALARM, { periodInMinutes: 1 })
+		chrome.alarms.create(KEEP_ALIVE_ALARM, { periodInMinutes: 0.5 })
 	})
 
 	// Ensure the alarm exists even if the SW restarted without an install event
 	chrome.alarms.get(KEEP_ALIVE_ALARM).then((alarm) => {
-		if (!alarm) chrome.alarms.create(KEEP_ALIVE_ALARM, { periodInMinutes: 1 })
+		if (!alarm) chrome.alarms.create(KEEP_ALIVE_ALARM, { periodInMinutes: 0.5 })
 	})
 
 	// Alarm handler: waking up is enough — Chrome won't let the SW sleep mid-alarm
