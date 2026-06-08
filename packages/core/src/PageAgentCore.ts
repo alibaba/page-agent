@@ -75,8 +75,7 @@ export class PageAgentCore extends EventTarget {
 	/**
 	 * Called when the agent needs to ask the user questions.
 	 * If unset, the `ask_user` tool will be disabled.
-	 * The optional `signal` aborts when the task is stopped or disposed —
-	 * implementations should reject the promise when it fires.
+	 * Implementations should reject the promise when `signal` aborts.
 	 * @example onAskUser: (q) => window.prompt(q) || ''
 	 */
 	onAskUser?: (question: string, options?: { signal: AbortSignal }) => Promise<string>
@@ -146,11 +145,6 @@ export class PageAgentCore extends EventTarget {
 	/** Get current agent status */
 	get status(): AgentStatus {
 		return this.#status
-	}
-
-	/** Abort signal for the current task. Tools get it via `ctx.signal`. */
-	get abortSignal(): AbortSignal {
-		return this.#abortController.signal
 	}
 
 	/** Emit statuschange event */
