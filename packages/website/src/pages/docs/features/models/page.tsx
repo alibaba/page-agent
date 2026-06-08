@@ -42,6 +42,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 	DeepSeek: ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-3.2'],
 	Google: ['gemini-3.1-flash-lite', 'gemini-3-pro', 'gemini-3-flash', 'gemini-2.5'],
 	Anthropic: [
+		'claude-opus-4.8',
 		'claude-opus-4.7',
 		'claude-opus-4.6',
 		'claude-opus-4.5',

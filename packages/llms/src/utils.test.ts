@@ -67,6 +67,18 @@ describe('modelPatch', () => {
 		expect(body).not.toHaveProperty('temperature')
 	})
 
+	it('claude-opus-4-8: drops temperature', () => {
+		const body = baseBody('claude-opus-4-8')
+		modelPatch(body)
+		expect(body).not.toHaveProperty('temperature')
+	})
+
+	it('claude-opus-48 (alt id form): drops temperature', () => {
+		const body = baseBody('claude-opus-48-20251210')
+		modelPatch(body)
+		expect(body).not.toHaveProperty('temperature')
+	})
+
 	it('grok: removes tool_choice and disables reasoning/thinking', () => {
 		const body = baseBody('grok-4')
 		modelPatch(body)

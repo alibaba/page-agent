@@ -56,8 +56,13 @@ export function modelPatch(body: Record<string, any>) {
 
 		// TODO: Claude naming pattern has changed
 		// needs proper handling
-		if (modelName.startsWith('claude-opus-4-7') || modelName.startsWith('claude-opus-47')) {
-			debug('Applying Claude-4.7 patch: remove temperature')
+		if (
+			modelName.startsWith('claude-opus-4-7') ||
+			modelName.startsWith('claude-opus-47') ||
+			modelName.startsWith('claude-opus-4-8') ||
+			modelName.startsWith('claude-opus-48')
+		) {
+			debug('Applying Claude-4.7/4.8 patch: remove temperature')
 			delete body.temperature
 		}
 	}
