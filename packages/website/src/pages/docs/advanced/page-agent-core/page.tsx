@@ -354,10 +354,10 @@ const result = await agent.execute('Fill in the form with test data')`}
 						},
 						{
 							name: 'onAskUser',
-							type: '(question: string) => Promise<string>',
+							type: '(question: string, options?: { signal: AbortSignal }) => Promise<string>',
 							description: isZh
-								? '当 agent 需要向用户提问时调用。未设置则禁用 `ask_user` 工具。'
-								: 'Called when the agent needs to ask the user questions. If unset, the `ask_user` tool will be disabled.',
+								? '当 agent 需要向用户提问时调用。未设置则禁用 `ask_user` 工具。实现应在 options.signal 触发 abort 时 reject promise。'
+								: 'Called when the agent needs to ask the user questions. If unset, the `ask_user` tool will be disabled. Implementations should reject the promise when options.signal aborts.',
 						},
 					]}
 				/>
@@ -373,8 +373,8 @@ const result = await agent.execute('Fill in the form with test data')`}
 							name: 'execute(task)',
 							type: 'Promise<ExecutionResult>',
 							description: isZh
-								? '执行任务并返回结果。包含 success、data 和 history 字段。'
-								: 'Execute a task and return result. Contains success, data, and history fields.',
+								? '执行任务并返回结果（包含 success、data 和 history 字段）。若已有任务在运行则抛出错误——不支持并发执行。'
+								: 'Execute a task and return result (contains success, data, and history fields). Throws if a task is already running — concurrent execution is not supported.',
 						},
 						{
 							name: 'stop()',

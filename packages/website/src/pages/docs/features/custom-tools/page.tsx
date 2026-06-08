@@ -38,8 +38,8 @@ import { z } from 'zod/v4'`}
 					</Heading>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
-							? '使用 tool() 辅助函数定义自定义工具，每个工具包含 description、inputSchema 和 execute 三个属性。'
-							: 'Use the tool() helper to define custom tools with description, inputSchema, and execute.'}
+							? '使用 tool() 辅助函数定义自定义工具，每个工具包含 description、inputSchema 和 execute 三个属性。异步工具必须 honor ctx.signal。'
+							: 'Use the tool() helper to define custom tools with description, inputSchema, and execute. Async tools must honor ctx.signal.'}
 					</p>
 
 					<CodeEditor
@@ -56,10 +56,11 @@ const pageAgent = new PageAgent({
         productId: z.string(),
         quantity: z.number().min(1).default(1),
       }),
-      execute: async function (input) {
+      execute: async function (input, { signal }) {
         await fetch('/api/cart', {
           method: 'POST',
           body: JSON.stringify(input),
+          signal, // honor cancellation
         })
         return \`Added \${input.quantity}x \${input.productId} to cart.\`
       },
@@ -72,9 +73,10 @@ const pageAgent = new PageAgent({
         query: z.string(),
         limit: z.number().max(10).default(3),
       }),
-      execute: async function (input) {
+      execute: async function (input, { signal }) {
         const res = await fetch(
-          \`/api/kb?q=\${encodeURIComponent(input.query)}&limit=\${input.limit}\`
+          \`/api/kb?q=\${encodeURIComponent(input.query)}&limit=\${input.limit}\`,
+          { signal }
         )
         const articles = await res.json()
         return JSON.stringify(articles)
