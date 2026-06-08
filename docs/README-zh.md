@@ -17,6 +17,16 @@
 
 ---
 
+<p align="center">
+  <a href="https://www.atlascloud.ai/?utm_source=github&utm_medium=link&utm_campaign=page-agent">
+    <img src="../assets/atlas-cloud-logo.png" alt="Atlas Cloud" width="200">
+  </a>
+</p>
+
+> 🎁 **[Atlas Cloud](https://www.atlascloud.ai/?utm_source=github&utm_medium=link&utm_campaign=page-agent)** 是全模态、OpenAI 兼容的 AI 推理平台（DeepSeek、Qwen、GLM、Kimi、MiniMax 等）。把 `baseURL` 指向 `https://api.atlascloud.ai/v1` 即可作为 Page Agent 的推理后端。
+
+---
+
 ## ✨ Features
 
 - **🎯 轻松集成**
@@ -67,6 +77,21 @@ const agent = new PageAgent({
     model: 'qwen3.5-plus',
     baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     apiKey: 'YOUR_API_KEY',
+    language: 'zh-CN',
+})
+
+await agent.execute('点击登录按钮')
+```
+
+或使用 **[Atlas Cloud](https://www.atlascloud.ai/?utm_source=github&utm_medium=link&utm_campaign=page-agent)**（OpenAI 兼容，含 DeepSeek、Qwen、GLM、Kimi、MiniMax 等 59+ 模型）：
+
+```javascript
+import { PageAgent } from 'page-agent'
+
+const agent = new PageAgent({
+    model: 'deepseek-ai/deepseek-v4-pro',
+    baseURL: 'https://api.atlascloud.ai/v1',
+    apiKey: 'YOUR_ATLASCLOUD_API_KEY',
     language: 'zh-CN',
 })
 

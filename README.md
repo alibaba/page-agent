@@ -17,6 +17,16 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ---
 
+<p align="center">
+  <a href="https://www.atlascloud.ai/?utm_source=github&utm_medium=link&utm_campaign=page-agent">
+    <img src="assets/atlas-cloud-logo.png" alt="Atlas Cloud" width="200">
+  </a>
+</p>
+
+> 🎁 **[Atlas Cloud](https://www.atlascloud.ai/?utm_source=github&utm_medium=link&utm_campaign=page-agent)** is a full-modal, OpenAI-compatible AI inference platform (DeepSeek, Qwen, GLM, Kimi, MiniMax, …). Use it as a drop-in backend for Page Agent by pointing `baseURL` at `https://api.atlascloud.ai/v1`.
+
+---
+
 ## ✨ Features
 
 - **🎯 Easy integration**
@@ -68,6 +78,21 @@ const agent = new PageAgent({
     model: 'qwen3.5-plus',
     baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     apiKey: 'YOUR_API_KEY',
+    language: 'en-US',
+})
+
+await agent.execute('Click the login button')
+```
+
+**Or use [Atlas Cloud](https://www.atlascloud.ai/?utm_source=github&utm_medium=link&utm_campaign=page-agent)** (OpenAI-compatible, 59+ LLMs including DeepSeek, Qwen, GLM, Kimi, MiniMax):
+
+```javascript
+import { PageAgent } from 'page-agent'
+
+const agent = new PageAgent({
+    model: 'deepseek-ai/deepseek-v4-pro',
+    baseURL: 'https://api.atlascloud.ai/v1',
+    apiKey: 'YOUR_ATLASCLOUD_API_KEY',
     language: 'en-US',
 })
 
