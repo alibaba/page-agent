@@ -9,7 +9,7 @@ const BASELINE = new Set([
 	'gpt-5.1',
 	'gpt-5.4-mini',
 	'claude-haiku-4.5',
-	'gemini-3.1-flash-lite',
+	'gemini-3.5-flash',
 	'deepseek-v4-flash',
 	'qwen3.5-plus',
 	'qwen3.5-flash',
@@ -18,6 +18,8 @@ const BASELINE = new Set([
 // Models grouped by brand, newest first
 const MODEL_GROUPS: Record<string, string[]> = {
 	Qwen: [
+		'qwen3.7-max',
+		'qwen3.7-plus',
 		'qwen3.6-max',
 		'qwen3.6-plus',
 		'qwen3.6-flash',
@@ -40,7 +42,13 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'gpt-4.1-mini',
 	],
 	DeepSeek: ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-3.2'],
-	Google: ['gemini-3.1-flash-lite', 'gemini-3-pro', 'gemini-3-flash', 'gemini-2.5'],
+	Google: [
+		'gemini-3.5-flash',
+		'gemini-3.1-flash-lite',
+		'gemini-3-pro',
+		'gemini-3-flash',
+		'gemini-2.5',
+	],
 	Anthropic: [
 		'claude-opus-4.8',
 		'claude-opus-4.7',
