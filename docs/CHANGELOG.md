@@ -5,6 +5,76 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.9.0] - 2026-06-08
+
+### Features
+
+- **Robust abort handling** - Rewrote the aborting system; sync tools, loop execution, and LLM clients now correctly respect task abort signals (`ctx.signal`). Also decoupled `AbortError` from `InvokeError` in `@page-agent/llms`.
+- **Claude Opus 4.8 support** - Added support for Claude Opus 4.8 model.
+
+### Improvements
+
+- **Concurrency guard** - Prevented concurrent `execute()` calls on a single PageAgent/Core instance to avoid race conditions.
+- **Model recommendations refresh** - Updated default and tested model list recommendations.
+- **Test coverage** - Added comprehensive Vitest unit tests for the `@page-agent/llms` package.
+- **Improved documentation** - Added website documentation for the `ctx.signal` abort contract and `execute()` concurrency rules.
+
+### Bug Fixes
+
+- **DTS bundle fix** - Fixed a packaging bug where global type declarations were incorrectly bundled into `.d.ts` outputs.
+- **Website sidebar fix** - Normalized trailing slashes in the website's sidebar location comparison.
+
+## [1.8.2] - 2026-05-11
+
+### Features
+
+- **IIFE demo control** - Added `showPanel` and `autoInit` switches to the IIFE CDN script to control whether the UI panel automatically displays or initializes on load.
+
+### Improvements
+
+- **Build toolchain modernization** - Upgraded build infrastructure to Vite 8.
+
+### Bug Fixes
+
+- **TypeScript `InvokeErrorType` fix** - Separated the value and type space for `InvokeErrorType` to resolve TypeScript compilation issues.
+- **Website chunking fix** - Restored working code-splitting with `manualChunks` for the documentation website.
+
+## [1.8.1] - 2026-04-27
+
+### Features
+
+- **GPT-5.4 & Qwen 3.6 support** - Added support for `gpt-5.4` and `qwen3.6-max/flash` in the recommended LLM list.
+- **Custom LLM request hook** - Added a `transformRequestBody` hook to allow custom modification of payloads before sending requests to LLM providers.
+
+### Improvements
+
+- **Accessibility (a11y) enhancements** - Added descriptive accessible labels to `ConfigPanel` input fields and icon buttons in compliance with WCAG 4.1.2.
+- **UI polish** - Improved `HistoryList` loading and empty states, and added helpful tooltips for actions.
+- **Prompt caching guidance** - Added website documentation for prompt caching optimization.
+- **Build speedups** - Added parallel build scripts to accelerate local development compilation.
+
+### Bug Fixes
+
+- **DeepSeek tool choice fix** - Disabled explicit `tool_choice` for DeepSeek models to avoid API compatibility errors.
+- **MCP version advertising** - MCP server now correctly advertises its package version.
+
+## [1.8.0] - 2026-04-15
+
+### Breaking Changes
+
+- **TypeScript 6 & ESLint 10 upgrade** - Major toolchain modernization. Upgraded the entire monorepo to TypeScript 6 and ESLint 10 with source-first monorepo resolution (library exports resolve to source files directly during local development).
+
+### Improvements
+
+- **MCP security hardening** - Bound the MCP HTTP + WebSocket server to `localhost` only.
+- **Extension UI refinement** - Made the history panel height responsive to the viewport and improved the result card readability by increasing font size.
+
+### Bug Fixes
+
+- **SimulatorMask memory leak** - Fixed a memory leak by ensuring the `requestAnimationFrame` loop is cancelled when disposing the SimulatorMask.
+- **Autofixer format fix** - Corrected the fallback action format for `autoFixer` when waiting.
+- **IIFE scope protection** - Fixed a name collision in IIFE builds by preventing global helper function re-declarations.
+
 ## [1.7.1] - 2026-04-04
 
 ### Features
