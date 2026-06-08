@@ -225,6 +225,8 @@ export class PageAgentCore extends EventTarget {
 		this.#states = { totalWaitTime: 0, lastURL: '', browserState: null }
 
 		let step = 0
+		let taskSuccess: boolean
+		let taskResult: string
 
 		while (true) {
 			try {
@@ -286,64 +288,49 @@ export class PageAgentCore extends EventTarget {
 				} as AgentStepEvent)
 				this.#emitHistoryChange()
 
-				//
-
 				await onAfterStep?.(this, this.history)
 
 				console.groupEnd()
 
-				// finish task if done
-
 				if (actionName === 'done') {
-					const success = action.input?.success ?? false
-					const text = action.input?.text || 'no text provided'
-					console.log(chalk.green.bold('Task completed'), success, text)
-					this.#onDone(success)
-					const result: ExecutionResult = {
-						success,
-						data: text,
-						history: this.history,
-					}
-					await onAfterTask?.(this, result)
-					return result
+					taskSuccess = action.input?.success ?? false
+					taskResult = action.input?.text || 'no text provided'
+					console.log(chalk.green.bold('Task completed'), taskSuccess, taskResult)
+					break
 				}
 			} catch (error: unknown) {
-				console.groupEnd() // to prevent nested groups
-				// Canonical abort check, independent of how the error was wrapped.
-				const isAbortError = this.#abortController.signal.aborted
-
+				console.groupEnd()
+				const isAbortError = (error as any)?.name === 'AbortError'
 				if (!isAbortError) console.error('Task failed', error)
-				const errorMessage = isAbortError ? 'Task stopped' : String(error)
-				this.#emitActivity({ type: 'error', message: errorMessage })
-				this.history.push({ type: 'error', message: errorMessage, rawResponse: error })
+				taskResult = isAbortError ? 'Task aborted' : String(error)
+				taskSuccess = false
+				this.#emitActivity({ type: 'error', message: taskResult })
+				this.history.push({ type: 'error', message: taskResult, rawResponse: error })
 				this.#emitHistoryChange()
-				this.#onDone(false)
-				const result: ExecutionResult = {
-					success: false,
-					data: errorMessage,
-					history: this.history,
-				}
-				await onAfterTask?.(this, result)
-				return result
+				break
 			}
 
 			step++
 			if (step > this.config.maxSteps) {
-				const errorMessage = 'Step count exceeded maximum limit'
-				this.history.push({ type: 'error', message: errorMessage })
+				taskResult = 'Step count exceeded maximum limit'
+				taskSuccess = false
+				this.#emitActivity({ type: 'error', message: taskResult })
+				this.history.push({ type: 'error', message: taskResult })
 				this.#emitHistoryChange()
-				this.#onDone(false)
-				const result: ExecutionResult = {
-					success: false,
-					data: errorMessage,
-					history: this.history,
-				}
-				await onAfterTask?.(this, result)
-				return result
+				break
 			}
 
 			await waitFor(this.config.stepDelay ?? 0.4)
 		}
+
+		this.#onDone(taskSuccess)
+		const result: ExecutionResult = {
+			success: taskSuccess,
+			data: taskResult,
+			history: this.history,
+		}
+		await onAfterTask?.(this, result)
+		return result
 	}
 
 	/**
