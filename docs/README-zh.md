@@ -49,8 +49,8 @@
 
 | Mirrors | URL                                                                                |
 | ------- | ---------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.8.2/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.8.2/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.9.0/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.9.0/files/dist/iife/page-agent.demo.js |
 
 在 URL 后添加 `?autoInit=false` 可只加载脚本，不自动创建 Demo Agent；之后可通过 `new window.PageAgent(...)` 手动初始化。
 
