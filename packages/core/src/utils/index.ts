@@ -26,27 +26,6 @@ export async function waitFor(seconds: number, signal?: AbortSignal): Promise<vo
 	})
 }
 
-/**
- * Diagnostic deadline: fire `callback` if `signal` stays aborted for `ms`,
- * surfacing async work that ignores abort. Returns an unsubscribe to call once
- * the awaited work settles.
- */
-export function onAbortTimeout(signal: AbortSignal, ms: number, callback: () => void): () => void {
-	if (signal.aborted) {
-		callback()
-		return () => {}
-	}
-	let timer: ReturnType<typeof setTimeout> | null = null
-	const onAbort = () => {
-		timer = setTimeout(callback, ms)
-	}
-	signal.addEventListener('abort', onAbort, { once: true })
-	return () => {
-		signal.removeEventListener('abort', onAbort)
-		if (timer) clearTimeout(timer)
-	}
-}
-
 //
 
 export function truncate(text: string, maxLength: number): string {

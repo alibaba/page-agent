@@ -21,7 +21,7 @@ import type {
 	MacroToolInput,
 	MacroToolResult,
 } from './types'
-import { assert, fetchLlmsTxt, normalizeResponse, onAbortTimeout, uid, waitFor } from './utils'
+import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
 
 export { tool, type PageAgentTool } from './tools'
 export type * from './types'
@@ -87,7 +87,7 @@ export class PageAgentCore extends EventTarget {
 	 * Task cancellation primitive: its signal reaches the LLM fetch, tools
 	 * (via `ctx.signal`) and async callbacks. Aborted only by `stop`/`dispose`
 	 * (during a task) or task setup, always WITHOUT a reason so `signal.reason`
-	 * stays a standard `AbortError`. Never abort as a cleanup/error shortcut.
+	 * stays a standard `AbortError`.
 	 */
 	#abortController = new AbortController()
 	#observations: string[] = []
@@ -382,7 +382,8 @@ export class PageAgentCore extends EventTarget {
 			description: 'You MUST call this tool every step!',
 			inputSchema: macroToolSchema as z.ZodType<MacroToolInput>,
 			execute: async (input: MacroToolInput): Promise<MacroToolResult> => {
-				this.#abortController.signal.throwIfAborted()
+				const signal = this.#abortController.signal
+				signal.throwIfAborted()
 
 				console.log(chalk.blue.bold('MacroTool input'), input)
 				const action = input.action
@@ -414,24 +415,9 @@ export class PageAgentCore extends EventTarget {
 
 				const startTime = Date.now()
 
-				// Run the tool with `this` = agent and the abort signal exposed.
-				// The deadline warning surfaces tools that ignore the signal
-				// without unblocking the loop, keeping the bug visible.
-				const signal = this.#abortController.signal
-				const unsubscribe = onAbortTimeout(signal, 3000, () => {
-					console.warn(
-						`[PageAgent] Tool "${toolName}" did not respond to abort signal within 3s. ` +
-							`Tools MUST honor ctx.signal for proper cancellation. ` +
-							`See: https://page-agent.dev/docs/custom-tools#abort`
-					)
-				})
-
-				let result: string
-				try {
-					result = await tool.execute.bind(this)(toolInput, { signal })
-				} finally {
-					unsubscribe()
-				}
+				const result = await tool.execute.bind(this)(toolInput, { signal })
+				// Enforce abort even if the tool ignored the signal and resolved normally.
+				signal.throwIfAborted()
 
 				const duration = Date.now() - startTime
 				console.log(chalk.green.bold(`Tool (${toolName}) executed for ${duration}ms`), result)
