@@ -192,9 +192,19 @@ export class PageAgentCore extends EventTarget {
 
 	async execute(task: string): Promise<ExecutionResult> {
 		if (this.disposed) throw new Error('PageAgent has been disposed. Create a new instance.')
+		if (this.#status === 'running') throw new Error('A task is already running.')
 		if (!task) throw new Error('Task is required')
+
 		this.task = task
 		this.taskId = uid()
+
+		this.history = []
+		this.#observations = []
+		this.#states = { totalWaitTime: 0, lastURL: '', browserState: null }
+		this.#abortController = new AbortController()
+
+		this.#setStatus('running')
+		this.#emitHistoryChange()
 
 		// Disable ask_user tool if onAskUser is not set
 		if (!this.onAskUser) {
@@ -206,23 +216,13 @@ export class PageAgentCore extends EventTarget {
 		const onBeforeTask = this.config.onBeforeTask
 		const onAfterTask = this.config.onAfterTask
 
-		await onBeforeTask?.(this)
-
-		// Show mask
-		await this.pageController.showMask()
-
-		if (this.#abortController) {
-			this.#abortController.abort()
-			this.#abortController = new AbortController()
+		try {
+			await onBeforeTask?.(this)
+			await this.pageController.showMask()
+		} catch (error) {
+			this.#setStatus('error')
+			throw error
 		}
-
-		this.history = []
-		this.#setStatus('running')
-		this.#emitHistoryChange()
-		this.#observations = []
-
-		// Reset internal states
-		this.#states = { totalWaitTime: 0, lastURL: '', browserState: null }
 
 		let step = 0
 		let taskSuccess: boolean
