@@ -8,13 +8,21 @@ import type { PageAgentCore } from '../PageAgentCore'
 import { waitFor } from '../utils'
 
 /**
+ * Per-invocation context passed to every tool execution.
+ * Tools MUST honor `signal` to support cooperative cancellation.
+ */
+export interface ToolContext {
+	signal: AbortSignal
+}
+
+/**
  * Internal tool definition that has access to PageAgent `this` context
  */
 export interface PageAgentTool<TParams = any> {
 	// name: string
 	description: string
 	inputSchema: z.ZodType<TParams>
-	execute: (this: PageAgentCore, args: TParams) => Promise<string>
+	execute: (this: PageAgentCore, args: TParams, ctx: ToolContext) => Promise<string>
 }
 
 export function tool<TParams>(options: PageAgentTool<TParams>): PageAgentTool<TParams> {
@@ -50,12 +58,12 @@ tools.set(
 		inputSchema: z.object({
 			seconds: z.number().min(1).max(10).default(1),
 		}),
-		execute: async function (this: PageAgentCore, input) {
+		execute: async function (this: PageAgentCore, input, { signal }) {
 			// try to subtract LLM calling time from the actual wait time
 			const lastTimeUpdate = await this.pageController.getLastUpdateTime()
 			const actualWaitTime = Math.max(0, input.seconds - (Date.now() - lastTimeUpdate) / 1000)
 			console.log(`actualWaitTime: ${actualWaitTime} seconds`)
-			await waitFor(actualWaitTime)
+			await waitFor(actualWaitTime, signal)
 
 			return `✅ Waited for ${input.seconds} seconds.`
 		},
@@ -70,11 +78,11 @@ tools.set(
 		inputSchema: z.object({
 			question: z.string(),
 		}),
-		execute: async function (this: PageAgentCore, input) {
+		execute: async function (this: PageAgentCore, input, { signal }) {
 			if (!this.onAskUser) {
 				throw new Error('ask_user tool requires onAskUser callback to be set')
 			}
-			const answer = await this.onAskUser(input.question)
+			const answer = await this.onAskUser(input.question, { signal })
 			return `User answered: ${answer}`
 		},
 	})

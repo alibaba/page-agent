@@ -63,8 +63,9 @@ export interface PanelAgentAdapter extends EventTarget {
 	 * Called when the agent needs to ask the user questions.
 	 * If unset, the `ask_user` tool will be disabled.
 	 * Panel will set this to handle user questions via its UI.
+	 * The optional `signal` aborts when the task is stopped or disposed.
 	 */
-	onAskUser?: (question: string) => Promise<string>
+	onAskUser?: (question: string, options?: { signal: AbortSignal }) => Promise<string>
 
 	/** Execute a task */
 	execute(task: string): Promise<unknown>
