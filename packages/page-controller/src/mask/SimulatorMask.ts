@@ -209,7 +209,6 @@ export class SimulatorMask extends EventTarget {
 
 	dispose() {
 		this.#disposed = true
-		console.log('dispose SimulatorMask')
 		this.motion?.dispose()
 		this.wrapper.remove()
 		this.dispatchEvent(new Event('dispose'))
