@@ -181,12 +181,15 @@ tools.set(
 	'execute_javascript',
 	tool({
 		description:
-			'Execute JavaScript code on the current page. Supports async/await syntax. Use with caution!',
+			'Execute JavaScript code on the current page. Supports async/await syntax. Use with caution! ' +
+			'An `AbortSignal` named `signal` is available in scope: long-running async code MUST honor it ' +
+			'(e.g. `await fetch(url, { signal })`, or `signal.throwIfAborted()` in loops)',
 		inputSchema: z.object({
 			script: z.string(),
 		}),
-		execute: async function (this: PageAgentCore, input) {
-			const result = await this.pageController.executeJavascript(input.script)
+		execute: async function (this: PageAgentCore, input, { signal }) {
+			const result = await this.pageController.executeJavascript(input.script, signal)
+			signal.throwIfAborted()
 			return result.message
 		},
 	})
