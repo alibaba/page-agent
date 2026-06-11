@@ -130,6 +130,16 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 			expect(fetchMock).toHaveBeenCalledTimes(1)
 		})
 
+		it('completes (not errors) when the LLM reports task failure', async () => {
+			const fetchMock = createFetchMock().mockResolvedValueOnce(doneResponse('gave up', false))
+			const agent = createAgent(fetchMock)
+
+			const result = await agent.execute('do something')
+
+			expect(result).toMatchObject({ success: false, data: 'gave up' })
+			expect(agent.status).toBe('completed')
+		})
+
 		it('throws when a task is already running', async () => {
 			const fetchMock = createFetchMock().mockResolvedValueOnce(waitResponse())
 			const agent = createAgent(fetchMock)
@@ -137,7 +147,7 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 
 			await expect(agent.execute('second')).rejects.toThrow('A task is already running.')
 
-			agent.stop()
+			await agent.stop()
 			await result
 		})
 	})
@@ -150,20 +160,30 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 			const agent = createAgent(fetchMock)
 			const { result: firstTask } = await startBlockedTask(agent)
 
-			agent.stop()
+			await agent.stop()
+			expect(agent.status).toBe('stopped')
 			await expect(firstTask).resolves.toMatchObject({ success: false, data: 'Task aborted' })
 
 			const secondTask = await agent.execute('second')
 			expect(secondTask).toMatchObject({ success: true, data: 'second task' })
+			expect(agent.status).toBe('completed')
 		})
 
-		it('is a no-op when no task is running', () => {
+		it('resolves only after the run has fully settled', async () => {
+			const fetchMock = createFetchMock().mockResolvedValueOnce(waitResponse())
+			const agent = createAgent(fetchMock)
+			const { result } = await startBlockedTask(agent)
+
+			await agent.stop()
+			expect(agent.status).toBe('stopped')
+			await expect(result).resolves.toMatchObject({ success: false })
+		})
+
+		it('is a no-op when no task is running', async () => {
 			const agent = createAgent(createFetchMock())
 
-			expect(() => {
-				agent.stop()
-				agent.stop()
-			}).not.toThrow()
+			await expect(agent.stop()).resolves.toBeUndefined()
+			await expect(agent.stop()).resolves.toBeUndefined()
 			expect(agent.status).toBe('idle')
 		})
 	})
@@ -222,17 +242,95 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 			expect(result.success).toBe(false)
 			expect(agent.status).toBe('error')
 		})
+
+		it('re-throws and sets error status when onBeforeTask throws', async () => {
+			const agent = createAgent(createFetchMock(), {
+				onBeforeTask: async () => {
+					throw new Error('setup failed')
+				},
+			})
+
+			await expect(agent.execute('do something')).rejects.toThrow('setup failed')
+			expect(agent.status).toBe('error')
+			expect(agent.history.some((e) => e.type === 'error')).toBe(false)
+		})
+
+		it('re-throws and sets error status when onAfterTask throws', async () => {
+			const fetchMock = createFetchMock().mockResolvedValueOnce(doneResponse('all done'))
+			const agent = createAgent(fetchMock, {
+				onAfterTask: async () => {
+					throw new Error('teardown failed')
+				},
+			})
+
+			await expect(agent.execute('do something')).rejects.toThrow('teardown failed')
+			expect(agent.status).toBe('error')
+		})
+
+		it('stays reusable after onBeforeTask throws', async () => {
+			const fetchMock = createFetchMock().mockResolvedValueOnce(doneResponse('second'))
+			let failOnce = true
+			const agent = createAgent(fetchMock, {
+				onBeforeTask: async () => {
+					if (failOnce) {
+						failOnce = false
+						throw new Error('setup failed')
+					}
+				},
+			})
+
+			await expect(agent.execute('first')).rejects.toThrow('setup failed')
+			const result = await agent.execute('second')
+			expect(result).toMatchObject({ success: true, data: 'second' })
+		})
+
+		it('re-throws and sets error status when onBeforeStep throws', async () => {
+			const agent = createAgent(createFetchMock(), {
+				onBeforeStep: async () => {
+					throw new Error('before step failed')
+				},
+			})
+
+			await expect(agent.execute('do something')).rejects.toThrow('before step failed')
+			expect(agent.status).toBe('error')
+			expect(agent.history.some((e) => e.type === 'error')).toBe(false)
+		})
+
+		it('re-throws and sets error status when onAfterStep throws', async () => {
+			// `done` breaks before onAfterStep, so use a non-terminal action.
+			const fetchMock = createFetchMock().mockResolvedValueOnce(
+				agentResponse({ action: { noop: {} } })
+			)
+			const agent = createAgent(fetchMock, {
+				customTools: {
+					noop: tool({
+						description: 'No-op.',
+						inputSchema: z.object({}),
+						execute: async () => 'ok',
+					}),
+				},
+				onAfterStep: async () => {
+					throw new Error('after step failed')
+				},
+			})
+
+			await expect(agent.execute('do something')).rejects.toThrow('after step failed')
+			expect(agent.status).toBe('error')
+			expect(agent.history.some((e) => e.type === 'error')).toBe(false)
+		})
 	})
 
 	describe('cancellation edge cases', () => {
-		it('rejects a new task while a stopped task is settling', async () => {
+		it('rejects a new task while a stop is still settling', async () => {
 			const fetchMock = createFetchMock().mockResolvedValueOnce(waitResponse())
 			const agent = createAgent(fetchMock)
 			const { result: firstTask } = await startBlockedTask(agent)
 
-			agent.stop()
+			const stopped = agent.stop()
 
 			await expect(agent.execute('too early')).rejects.toThrow('A task is already running.')
+
+			await stopped
 			await expect(firstTask).resolves.toMatchObject({ success: false, data: 'Task aborted' })
 			expect(fetchMock).toHaveBeenCalledTimes(1)
 		})
@@ -266,10 +364,12 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 			const task = agent.execute('run slow tool')
 			await toolStarted
 
-			agent.stop()
+			const stopped = agent.stop()
 			resolveTool()
+			await stopped
 
 			await expect(task).resolves.toMatchObject({ success: false, data: 'Task aborted' })
+			expect(agent.status).toBe('stopped')
 		})
 	})
 })

@@ -22,14 +22,17 @@ export type AgentActivity =
  * This enables decoupling and allows any agent implementation to work with Panel.
  *
  * Events:
- * - 'statuschange': Agent status changed (idle/running/completed/error)
+ * - 'statuschange': Agent status changed
  * - 'historychange': Historical events updated (persisted)
  * - 'activity': Transient activity for immediate UI feedback (thinking/executing/etc)
  * - 'dispose': Agent is being disposed
  */
 export interface PanelAgentAdapter extends EventTarget {
 	/** Current agent status */
-	readonly status: 'idle' | 'running' | 'completed' | 'error'
+	readonly status: 'idle' | 'running' | 'completed' | 'error' | 'stopped'
+
+	/** Result of the most recent run, or `null` before the first run completes */
+	readonly lastResult: { success: boolean } | null
 
 	/** History of agent events */
 	readonly history: readonly {
@@ -71,7 +74,7 @@ export interface PanelAgentAdapter extends EventTarget {
 	execute(task: string): Promise<unknown>
 
 	/** Stop the current task (agent remains reusable) */
-	stop(): void
+	stop(): Promise<void>
 
 	/** Dispose the agent (terminal, cannot be reused) */
 	dispose(): void

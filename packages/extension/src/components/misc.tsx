@@ -14,6 +14,7 @@ export function StatusDot({ status }: { status: AgentStatus }) {
 		running: 'bg-blue-500',
 		completed: 'bg-green-500',
 		error: 'bg-destructive',
+		stopped: 'bg-muted-foreground',
 	}[status]
 
 	const label = {
@@ -21,6 +22,7 @@ export function StatusDot({ status }: { status: AgentStatus }) {
 		running: 'Running',
 		completed: 'Done',
 		error: 'Error',
+		stopped: 'Stopped',
 	}[status]
 
 	return (

@@ -325,7 +325,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 					properties={[
 						{
 							name: 'status',
-							type: "'idle' | 'running' | 'completed' | 'error'",
+							type: "'idle' | 'running' | 'completed' | 'error' | 'stopped'",
 							description: isZh ? '当前 Agent 执行状态' : 'Current agent execution status',
 						},
 						{
@@ -378,10 +378,10 @@ const result = await agent.execute('Fill in the form with test data')`}
 						},
 						{
 							name: 'stop()',
-							type: 'void',
+							type: 'Promise<void>',
 							description: isZh
-								? '停止当前任务。Agent 仍可复用。'
-								: 'Stop the current task. Agent remains reusable.',
+								? '停止当前任务，并在任务完全结束后 resolve。Agent 仍可复用。'
+								: 'Stop the current task; resolves once the run has fully settled. Agent remains reusable.',
 						},
 						{
 							name: 'dispose()',
