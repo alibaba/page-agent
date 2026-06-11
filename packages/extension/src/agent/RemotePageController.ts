@@ -133,11 +133,7 @@ export class RemotePageController {
 		return this.remoteCallDomAction('scroll_horizontally', args)
 	}
 
-	async executeJavascript(script: string, _signal?: AbortSignal): Promise<DomActionReturn> {
-		// `AbortSignal` is not structured-cloneable across the messaging boundary.
-		// The remote script runs without it
-		return this.remoteCallDomAction('execute_javascript', [script])
-	}
+	// `execute_javascript` is intentionally not implemented: AbortSignal cannot cross context
 
 	/** @note Managed by content script via storage polling. */
 	async showMask(): Promise<void> {}
