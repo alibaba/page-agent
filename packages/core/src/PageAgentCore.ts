@@ -194,7 +194,8 @@ export class PageAgentCore extends EventTarget {
 	}
 
 	/**
-	 * Stop the current task and wait until the run has fully settled.
+	 * Stop the current task and wait until the run has fully settled (including lifecycle hooks).
+	 * @note never await .stop() in a lifecycle hook.
 	 */
 	async stop(): Promise<void> {
 		if (this.#status !== 'running') return
@@ -223,14 +224,8 @@ export class PageAgentCore extends EventTarget {
 		this.#setStatus('running')
 		this.#emitHistoryChange()
 
-		let settleRun!: (status: AgentStatus) => void
-		this.#running = new Promise<void>(
-			(resolve) =>
-				(settleRun = (status) => {
-					this.#setStatus(status)
-					resolve()
-				})
-		)
+		let resolveRunning!: () => void
+		this.#running = new Promise<void>((r) => (resolveRunning = r))
 
 		// Disable ask_user tool if onAskUser is not set
 		if (!this.onAskUser) this.tools.delete('ask_user')
@@ -257,8 +252,7 @@ export class PageAgentCore extends EventTarget {
 				try {
 					console.group(`step: ${step}`)
 
-					// Abort may have fired between steps (e.g. during stepDelay).
-					// Check inside the try so it is classified as `stopped`, and skip the observe phase.
+					// inside the try: abort between steps must settle as `stopped`
 					this.#abortController.signal.throwIfAborted()
 
 					// observe
@@ -371,7 +365,8 @@ export class PageAgentCore extends EventTarget {
 			suppress(() => this.pageController.cleanUpHighlights())
 			suppress(() => this.pageController.hideMask())
 			this.#abortController.abort()
-			settleRun(finalStatus)
+			resolveRunning()
+			this.#setStatus(finalStatus)
 		}
 	}
 

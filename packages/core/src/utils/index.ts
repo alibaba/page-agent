@@ -133,9 +133,9 @@ export function assert(condition: unknown, message?: string, silent?: boolean): 
 /**
  * Suppress errors from a function.
  */
-export function suppress<T>(fn: () => T): T | undefined {
+export async function suppress<T>(fn: () => T | Promise<T>): Promise<Awaited<T> | undefined> {
 	try {
-		return fn()
+		return await fn()
 	} catch (error) {
 		console.error(error)
 		return undefined
