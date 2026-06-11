@@ -262,9 +262,9 @@ export type HistoricalEvent =
 	| AgentErrorEvent
 
 /**
- * Agent execution status
+ * Agent lifecycle status.
  */
-export type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
+export type AgentStatus = 'idle' | 'running' | 'completed' | 'error' | 'stopped'
 
 /**
  * Agent activity - transient state for immediate UI feedback.

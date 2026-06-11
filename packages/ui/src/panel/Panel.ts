@@ -100,10 +100,10 @@ export class Panel {
 	#handleStatusChange(): void {
 		const status = this.#agent.status
 
-		// Map agent status to UI indicator type
-		const indicatorType =
-			status === 'running' ? 'thinking' : status === 'idle' ? 'thinking' : status
-		this.#updateStatusIndicator(indicatorType)
+		// Map agent status to UI indicator. A `completed` run whose result reports
+		// failure shows as error; other statuses map to their own indicator.
+		const failed = status === 'completed' && this.#agent.lastResult?.success === false
+		this.#updateStatusIndicator(failed ? 'error' : status)
 
 		// Morph action button: running = stop (■), not running = close (X)
 		if (status === 'running') {
@@ -121,7 +121,7 @@ export class Panel {
 		}
 
 		// Handle completion
-		if (status === 'completed' || status === 'error') {
+		if (status === 'completed' || status === 'error' || status === 'stopped') {
 			if (!this.#isExpanded) {
 				this.#expand()
 			}
@@ -376,7 +376,7 @@ export class Panel {
 		}
 
 		const status = this.#agent.status
-		const isTaskEnded = status === 'completed' || status === 'error'
+		const isTaskEnded = status === 'completed' || status === 'error' || status === 'stopped'
 
 		// Only show input area after task completion if configured to do so
 		if (isTaskEnded) {
@@ -559,13 +559,23 @@ export class Panel {
 	}
 
 	#updateStatusIndicator(
-		type: 'thinking' | 'executing' | 'executed' | 'retrying' | 'completed' | 'error'
+		type:
+			| 'idle'
+			| 'running'
+			| 'thinking'
+			| 'executing'
+			| 'executed'
+			| 'retrying'
+			| 'completed'
+			| 'error'
+			| 'stopped'
 	): void {
-		// Clear all status classes
+		// `running` animates like thinking; `idle`/`stopped` use the neutral base.
+		const variant = type === 'running' ? 'thinking' : type
 		this.#indicator.className = styles.indicator
-
-		// Add corresponding status class
-		this.#indicator.classList.add(styles[type])
+		if (variant !== 'idle' && variant !== 'stopped') {
+			this.#indicator.classList.add(styles[variant])
+		}
 	}
 
 	#scrollToBottom(): void {

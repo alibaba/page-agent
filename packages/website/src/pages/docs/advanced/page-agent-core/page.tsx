@@ -281,8 +281,8 @@ const result = await agent.execute('Fill in the form with test data')`}
 				<div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-4">
 					<p className="text-amber-800 dark:text-amber-200 text-sm">
 						{isZh
-							? '这些接口高度实验性，可能在未来版本中发生变化。'
-							: 'These APIs are highly experimental and may change in future versions. '}
+							? '这些接口高度实验性，可能在未来版本中发生变化。钩子中抛出的错误会使任务失败并从 execute() 抛出；如不希望影响任务，请在钩子内部自行捕获。'
+							: 'These APIs are highly experimental and may change in future versions. Errors thrown from hooks fail the run and propagate from execute(); catch errors inside the hook if the task should not be affected.'}
 					</p>
 				</div>
 				<APIReference
@@ -325,7 +325,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 					properties={[
 						{
 							name: 'status',
-							type: "'idle' | 'running' | 'completed' | 'error'",
+							type: "'idle' | 'running' | 'completed' | 'error' | 'stopped'",
 							description: isZh ? '当前 Agent 执行状态' : 'Current agent execution status',
 						},
 						{
@@ -378,10 +378,10 @@ const result = await agent.execute('Fill in the form with test data')`}
 						},
 						{
 							name: 'stop()',
-							type: 'void',
+							type: 'Promise<void>',
 							description: isZh
-								? '停止当前任务。Agent 仍可复用。'
-								: 'Stop the current task. Agent remains reusable.',
+								? '停止当前任务，并在任务完全结束后 resolve。Agent 仍可复用。'
+								: 'Stop the current task; resolves once the run has fully settled. Agent remains reusable.',
 						},
 						{
 							name: 'dispose()',
@@ -415,8 +415,8 @@ const result = await agent.execute('Fill in the form with test data')`}
 							name: 'statuschange',
 							type: 'Event',
 							description: isZh
-								? 'Agent 状态变化时触发 (idle → running → completed/error)'
-								: 'Fired when agent status changes (idle → running → completed/error)',
+								? 'Agent 状态变化时触发 (idle → running → completed/error/stopped)'
+								: 'Fired when agent status changes (idle → running → completed/error/stopped)',
 						},
 						{
 							name: 'historychange',

@@ -80,7 +80,7 @@ export function useAgent(): UseAgentResult {
 		const handleStatusChange = (e: Event) => {
 			const newStatus = agent.status as AgentStatus
 			setStatus(newStatus)
-			if (newStatus === 'idle' || newStatus === 'completed' || newStatus === 'error') {
+			if (newStatus !== 'running') {
 				setActivity(null)
 			}
 		}
