@@ -21,7 +21,7 @@ import type {
 	MacroToolInput,
 	MacroToolResult,
 } from './types'
-import { assert, fetchLlmsTxt, normalizeResponse, uid, waitFor } from './utils'
+import { assert, fetchLlmsTxt, normalizeResponse, suppress, uid, waitFor } from './utils'
 
 export { tool, type PageAgentTool } from './tools'
 export type * from './types'
@@ -244,10 +244,10 @@ export class PageAgentCore extends EventTarget {
 		let taskResult: ExecutionResult
 		let finalStatus: AgentStatus = 'error'
 
+		await suppress(() => this.pageController.showMask())
+
 		// graceful exit
 		try {
-			await this.pageController.showMask()
-
 			await onBeforeTask?.(this)
 
 			while (true) {
@@ -368,8 +368,8 @@ export class PageAgentCore extends EventTarget {
 			finalStatus = 'error'
 			throw error
 		} finally {
-			this.pageController.cleanUpHighlights()
-			this.pageController.hideMask()
+			suppress(() => this.pageController.cleanUpHighlights())
+			suppress(() => this.pageController.hideMask())
 			this.#abortController.abort()
 			settleRun(finalStatus)
 		}

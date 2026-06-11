@@ -129,3 +129,15 @@ export function assert(condition: unknown, message?: string, silent?: boolean): 
 		throw new Error(errorMessage)
 	}
 }
+
+/**
+ * Suppress errors from a function.
+ */
+export function suppress<T>(fn: () => T): T | undefined {
+	try {
+		return fn()
+	} catch (error) {
+		console.error(error)
+		return undefined
+	}
+}
