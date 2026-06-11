@@ -42,7 +42,7 @@ export class TabsController {
 			throw new Error('TabsController already disposed')
 		}
 
-		this.currentTabId = null
+		await this.updateCurrentTabId(null)
 		this.disposed = false
 		this.port = undefined
 		this.portRetries = 0
