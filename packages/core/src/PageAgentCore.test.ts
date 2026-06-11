@@ -297,18 +297,8 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 		})
 
 		it('re-throws and sets error status when onAfterStep throws', async () => {
-			// `done` breaks before onAfterStep, so use a non-terminal action.
-			const fetchMock = createFetchMock().mockResolvedValueOnce(
-				agentResponse({ action: { noop: {} } })
-			)
+			const fetchMock = createFetchMock().mockResolvedValueOnce(doneResponse('all done'))
 			const agent = createAgent(fetchMock, {
-				customTools: {
-					noop: tool({
-						description: 'No-op.',
-						inputSchema: z.object({}),
-						execute: async () => 'ok',
-					}),
-				},
 				onAfterStep: async () => {
 					throw new Error('after step failed')
 				},
