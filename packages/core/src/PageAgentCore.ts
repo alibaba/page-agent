@@ -220,12 +220,13 @@ export class PageAgentCore extends EventTarget {
 		this.#observations = []
 		this.#states = { totalWaitTime: 0, lastURL: '', browserState: null }
 		this.#abortController = new AbortController()
-
-		this.#setStatus('running')
-		this.#emitHistoryChange()
+		const signal = this.#abortController.signal
 
 		let resolveRunning!: () => void
 		this.#running = new Promise<void>((r) => (resolveRunning = r))
+
+		this.#setStatus('running')
+		this.#emitHistoryChange()
 
 		// Disable ask_user tool if onAskUser is not set
 		if (!this.onAskUser) this.tools.delete('ask_user')
@@ -234,6 +235,8 @@ export class PageAgentCore extends EventTarget {
 		const onAfterStep = this.config.onAfterStep
 		const onBeforeTask = this.config.onBeforeTask
 		const onAfterTask = this.config.onAfterTask
+		const stepDelay = this.config.stepDelay ?? 0.4
+		const maxSteps = this.config.maxSteps
 
 		let step = 0
 		let taskResult: ExecutionResult
@@ -252,8 +255,9 @@ export class PageAgentCore extends EventTarget {
 				try {
 					console.group(`step: ${step}`)
 
-					// inside the try: abort between steps must settle as `stopped`
-					this.#abortController.signal.throwIfAborted()
+					if (step > 0) await waitFor(stepDelay, signal)
+
+					signal.throwIfAborted()
 
 					// observe
 
@@ -276,7 +280,7 @@ export class PageAgentCore extends EventTarget {
 					console.log(chalk.blue.bold('🧠 Thinking...'))
 					this.#emitActivity({ type: 'thinking' })
 
-					const result = await this.#llm.invoke(messages, macroTool, this.#abortController.signal, {
+					const result = await this.#llm.invoke(messages, macroTool, signal, {
 						toolChoiceName: 'AgentOutput',
 						normalizeResponse: (res) => normalizeResponse(res, this.tools),
 					})
@@ -340,7 +344,7 @@ export class PageAgentCore extends EventTarget {
 				}
 
 				step++
-				if (step > this.config.maxSteps) {
+				if (step > maxSteps) {
 					const message = 'Step count exceeded maximum limit'
 					console.error(message)
 					this.#emitActivity({ type: 'error', message: message })
@@ -350,8 +354,6 @@ export class PageAgentCore extends EventTarget {
 					finalStatus = 'error'
 					break
 				}
-
-				await waitFor(this.config.stepDelay ?? 0.4)
 			} // while
 
 			await onAfterTask?.(this, taskResult)
@@ -362,8 +364,8 @@ export class PageAgentCore extends EventTarget {
 			finalStatus = 'error'
 			throw error
 		} finally {
-			suppress(() => this.pageController.cleanUpHighlights())
-			suppress(() => this.pageController.hideMask())
+			await suppress(() => this.pageController.cleanUpHighlights())
+			await suppress(() => this.pageController.hideMask())
 			this.#abortController.abort()
 			resolveRunning()
 			this.#setStatus(finalStatus)
