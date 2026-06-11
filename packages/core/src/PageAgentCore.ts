@@ -195,7 +195,6 @@ export class PageAgentCore extends EventTarget {
 
 	/**
 	 * Stop the current task and wait until the run has fully settled.
-	 * Once resolved, `status` is `stopped` and the agent can be reused.
 	 */
 	async stop(): Promise<void> {
 		if (this.#status !== 'running') return
@@ -224,8 +223,14 @@ export class PageAgentCore extends EventTarget {
 		this.#setStatus('running')
 		this.#emitHistoryChange()
 
-		let resolveRunning!: () => void
-		this.#running = new Promise<void>((resolve) => (resolveRunning = resolve))
+		let settleRun!: (status: AgentStatus) => void
+		this.#running = new Promise<void>(
+			(resolve) =>
+				(settleRun = (status) => {
+					this.#setStatus(status)
+					resolve()
+				})
+		)
 
 		// Disable ask_user tool if onAskUser is not set
 		if (!this.onAskUser) this.tools.delete('ask_user')
@@ -235,14 +240,15 @@ export class PageAgentCore extends EventTarget {
 		const onBeforeTask = this.config.onBeforeTask
 		const onAfterTask = this.config.onAfterTask
 
+		let step = 0
+		let taskResult: ExecutionResult
+		let finalStatus: AgentStatus = 'error'
+
 		// graceful exit
 		try {
 			await this.pageController.showMask()
 
 			await onBeforeTask?.(this)
-
-			let step = 0
-			let taskResult: ExecutionResult
 
 			while (true) {
 				await onBeforeStep?.(this, step)
@@ -250,6 +256,10 @@ export class PageAgentCore extends EventTarget {
 				// handle internal agent errors
 				try {
 					console.group(`step: ${step}`)
+
+					// Abort may have fired between steps (e.g. during stepDelay).
+					// Check inside the try so it is classified as `stopped`, and skip the observe phase.
+					this.#abortController.signal.throwIfAborted()
 
 					// observe
 
@@ -310,7 +320,7 @@ export class PageAgentCore extends EventTarget {
 						console.log(chalk.green.bold('Task completed'), success, data)
 						taskResult = { success, data, history: this.history }
 						this.#lastResult = taskResult
-						this.#setStatus('completed')
+						finalStatus = 'completed'
 						break
 					}
 				} catch (error: unknown) {
@@ -323,7 +333,7 @@ export class PageAgentCore extends EventTarget {
 					this.#emitHistoryChange({ type: 'error', message: message, rawResponse: error })
 					taskResult = { success: false, data: message, history: this.history }
 					this.#lastResult = taskResult
-					this.#setStatus(isAbortError ? 'stopped' : 'error')
+					finalStatus = isAbortError ? 'stopped' : 'error'
 					break
 				} finally {
 					// finally block runs before the break above.
@@ -343,7 +353,7 @@ export class PageAgentCore extends EventTarget {
 					this.#emitHistoryChange({ type: 'error', message: message })
 					taskResult = { success: false, data: message, history: this.history }
 					this.#lastResult = taskResult
-					this.#setStatus('error')
+					finalStatus = 'error'
 					break
 				}
 
@@ -355,13 +365,13 @@ export class PageAgentCore extends EventTarget {
 			return taskResult
 		} catch (error) {
 			this.#emitActivity({ type: 'error', message: String(error) })
-			this.#setStatus('error')
+			finalStatus = 'error'
 			throw error
 		} finally {
 			this.pageController.cleanUpHighlights()
 			this.pageController.hideMask()
 			this.#abortController.abort()
-			resolveRunning()
+			settleRun(finalStatus)
 		}
 	}
 
