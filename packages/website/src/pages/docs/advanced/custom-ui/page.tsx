@@ -128,8 +128,8 @@ export default function CustomUIDocs() {
 							name: 'statuschange',
 							type: 'Event',
 							description: isZh
-								? 'Agent 状态变化 (idle → running → completed/error)'
-								: 'Agent status changes (idle → running → completed/error)',
+								? 'Agent 状态变化 (idle → running → completed/error/stopped)'
+								: 'Agent status changes (idle → running → completed/error/stopped)',
 						},
 						{
 							name: 'historychange',
