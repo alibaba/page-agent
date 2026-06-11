@@ -255,6 +255,8 @@ export class PageAgentCore extends EventTarget {
 				try {
 					console.group(`step: ${step}`)
 
+					// @note It's convenient to treat stepDelay as part of the next step.
+					// Maybe move it to a dedicated try block for better semantics?
 					if (step > 0) await waitFor(stepDelay, signal)
 
 					signal.throwIfAborted()
