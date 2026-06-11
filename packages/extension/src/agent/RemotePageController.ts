@@ -133,9 +133,7 @@ export class RemotePageController {
 		return this.remoteCallDomAction('scroll_horizontally', args)
 	}
 
-	async executeJavascript(...args: any[]): Promise<DomActionReturn> {
-		return this.remoteCallDomAction('execute_javascript', args)
-	}
+	// `execute_javascript` is intentionally not implemented: AbortSignal cannot cross context
 
 	/** @note Managed by content script via storage polling. */
 	async showMask(): Promise<void> {}

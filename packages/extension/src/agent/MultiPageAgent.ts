@@ -53,6 +53,8 @@ export class MultiPageAgent extends PageAgentCore {
 
 		super({
 			...config,
+			// Disabled: AbortSignal cannot cross contexts
+			experimentalScriptExecutionTool: false,
 			pageController: pageController as any,
 			customTools: customTools,
 			customSystemPrompt: systemPrompt,

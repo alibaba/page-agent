@@ -376,13 +376,15 @@ export class PageController extends EventTarget {
 	}
 
 	/**
-	 * Execute arbitrary JavaScript on the page
+	 * Execute arbitrary JavaScript on the page.
+	 * The optional `signal` is exposed to the script scope so cooperative code
+	 * can abort promptly when the task is stopped.
 	 */
-	async executeJavascript(script: string): Promise<ActionResult> {
+	async executeJavascript(script: string, signal?: AbortSignal): Promise<ActionResult> {
 		try {
-			// Wrap script in async function to support await
-			const asyncFunction = eval(`(async () => { ${script} })`)
-			const result = await asyncFunction()
+			// Wrap script in async function to support await, exposing `signal`.
+			const asyncFunction = eval(`(async (signal) => { ${script} })`)
+			const result = await asyncFunction(signal)
 			return {
 				success: true,
 				message: `✅ Executed JavaScript. Result: ${result}`,
