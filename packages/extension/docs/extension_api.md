@@ -131,7 +131,7 @@ export type Execute = (task: string, config: ExecuteConfig) => Promise<Execution
 `AgentStatus`
 
 ```typescript
-type AgentStatus = 'idle' | 'running' | 'completed' | 'error'
+type AgentStatus = 'idle' | 'running' | 'completed' | 'error' | 'stopped'
 ```
 
 `AgentActivity`

@@ -8,7 +8,7 @@ export interface SessionRecord {
 	id: string
 	task: string
 	history: HistoricalEvent[]
-	status: 'completed' | 'error'
+	status: 'completed' | 'error' | 'stopped'
 	createdAt: number
 }
 

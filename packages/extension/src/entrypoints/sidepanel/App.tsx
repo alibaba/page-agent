@@ -39,7 +39,7 @@ export default function App() {
 
 		if (
 			prev === 'running' &&
-			(status === 'completed' || status === 'error') &&
+			(status === 'completed' || status === 'error' || status === 'stopped') &&
 			history.length > 0 &&
 			currentTask
 		) {
