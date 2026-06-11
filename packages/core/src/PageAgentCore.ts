@@ -309,23 +309,31 @@ export class PageAgentCore extends EventTarget {
 						const data = action.input?.text || 'no text provided'
 						console.log(chalk.green.bold('Task completed'), success, data)
 						taskResult = { success, data, history: this.history }
+						this.#lastResult = taskResult
 						this.#setStatus('completed')
 						break
 					}
 				} catch (error: unknown) {
+					// catch block must not throw error. otherwise the error may be overridden if finally block also throws error.
+
 					const isAbortError = (error as any)?.name === 'AbortError'
 					if (!isAbortError) console.error('Task failed', error)
 					const message = isAbortError ? 'Task aborted' : String(error)
 					this.#emitActivity({ type: 'error', message: message })
 					this.#emitHistoryChange({ type: 'error', message: message, rawResponse: error })
 					taskResult = { success: false, data: message, history: this.history }
+					this.#lastResult = taskResult
 					this.#setStatus(isAbortError ? 'stopped' : 'error')
 					break
 				} finally {
-					console.groupEnd()
-				}
+					// finally block runs before the break above.
 
-				await onAfterStep?.(this, this.history)
+					console.groupEnd()
+					// @note hook may throw error.
+					// which will override the `break` above and be handled as an external error.
+					// as expected.
+					await onAfterStep?.(this, this.history)
+				}
 
 				step++
 				if (step > this.config.maxSteps) {
@@ -334,6 +342,7 @@ export class PageAgentCore extends EventTarget {
 					this.#emitActivity({ type: 'error', message: message })
 					this.#emitHistoryChange({ type: 'error', message: message })
 					taskResult = { success: false, data: message, history: this.history }
+					this.#lastResult = taskResult
 					this.#setStatus('error')
 					break
 				}
@@ -343,7 +352,6 @@ export class PageAgentCore extends EventTarget {
 
 			await onAfterTask?.(this, taskResult)
 
-			this.#lastResult = taskResult
 			return taskResult
 		} catch (error) {
 			this.#emitActivity({ type: 'error', message: String(error) })
