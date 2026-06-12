@@ -58,12 +58,8 @@ tools.set(
 			console.log(`actualWaitTime: ${actualWaitTime} seconds`)
 			await waitFor(actualWaitTime)
 
-			const waitedSeconds = Number(actualWaitTime.toFixed(2))
-			if (waitedSeconds === input.seconds) {
-				return `✅ Waited for ${input.seconds} seconds.`
-			}
-
-			return `✅ Waited for ${waitedSeconds} seconds. ${secondsSinceLastUpdate.toFixed(2)} seconds had already passed since the last page update.`
+			const waitedSeconds = (secondsSinceLastUpdate + actualWaitTime).toFixed(2)
+			return `✅ Waited for ${waitedSeconds} seconds.`
 		},
 	})
 )
