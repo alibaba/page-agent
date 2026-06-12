@@ -7,11 +7,21 @@
  * Inbound (Caller → Hub):
  *   { type: "execute", task: string, config?: object }
  *   { type: "stop" }
+ *   { type: "get_status" }   // query whether a task is currently running
  *
  * Outbound (Hub → Caller):
  *   { type: "ready" }
  *   { type: "result", success: boolean, data: string }
  *   { type: "error", message: string }
+ *   { type: "status", busy: boolean }   // reply to `get_status`
+ *
+ * `get_status` lets a caller confirm the hub's own view of whether a task is
+ * still in flight — useful to detect state drift (e.g. the `result` message
+ * was lost while both sides believe the task is still running). This is an
+ * application-level check: WS-level liveness is already guaranteed by the
+ * protocol's ping/pong frames, which browsers auto-respond to, so callers
+ * should rely on those for dead-connection detection and use `get_status`
+ * only when in doubt.
  */
 import type { ExecutionResult } from '@page-agent/core'
 import { useEffect, useRef, useState } from 'react'
@@ -30,7 +40,11 @@ interface StopMessage {
 	type: 'stop'
 }
 
-type InboundMessage = ExecuteMessage | StopMessage
+interface GetStatusMessage {
+	type: 'get_status'
+}
+
+type InboundMessage = ExecuteMessage | StopMessage | GetStatusMessage
 
 interface ReadyMessage {
 	type: 'ready'
@@ -47,7 +61,12 @@ interface ErrorMessage {
 	message: string
 }
 
-type OutboundMessage = ReadyMessage | ResultMessage | ErrorMessage
+interface StatusMessage {
+	type: 'status'
+	busy: boolean
+}
+
+type OutboundMessage = ReadyMessage | ResultMessage | ErrorMessage | StatusMessage
 
 export type HubWsState = 'connecting' | 'connected' | 'disconnected'
 
@@ -152,6 +171,9 @@ export class HubWs {
 				break
 			case 'stop':
 				this.#handlers.onStop()
+				break
+			case 'get_status':
+				this.#send({ type: 'status', busy: this.#busy })
 				break
 		}
 	}
