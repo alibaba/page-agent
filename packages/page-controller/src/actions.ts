@@ -43,6 +43,31 @@ export function getElementByIndex(
 
 let lastClickedElement: HTMLElement | null = null
 
+function getElementCenter(element: Element): { x: number; y: number } {
+	const rect = element.getBoundingClientRect()
+	return {
+		x: rect.left + rect.width / 2,
+		y: rect.top + rect.height / 2,
+	}
+}
+
+function dispatchHoverEvents(target: HTMLElement, x: number, y: number) {
+	const pointerOpts = {
+		bubbles: true,
+		cancelable: true,
+		clientX: x,
+		clientY: y,
+		pointerType: 'mouse',
+	}
+	const mouseOpts = { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 }
+
+	// Hover — pointer events first, then mouse events (spec order)
+	target.dispatchEvent(new PointerEvent('pointerover', pointerOpts))
+	target.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
+	target.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
+	target.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
+}
+
 function blurLastClickedElement() {
 	if (lastClickedElement) {
 		lastClickedElement.dispatchEvent(new PointerEvent('pointerout', { bubbles: true }))
@@ -52,6 +77,35 @@ function blurLastClickedElement() {
 		lastClickedElement.blur()
 		lastClickedElement = null
 	}
+}
+
+/**
+ * Simulate moving the pointer over an element without clicking or focusing it.
+ *
+ * @private Internal method, subject to change at any time.
+ */
+export async function hoverElement(element: HTMLElement) {
+	await scrollIntoViewIfNeeded(element)
+	const frame = element.ownerDocument.defaultView?.frameElement
+	if (frame) await scrollIntoViewIfNeeded(frame)
+
+	const { x, y } = getElementCenter(element)
+
+	await movePointerToElement(element, x, y)
+	await waitFor(0.1)
+
+	// Hit-test to find the deepest element at hover coordinates, matching
+	// real browser behavior where events target the innermost element.
+	const doc = element.ownerDocument
+	await enablePassThrough()
+	const hitTarget = doc.elementFromPoint(x, y)
+	await disablePassThrough()
+	const target =
+		hitTarget instanceof HTMLElement && element.contains(hitTarget) ? hitTarget : element
+
+	dispatchHoverEvents(target, x, y)
+
+	await waitFor(0.2)
 }
 
 /**
@@ -70,9 +124,7 @@ export async function clickElement(element: HTMLElement) {
 	const frame = element.ownerDocument.defaultView?.frameElement
 	if (frame) await scrollIntoViewIfNeeded(frame)
 
-	const rect = element.getBoundingClientRect()
-	const x = rect.left + rect.width / 2
-	const y = rect.top + rect.height / 2
+	const { x, y } = getElementCenter(element)
 
 	await movePointerToElement(element, x, y)
 	await clickPointer()
@@ -90,23 +142,20 @@ export async function clickElement(element: HTMLElement) {
 	const target =
 		hitTarget instanceof HTMLElement && element.contains(hitTarget) ? hitTarget : element
 
-	const pointerOpts = {
-		bubbles: true,
-		cancelable: true,
-		clientX: x,
-		clientY: y,
-		pointerType: 'mouse',
-	}
 	const mouseOpts = { bubbles: true, cancelable: true, clientX: x, clientY: y, button: 0 }
 
-	// Hover — pointer events first, then mouse events (spec order)
-	target.dispatchEvent(new PointerEvent('pointerover', pointerOpts))
-	target.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
-	target.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
-	target.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
+	dispatchHoverEvents(target, x, y)
 
 	// Press
-	target.dispatchEvent(new PointerEvent('pointerdown', pointerOpts))
+	target.dispatchEvent(
+		new PointerEvent('pointerdown', {
+			bubbles: true,
+			cancelable: true,
+			clientX: x,
+			clientY: y,
+			pointerType: 'mouse',
+		})
+	)
 	target.dispatchEvent(new MouseEvent('mousedown', mouseOpts))
 
 	// Focus is not part of the standard pointer/mouse event sequence
@@ -115,7 +164,15 @@ export async function clickElement(element: HTMLElement) {
 	element.focus({ preventScroll: true })
 
 	// Release
-	target.dispatchEvent(new PointerEvent('pointerup', pointerOpts))
+	target.dispatchEvent(
+		new PointerEvent('pointerup', {
+			bubbles: true,
+			cancelable: true,
+			clientX: x,
+			clientY: y,
+			pointerType: 'mouse',
+		})
+	)
 	target.dispatchEvent(new MouseEvent('mouseup', mouseOpts))
 
 	// Click — activation behavior (navigation, form submit, etc.) triggers
