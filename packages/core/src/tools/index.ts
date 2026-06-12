@@ -199,5 +199,4 @@ tools.set(
 
 // @todo send_keys
 // @todo upload_file
-// @todo go_back
 // @todo extract_structured_data
