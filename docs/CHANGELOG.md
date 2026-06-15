@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.10.0] - 2026-06-15
+
+### Breaking Changes
+
+- **Agent run lifecycle rework** - `stop()` is now async and resolves only after the run fully settles. Run status is decoupled from task outcome: a new `stopped` state was added, and LLM self-reported failures now end as `completed`. Lifecycle hooks re-throw instead of folding errors into the result, agent errors are recorded in history, and `agent.lastResult` was added.
+
+### Features
+
+- **Abortable JavaScript execution** - `execute_javascript` now honors the `AbortSignal`.
+- **Leaner agent prompts** - Simplified the waiting-response flow and removed navigation-back instructions to reduce LLM cognitive load.
+- **MultiPageAgent safety** - Disabled `ScriptExecutionTool` for `MultiPageAgent`.
+
+### Improvements
+
+- **Dark mode detection** - Refined detection heuristics and made `isMainContentDark` less aggressive by checking `html` and `body` data attributes independently.
+- **Extension lifecycle robustness** - Drove heartbeat and running state from status changes, cleared stale activity on any non-running status, handled the stopped lifecycle state, and cleared `currentTabId` on `TabsController.init`.
+
+### Bug Fixes
+
+- **Accurate wait reporting** - Wait steps now report the actual wait duration.
+- **Scroll predicates** - Scroll predicates now return booleans.
+- **Docs** - Fixed the broken demo video on GitHub.
+
 ## [1.9.0] - 2026-06-08
 
 ### Features
