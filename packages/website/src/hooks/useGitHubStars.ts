@@ -9,13 +9,15 @@ export function useGitHubStars() {
 
 	useEffect(() => {
 		if (cached !== null) return
-		fetch(STATS_URL)
+		const controller = new AbortController()
+		fetch(STATS_URL, { signal: controller.signal })
 			.then((r) => r.json())
 			.then((data) => {
 				cached = data.stargazers_count ?? null
 				setStars(cached)
 			})
 			.catch(() => {})
+		return () => controller.abort()
 	}, [])
 
 	return stars
