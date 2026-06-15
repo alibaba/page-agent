@@ -50,6 +50,6 @@
         "ai-motion": "^0.4.8"
     },
     "devDependencies": {
-        "happy-dom": "^20.10.2"
+        "happy-dom": "^20.10.3"
     }
 }
