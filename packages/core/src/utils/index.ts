@@ -2,6 +2,71 @@ import chalk from 'chalk'
 
 export * from './autoFixer'
 
+function toError(error: unknown): Error {
+	if (error instanceof Error) return error
+
+	const normalized = new Error(String(error))
+
+	if (
+		typeof error === 'object' &&
+		error !== null &&
+		'name' in error &&
+		typeof error.name === 'string'
+	) {
+		normalized.name = error.name
+	}
+
+	return normalized
+}
+
+function getAbortError(signal: AbortSignal): Error {
+	const reason = signal.reason
+	if (reason instanceof Error) return reason
+
+	const error = toError(reason || 'This operation was aborted.')
+	error.name = error.name === 'Error' ? 'AbortError' : error.name
+	return error
+}
+
+/**
+ * Run async work while honoring `signal`. Aborting rejects immediately even if
+ * the underlying work does not accept an AbortSignal.
+ */
+export async function runWithAbortSignal<T>(
+	task: () => T | Promise<T>,
+	signal: AbortSignal
+): Promise<T> {
+	signal.throwIfAborted()
+
+	return new Promise<T>((resolve, reject) => {
+		const onAbort = () => {
+			reject(getAbortError(signal))
+		}
+
+		signal.addEventListener('abort', onAbort, { once: true })
+
+		let promise: Promise<T>
+		try {
+			promise = Promise.resolve(task())
+		} catch (error) {
+			signal.removeEventListener('abort', onAbort)
+			reject(toError(error))
+			return
+		}
+
+		promise.then(
+			(value) => {
+				signal.removeEventListener('abort', onAbort)
+				resolve(value)
+			},
+			(error) => {
+				signal.removeEventListener('abort', onAbort)
+				reject(toError(error))
+			}
+		)
+	})
+}
+
 /**
  * Wait for `seconds`. If a `signal` is provided, the wait is cancellable:
  * aborting rejects with the signal's reason (an `AbortError`).
@@ -19,8 +84,7 @@ export async function waitFor(seconds: number, signal?: AbortSignal): Promise<vo
 		}, seconds * 1000)
 		const onAbort = () => {
 			clearTimeout(timer)
-			// reason is a DOMException AbortError.
-			reject(signal.reason as DOMException)
+			reject(getAbortError(signal))
 		}
 		signal.addEventListener('abort', onAbort, { once: true })
 	})
