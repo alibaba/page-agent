@@ -24,7 +24,7 @@
 	mix-blend-mode: add;
 
 	/* 边框遮罩 - 中间透明，边缘不透明 */
-	mask-image: url(https://img.alicdn.com/imgextra/i2/O1CN01iW1wfX1C0ICvoPbTq_!!6000000000018-2-tps-512-512.png);
+	mask-image: url(https://page-agent.github.io/assets/ui/motion-mask.png);
 	mask-repeat: no-repeat;
 	mask-size: calc(100% + 10px) calc(100% + 10px);
 }
@@ -219,7 +219,7 @@ rgb(255, 214, 0)
 		mix-blend-mode: var(--blend-mode);
 
 		/* 边框遮罩 - 中间透明，边缘不透明 */
-		mask-image: url(https://img.alicdn.com/imgextra/i2/O1CN01iW1wfX1C0ICvoPbTq_!!6000000000018-2-tps-512-512.png);
+		mask-image: url(https://page-agent.github.io/assets/ui/motion-mask.png);
 		mask-repeat: no-repeat;
 		mask-size: 100% 100%;
 	}
@@ -237,10 +237,8 @@ rgb(255, 214, 0)
 
 		mix-blend-mode: var(--blend-mode);
 
-		mask-border: url(https://img.alicdn.com/imgextra/i3/O1CN01bFjRug1yssyWEUbKL_!!6000000006635-2-tps-256-256.png)
-			25;
-		-webkit-mask-box-image: url(https://img.alicdn.com/imgextra/i3/O1CN01bFjRug1yssyWEUbKL_!!6000000006635-2-tps-256-256.png)
-			25;
+		mask-border: url(https://page-agent.github.io/assets/ui/motion-border.png) 25;
+		-webkit-mask-box-image: url(https://page-agent.github.io/assets/ui/motion-border.png) 25;
 
 		mask-repeat: no-repeat;
 		mask-size: 100% 100%;
