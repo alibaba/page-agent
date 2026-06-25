@@ -79,7 +79,12 @@ export function modelPatch(body: Record<string, any>) {
 		debug('Applying GPT patch: set verbosity to low')
 		body.verbosity = 'low'
 
-		if (modelName.startsWith('gpt-52')) {
+		// *-chat-latest models don't support reasoning_effort — skip patches that set it
+		if (modelName.includes('chat-latest')) {
+			debug('Omitting reasoning_effort and temperature for chat-latest')
+			delete body.reasoning_effort
+			delete body.temperature
+		} else if (modelName.startsWith('gpt-52')) {
 			debug('Applying GPT-52 patch: disable reasoning')
 			body.reasoning_effort = 'none'
 		} else if (modelName.startsWith('gpt-51')) {
