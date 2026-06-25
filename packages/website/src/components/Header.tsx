@@ -31,7 +31,7 @@ export default function Header() {
 							onClick={() => setMobileMenuOpen(false)}
 						>
 							<img
-								src="https://img.alicdn.com/imgextra/i2/O1CN01HB8ylu1uozANEMZw2_!!6000000006085-49-tps-128-128.webp"
+								src="https://page-agent.github.io/assets/brand/page-agent-color-128.webp"
 								alt="PageAgent Logo"
 								className="w-10 h-10 rounded-xl group-hover:scale-110 transition-transform duration-200"
 							/>

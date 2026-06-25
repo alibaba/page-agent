@@ -40,7 +40,7 @@ export default function OneMoreThingSection() {
 						className="group inline-flex items-center gap-3 px-8 py-4 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
 					>
 						<img
-							src="https://img.alicdn.com/imgextra/i3/O1CN01JpW0Vo1sR3FpiZKFM_!!6000000005762-55-tps-192-192.svg"
+							src="https://page-agent.github.io/assets/third-party/chrome-web-store-192.svg"
 							alt="Chrome Web Store"
 							className="w-7 h-7"
 						/>
