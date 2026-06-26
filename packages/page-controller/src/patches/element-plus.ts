@@ -27,43 +27,50 @@ function fixElementPlusInputs() {
 /**
  * Patch Element Plus DatePicker components to make them recognizable.
  * DatePicker wrappers need cursor: pointer to be included in the selector map.
+ * We check on every update and handle dynamic disabled state changes.
  */
 function fixElementPlusDatePicker() {
 	const datePickers = [...document.querySelectorAll('.el-date-editor')]
 	for (const picker of datePickers) {
-		if (picker.hasAttribute('data-element-plus-date-picker-patched')) continue
 		if (!(picker instanceof HTMLElement)) continue
 
-		// Set cursor: pointer unconditionally for DatePicker wrappers
+		// Check if disabled (Element Plus adds .is-disabled class)
+		// If disabled, remove forced cursor (if previously applied) and skip
+		if (picker.classList.contains('is-disabled')) {
+			if (picker.style.cursor === 'pointer') {
+				picker.style.cursor = ''
+			}
+			continue
+		}
+
+		// Set cursor: pointer for DatePicker wrappers
 		// Element Plus doesn't set cursor on these elements, so computed style is 'auto'
 		picker.style.cursor = 'pointer'
-
-		// Mark as patched
-		picker.setAttribute('data-element-plus-date-picker-patched', 'true')
 	}
 }
 
 /**
  * Patch Element Plus Select components to make them recognizable.
  * Select wrappers need cursor: pointer to be included in the selector map.
- * We skip disabled selects to avoid exposing non-actionable elements.
+ * We check on every update and handle dynamic disabled state changes.
  */
 function fixElementPlusSelect() {
 	const selects = [...document.querySelectorAll('.el-select')]
 	for (const select of selects) {
-		if (select.hasAttribute('data-element-plus-select-patched')) continue
 		if (!(select instanceof HTMLElement)) continue
 
-		// Skip disabled selects (Element Plus adds .is-disabled class)
-		// Disabled selects should not be exposed as actionable elements
-		if (select.classList.contains('is-disabled')) continue
+		// Check if disabled (Element Plus adds .is-disabled class)
+		// If disabled, remove forced cursor (if previously applied) and skip
+		if (select.classList.contains('is-disabled')) {
+			if (select.style.cursor === 'pointer') {
+				select.style.cursor = ''
+			}
+			continue
+		}
 
 		// Set cursor: pointer for Select wrappers
 		// Element Plus doesn't set cursor on these elements, so computed style is 'auto'
 		select.style.cursor = 'pointer'
-
-		// Mark as patched
-		select.setAttribute('data-element-plus-select-patched', 'true')
 	}
 }
 
