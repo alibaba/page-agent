@@ -11,9 +11,9 @@ const clearFunctions: (() => void)[] = []
 function fixAntdSelect() {
 	const inputs = [...document.querySelectorAll('input[role="combobox"]')]
 	for (const input of inputs) {
-		// Find the parent div (Ant Design Select container)
-		const parent = input.closest('.ant-select-selector') || input.parentElement
-		if (!parent || !(parent instanceof HTMLElement)) return
+		// Only patch Ant Design Select components (with .ant-select-selector parent)
+		const parent = input.closest('.ant-select-selector')
+		if (!parent || !(parent instanceof HTMLElement)) continue
 
 		// Always refresh ARIA attributes from the hidden input to the parent div
 		// This ensures the LLM sees up-to-date state (e.g., aria-expanded changes when opened/closed)
