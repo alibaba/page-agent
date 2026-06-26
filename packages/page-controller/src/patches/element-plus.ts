@@ -59,9 +59,10 @@ function fixElementPlusSelect() {
 	for (const select of selects) {
 		if (!(select instanceof HTMLElement)) continue
 
-		// Check if disabled (Element Plus adds .is-disabled class)
+		// Check if disabled (Element Plus puts .is-disabled on .el-select__wrapper)
 		// If disabled, remove forced cursor (if previously applied) and skip
-		if (select.classList.contains('is-disabled')) {
+		const innerWrapper = select.querySelector('.el-select__wrapper')
+		if (innerWrapper && innerWrapper.classList.contains('is-disabled')) {
 			if (select.style.cursor === 'pointer') {
 				select.style.cursor = ''
 			}
