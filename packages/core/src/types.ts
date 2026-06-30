@@ -255,11 +255,7 @@ export interface AgentErrorEvent {
  * Union type for all history events
  */
 export type HistoricalEvent =
-	| AgentStepEvent
-	| ObservationEvent
-	| UserTakeoverEvent
-	| RetryEvent
-	| AgentErrorEvent
+	AgentStepEvent | ObservationEvent | UserTakeoverEvent | RetryEvent | AgentErrorEvent
 
 /**
  * Agent lifecycle status.
