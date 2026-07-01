@@ -16,6 +16,20 @@ function sendMessage(message: {
 }
 
 /**
+ * Resolve the window hosting this script's own context, when knowable.
+ *
+ * Extension pages (side panel, hub tab) have `chrome.windows` access and can
+ * identify their own window directly via `getCurrent()`.
+ * Content scripts have no `chrome.windows` access; they resolve `undefined`
+ * here and the background script falls back to `sender.tab` instead.
+ */
+async function getOwnWindowId(): Promise<number | undefined> {
+	if (typeof chrome.windows === 'undefined') return undefined
+	const win = await chrome.windows.getCurrent()
+	return win.id
+}
+
+/**
  * Controller for managing browser tabs.
  * - live in the agent env (extension page or content script)
  * - no chrome apis. call sw for tab operations
@@ -57,6 +71,7 @@ export class TabsController {
 		const activeTabResult = await sendMessage({
 			type: 'TAB_CONTROL',
 			action: 'get_active_tab',
+			payload: { windowId: await getOwnWindowId() },
 		})
 
 		this.initialTabId = activeTabResult.tab?.id
@@ -124,7 +139,7 @@ export class TabsController {
 		const result = await sendMessage({
 			type: 'TAB_CONTROL',
 			action: 'open_new_tab',
-			payload: { url },
+			payload: { url, windowId: this.windowId },
 		})
 
 		if (!result.success) {
@@ -307,7 +322,10 @@ export class TabsController {
 
 			if (message.action === 'created') {
 				const tab = message.payload.tab as chrome.tabs.Tab
-				const shouldTrack = this.experimentalIncludeAllTabs || tab.groupId === this.tabGroupId
+				const shouldTrack =
+					tab.groupId === this.tabGroupId ||
+					// @note Never track tabs from other windows.
+					(this.experimentalIncludeAllTabs && tab.windowId === this.windowId)
 				if (shouldTrack && tab.id != null) {
 					this.addTab({ id: tab.id, isInitial: false })
 					this.switchToTab(tab.id)
