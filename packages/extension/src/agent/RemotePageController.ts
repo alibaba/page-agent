@@ -117,6 +117,10 @@ export class RemotePageController {
 		return res
 	}
 
+	async hoverElement(...args: any[]): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('hover_element', args)
+	}
+
 	async inputText(...args: any[]): Promise<DomActionReturn> {
 		return this.remoteCallDomAction('input_text', args)
 	}
