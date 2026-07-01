@@ -1,24 +1,4 @@
 {
-    "cSpell.words": [
-        "agentic",
-        "contenteditable",
-        "deepseek",
-        "historychange",
-        "HITL",
-        "innerhtml",
-        "languagedetector",
-        "llms",
-        "magicui",
-        "npmmirror",
-        "onwarn",
-        "opensource",
-        "qwen",
-        "retryable",
-        "shadcn",
-        "sidepanel",
-        "statuschange",
-        "wouter"
-    ],
     "files.exclude": {
         "packages/*/node_modules": true
     },
