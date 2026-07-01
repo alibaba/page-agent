@@ -96,6 +96,10 @@ Returns: `Promise<ExecutionResult>`
 
 Stop the current task.
 
+## Limitations
+
+- **Normal browser windows only.** This extension relies on tab group API which does not work for pop-up window or PWA App window.
+
 ## Types
 
 Install `@page-agent/core` for complete types:
