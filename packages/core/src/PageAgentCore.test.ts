@@ -30,7 +30,7 @@ function agentResponse(args: unknown): Response {
 	)
 }
 
-function createPageController(): PageController {
+function createPageController(overrides: Partial<PageController> = {}): PageController {
 	const browserState: BrowserState = {
 		url: 'https://example.test/',
 		title: 'Test page',
@@ -46,6 +46,7 @@ function createPageController(): PageController {
 		getLastUpdateTime: vi.fn(() => Date.now()),
 		getBrowserState: vi.fn(async () => browserState),
 		dispose: vi.fn(),
+		...overrides,
 	} as unknown as PageController
 }
 
@@ -311,6 +312,43 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 	})
 
 	describe('cancellation edge cases', () => {
+		it('aborts wait while reading the last page update time', async () => {
+			let resolveLastUpdate!: (value: number) => void
+			let notifyLastUpdateStarted!: () => void
+			const lastUpdateStarted = new Promise<void>((resolve) => {
+				notifyLastUpdateStarted = resolve
+			})
+			const lastUpdate = new Promise<number>((resolve) => {
+				resolveLastUpdate = resolve
+			})
+			const pageController = createPageController({
+				getLastUpdateTime: vi.fn(() => {
+					notifyLastUpdateStarted()
+					return lastUpdate
+				}),
+			})
+			const fetchMock = createFetchMock().mockResolvedValueOnce(waitResponse())
+			const agent = createAgent(fetchMock, { pageController })
+
+			const task = agent.execute('wait for page')
+			await onceActivity(agent, (detail) => isExecutingTool(detail, 'wait'))
+			await lastUpdateStarted
+
+			let stopSettled = false
+			const stopped = agent.stop().then(() => {
+				stopSettled = true
+			})
+
+			await new Promise((resolve) => setTimeout(resolve, 0))
+			const stoppedBeforeLastUpdateResolved = stopSettled
+			resolveLastUpdate(Date.now())
+			await stopped
+
+			expect(stoppedBeforeLastUpdateResolved).toBe(true)
+			await expect(task).resolves.toMatchObject({ success: false, data: 'Task aborted' })
+			expect(agent.status).toBe('stopped')
+		})
+
 		it('rejects a new task while a stop is still settling', async () => {
 			const fetchMock = createFetchMock().mockResolvedValueOnce(waitResponse())
 			const agent = createAgent(fetchMock)

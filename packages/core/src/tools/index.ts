@@ -5,7 +5,7 @@
 import * as z from 'zod/v4'
 
 import type { PageAgentCore } from '../PageAgentCore'
-import { waitFor } from '../utils'
+import { runWithAbortSignal, waitFor } from '../utils'
 
 /**
  * Per-invocation context passed to every tool execution.
@@ -60,7 +60,10 @@ tools.set(
 		}),
 		execute: async function (this: PageAgentCore, input, { signal }) {
 			// try to subtract LLM calling time from the actual wait time
-			const lastTimeUpdate = await this.pageController.getLastUpdateTime()
+			const lastTimeUpdate = await runWithAbortSignal(
+				() => this.pageController.getLastUpdateTime(),
+				signal
+			)
 			const secondsSinceLastUpdate = (Date.now() - lastTimeUpdate) / 1000
 			const actualWaitTime = Math.max(0, input.seconds - secondsSinceLastUpdate)
 			console.log(`actualWaitTime: ${actualWaitTime} seconds`)
