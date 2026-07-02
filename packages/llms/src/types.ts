@@ -92,7 +92,12 @@ export interface LLMConfig {
 	model: string
 	apiKey?: string
 
+	/**
+	 * @deprecated No longer a standard parameter; many models reject it outright.
+	 * Use `transformRequestBody` to set it only for models you've verified.
+	 */
 	temperature?: number
+
 	maxRetries?: number
 
 	/**
@@ -118,3 +123,5 @@ export interface LLMConfig {
 	 */
 	customFetch?: typeof globalThis.fetch
 }
+
+export type ResolvedLLMConfig = Required<Omit<LLMConfig, 'temperature'>> & { temperature?: number }

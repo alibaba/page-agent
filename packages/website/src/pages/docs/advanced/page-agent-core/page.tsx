@@ -144,13 +144,6 @@ const result = await agent.execute('Fill in the form with test data')`}
 							description: 'LLM AK',
 						},
 						{
-							name: 'temperature',
-							type: 'number',
-							description: isZh
-								? '模型温度参数，控制输出随机性'
-								: 'Model temperature, controls output randomness',
-						},
-						{
 							name: 'maxRetries',
 							type: 'number',
 							defaultValue: '3',

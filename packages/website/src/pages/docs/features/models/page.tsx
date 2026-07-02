@@ -124,8 +124,8 @@ export default function Models() {
 						</li>
 						<li>
 							{isZh
-								? 'ToolCall 能力较弱的模型可能返回错误的格式，常见错误能够自动恢复，建议设置较高的 temperature'
-								: 'Models with weaker ToolCall capabilities may return incorrect formats. Common errors usually auto-recover. Higher temperature recommended'}
+								? 'ToolCall 能力较弱的模型可能返回错误的格式，常见错误能够自动恢复'
+								: 'Models with weaker ToolCall capabilities may return incorrect formats. Common errors usually auto-recover'}
 						</li>
 						<li>
 							{isZh
