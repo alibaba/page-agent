@@ -17,11 +17,12 @@ import { useLanguage } from '../../i18n/context'
 
 let pageAgentModule: Promise<typeof import('page-agent')> | null = null
 
-function getInjection(useCN?: boolean) {
+function getInjection(useCN?: boolean, isZh?: boolean) {
 	const cdn = useCN ? CDN_DEMO_CN_URL : CDN_DEMO_URL
+	const locale = isZh ? 'zh-CN' : 'en-US'
 
 	const injection = encodeURI(
-		`javascript:(function(){var s=document.createElement('script');s.src=\`${cdn}?t=\${Math.random()}\`;s.setAttribute('crossorigin', true);s.type="text/javascript";s.onload=()=>console.log('PageAgent script loaded!');document.body.appendChild(s);})();`
+		`javascript:(function(){var s=document.createElement('script');s.src=\`${cdn}?lang=${locale}&t=\${Math.random()}\`;s.setAttribute('crossorigin', true);s.type="text/javascript";s.onload=()=>console.log('PageAgent script loaded!');document.body.appendChild(s);})();`
 	)
 
 	return `
@@ -298,7 +299,7 @@ export default function HeroSection() {
 														</select>
 														<div
 															dangerouslySetInnerHTML={{
-																__html: getInjection(cdnSource === 'china'),
+																__html: getInjection(cdnSource === 'china', isZh),
 															}}
 														></div>
 													</div>
