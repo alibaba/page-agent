@@ -57,17 +57,29 @@ export function modelPatch(body: Record<string, any>) {
 		delete body.tool_choice
 	}
 
-	if (modelName.startsWith('gpt-5')) {
-		// verbosity trims output tokens across the whole GPT-5 family.
+	if (modelName.startsWith('gpt')) {
 		body.verbosity = 'low'
-		// The GPT-5.0 generation only supports "minimal"; 5.1+ supports "none".
+
+		// gpt-5 gpt-5-mini gpt-5-nano only supports "minimal";
+		// 5.1+ supports "none".
 		body.reasoning_effort = /^gpt-5(-|$)/.test(modelName) ? 'minimal' : 'none'
 		debug(`Patch GPT-5: verbosity=low, reasoning_effort=${body.reasoning_effort}`)
+
+		if (modelName.includes('chat-latest')) {
+			debug('Omitting reasoning_effort and temperature for chat-latest')
+			delete body.reasoning_effort
+			delete body.temperature
+		}
 	}
 
-	if (modelName.startsWith('claude') && /opus|sonnet|haiku/.test(modelName)) {
-		debug('Patch Claude: disable thinking')
-		body.thinking = { type: 'disabled' }
+	if (modelName.startsWith('claude')) {
+		if (/opus|sonnet|haiku/.test(modelName)) {
+			debug('Patch Claude: disable thinking')
+			body.thinking = { type: 'disabled' }
+		} else {
+			debug('Patch Claude: reasoning_effort=low')
+			body.reasoning_effort = 'low'
+		}
 
 		// Convert tool_choice to Claude format
 		if (body.tool_choice === 'required') {
