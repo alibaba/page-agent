@@ -163,6 +163,7 @@ export function modelPatch(body: Record<string, any>, baseURL?: string) {
 		let reasoningEnabled = true
 		if (body.thinking?.type === 'disabled') reasoningEnabled = false
 		if (body.enable_thinking === false) reasoningEnabled = false
+		if (reasoningEffort === 'none') reasoningEnabled = false
 
 		body.reasoning = { enabled: reasoningEnabled }
 
