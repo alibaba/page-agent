@@ -26,7 +26,6 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'qwen3.5-plus',
 		'qwen3.5-flash',
 		'qwen3-max',
-		'qwen3-coder-next',
 	],
 	OpenAI: [
 		'gpt-5.5',
@@ -57,13 +56,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'claude-sonnet-4-5',
 		'claude-haiku-4-5',
 	],
-	MiniMax: [
-		'MiniMax-M3',
-		'MiniMax-M2.7',
-		'MiniMax-M2.7-highspeed',
-		'MiniMax-M2.5',
-		'MiniMax-M2.5-highspeed',
-	],
+	MiniMax: ['MiniMax-M3', 'MiniMax-M2.7', 'MiniMax-M2.5'],
 	xAI: ['grok-4.3', 'grok-build-0.1'],
 	MoonshotAI: ['kimi-k2.7-code', 'kimi-k2.6', 'kimi-k2.5'],
 	'Z.AI': ['glm-5.2', 'glm-5.1', 'glm-5', 'glm-4.7'],
