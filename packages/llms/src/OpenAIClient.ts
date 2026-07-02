@@ -56,7 +56,8 @@ export class OpenAIClient implements LLMClient {
 			requestBody.temperature = this.config.temperature
 		}
 
-		modelPatch(requestBody)
+		modelPatch(requestBody, this.config.baseURL)
+
 		let transformedBody: Record<string, unknown> | undefined
 		try {
 			transformedBody = this.config.transformRequestBody(requestBody)

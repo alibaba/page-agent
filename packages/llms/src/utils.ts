@@ -36,9 +36,11 @@ export function zodToOpenAITool(name: string, tool: Tool) {
  * @todo Need vendor-specific patches.
  * Local and 3rd-party hosted models may have different schema.
  */
-export function modelPatch(body: Record<string, any>) {
+export function modelPatch(body: Record<string, any>, baseURL?: string) {
 	const model: string = body.model || ''
 	if (!model) return body
+
+	const provider = getProvider(baseURL)
 
 	const modelName = normalizeModelName(model)
 
@@ -58,12 +60,14 @@ export function modelPatch(body: Record<string, any>) {
 	}
 
 	if (modelName.startsWith('gpt')) {
-		body.verbosity = 'low'
+		if (modelName.startsWith('gpt-5')) {
+			body.verbosity = 'low'
 
-		// gpt-5 gpt-5-mini gpt-5-nano only supports "minimal";
-		// 5.1+ supports "none".
-		body.reasoning_effort = /^gpt-5(-|$)/.test(modelName) ? 'minimal' : 'none'
-		debug(`Patch GPT-5: verbosity=low, reasoning_effort=${body.reasoning_effort}`)
+			// gpt-5 gpt-5-mini gpt-5-nano only supports "minimal";
+			// 5.1+ supports "none".
+			body.reasoning_effort = /^gpt-5(-|$)/.test(modelName) ? 'minimal' : 'none'
+			debug(`Patch GPT-5: verbosity=low, reasoning_effort=${body.reasoning_effort}`)
+		}
 
 		if (modelName.includes('chat-latest')) {
 			debug('Omitting reasoning_effort and temperature for chat-latest')
@@ -76,20 +80,27 @@ export function modelPatch(body: Record<string, any>) {
 		if (/opus|sonnet|haiku/.test(modelName)) {
 			debug('Patch Claude: disable thinking')
 			body.thinking = { type: 'disabled' }
+
+			if (provider !== 'openrouter') {
+				// Convert tool_choice to Claude format
+				if (body.tool_choice === 'required') {
+					// 'required' -> { type: 'any' } (must call some tool)
+					debug('Applying Claude patch: convert tool_choice "required" to { type: "any" }')
+					body.tool_choice = { type: 'any' }
+				} else if (body.tool_choice?.function?.name) {
+					// { type: 'function', function: { name: '...' } } -> { type: 'tool', name: '...' }
+					debug('Applying Claude patch: convert tool_choice format')
+					body.tool_choice = { type: 'tool', name: body.tool_choice.function.name }
+				}
+			}
 		} else {
 			debug('Patch Claude: reasoning_effort=low')
 			body.reasoning_effort = 'low'
-		}
 
-		// Convert tool_choice to Claude format
-		if (body.tool_choice === 'required') {
-			// 'required' -> { type: 'any' } (must call some tool)
-			debug('Applying Claude patch: convert tool_choice "required" to { type: "any" }')
-			body.tool_choice = { type: 'any' }
-		} else if (body.tool_choice?.function?.name) {
-			// { type: 'function', function: { name: '...' } } -> { type: 'tool', name: '...' }
-			debug('Applying Claude patch: convert tool_choice format')
-			body.tool_choice = { type: 'tool', name: body.tool_choice.function.name }
+			// Fable and mythos can not disable adaptive thinking.
+			// Claude does not support tool_choice with extended thinking.
+			// These 2 concepts are blurred. Basically no tool_choice with thinking.
+			delete body.tool_choice
 		}
 	}
 
@@ -124,18 +135,40 @@ export function modelPatch(body: Record<string, any>) {
 		}
 	}
 
-	if (modelName.startsWith('kimi') && !modelName.includes('code')) {
-		// kimi-k2.7-code cannot disable thinking (errors), hence the code exclusion.
-		debug('Patch Kimi: disable thinking')
-		body.thinking = { type: 'disabled' }
+	if (modelName.startsWith('kimi')) {
+		if (!modelName.includes('code')) {
+			// kimi-k2.7-code cannot disable thinking
+			debug('Patch Kimi: disable thinking')
+			body.thinking = { type: 'disabled' }
+		}
 	}
 
 	if (modelName.startsWith('minimax')) {
-		// Only M3 can disable thinking; M2.x accepts the field as a silent no-op.
-		// parallel_tool_calls is unsupported.
-		debug('Patch MiniMax: disable thinking, remove parallel_tool_calls')
-		body.thinking = { type: 'disabled' }
+		debug('Patch MiniMax: remove parallel_tool_calls')
 		delete body.parallel_tool_calls
+
+		if (modelName.includes('m3')) {
+			// Only M3 can disable thinking
+			debug('Patch MiniMax: disable thinking')
+			body.thinking = { type: 'disabled' }
+		}
+	}
+
+	// provider patches
+
+	if (provider === 'openrouter') {
+		// openrouter use reasoning object instead of reasoning_effort
+
+		const reasoningEffort = body.reasoning_effort
+		let reasoningEnabled = true
+		if (body.thinking?.type === 'disabled') reasoningEnabled = false
+		if (body.enable_thinking === false) reasoningEnabled = false
+
+		body.reasoning = { enabled: reasoningEnabled }
+
+		if (reasoningEnabled && reasoningEffort) {
+			body.reasoning.effort = reasoningEffort
+		}
 	}
 
 	return body
@@ -171,4 +204,12 @@ export function normalizeModelName(modelName: string): string {
 	normalizedName = normalizedName.replace(/\./g, '')
 
 	return normalizedName
+}
+
+export function getProvider(baseURL?: string): 'openrouter' | undefined {
+	if (!baseURL) return undefined
+	const url = new URL(baseURL)
+	const hostname = url.hostname
+	if (hostname === 'openrouter.ai') return 'openrouter'
+	return undefined
 }
