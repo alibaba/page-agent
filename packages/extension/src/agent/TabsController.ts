@@ -1,18 +1,56 @@
 import { isContentScriptAllowed } from './RemotePageController'
 
 const PREFIX = '[TabsController]'
+const BACKGROUND_RESPONSE_TIMEOUT_MS = 2_000
 
 const debug = console.debug.bind(console, `\x1b[90m${PREFIX}\x1b[0m`)
 
-function sendMessage(message: {
+interface TabControlMessage {
 	type: 'TAB_CONTROL'
 	action: TabAction
 	payload?: any
-}): Promise<any> {
-	return chrome.runtime.sendMessage(message).catch((error) => {
-		console.error(PREFIX, message.action, error)
-		return null
+}
+
+function backgroundUnavailableError(action: string, cause?: unknown): Error {
+	const detail = cause instanceof Error ? ` (${cause.message})` : ''
+	return new Error(
+		`Background service worker is not responding while running ${action}${detail}. ` +
+			'Try fully restarting the browser, or inspect the extension side panel Application tab and update or unregister the service worker if it is stuck.'
+	)
+}
+
+async function sendBackgroundMessage<T>(message: unknown, action: string): Promise<T> {
+	let timeoutId: ReturnType<typeof setTimeout> | undefined
+	const timeout = new Promise<never>((_, reject) => {
+		timeoutId = setTimeout(() => {
+			reject(backgroundUnavailableError(action))
+		}, BACKGROUND_RESPONSE_TIMEOUT_MS)
 	})
+
+	try {
+		return await Promise.race([chrome.runtime.sendMessage(message), timeout])
+	} catch (error) {
+		const normalized =
+			error instanceof Error && error.message.startsWith('Background service worker')
+				? error
+				: backgroundUnavailableError(action, error)
+		console.error(PREFIX, action, normalized)
+		throw normalized
+	} finally {
+		if (timeoutId) clearTimeout(timeoutId)
+	}
+}
+
+function sendMessage(message: TabControlMessage): Promise<any> {
+	return sendBackgroundMessage(message, message.action)
+}
+
+async function checkBackgroundHealth() {
+	const result = await sendBackgroundMessage<{ ok?: boolean }>(
+		{ type: 'EXT_HEALTH_CHECK' },
+		'health_check'
+	)
+	if (!result?.ok) throw backgroundUnavailableError('health_check')
 }
 
 /**
@@ -67,6 +105,8 @@ export class TabsController {
 		this.initialTabId = null
 		this.experimentalIncludeAllTabs = experimentalIncludeAllTabs
 		this.task = task
+
+		await checkBackgroundHealth()
 
 		const activeTabResult = await sendMessage({
 			type: 'TAB_CONTROL',
