@@ -94,7 +94,7 @@ export function modelPatch(body: Record<string, any>) {
 			debug('Applying GPT-5.4 patch: remove reasoning_effort')
 			delete body.reasoning_effort
 		} else if (modelName.startsWith('gpt-55')) {
-			debug('Applying GPT-5.4 patch: remove reasoning_effort and temperature')
+			debug('Applying GPT-5.5 patch: remove reasoning_effort and temperature')
 			delete body.reasoning_effort
 			delete body.temperature
 		} else if (modelName.startsWith('gpt-5-mini')) {
