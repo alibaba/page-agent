@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.11.0] - 2026-07-03
+
+### Features
+
+- **LLM model patching rework** - Rewrote per-model request patching for GPT, Claude, Qwen, Gemini, and DeepSeek, and refreshed the recommended model list.
+
+### Improvements
+
+- **Deprecate `LLMConfig.temperature`** - Warn when set; use `transformRequestBody` for models that still accept it.
+- **Extension limitations docs** - Added a limitations section to extension documentation.
+
+### Bug Fixes
+
+- **Multi-window extension tabs** - Resolved the active tab/window from the caller's window context instead of the global active tab.
+- **chat-latest model compatibility** - Skip `reasoning_effort` and `temperature` patches for `*-chat-latest` models.
+- **OpenRouter defaults** - Do not enable reasoning by default on OpenRouter.
+- **Asset URLs** - Migrated `img.alicdn.com` links to `page-agent.github.io`.
+
 ## [1.10.0] - 2026-06-15
 
 ### Breaking Changes
