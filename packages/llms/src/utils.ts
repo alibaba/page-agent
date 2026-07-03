@@ -160,15 +160,15 @@ export function modelPatch(body: Record<string, any>, baseURL?: string) {
 		// openrouter use reasoning object instead of reasoning_effort
 
 		const reasoningEffort = body.reasoning_effort
-		let reasoningEnabled = true
-		if (body.thinking?.type === 'disabled') reasoningEnabled = false
-		if (body.enable_thinking === false) reasoningEnabled = false
-		if (reasoningEffort === 'none') reasoningEnabled = false
+		const reasoningDisabled =
+			body.thinking?.type === 'disabled' ||
+			body.enable_thinking === false ||
+			reasoningEffort === 'none'
 
-		body.reasoning = { enabled: reasoningEnabled }
-
-		if (reasoningEnabled && reasoningEffort) {
-			body.reasoning.effort = reasoningEffort
+		if (reasoningDisabled) {
+			body.reasoning = { enabled: false }
+		} else if (reasoningEffort) {
+			body.reasoning = { enabled: true, effort: reasoningEffort }
 		}
 	}
 
