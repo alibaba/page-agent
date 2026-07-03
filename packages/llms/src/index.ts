@@ -1,34 +1,23 @@
 import { OpenAIClient } from './OpenAIClient'
-import { DEFAULT_TEMPERATURE, LLM_MAX_RETRIES } from './constants'
 import { InvokeError, InvokeErrorTypes } from './errors'
-import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
+import type {
+	InvokeOptions,
+	InvokeResult,
+	LLMClient,
+	LLMConfig,
+	Message,
+	ResolvedLLMConfig,
+	Tool,
+} from './types'
 
 export { InvokeError, InvokeErrorTypes }
 export type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool }
 
-export function parseLLMConfig(config: LLMConfig): Required<LLMConfig> {
-	// Runtime validation as defensive programming (types already guarantee these)
-	if (!config.baseURL || !config.model) {
-		throw new Error(
-			'[PageAgent] LLM configuration required. Please provide: baseURL, model. ' +
-				'See: https://alibaba.github.io/page-agent/docs/features/models'
-		)
-	}
-
-	return {
-		baseURL: config.baseURL,
-		model: config.model,
-		apiKey: config.apiKey || '',
-		temperature: config.temperature ?? DEFAULT_TEMPERATURE,
-		maxRetries: config.maxRetries ?? LLM_MAX_RETRIES,
-		transformRequestBody: config.transformRequestBody ?? ((requestBody) => requestBody),
-		disableNamedToolChoice: config.disableNamedToolChoice ?? false,
-		customFetch: (config.customFetch ?? fetch).bind(globalThis), // fetch will be illegal unless bound
-	}
-}
-
+/**
+ * LLM module
+ */
 export class LLM extends EventTarget {
-	config: Required<LLMConfig>
+	config: ResolvedLLMConfig
 	client: LLMClient
 
 	constructor(config: LLMConfig) {
@@ -88,5 +77,33 @@ async function withRetry<T>(
 
 			await new Promise((resolve) => setTimeout(resolve, 100))
 		}
+	}
+}
+
+export function parseLLMConfig(config: LLMConfig): ResolvedLLMConfig {
+	// Runtime validation as defensive programming (types already guarantee these)
+	if (!config.baseURL || !config.model) {
+		throw new Error(
+			'[PageAgent] LLM configuration required. Please provide: baseURL, model. ' +
+				'See: https://alibaba.github.io/page-agent/docs/features/models'
+		)
+	}
+
+	if (config.temperature !== undefined) {
+		console.warn(
+			'[PageAgent] LLMConfig.temperature is deprecated and will be removed in a future version. ' +
+				'Use transformRequestBody to set it only for models you have verified accept it.'
+		)
+	}
+
+	return {
+		baseURL: config.baseURL,
+		model: config.model,
+		apiKey: config.apiKey || '',
+		temperature: config.temperature,
+		maxRetries: config.maxRetries ?? 2,
+		transformRequestBody: config.transformRequestBody ?? ((requestBody) => requestBody),
+		disableNamedToolChoice: config.disableNamedToolChoice ?? false,
+		customFetch: (config.customFetch ?? fetch).bind(globalThis), // fetch will be illegal unless bound
 	}
 }

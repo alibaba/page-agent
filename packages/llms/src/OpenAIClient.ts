@@ -4,17 +4,24 @@
 import * as z from 'zod/v4'
 
 import { InvokeError, InvokeErrorTypes } from './errors'
-import type { InvokeOptions, InvokeResult, LLMClient, LLMConfig, Message, Tool } from './types'
+import type {
+	InvokeOptions,
+	InvokeResult,
+	LLMClient,
+	Message,
+	ResolvedLLMConfig,
+	Tool,
+} from './types'
 import { modelPatch, zodToOpenAITool } from './utils'
 
 /**
  * Client for OpenAI compatible APIs
  */
 export class OpenAIClient implements LLMClient {
-	config: Required<LLMConfig>
+	config: ResolvedLLMConfig
 	private fetch: typeof globalThis.fetch
 
-	constructor(config: Required<LLMConfig>) {
+	constructor(config: ResolvedLLMConfig) {
 		this.config = config
 		this.fetch = config.customFetch
 	}
@@ -39,14 +46,18 @@ export class OpenAIClient implements LLMClient {
 
 		const requestBody: Record<string, unknown> = {
 			model: this.config.model,
-			temperature: this.config.temperature,
 			messages,
 			tools: openaiTools,
 			parallel_tool_calls: false,
 			tool_choice: toolChoice,
 		}
+		// Only sent if the caller explicitly set it. Most new models throw if this is set.
+		if (this.config.temperature !== undefined) {
+			requestBody.temperature = this.config.temperature
+		}
 
-		modelPatch(requestBody)
+		modelPatch(requestBody, this.config.baseURL)
+
 		let transformedBody: Record<string, unknown> | undefined
 		try {
 			transformedBody = this.config.transformRequestBody(requestBody)

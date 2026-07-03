@@ -6,9 +6,9 @@ import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
 const BASELINE = new Set([
-	'gpt-5.1',
 	'gpt-5.4-mini',
-	'claude-haiku-4.5',
+	'gpt-5.4-nano',
+	'claude-haiku-4-5',
 	'gemini-3.5-flash',
 	'deepseek-v4-flash',
 	'qwen3.5-plus',
@@ -25,9 +25,8 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'qwen3.6-flash',
 		'qwen3.5-plus',
 		'qwen3.5-flash',
-		'qwen3-coder-next',
-		'qwen-3-max',
-		'qwen-3-plus',
+		'qwen3-max',
+		// 'qwen3-coder-next', // low success rate
 	],
 	OpenAI: [
 		'gpt-5.5',
@@ -44,24 +43,29 @@ const MODEL_GROUPS: Record<string, string[]> = {
 	DeepSeek: ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-3.2'],
 	Google: [
 		'gemini-3.5-flash',
+		'gemini-3.1-pro',
 		'gemini-3.1-flash-lite',
-		'gemini-3-pro',
-		'gemini-3-flash',
-		'gemini-2.5',
+		'gemini-2.5-pro',
+		'gemini-2.5-flash',
 	],
 	Anthropic: [
-		'claude-opus-4.8',
-		'claude-opus-4.7',
-		'claude-opus-4.6',
-		'claude-opus-4.5',
-		'claude-sonnet-4.5',
-		'claude-haiku-4.5',
-		'claude-sonnet-3.5',
+		'claude-sonnet-5',
+		'claude-fable-5',
+		'claude-opus-4-8',
+		'claude-opus-4-7',
+		'claude-opus-4-6',
+		'claude-opus-4-5',
+		'claude-sonnet-4-5',
+		'claude-haiku-4-5',
 	],
-	MiniMax: ['MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5', 'MiniMax-M2.5-highspeed'],
-	xAI: ['grok-4.1-fast', 'grok-4', 'grok-code-fast'],
-	MoonshotAI: ['kimi-k2.5'],
-	'Z.AI': ['glm-5', 'glm-4.7'],
+	MiniMax: [
+		// 'MiniMax-M3', low success rate
+		'MiniMax-M2.7',
+		'MiniMax-M2.5',
+	],
+	xAI: ['grok-4.3', 'grok-build-0.1'],
+	MoonshotAI: ['kimi-k2.7-code', 'kimi-k2.6', 'kimi-k2.5'],
+	'Z.AI': ['glm-5.2', 'glm-5.1', 'glm-5', 'glm-4.7'],
 }
 
 const ModelBadge = ({ model, baseline }: { model: string; baseline?: boolean }) => (
@@ -91,7 +95,7 @@ export default function Models() {
 
 			<section className="mb-10">
 				<Heading id="tested-models" className="text-2xl font-semibold mb-3">
-					{isZh ? '已测试模型' : 'Tested Models'}
+					{isZh ? '模型列表' : 'Model List'}
 				</Heading>
 				<div className="bg-linear-to-br from-emerald-50 to-cyan-50 dark:from-emerald-950/30 dark:to-cyan-950/30 rounded-xl p-6 border border-emerald-200/50 dark:border-emerald-800/50">
 					<div className="grid grid-cols-[5rem_1fr] gap-x-3 gap-y-3 items-start">
@@ -124,8 +128,8 @@ export default function Models() {
 						</li>
 						<li>
 							{isZh
-								? 'ToolCall 能力较弱的模型可能返回错误的格式，常见错误能够自动恢复，建议设置较高的 temperature'
-								: 'Models with weaker ToolCall capabilities may return incorrect formats. Common errors usually auto-recover. Higher temperature recommended'}
+								? 'ToolCall 能力较弱的模型可能返回错误的格式，常见错误能够自动恢复'
+								: 'Models with weaker ToolCall capabilities may return incorrect formats. Common errors usually auto-recover'}
 						</li>
 						<li>
 							{isZh
@@ -281,7 +285,7 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 							code={`const pageAgent = new PageAgent({
   baseURL: 'https://your-claude-proxy.example/v1',
   apiKey: 'your-api-key',
-  model: 'claude-sonnet-4.5',
+  model: 'claude-sonnet-5',
   transformRequestBody: (requestBody) => ({
     ...requestBody,
     cache_control: { type: 'ephemeral' },
