@@ -246,10 +246,10 @@ export class PageAgentCore extends EventTarget {
 
 		// graceful exit
 		try {
-			await onBeforeTask?.(this)
+			await onBeforeTask?.(this, { signal })
 
 			while (true) {
-				await onBeforeStep?.(this, step)
+				await onBeforeStep?.(this, step, { signal })
 
 				// handle internal agent errors
 				try {
@@ -342,7 +342,7 @@ export class PageAgentCore extends EventTarget {
 					// @note hook may throw error.
 					// which will override the `break` above and be handled as an external error.
 					// as expected.
-					await onAfterStep?.(this, this.history)
+					await onAfterStep?.(this, this.history, { signal })
 				}
 
 				step++
@@ -358,7 +358,7 @@ export class PageAgentCore extends EventTarget {
 				}
 			} // while
 
-			await onAfterTask?.(this, taskResult)
+			await onAfterTask?.(this, taskResult, { signal })
 
 			return taskResult
 		} catch (error) {

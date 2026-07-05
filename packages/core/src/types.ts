@@ -78,31 +78,47 @@ export interface AgentConfig extends LLMConfig {
 	 * @experimental
 	 * @param agent - The PageAgentCore instance
 	 * @param stepCount - Current step number (0-indexed)
+	 * @param options - Options containing abort signal
 	 */
-	onBeforeStep?: (agent: PageAgentCore, stepCount: number) => Promise<void> | void
+	onBeforeStep?: (
+		agent: PageAgentCore,
+		stepCount: number,
+		options: { signal: AbortSignal }
+	) => Promise<void> | void
 
 	/**
 	 * Called after each step execution.
 	 * @experimental
 	 * @param agent - The PageAgentCore instance
 	 * @param history - Current history of events
+	 * @param options - Options containing abort signal
 	 */
-	onAfterStep?: (agent: PageAgentCore, history: HistoricalEvent[]) => Promise<void> | void
+	onAfterStep?: (
+		agent: PageAgentCore,
+		history: HistoricalEvent[],
+		options: { signal: AbortSignal }
+	) => Promise<void> | void
 
 	/**
 	 * Called before task execution starts.
 	 * @experimental
 	 * @param agent - The PageAgentCore instance
+	 * @param options - Options containing abort signal
 	 */
-	onBeforeTask?: (agent: PageAgentCore) => Promise<void> | void
+	onBeforeTask?: (agent: PageAgentCore, options: { signal: AbortSignal }) => Promise<void> | void
 
 	/**
 	 * Called after task execution completes (success or failure).
 	 * @experimental
 	 * @param agent - The PageAgentCore instance
 	 * @param result - The execution result
+	 * @param options - Options containing abort signal
 	 */
-	onAfterTask?: (agent: PageAgentCore, result: ExecutionResult) => Promise<void> | void
+	onAfterTask?: (
+		agent: PageAgentCore,
+		result: ExecutionResult,
+		options: { signal: AbortSignal }
+	) => Promise<void> | void
 
 	/**
 	 * Called when the agent is disposed.
