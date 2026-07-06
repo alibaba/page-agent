@@ -82,6 +82,9 @@
         ],
         "*.css": [
             "npx prettier --write --ignore-unknown"
+        ],
+        "*.md": [
+            "npx prettier --write --ignore-unknown"
         ]
     },
     "commitlint": {
