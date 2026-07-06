@@ -5,9 +5,18 @@
   <img alt="Page Agent Banner" src="https://page-agent.github.io/assets/readme/banner-light.png">
 </picture>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-auto.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
+[![CI](https://img.shields.io/github/actions/workflow/status/alibaba/page-agent/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/alibaba/page-agent/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/page-agent?style=flat-square&label=npm)](https://www.npmjs.com/package/page-agent)
+[![downloads](https://img.shields.io/npm/dt/page-agent?style=flat-square)](https://www.npmjs.com/package/page-agent)
+[![size](https://img.shields.io/bundlephobia/minzip/page-agent?style=flat-square&label=size)](https://bundlephobia.com/package/page-agent)
+[![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://opensource.org/licenses/MIT)
+[![typescript](https://img.shields.io/badge/%3C%2F%3E-typescript-blue?style=flat-square)](http://www.typescriptlang.org/)
+[![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/akldabonmimlicnjlflnapfeklbfemhj?style=flat-square&label=chrome%20rating)](https://chromewebstore.google.com/detail/page-agent-ext/akldabonmimlicnjlflnapfeklbfemhj)
+[![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
 
-The GUI Agent Living in Your Webpage. Control web interfaces with natural language.
+The GUI Agent Living in Your Webpage. One script gives any web page its own AI agent.
+
+<a href="https://trendshift.io/repositories/22551?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-22551" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/22551" alt="alibaba%2Fpage-agent | Trendshift" width="180"/></a>
 
 🌐 **English** | [中文](./docs/README-zh.md)
 
@@ -15,7 +24,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 <!-- demo video -->
 
-https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2
+[![Watch the demo](https://page-agent.github.io/assets/readme/poster.jpg)](https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2)
 
 ---
 
@@ -27,6 +36,7 @@ https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2
 - **📖 Text-based DOM manipulation**
     - No screenshots. No multi-modal LLMs or special permissions needed.
 - **🧠 Bring your own LLMs**
+    - Works with most mainstream models, including locally deployed ones. See [supported models](https://alibaba.github.io/page-agent/docs/features/models).
 - **🐙 Optional [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension) for multi-page tasks.**
     - And an [MCP Server (Beta)](https://alibaba.github.io/page-agent/docs/features/mcp-server) to control it from outside
 
@@ -35,7 +45,7 @@ https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2
 - **SaaS AI Copilot** — Ship an AI copilot in your product in lines of code. No backend rewrite.
 - **Smart Form Filling** — Turn 20-click workflows into one sentence. Perfect for ERP, CRM, and admin systems.
 - **Accessibility** — Make any web app accessible through natural language. Voice commands, screen readers, zero barrier.
-- **Multi-page Agent** — Extend your own web agent's reach across browser tabs [chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension).
+- **Multi-page Agent** — Extend your own web agent's reach across browser tabs via the [Chrome extension](https://alibaba.github.io/page-agent/docs/features/chrome-extension).
 - **MCP** - Allow your agent clients to control your browser.
 
 ## 🚀 Quick Start
@@ -45,7 +55,7 @@ https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2
 Fastest way to try PageAgent with our free Demo LLM:
 
 ```html
-<script src="{URL}" crossorigin="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.11.0/dist/iife/page-agent.demo.js" crossorigin="anonymous"></script>
 ```
 
 > **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api). By using it, you agree to its [terms](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md).
@@ -78,19 +88,11 @@ await agent.execute('Click the login button')
 
 For more programmatic usage, see [📖 Documentations](https://alibaba.github.io/page-agent/docs/introduction/overview).
 
-## 🌟 Awesome Page Agent
-
-Built something cool with PageAgent? Add it here! Open a PR to share your project.
-
-> These are community projects — not maintained or endorsed by us. Use at your own discretion.
-
-| Project  | Description                                                 |
-| -------- | ----------------------------------------------------------- |
-| _Yours?_ | [Open a PR](https://github.com/alibaba/page-agent/pulls) 🙌 |
-
 ## 🤝 Contributing
 
 We welcome contributions from the community! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and [docs/developer-guide.md](docs/developer-guide.md) for local development workflows.
+
+Built something cool with PageAgent? Share it in [Show and Tell](https://github.com/alibaba/page-agent/discussions/categories/show-and-tell). 🙌
 
 Please read the [maintainer's note](https://github.com/alibaba/page-agent/issues/349) on principles and current state.
 
@@ -117,7 +119,5 @@ We gratefully acknowledge the browser-use project and its contributors for their
 excellent work on web automation and DOM interaction patterns that helped make
 this project possible.
 ```
-
----
 
 **⭐ Star this repo if you find PageAgent helpful!**

@@ -5,9 +5,18 @@
   <img alt="Page Agent Banner" src="https://page-agent.github.io/assets/readme/banner-light.png">
 </picture>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-auto.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-agent)](https://bundlephobia.com/package/page-agent) [![Downloads](https://img.shields.io/npm/dt/page-agent.svg)](https://www.npmjs.com/package/page-agent) [![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
+[![CI](https://img.shields.io/github/actions/workflow/status/alibaba/page-agent/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/alibaba/page-agent/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/page-agent?style=flat-square&label=npm)](https://www.npmjs.com/package/page-agent)
+[![downloads](https://img.shields.io/npm/dt/page-agent?style=flat-square)](https://www.npmjs.com/package/page-agent)
+[![size](https://img.shields.io/bundlephobia/minzip/page-agent?style=flat-square&label=size)](https://bundlephobia.com/package/page-agent)
+[![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://opensource.org/licenses/MIT)
+[![typescript](https://img.shields.io/badge/%3C%2F%3E-typescript-blue?style=flat-square)](http://www.typescriptlang.org/)
+[![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/akldabonmimlicnjlflnapfeklbfemhj?style=flat-square&label=chrome%20rating)](https://chromewebstore.google.com/detail/page-agent-ext/akldabonmimlicnjlflnapfeklbfemhj)
+[![GitHub stars](https://img.shields.io/github/stars/alibaba/page-agent.svg)](https://github.com/alibaba/page-agent)
 
 纯 JS 实现的 GUI agent。使用自然语言操作你的 Web 应用。无须后端、客户端、浏览器插件。
+
+<a href="https://trendshift.io/repositories/22551?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-22551" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/22551" alt="alibaba%2Fpage-agent | Trendshift" width="180"/></a>
 
 🌐 [English](../README.md) | **中文**
 
@@ -15,7 +24,7 @@
 
 <!-- demo video -->
 
-https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2
+[![Watch the demo](https://page-agent.github.io/assets/readme/poster.jpg)](https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2)
 
 ---
 
@@ -26,6 +35,7 @@ https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2
 - **📖 基于文本的 DOM 操作**
     - 无需截图，无需多模态模型或特殊权限
 - **🧠 自备 LLM**
+    - 支持多数主流模型，包括本地部署模型。参见[支持的模型](https://alibaba.github.io/page-agent/docs/features/models)。
 - 🐙 可选的 [Chrome 扩展](https://alibaba.github.io/page-agent/docs/features/chrome-extension)，支持跨页面任务
     - [MCP Server (Beta)](https://alibaba.github.io/page-agent/docs/features/mcp-server)
 
@@ -44,7 +54,7 @@ https://github.com/user-attachments/assets/a1f2eae2-13fb-4aae-98cf-a3fc1620a6c2
 通过我们免费的 Demo LLM 快速体验 PageAgent：
 
 ```html
-<script src="{URL}" crossorigin="true"></script>
+<script src="https://cdn.jsdelivr.net/npm/page-agent@1.11.0/dist/iife/page-agent.demo.js" crossorigin="anonymous"></script>
 ```
 
 > **⚠️ 仅用于技术评估。** 该 Demo CDN 使用了免费的[测试 LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api)，使用即表示您同意其[条款](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md)。
@@ -85,6 +95,8 @@ await agent.execute('点击登录按钮')
 
 我们不接受未经实质性人类参与、完全由 Bot 或 Agent 自动生成的代码。
 
+用 PageAgent 做了有趣的东西？欢迎到 [Show and Tell](https://github.com/alibaba/page-agent/discussions/categories/show-and-tell) 分享。🙌
+
 ## 👏 声明与致谢
 
 本项目基于 **[`browser-use`](https://github.com/browser-use/browser-use)** 的优秀工作构建。
@@ -106,7 +118,5 @@ this project possible.
 ## ⚖️ 许可证
 
 [MIT License](../LICENSE)
-
----
 
 **⭐ 如果觉得 PageAgent 有用或有趣，请给项目点个星！**
