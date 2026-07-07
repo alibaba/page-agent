@@ -291,16 +291,21 @@ export class TabsController {
 	async waitUntilTabLoaded(tabId: number): Promise<void> {
 		const tab = this.tabs.find((t) => t.id === tabId)
 		if (!tab) throw new Error(`Tab ID ${tabId} not found in tab list.`)
-
-		if (tab.status === 'unloaded') throw new Error(`Tab ID ${tabId} is unloaded.`)
 		if (tab.status === 'complete') return
+
+		// When a tracked tab is closed or untracked.
+		// The tab object will be removed from the tab list.
+		// Finding the latest tab object is the only way to know if it's closed.
 
 		debug('waitUntilTabLoaded', tabId)
 		await waitUntil(async () => {
 			await this.syncTabs()
 			const latest = this.tabs.find((t) => t.id === tabId)
-			return !latest || latest.status === 'complete'
+			return !latest || latest.status !== 'loading'
 		}, 4_000)
+
+		const latest = this.tabs.find((t) => t.id === tabId)
+		if (latest?.status === 'unloaded') throw new Error(`Tab ID ${tabId} is unloaded.`)
 	}
 
 	/**
