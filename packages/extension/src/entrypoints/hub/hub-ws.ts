@@ -51,6 +51,8 @@ type OutboundMessage = ReadyMessage | ResultMessage | ErrorMessage
 
 export type HubWsState = 'connecting' | 'connected' | 'disconnected'
 
+const RECONNECT_DELAY_MS = 1000
+
 // --- HubWs class ---
 
 export interface HubWsHandlers {
@@ -68,9 +70,11 @@ export interface HubWsHandlers {
  */
 export class HubWs {
 	#ws: WebSocket | null = null
+	#reconnectTimer: ReturnType<typeof setTimeout> | null = null
 	#state: HubWsState = 'disconnected'
 	#busy = false
 	#approved = false
+	#shouldReconnect = false
 	#handlers: HubWsHandlers
 	#port: number
 	#onStateChange: (state: HubWsState) => void
@@ -90,6 +94,22 @@ export class HubWs {
 	}
 
 	connect() {
+		this.#shouldReconnect = true
+		this.#clearReconnectTimer()
+		this.#open()
+	}
+
+	disconnect() {
+		this.#shouldReconnect = false
+		this.#clearReconnectTimer()
+		this.#ws?.close()
+		this.#ws = null
+		this.#busy = false
+		this.#approved = false
+		this.#setState('disconnected')
+	}
+
+	#open() {
 		if (this.#ws) return
 		this.#setState('connecting')
 
@@ -102,10 +122,16 @@ export class HubWs {
 		})
 
 		ws.addEventListener('close', () => {
+			if (this.#ws !== ws) return
 			this.#ws = null
 			this.#busy = false
 			this.#approved = false
 			this.#setState('disconnected')
+			this.#scheduleReconnect()
+		})
+
+		ws.addEventListener('error', () => {
+			ws.close()
 		})
 
 		ws.addEventListener('message', (event) => {
@@ -113,18 +139,24 @@ export class HubWs {
 		})
 	}
 
-	disconnect() {
-		this.#ws?.close()
-		this.#ws = null
-		this.#busy = false
-		this.#approved = false
-		this.#setState('disconnected')
-	}
-
 	#setState(state: HubWsState) {
 		if (this.#state === state) return
 		this.#state = state
 		this.#onStateChange(state)
+	}
+
+	#scheduleReconnect() {
+		if (!this.#shouldReconnect || this.#reconnectTimer) return
+		this.#reconnectTimer = setTimeout(() => {
+			this.#reconnectTimer = null
+			this.#open()
+		}, RECONNECT_DELAY_MS)
+	}
+
+	#clearReconnectTimer() {
+		if (!this.#reconnectTimer) return
+		clearTimeout(this.#reconnectTimer)
+		this.#reconnectTimer = null
 	}
 
 	#send(msg: OutboundMessage) {
