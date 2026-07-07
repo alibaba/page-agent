@@ -312,7 +312,7 @@ export class TabsController {
 
 	/**
 	 * Pull the window's tabs from the background.
-	 * PUSHING IS BAD. Long-lived ports are stateful troublemakers.
+	 * Pulling is better than pushing. Long-lived ports are stateful troublemakers.
 	 */
 	async syncTabs(): Promise<void> {
 		if (this.disposed || this.windowId == null) return
