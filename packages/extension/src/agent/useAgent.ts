@@ -47,6 +47,7 @@ export function useAgent(): UseAgentResult {
 	const [activity, setActivity] = useState<AgentActivity | null>(null)
 	const [currentTask, setCurrentTask] = useState('')
 	const [config, setConfig] = useState<ExtConfig | null>(null)
+	const agentReadyResolversRef = useRef<(() => void)[]>([])
 
 	useEffect(() => {
 		chrome.storage.local.get(['llmConfig', 'language', 'advancedConfig']).then((result) => {
@@ -97,11 +98,16 @@ export function useAgent(): UseAgentResult {
 		agent.addEventListener('statuschange', handleStatusChange)
 		agent.addEventListener('historychange', handleHistoryChange)
 		agent.addEventListener('activity', handleActivity)
+		const resolvers = agentReadyResolversRef.current.splice(0)
+		resolvers.forEach((resolve) => resolve())
 
 		return () => {
 			agent.removeEventListener('statuschange', handleStatusChange)
 			agent.removeEventListener('historychange', handleHistoryChange)
 			agent.removeEventListener('activity', handleActivity)
+			if (agentRef.current === agent) {
+				agentRef.current = null
+			}
 			agent.dispose()
 		}
 	}, [config])
@@ -143,7 +149,12 @@ export function useAgent(): UseAgentResult {
 				disableNamedToolChoice,
 			}
 			await chrome.storage.local.set({ advancedConfig })
-			setConfig({ ...llmConfig, ...advancedConfig, language })
+			const nextConfig = { ...llmConfig, ...advancedConfig, language }
+			const agentReady = new Promise<void>((resolve) => {
+				agentReadyResolversRef.current.push(resolve)
+			})
+			setConfig(nextConfig)
+			await agentReady
 		},
 		[]
 	)

@@ -218,10 +218,11 @@ export function useHubWs(
 			Number(wsPort),
 			{
 				onExecute: async (task, incomingConfig) => {
-					const { execute, configure, config } = latestRef.current
+					const { configure, config } = latestRef.current
 					if (incomingConfig) {
 						await configure({ ...config, ...incomingConfig } as ExtConfig)
 					}
+					const { execute } = latestRef.current
 					const result = await execute(task)
 					return { success: result.success, data: result.data }
 				},
