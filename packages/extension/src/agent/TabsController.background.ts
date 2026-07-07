@@ -1,5 +1,9 @@
 /**
  * background logics for TabsController
+ *
+ * Keep this stateless: pure request/response handlers only, no in-memory
+ * state, no ports, no event pushing. MV3 SW should be killed and restarted at
+ * any time (idle timeout, extension update) without special handling.
  */
 import type { TabAction } from './TabsController'
 
@@ -160,42 +164,4 @@ export function handleTabControlMessage(
 			sendResponse({ error: `Unknown action: ${action}` })
 			return
 	}
-}
-
-const tabEventPorts = new Set<chrome.runtime.Port>()
-
-function broadcastTabEvent(message: object) {
-	for (const port of tabEventPorts) {
-		port.postMessage(message)
-	}
-}
-
-/**
- * Port-based tab events: agents connect via `chrome.runtime.connect({ name: 'tab-events' })`
- * and receive tab change events through the port. Works for both extension pages and content scripts.
- */
-export function setupTabEventsPort() {
-	chrome.runtime.onConnect.addListener((port) => {
-		if (port.name !== 'tab-events') return
-
-		debug('port connected', port.sender?.tab?.id ?? port.sender?.url)
-		tabEventPorts.add(port)
-
-		port.onDisconnect.addListener(() => {
-			debug('port disconnected')
-			tabEventPorts.delete(port)
-		})
-	})
-
-	chrome.tabs.onCreated.addListener((tab) => {
-		broadcastTabEvent({ action: 'created', payload: { tab } })
-	})
-
-	chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-		broadcastTabEvent({ action: 'removed', payload: { tabId, removeInfo } })
-	})
-
-	chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-		broadcastTabEvent({ action: 'updated', payload: { tabId, changeInfo, tab } })
-	})
 }
