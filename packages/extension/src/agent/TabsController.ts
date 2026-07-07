@@ -40,7 +40,9 @@ export class TabsController {
 
 	private disposed = false
 
+	/* tracked window */
 	private windowId: number | null = null
+	/* tracked tabs */
 	private tabs: TabMeta[] = []
 	private initialTabId: number | null = null
 	private tabGroupId: number | null = null
@@ -418,29 +420,33 @@ function randomColor(): TabGroupColor {
 
 /**
  * Wait until condition becomes true
- * @returns Returns when condition becomes true, throws otherwise
- * @param timeoutMS Timeout in milliseconds, default 1 minutes, throws error on timeout
- * @param error Error object to reject on timeout. If not provided, will resolve with false
+ * @returns Returns when condition becomes true, false if timeout
+ * @param timeoutMS Timeout in milliseconds, default 1 minutes
+ * @param throwIfTimeout Reject on timeout instead of resolving with `false`
  */
-export async function waitUntil(
+async function waitUntil(
 	check: () => boolean | Promise<boolean>,
 	timeoutMS = 60_000,
-	error?: string
+	throwIfTimeout = false
 ): Promise<boolean> {
 	if (await check()) return true
 
 	return new Promise((resolve, reject) => {
 		const start = Date.now()
 		const poll = async () => {
-			if (await check()) return resolve(true)
-			if (Date.now() - start > timeoutMS) {
-				if (error) {
-					return reject(new Error(error))
-				} else {
-					return resolve(false)
+			try {
+				if (await check()) return resolve(true)
+				if (Date.now() - start > timeoutMS) {
+					if (throwIfTimeout) {
+						return reject(new Error(`waitUntil timed out after ${timeoutMS}ms`))
+					} else {
+						return resolve(false)
+					}
 				}
+				setTimeout(poll, 100)
+			} catch (err) {
+				reject(err instanceof Error ? err : new Error(String(err)))
 			}
-			setTimeout(poll, 100)
 		}
 		setTimeout(poll, 100)
 	})
