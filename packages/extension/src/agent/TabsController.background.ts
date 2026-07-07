@@ -148,7 +148,6 @@ export function handleTabControlMessage(
 		}
 
 		case 'get_window_tabs': {
-			debug('get_window_tabs', payload)
 			chrome.tabs
 				.query({ windowId: payload.windowId })
 				.then((tabs) => {
