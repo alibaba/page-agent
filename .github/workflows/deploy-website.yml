@@ -1,4 +1,4 @@
-name: Deploy Demo
+name: Deploy Website
 
 on:
   push:
@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build demo
+      - name: Build website
         run: npm run build:website
 
       - name: Setup Pages
