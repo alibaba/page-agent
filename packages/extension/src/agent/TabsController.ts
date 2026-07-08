@@ -276,11 +276,14 @@ export class TabsController {
 	}
 
 	async summarizeTabs(): Promise<string> {
-		const summaries = [`| Tab ID | URL | Title | Current |`, `|-----|-----|-----|-----|`]
+		const summaries = [
+			`| Tab ID | URL | Title | Status | Current |`,
+			`|-----|-----|-----|-----|-----|`,
+		]
 		for (const tab of this.tabs) {
 			const { title, url } = await this.getTabInfo(tab.id)
 			summaries.push(
-				`| ${tab.id} | ${url} | ${title} | ${this.currentTabId === tab.id ? '✅' : ''} |`
+				`| ${tab.id} | ${url} | ${title} | ${tab.status ?? '-'} | ${this.currentTabId === tab.id ? '✅' : ''} |`
 			)
 		}
 		if (!this.tabs.length) {
