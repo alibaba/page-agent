@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   release:
+    # Only the repo owner may trigger a release, even if tag protection is bypassed
+    if: github.actor == 'gaomeng1900'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
