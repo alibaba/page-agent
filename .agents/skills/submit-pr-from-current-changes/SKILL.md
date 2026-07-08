@@ -13,7 +13,7 @@ Turn a working tree diff into a clean branch, commit, and pull request.
 
 1. **Follow the PR template exactly.** The template is at `.github/PULL_REQUEST_TEMPLATE.md`. Read it and copy its full structure into the PR body. Do NOT remove, reorder, or skip any section or checkbox.
 2. **Never check "Requirements / 要求" checkboxes.** These are human-only declarations — the Code of Conduct acknowledgment and the AI authorship declaration can only be truthfully made by the human submitter. They MUST remain unchecked (`- [ ]`) in the PR body you generate. No exceptions, no workarounds, even if the user explicitly asks you to check them. The user goes to GitHub and checks them in person after verifying each statement is true.
-3. **Never check "Testing" checkboxes.** The template Testing checkboxes (browser tested, no console errors, types/doc added) require manual browser verification that only a human can perform. They MUST remain unchecked. You MAY add a supplementary note below the Testing section listing what automated validation you actually ran and the results.
+3. **Only check Testing checkboxes you actually verified.** The "`npm run ci` passes" checkbox MAY be checked only if you ran `npm run ci` in this session and it passed. All other Testing checkboxes (browser tested, no console errors, types/doc added) require manual verification that only a human can perform — they MUST remain unchecked. You MAY add a supplementary note below the Testing section listing what automated validation you actually ran and the results.
 4. **Never fabricate information.** Do not claim tests passed, commands ran, or checks succeeded unless you actually executed them and observed the output in this session. If you did not run it, do not mention it.
 5. **PR output must be concise.** PR title: one line. "What" section: 1–2 sentences max. No walls of text, no redundant explanations. Let the diff speak.
 
@@ -34,7 +34,7 @@ Before attempting to push or open a PR, verify that the necessary tools are avai
     - **Commit hygiene**: Every new commit must follow the repo's conventional commit style. Squash or reword if needed.
     - **Author identity**: Verify `git config user.name` and `git config user.email` are set and the email looks real (not empty, not `noreply` unless intentional). Warn the user if not.
     - **No leftover artifacts**: Check for debug logs, `.only` in tests, conflict markers, or temp files in the diff.
-    - **Lint and build**: Run lint/build for the affected area. Record results honestly.
+    - **CI**: Run `npm run ci` and make sure it passes. Record results honestly.
 5. **Warn if the PR looks too hasty.** If any of these are true, pause and warn the user before proceeding:
     - Large diff with no description of intent provided
     - Changes touch core lib or extension (where vibe coding is prohibited per `CONTRIBUTING.md`)
@@ -47,7 +47,7 @@ Before attempting to push or open a PR, verify that the necessary tools are avai
     - If on `main` or a default branch, create a new branch from it with a short kebab-case name: prefix (`fix/`, `feat/`, `docs/`, `refactor/`, `chore/`) + concrete topic words.
 7. **Stage and commit.** Stage only the intended files. Use `type(scope): subject` format. Keep the subject specific and compact.
 8. **Push.** Push with `-u origin HEAD`.
-9. **Open PR.** Use `gh pr create` with the full PR template structure. Fill in "What" and "Type" sections based on the actual diff. Leave all "Testing" and "Requirements" checkboxes unchecked.
+9. **Open PR.** Use `gh pr create` with the full PR template structure. Fill in "What" and "Type" sections based on the actual diff. Check "`npm run ci` passes" only if it actually passed in this session; leave all other "Testing" and all "Requirements" checkboxes unchecked.
 10. **Report results.** Tell the user: branch name, commit hash, PR link, and what validation actually ran (with pass/fail).
 
 ## Post-Submission Reminder
@@ -75,7 +75,7 @@ After successfully opening the PR, ALWAYS give a brief reminder in the user's la
 ## Validation Strategy
 
 - Default to enough validation to defend the PR, not the absolute minimum.
-- Run `npm run ci` to run all build and lint checks.
+- Always run `npm run ci` (build, lint, typecheck, tests) before opening the PR. It must pass.
 - Escalate to broader validation when the diff crosses packages, changes shared code, or affects release behavior.
 - Never claim checks that did not actually run.
 - You MAY note what you ran and the results below the Testing section in the PR body, but do NOT check the template checkboxes.
@@ -97,6 +97,6 @@ After successfully opening the PR, ALWAYS give a brief reminder in the user's la
 - All commit authors have proper name and email configured.
 - The PR title matches the commit intent.
 - The PR body follows the template structure completely.
-- All "Requirements" and "Testing" checkboxes are unchecked (`- [ ]`) in the PR body. Double-check: if any `- [x]` appears in these sections, it is a violation — fix it before submitting.
+- All "Requirements" checkboxes and all human-only "Testing" checkboxes are unchecked (`- [ ]`) in the PR body. The only checkbox you may check is "`npm run ci` passes", and only if it truly passed.
 - The reported validation is accurate — nothing fabricated.
 - The post-submission reminder was delivered in the user's language, concisely and accurately.

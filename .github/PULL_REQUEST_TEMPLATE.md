@@ -14,8 +14,8 @@ Closes #(issue)
 
 ## Testing
 
+- [ ] `npm run ci` passes
 - [ ] Tested in modern browsers
-- [ ] No console errors
 - [ ] Types/doc added
 
 ## Requirements / 要求
