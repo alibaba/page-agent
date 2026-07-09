@@ -61,13 +61,12 @@
 ```
 
 > **⚠️ 仅用于技术评估。** 该 Demo CDN 使用了免费的[测试 LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api)，使用即表示您同意其[条款](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md)。
+> 在 URL 后添加 `?autoInit=false` 可只加载脚本，不自动创建 Demo Agent；之后可通过 `new window.PageAgent(...)` 手动初始化。
 
 | Mirrors | URL                                                                                 |
 | ------- | ----------------------------------------------------------------------------------- |
 | Global  | https://cdn.jsdelivr.net/npm/page-agent@1.12.0/dist/iife/page-agent.demo.js         |
 | China   | https://registry.npmmirror.com/page-agent/1.12.0/files/dist/iife/page-agent.demo.js |
-
-在 URL 后添加 `?autoInit=false` 可只加载脚本，不自动创建 Demo Agent；之后可通过 `new window.PageAgent(...)` 手动初始化。
 
 ### NPM 安装
 
