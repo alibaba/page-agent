@@ -3,10 +3,11 @@ name: Deploy Website
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: page-agent-trusted
     permissions:
       contents: read
       pages: write
