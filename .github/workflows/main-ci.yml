@@ -1,14 +1,17 @@
-name: CI
+# Runs only for code already on main, on the self-hosted runner.
+# PR-triggered CI must stay on GitHub-hosted runners (see ci.yml).
+name: Main CI
 permissions:
   contents: read
 
 on:
-  pull_request:
+  push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: page-agent-trusted
     steps:
       - uses: actions/checkout@v7
         with:
