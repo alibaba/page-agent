@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.12.0] - 2026-07-09
+
+- **Stateless extension tab sync** - TabsController pulls tab state on demand instead of long-lived ports, so the MV3 service worker stays stateless and survives idle kills without stalling the side panel.
+- **Tab status in agent context** - Tab summaries now include each tab's loading status for the LLM.
+
 ## [1.11.0] - 2026-07-03
 
 ### Features
