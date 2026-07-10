@@ -51,6 +51,9 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'qwen3-max',
 	],
 	OpenAI: [
+		'gpt-5.6-sol',
+		'gpt-5.6-terra',
+		'gpt-5.6-luna',
 		'gpt-5.5',
 		'gpt-5.4',
 		'gpt-5.4-mini',
@@ -80,7 +83,8 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'claude-haiku-4-5',
 	],
 	MiniMax: ['MiniMax-M3', 'MiniMax-M2.7', 'MiniMax-M2.5'],
-	xAI: ['grok-4.3', 'grok-build-0.1'],
+	xAI: ['grok-4.5', 'grok-4.3', 'grok-build-0.1'],
+	Tencent: ['hy3'],
 	MoonshotAI: ['kimi-k2.7-code', 'kimi-k2.6', 'kimi-k2.5'],
 	'Z.AI': ['glm-5.2', 'glm-5.1', 'glm-5', 'glm-4.7'],
 }
@@ -98,6 +102,7 @@ const OPENROUTER_VENDOR_SLUG: Record<string, string> = {
 	Anthropic: 'anthropic',
 	MiniMax: 'minimax',
 	xAI: 'x-ai',
+	Tencent: 'tencent',
 	MoonshotAI: 'moonshotai',
 	'Z.AI': 'z-ai',
 }
@@ -107,7 +112,7 @@ const OPENROUTER_VENDOR_SLUG: Record<string, string> = {
  * `<vendor-slug>/<lowercased-name>` heuristic — dated snapshots, "-preview"
  * suffixes, "v"-prefixed versions, or dots instead of hyphens in the
  * version number. Verified against `GET https://openrouter.ai/api/v1/models`
- * on 2026-07-03; re-check when models are added to `MODEL_GROUPS`.
+ * on 2026-07-10; re-check when models are added to `MODEL_GROUPS`.
  */
 const OPENROUTER_ID_OVERRIDES: Record<string, string> = {
 	'qwen3.6-max': 'qwen/qwen3.6-max-preview',
