@@ -24,6 +24,13 @@ Before attempting to push or open a PR, verify that the necessary tools are avai
 - Check that `gh` CLI is installed and authenticated (`gh auth status`). If not available, stop and ask the user to install and authenticate GitHub CLI first.
 - If the workflow uses MCP tools for GitHub operations, verify the MCP server is accessible.
 
+## Shell Permissions
+
+`gh` reads credentials from the OS keyring. A sandboxed shell cannot reach the keyring and will report a false auth failure.
+
+- Run every `gh` command (`gh auth status`, `gh pr create`, `gh pr view`, …) and every `git push` / `git fetch` that talks to GitHub with full permissions on the **first** attempt (`required_permissions: ["all"]` for the Shell tool). Do not probe these in the sandbox first.
+- Local read-only git inspection (`git status`, `git diff`, `git log`, `git branch`) may stay sandboxed.
+
 ## Procedure
 
 1. **Read contribution rules.** Read `CONTRIBUTING.md` and any package-level instructions (e.g. `packages/*/AGENTS.md`) relevant to the changed files.
