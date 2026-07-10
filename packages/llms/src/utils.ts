@@ -134,6 +134,12 @@ export function modelPatch(body: Record<string, any>, baseURL?: string) {
 		body.thinking = { type: 'disabled' }
 	}
 
+	if (modelName.startsWith('hy')) {
+		debug('Patch Hunyuan: disable thinking, reasoning_effort=low')
+		body.thinking = { type: 'disabled' }
+		body.reasoning_effort = 'low'
+	}
+
 	if (modelName.startsWith('grok')) {
 		if (/^grok-4-?3/.test(modelName)) {
 			debug('Patch Grok 4.3: reasoning_effort=none')
