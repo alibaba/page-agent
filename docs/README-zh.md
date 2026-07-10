@@ -55,7 +55,7 @@
 
 ```html
 <script
-    src="https://cdn.jsdelivr.net/npm/page-agent@1.12.0/dist/iife/page-agent.demo.js"
+    src="https://cdn.jsdelivr.net/npm/page-agent@1.12.1/dist/iife/page-agent.demo.js"
     crossorigin="anonymous"
 ></script>
 ```
@@ -65,8 +65,8 @@
 
 | Mirrors | URL                                                                                 |
 | ------- | ----------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.12.0/dist/iife/page-agent.demo.js         |
-| China   | https://registry.npmmirror.com/page-agent/1.12.0/files/dist/iife/page-agent.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/page-agent@1.12.1/dist/iife/page-agent.demo.js         |
+| China   | https://registry.npmmirror.com/page-agent/1.12.1/files/dist/iife/page-agent.demo.js |
 
 ### NPM 安装
 
