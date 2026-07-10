@@ -10,9 +10,10 @@
  * Tests `OpenAIClient` directly (not the `LLM` retry wrapper), so a failure
  * always reflects the very first request/response — no retry can mask it.
  *
- * Each provider's tests skip (not fail) when its `TESTING_*_KEY` env var is
- * absent, so this stays CI-safe. To actually run these, put keys in the
- * repo-root `.env`:
+ * Per the `*.live.test.ts` convention this suite is excluded from `npm test`
+ * (slow, costs tokens) — run it manually with `npm run test:live`. Each
+ * provider's tests skip (not fail) when its `TESTING_*_KEY` env var is
+ * absent. Keys live in the repo-root `.env`:
  *
  *   TESTING_OPENROUTER_KEY=...
  *   TESTING_DEEPSEEK_KEY=...
