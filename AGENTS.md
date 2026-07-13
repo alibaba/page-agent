@@ -14,6 +14,7 @@ Internal packages:
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback (SimulatorMask), independent of LLM
 - **UI** (`packages/ui/`) - Panel and i18n. Decoupled from PageAgent
+- **MCP** (`packages/mcp/`) - MCP server bridging MCP clients to the browser extension (npm: `@page-agent/mcp`)
 
 ## Development Commands
 
@@ -40,6 +41,7 @@ packages/
 ├── website/                 # @page-agent/website (private)
 ├── llms/                    # @page-agent/llms
 ├── extension/               # Browser extension
+├── mcp/                     # @page-agent/mcp MCP server (Beta), drives the extension
 ├── page-controller/         # @page-agent/page-controller
 └── ui/                      # @page-agent/ui
 ```
@@ -130,8 +132,8 @@ const pageInfo = await this.pageController.getPageInfo()
 
 - **Framework**: Vitest (unit tests only for now; future E2E goes to `packages/e2e/` with Playwright)
 - **Location**: co-located, `src/foo.test.ts` next to `src/foo.ts`
-- **Coverage today**: `packages/llms` only — other packages will follow incrementally
-- **Adding tests to a new package**: create `vitest.config.ts` in the package and add a `"test": "vitest run"` script. Root `npm test` and `node scripts/ci.js` pick it up through npm workspaces.
+- **Coverage today**: `packages/llms`, `packages/core`, `packages/page-controller`, `packages/ui` — other packages will follow incrementally
+- **Adding tests to a new package**: create `vitest.config.js` in the package and add a `"test": "vitest run"` script. Root `npm test` and `node scripts/ci.js` pick it up through npm workspaces.
 - **Live tests** (hit real external APIs, slow/costly): name them `*.live.test.ts`, exclude them from the package's `test` script, and expose them via a `test:live` script. Root `npm run test:live` runs all of them; they never run in `npm test` or CI. Template: `packages/llms`.
 - **Template**: See @page-agent/llms
 
