@@ -15,7 +15,7 @@ export class I18n {
 		this.translations = locales[this.language]
 	}
 
-	// 类型安全的翻译方法
+	// Type-safe translation method
 	t(key: TranslationKey, params?: TranslationParams): string {
 		const value = this.getNestedValue(this.translations, key)
 		if (!value) {
@@ -45,6 +45,5 @@ export class I18n {
 	}
 }
 
-// 导出类型和实例创建函数
 export type { TranslationKey, SupportedLanguage, TranslationParams }
 export { locales }
