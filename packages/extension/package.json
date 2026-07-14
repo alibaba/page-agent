@@ -7,6 +7,7 @@
         "dev": "wxt",
         "build:ext": "wxt build",
         "zip": "wxt zip",
+        "test": "vitest run",
         "postinstall": "wxt prepare"
     },
     "devDependencies": {
