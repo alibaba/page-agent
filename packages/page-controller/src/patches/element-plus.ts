@@ -18,8 +18,16 @@ function fixElementPlusInputs() {
 		// (e.g., when input value changes, or disabled/readonly/clearable props change)
 		const clearButton = wrapper.querySelector('.el-input__clear')
 		if (clearButton instanceof HTMLElement) {
-			// Add cursor: pointer to the clear button so it's recognized as interactive
+			// Add cursor: pointer and role="button" so the clear button is
+			// recognized as a distinct interactive element by the DOM extractor
+			// (isElementDistinctInteraction checks for role="button").
 			clearButton.style.setProperty('cursor', 'pointer', 'important')
+			if (!clearButton.hasAttribute('role')) {
+				clearButton.setAttribute('role', 'button')
+			}
+			if (!clearButton.hasAttribute('aria-label')) {
+				clearButton.setAttribute('aria-label', 'Clear')
+			}
 		}
 	}
 }
