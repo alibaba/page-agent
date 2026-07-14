@@ -30,7 +30,7 @@
         "react": "^19.2.7",
         "react-dom": "^19.2.7",
         "rough-notation": "^0.5.1",
-        "simple-icons": "^16.25.0",
+        "simple-icons": "^16.26.0",
         "sonner": "^2.0.7",
         "tailwind-merge": "^3.6.0",
         "tailwindcss": "^4.3.2",
