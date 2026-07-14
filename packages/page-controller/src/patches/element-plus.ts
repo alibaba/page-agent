@@ -1,66 +1,66 @@
 import type { PageController } from '../PageController'
 
-const clearFunctions = [] as (() => void)[]
+const clearFunctions: (() => void)[] = []
 
 /**
- * element-plus 的 Input 组件有清空按钮（clearable），
- * 需要让 PageAgent 能识别这个按钮。
- *
- * 同样，DatePicker、Select 等组件也有类似问题。
+ * Patch Element Plus Input components to make the clear button recognizable.
+ * The clear button (.el-input__clear) needs cursor: pointer to be detected.
  */
 function fixElementPlusInputs() {
 	const inputs = [...document.querySelectorAll('.el-input__inner')]
 	for (const input of inputs) {
 		const wrapper = input.closest('.el-input')
 		if (!wrapper || !(wrapper instanceof HTMLElement)) return
-		if (wrapper.hasAttribute('data-element-plus-patched')) continue
+		if (wrapper.hasAttribute('data-element-plus-input-patched')) continue
 
-		// 检查是否有清空按钮
+		// Check if there's a clear button
 		const clearButton = wrapper.querySelector('.el-input__clear')
 		if (clearButton && clearButton instanceof HTMLElement) {
-			// 给清空按钮添加 cursor: pointer 样式，让它被识别为可交互元素
-			// 使用 style 属性直接设置（最高优先级）
+			// Add cursor: pointer to the clear button so it's recognized as interactive
 			clearButton.style.setProperty('cursor', 'pointer', 'important')
+			// Mark as patched only after successfully patching the button
+			wrapper.setAttribute('data-element-plus-input-patched', 'true')
 		}
-
-		// 标记已处理
-		wrapper.setAttribute('data-element-plus-patched', 'true')
+		// Note: if the clear button is not in the DOM yet (empty input), we don't mark as patched
+		// so the next beforeUpdate pass will try again
 	}
 }
 
 /**
- * element-plus 的 DatePicker 组件
+ * Patch Element Plus DatePicker components to make them recognizable.
+ * DatePicker wrappers need cursor: pointer to be included in the selector map.
  */
 function fixElementPlusDatePicker() {
 	const datePickers = [...document.querySelectorAll('.el-date-editor')]
 	for (const picker of datePickers) {
-		if (picker.hasAttribute('data-element-plus-patched')) continue
+		if (picker.hasAttribute('data-element-plus-date-picker-patched')) continue
+		if (!(picker instanceof HTMLElement)) continue
 
-		// 给整个 DatePicker 添加 cursor: pointer 样式
-		if (picker instanceof HTMLElement && getComputedStyle(picker).cursor === 'default') {
-			picker.style.cursor = 'pointer'
-		}
+		// Set cursor: pointer unconditionally for DatePicker wrappers
+		// Element Plus doesn't set cursor on these elements, so computed style is 'auto'
+		picker.style.cursor = 'pointer'
 
-		// 标记已处理
-		picker.setAttribute('data-element-plus-patched', 'true')
+		// Mark as patched
+		picker.setAttribute('data-element-plus-date-picker-patched', 'true')
 	}
 }
 
 /**
- * element-plus 的 Select 组件
+ * Patch Element Plus Select components to make them recognizable.
+ * Select wrappers need cursor: pointer to be included in the selector map.
  */
 function fixElementPlusSelect() {
 	const selects = [...document.querySelectorAll('.el-select')]
 	for (const select of selects) {
-		if (select.hasAttribute('data-element-plus-patched')) continue
+		if (select.hasAttribute('data-element-plus-select-patched')) continue
+		if (!(select instanceof HTMLElement)) continue
 
-		// 给整个 Select 添加 cursor: pointer 样式
-		if (select instanceof HTMLElement && getComputedStyle(select).cursor === 'default') {
-			select.style.cursor = 'pointer'
-		}
+		// Set cursor: pointer unconditionally for Select wrappers
+		// Element Plus doesn't set cursor on these elements, so computed style is 'auto'
+		select.style.cursor = 'pointer'
 
-		// 标记已处理
-		select.setAttribute('data-element-plus-patched', 'true')
+		// Mark as patched
+		select.setAttribute('data-element-plus-select-patched', 'true')
 	}
 }
 
