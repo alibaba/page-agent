@@ -27,11 +27,15 @@ function fixAntdSelect() {
 			parent.setAttribute('aria-controls', input.getAttribute('aria-controls')!)
 		}
 
-		// If the input has a value, add it as a data attribute on the parent
-		// flatTreeToString will read the parent's text content / attributes
+		// If the input has a value, add it as a data attribute on the parent.
+		// flatTreeToString reads the parent's text content / attributes.
+		// Remove stale data-value when the input is cleared so the LLM sees
+		// the current state, not a previous value.
 		const inputEl = input as HTMLInputElement
 		if (inputEl.value) {
 			parent.setAttribute('data-value', inputEl.value)
+		} else {
+			parent.removeAttribute('data-value')
 		}
 
 		// Mark as patched to avoid duplicate processing
