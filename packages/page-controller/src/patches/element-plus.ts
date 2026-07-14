@@ -5,24 +5,22 @@ const clearFunctions: (() => void)[] = []
 /**
  * Patch Element Plus Input components to make the clear button recognizable.
  * The clear button (.el-input__clear) needs cursor: pointer to be detected.
+ * We patch on every update to handle dynamic clear button creation/removal.
  */
 function fixElementPlusInputs() {
 	const inputs = [...document.querySelectorAll('.el-input__inner')]
 	for (const input of inputs) {
 		const wrapper = input.closest('.el-input')
-		if (!wrapper || !(wrapper instanceof HTMLElement)) return
-		if (wrapper.hasAttribute('data-element-plus-input-patched')) continue
+		if (!wrapper || !(wrapper instanceof HTMLElement)) continue
 
-		// Check if there's a clear button
+		// Always check and patch the clear button on every update
+		// This handles cases where the clear button is dynamically created/removed
+		// (e.g., when input value changes, or disabled/readonly/clearable props change)
 		const clearButton = wrapper.querySelector('.el-input__clear')
-		if (clearButton && clearButton instanceof HTMLElement) {
+		if (clearButton instanceof HTMLElement) {
 			// Add cursor: pointer to the clear button so it's recognized as interactive
 			clearButton.style.setProperty('cursor', 'pointer', 'important')
-			// Mark as patched only after successfully patching the button
-			wrapper.setAttribute('data-element-plus-input-patched', 'true')
 		}
-		// Note: if the clear button is not in the DOM yet (empty input), we don't mark as patched
-		// so the next beforeUpdate pass will try again
 	}
 }
 
@@ -48,6 +46,7 @@ function fixElementPlusDatePicker() {
 /**
  * Patch Element Plus Select components to make them recognizable.
  * Select wrappers need cursor: pointer to be included in the selector map.
+ * We skip disabled selects to avoid exposing non-actionable elements.
  */
 function fixElementPlusSelect() {
 	const selects = [...document.querySelectorAll('.el-select')]
@@ -55,7 +54,11 @@ function fixElementPlusSelect() {
 		if (select.hasAttribute('data-element-plus-select-patched')) continue
 		if (!(select instanceof HTMLElement)) continue
 
-		// Set cursor: pointer unconditionally for Select wrappers
+		// Skip disabled selects (Element Plus adds .is-disabled class)
+		// Disabled selects should not be exposed as actionable elements
+		if (select.classList.contains('is-disabled')) continue
+
+		// Set cursor: pointer for Select wrappers
 		// Element Plus doesn't set cursor on these elements, so computed style is 'auto'
 		select.style.cursor = 'pointer'
 
