@@ -17,6 +17,8 @@ import {
 import * as dom from './dom'
 import type { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
 import { getPageInfo } from './dom/getPageInfo'
+import { patchAntd } from './patches/antd'
+import { patchElementPlus } from './patches/element-plus'
 import { patchReact } from './patches/react'
 import { isAnchorElement } from './utils'
 
@@ -92,6 +94,8 @@ export class PageController extends EventTarget {
 		this.config = config
 
 		patchReact(this)
+		patchAntd(this)
+		patchElementPlus(this)
 
 		if (config.enableMask) this.initMask()
 	}
