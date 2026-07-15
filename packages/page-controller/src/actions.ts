@@ -552,3 +552,56 @@ export async function scrollHorizontally(scroll_amount: number, element?: HTMLEl
 		return `✅ ${warningMsg} Scrolled container (${el!.tagName}) horizontally by ${scrolled}px.`
 	}
 }
+
+/**
+ * Resolve the actual `<input type="file">` for an upload target.
+ * Upload UIs usually expose a styled button/label/dropzone while the real
+ * input is visually hidden (and therefore often absent from the selector map),
+ * so we search outward from the indexed element.
+ * @private Internal method, subject to change at any time.
+ */
+export function resolveFileInput(element: HTMLElement): HTMLInputElement {
+	const isFileInput = (el: Element | null): el is HTMLInputElement =>
+		!!el && isInputElement(el) && el.type === 'file'
+
+	if (isFileInput(element)) return element
+
+	const descendant = element.querySelector('input[type="file"]')
+	if (isFileInput(descendant)) return descendant
+
+	if (element instanceof HTMLLabelElement && element.control && isFileInput(element.control)) {
+		return element.control
+	}
+
+	const inForm = element.closest('form')?.querySelector('input[type="file"]')
+	if (isFileInput(inForm ?? null)) return inForm as HTMLInputElement
+
+	// Last resort: a single file input anywhere in the document is unambiguous
+	const all = element.ownerDocument.querySelectorAll('input[type="file"]')
+	if (all.length === 1 && isFileInput(all[0])) return all[0]
+
+	throw new Error(
+		'No file input found for this element. Point the index at the upload button/dropzone or the file input itself.'
+	)
+}
+
+/**
+ * Set files on a file input and fire the events frameworks listen for.
+ * @private Internal method, subject to change at any time.
+ */
+export async function uploadFileToElement(element: HTMLElement, files: File[]) {
+	const input = resolveFileInput(element)
+
+	if (files.length > 1 && !input.multiple) {
+		throw new Error('This file input does not accept multiple files')
+	}
+
+	const dataTransfer = new DataTransfer()
+	for (const file of files) dataTransfer.items.add(file)
+	input.files = dataTransfer.files
+
+	input.dispatchEvent(new Event('input', { bubbles: true }))
+	input.dispatchEvent(new Event('change', { bubbles: true }))
+
+	await waitFor(0.2)
+}
