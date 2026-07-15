@@ -21,7 +21,7 @@ function sendMessage(message: {
  * Extension pages (side panel, hub tab) have `chrome.windows` access and can
  * identify their own window directly via `getCurrent()`.
  * Content scripts have no `chrome.windows` access; they resolve `undefined`
- * here and the background script falls back to `sender.tab` instead.
+ * here and fall back to `chrome.tabs.query` without a windowId.
  */
 async function getOwnWindowId(): Promise<number | undefined> {
 	if (typeof chrome.windows === 'undefined') return undefined
@@ -66,21 +66,24 @@ export class TabsController {
 		this.experimentalIncludeAllTabs = experimentalIncludeAllTabs
 		this.task = task
 
-		const activeTabResult = await sendMessage({
-			type: 'TAB_CONTROL',
-			action: 'get_active_tab',
-			payload: { windowId: await getOwnWindowId() },
-		})
+		// Resolve the active tab directly from the extension context.
+		// chrome.tabs.query from the side panel with its own windowId is more
+		// reliable than routing through the background script, because the
+		// background script's resolveActiveTab may pick the wrong window in
+		// multi-window scenarios (see #457).
+		const windowId = await getOwnWindowId()
+		const query: chrome.tabs.QueryInfo = { active: true }
+		if (windowId != null) {
+			query.windowId = windowId
+		}
+		const activeTabs = await chrome.tabs.query(query)
+		const activeTab = activeTabs[0]
 
-		this.initialTabId = activeTabResult.tab?.id
-		this.windowId = activeTabResult.tab?.windowId
+		this.initialTabId = activeTab?.id ?? null
+		this.windowId = activeTab?.windowId ?? null
 
 		if (!this.initialTabId || !this.windowId) {
-			if (activeTabResult.error) {
-				throw new Error(activeTabResult.error)
-			} else {
-				throw new Error('Failed to get active tab')
-			}
+			throw new Error('Failed to get active tab')
 		}
 
 		if (experimentalIncludeAllTabs) {
@@ -395,7 +398,6 @@ export interface TabsInitOptions {
 }
 
 export type TabAction =
-	| 'get_active_tab'
 	| 'get_tab_info'
 	| 'open_new_tab'
 	| 'create_tab_group'
