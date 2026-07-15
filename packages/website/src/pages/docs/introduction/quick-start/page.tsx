@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import CodeEditor from '@/components/CodeEditor'
 import { Heading } from '@/components/Heading'
 import { CDN_DEMO_CN_URL, CDN_DEMO_URL } from '@/constants'
@@ -5,6 +7,11 @@ import { useLanguage } from '@/i18n/context'
 
 export default function QuickStart() {
 	const { isZh } = useLanguage()
+	const [cdnSource, setCdnSource] = useState<'international' | 'china'>(
+		isZh ? 'china' : 'international'
+	)
+	const cdnBase = cdnSource === 'china' ? CDN_DEMO_CN_URL : CDN_DEMO_URL
+	const cdnUrl = `${cdnBase}?lang=${isZh ? 'zh-CN' : 'en-US'}`
 
 	return (
 		<div>
@@ -54,35 +61,29 @@ export default function QuickStart() {
 							)}
 						</span>
 					</div>
+					<div className="flex items-center gap-2 text-sm">
+						<label htmlFor="cdn-source" className="text-gray-700 dark:text-gray-300">
+							{isZh ? '镜像：' : 'Mirror:'}
+						</label>
+						<select
+							id="cdn-source"
+							value={cdnSource}
+							onChange={(e) => setCdnSource(e.target.value as 'international' | 'china')}
+							className="px-2 py-1.5 text-xs border border-gray-300 dark:border-gray-500 rounded bg-white dark:bg-gray-600 text-gray-700 dark:text-gray-200"
+						>
+							<option value="international">jsdelivr CDN {isZh ? '（全球）' : '(Global)'}</option>
+							<option value="china">npmmirror CDN {isZh ? '（中国）' : '(China)'}</option>
+						</select>
+					</div>
 					<CodeEditor
-						code={`<script src="DEMO_CDN_URL" crossorigin="true"></script>`}
+						code={`<script src="${cdnUrl}" crossorigin="anonymous"></script>`}
 						language="html"
 					/>
-					<p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+					<p className="text-sm text-gray-600 dark:text-gray-300">
 						{isZh
-							? '在 URL 后添加 ?autoInit=false 可只加载脚本，不自动创建 Demo Agent；之后可通过 new window.PageAgent(...) 手动初始化。'
-							: 'Add ?autoInit=false to load the script without creating the demo agent automatically. You can then instantiate it with new window.PageAgent(...).'}
+							? '添加 autoInit=false 参数可只加载脚本，不自动创建 Demo Agent，之后可通过 new window.PageAgent(...) 手动初始化，并使用自定义 LLM。'
+							: 'Add the autoInit=false parameter to load the script without creating the demo agent automatically. You can then instantiate it with new window.PageAgent(...) and your own LLMs.'}
 					</p>
-					<table className="w-full border-collapse text-sm">
-						<thead>
-							<tr className="border-b border-gray-200 dark:border-gray-700">
-								<th className="text-left py-2 px-3 font-semibold w-28">
-									{isZh ? '镜像' : 'Mirrors'}
-								</th>
-								<th className="text-left py-2 px-3 font-semibold">URL</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr className="border-b border-gray-100 dark:border-gray-800">
-								<td className="py-2 px-3">{isZh ? '全球' : 'Global'}</td>
-								<td className="py-2 px-3 font-mono text-xs break-all">{CDN_DEMO_URL}</td>
-							</tr>
-							<tr>
-								<td className="py-2 px-3">{isZh ? '中国' : 'China'}</td>
-								<td className="py-2 px-3 font-mono text-xs break-all">{CDN_DEMO_CN_URL}</td>
-							</tr>
-						</tbody>
-					</table>
 				</div>
 
 				{/* NPM - Recommended */}
