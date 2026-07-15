@@ -431,7 +431,8 @@ function randomColor(): TabGroupColor {
  * @returns Returns when condition becomes true, false if timeout
  * @param timeoutMS Timeout in milliseconds, default 1 minutes
  * @param throwIfTimeout Reject on timeout instead of resolving with `false`
- * @param signal Abort the wait early; rejects with the signal's reason (an `AbortError`)
+ * @param signal Abort the wait early; rejects with the signal's reason (an `AbortError`).
+ *   Observed once per poll iteration, not during an in-flight `check()`.
  */
 async function waitUntil(
 	check: () => boolean | Promise<boolean>,
@@ -439,54 +440,15 @@ async function waitUntil(
 	throwIfTimeout = false,
 	signal?: AbortSignal
 ): Promise<boolean> {
-	signal?.throwIfAborted()
-
-	return new Promise((resolve, reject) => {
-		const start = Date.now()
-		let timer: ReturnType<typeof setTimeout> | undefined
-		let onAbort: (() => void) | undefined
-		let settled = false
-
-		// Single exit point: stop polling, detach the abort listener, and settle exactly once.
-		const settle = (finalize: () => void) => {
-			if (settled) return
-			settled = true
-			if (timer !== undefined) clearTimeout(timer)
-			if (signal && onAbort) signal.removeEventListener('abort', onAbort)
-			finalize()
+	const start = Date.now()
+	while (true) {
+		signal?.throwIfAborted()
+		if (await check()) return true
+		signal?.throwIfAborted()
+		if (Date.now() - start > timeoutMS) {
+			if (throwIfTimeout) throw new Error(`waitUntil timed out after ${timeoutMS}ms`)
+			return false
 		}
-
-		const poll = async () => {
-			let met: boolean
-			try {
-				met = await check()
-			} catch (err) {
-				settle(() => reject(err instanceof Error ? err : new Error(String(err))))
-				return
-			}
-			// The wait may have aborted or timed out while `check` was in flight.
-			if (settled) return
-			if (met) return settle(() => resolve(true))
-			if (Date.now() - start > timeoutMS) {
-				return settle(() =>
-					throwIfTimeout
-						? reject(new Error(`waitUntil timed out after ${timeoutMS}ms`))
-						: resolve(false)
-				)
-			}
-			timer = setTimeout(poll, 100)
-		}
-
-		// Install abort handling before the first check so an abort during a slow or hung
-		// `check()` (here `syncTabs` round-trips the background) rejects promptly instead of
-		// waiting for it to resolve.
-		if (signal) {
-			// reason is a DOMException AbortError.
-			onAbort = () => settle(() => reject(signal.reason as DOMException))
-			if (signal.aborted) return onAbort()
-			signal.addEventListener('abort', onAbort, { once: true })
-		}
-
-		void poll()
-	})
+		await new Promise((resolve) => setTimeout(resolve, 100))
+	}
 }

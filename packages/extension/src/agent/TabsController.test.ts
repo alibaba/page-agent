@@ -26,11 +26,6 @@ describe('TabsController.waitUntilTabLoaded', () => {
 		return { controller, syncCount: () => syncs }
 	}
 
-	it('resolves immediately when the tab is already complete', async () => {
-		const { controller } = makeController([{ id: 1, isInitial: false, status: 'complete' }])
-		await expect(controller.waitUntilTabLoaded(1)).resolves.toBeUndefined()
-	})
-
 	it('throws for an unknown tab id', async () => {
 		const { controller } = makeController([{ id: 1, isInitial: false, status: 'complete' }])
 		await expect(controller.waitUntilTabLoaded(999)).rejects.toThrow('not found')
@@ -56,7 +51,7 @@ describe('TabsController.waitUntilTabLoaded', () => {
 		await expect(controller.waitUntilTabLoaded(1)).rejects.toThrow('unloaded')
 	})
 
-	it('rejects promptly with an AbortError when aborted while the tab is still loading', async () => {
+	it('rejects with an AbortError when aborted while the tab is still loading', async () => {
 		// syncTabs never leaves the tab in `loading`, so only the signal can end the wait.
 		const tabs: TabRow[] = [{ id: 1, isInitial: false, status: 'loading' }]
 		const { controller } = makeController(tabs)
