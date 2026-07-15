@@ -10,7 +10,8 @@ export default function QuickStart() {
 	const [cdnSource, setCdnSource] = useState<'international' | 'china'>(
 		isZh ? 'china' : 'international'
 	)
-	const cdnUrl = cdnSource === 'china' ? CDN_DEMO_CN_URL : CDN_DEMO_URL
+	const cdnBase = cdnSource === 'china' ? CDN_DEMO_CN_URL : CDN_DEMO_URL
+	const cdnUrl = `${cdnBase}?lang=${isZh ? 'zh-CN' : 'en-US'}`
 
 	return (
 		<div>
@@ -80,8 +81,8 @@ export default function QuickStart() {
 					/>
 					<p className="text-sm text-gray-600 dark:text-gray-300">
 						{isZh
-							? '在 URL 后添加 ?autoInit=false 可只加载脚本，不自动创建 Demo Agent，之后可通过 new window.PageAgent(...) 手动初始化，并使用自定义 LLM。'
-							: 'Add ?autoInit=false to load the script without creating the demo agent automatically. You can then instantiate it with new window.PageAgent(...) and your own LLMs.'}
+							? '添加 autoInit=false 参数可只加载脚本，不自动创建 Demo Agent，之后可通过 new window.PageAgent(...) 手动初始化，并使用自定义 LLM。'
+							: 'Add the autoInit=false parameter to load the script without creating the demo agent automatically. You can then instantiate it with new window.PageAgent(...) and your own LLMs.'}
 					</p>
 				</div>
 
