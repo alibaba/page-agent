@@ -55,7 +55,7 @@
 
 ```html
 <script
-    src="https://registry.npmmirror.com/page-agent/1.12.1/files/dist/iife/page-agent.demo.js"
+    src="https://registry.npmmirror.com/page-agent/1.12.2/files/dist/iife/page-agent.demo.js"
     crossorigin="anonymous"
 ></script>
 ```
