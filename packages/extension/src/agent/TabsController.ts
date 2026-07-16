@@ -129,7 +129,7 @@ export class TabsController {
 		await this.updateCurrentTabId(this.currentTabId)
 	}
 
-	async openNewTab(url: string): Promise<string> {
+	async openNewTab(url: string, options: { signal?: AbortSignal } = {}): Promise<string> {
 		debug('openNewTab', url)
 
 		const result = await sendMessage({
@@ -161,7 +161,7 @@ export class TabsController {
 			})
 		}
 
-		await this.waitUntilTabLoaded(tabId)
+		await this.waitUntilTabLoaded(tabId, options)
 
 		return `✅ Opened new tab ID ${tabId} with URL ${url}`
 	}
@@ -293,7 +293,7 @@ export class TabsController {
 		return summaries.join('\n')
 	}
 
-	async waitUntilTabLoaded(tabId: number): Promise<void> {
+	async waitUntilTabLoaded(tabId: number, options: { signal?: AbortSignal } = {}): Promise<void> {
 		const tab = this.tabs.find((t) => t.id === tabId)
 		if (!tab) throw new Error(`Tab ID ${tabId} not found in tab list.`)
 		if (tab.status === 'complete') return
@@ -303,11 +303,16 @@ export class TabsController {
 		// Finding the latest tab object is the only way to know if it's closed.
 
 		debug('waitUntilTabLoaded', tabId)
-		await waitUntil(async () => {
-			await this.syncTabs()
-			const latest = this.tabs.find((t) => t.id === tabId)
-			return !latest || latest.status !== 'loading'
-		}, 4_000)
+		await waitUntil(
+			async () => {
+				await this.syncTabs()
+				const latest = this.tabs.find((t) => t.id === tabId)
+				return !latest || latest.status !== 'loading'
+			},
+			4_000,
+			false,
+			options.signal
+		)
 
 		const latest = this.tabs.find((t) => t.id === tabId)
 		if (latest?.status === 'unloaded') throw new Error(`Tab ID ${tabId} is unloaded.`)
@@ -426,31 +431,24 @@ function randomColor(): TabGroupColor {
  * @returns Returns when condition becomes true, false if timeout
  * @param timeoutMS Timeout in milliseconds, default 1 minutes
  * @param throwIfTimeout Reject on timeout instead of resolving with `false`
+ * @param signal Abort the wait early; rejects with the signal's reason (an `AbortError`).
+ *   Observed once per poll iteration, not during an in-flight `check()`.
  */
 async function waitUntil(
 	check: () => boolean | Promise<boolean>,
 	timeoutMS = 60_000,
-	throwIfTimeout = false
+	throwIfTimeout = false,
+	signal?: AbortSignal
 ): Promise<boolean> {
-	if (await check()) return true
-
-	return new Promise((resolve, reject) => {
-		const start = Date.now()
-		const poll = async () => {
-			try {
-				if (await check()) return resolve(true)
-				if (Date.now() - start > timeoutMS) {
-					if (throwIfTimeout) {
-						return reject(new Error(`waitUntil timed out after ${timeoutMS}ms`))
-					} else {
-						return resolve(false)
-					}
-				}
-				setTimeout(poll, 100)
-			} catch (err) {
-				reject(err instanceof Error ? err : new Error(String(err)))
-			}
+	const start = Date.now()
+	while (true) {
+		signal?.throwIfAborted()
+		if (await check()) return true
+		signal?.throwIfAborted()
+		if (Date.now() - start > timeoutMS) {
+			if (throwIfTimeout) throw new Error(`waitUntil timed out after ${timeoutMS}ms`)
+			return false
 		}
-		setTimeout(poll, 100)
-	})
+		await new Promise((resolve) => setTimeout(resolve, 100))
+	}
 }

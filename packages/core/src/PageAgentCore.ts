@@ -23,7 +23,7 @@ import type {
 } from './types'
 import { assert, fetchLlmsTxt, normalizeResponse, suppress, uid, waitFor } from './utils'
 
-export { tool, type PageAgentTool } from './tools'
+export { tool, type PageAgentTool, type ToolContext } from './tools'
 export type * from './types'
 
 export type PageAgentCoreConfig = AgentConfig & { pageController: PageController }

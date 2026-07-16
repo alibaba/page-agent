@@ -6,6 +6,7 @@
  * - switch_to_tab: Switch to an existing tab
  * - close_tab: Close a tab (optionally switch to another)
  */
+import type { ToolContext } from '@page-agent/core'
 import * as z from 'zod/v4'
 
 import type { TabsController } from './TabsController'
@@ -14,7 +15,7 @@ import type { TabsController } from './TabsController'
 interface TabTool {
 	description: string
 	inputSchema: z.ZodType
-	execute: (input: unknown) => Promise<string>
+	execute: (input: unknown, ctx: ToolContext) => Promise<string>
 }
 
 /**
@@ -29,11 +30,13 @@ export function createTabTools(tabsController: TabsController): Record<string, T
 			inputSchema: z.object({
 				url: z.string().describe('The URL to open in the new tab'),
 			}),
-			execute: async (input: unknown) => {
+			execute: async (input: unknown, { signal }: ToolContext) => {
 				const { url } = input as { url: string }
 				try {
-					return await tabsController.openNewTab(url)
+					return await tabsController.openNewTab(url, { signal })
 				} catch (error) {
+					// Let cancellation propagate instead of masking it as a tool failure.
+					if (signal.aborted) throw error
 					return `❌ Failed: ${error instanceof Error ? error.message : String(error)}`
 				}
 			},
