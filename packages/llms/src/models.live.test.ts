@@ -85,7 +85,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 	MiniMax: ['MiniMax-M3', 'MiniMax-M2.7', 'MiniMax-M2.5'],
 	xAI: ['grok-4.5', 'grok-4.3', 'grok-build-0.1'],
 	Tencent: ['hy3'],
-	MoonshotAI: ['kimi-k2.7-code', 'kimi-k2.6', 'kimi-k2.5'],
+	MoonshotAI: ['kimi-k3', 'kimi-k2.7-code', 'kimi-k2.6', 'kimi-k2.5'],
 	'Z.AI': ['glm-5.2', 'glm-5.1', 'glm-5', 'glm-4.7'],
 }
 

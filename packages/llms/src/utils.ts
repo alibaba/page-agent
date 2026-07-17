@@ -151,7 +151,12 @@ export function modelPatch(body: Record<string, any>, baseURL?: string) {
 	}
 
 	if (modelName.startsWith('kimi')) {
-		if (!modelName.includes('code')) {
+		if (modelName.startsWith('kimi-k3')) {
+			// Kimi K3 always thinks and rejects named tool choice while thinking.
+			debug('Patch Kimi K3: use required tool choice, remove parallel tool calls')
+			delete body.parallel_tool_calls
+			if (body.tool_choice?.function?.name) body.tool_choice = 'required'
+		} else if (!modelName.includes('code')) {
 			// kimi-k2.7-code cannot disable thinking
 			debug('Patch Kimi: disable thinking')
 			body.thinking = { type: 'disabled' }
