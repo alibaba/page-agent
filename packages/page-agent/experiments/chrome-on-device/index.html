@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Page Agent · Chrome on-device lab</title>
+		<style>
+			:root {
+				font-family:
+					Inter,
+					ui-sans-serif,
+					-apple-system,
+					BlinkMacSystemFont,
+					'Segoe UI',
+					sans-serif;
+				color: #1b1d22;
+				background: #f1f0ec;
+				font-synthesis: none;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				min-height: 100vh;
+				margin: 0;
+				background:
+					radial-gradient(circle at 12% 2%, rgba(95, 80, 246, 0.12), transparent 31rem), #f1f0ec;
+			}
+
+			button,
+			input,
+			select,
+			textarea {
+				font: inherit;
+			}
+
+			button {
+				min-height: 2.7rem;
+				border: 1px solid #1b1d22;
+				border-radius: 999px;
+				padding: 0 1.1rem;
+				color: #fff;
+				background: #1b1d22;
+				cursor: pointer;
+				transition:
+					transform 120ms ease,
+					box-shadow 120ms ease;
+			}
+
+			button:hover:not(:disabled) {
+				transform: translateY(-1px);
+				box-shadow: 0 6px 18px rgba(27, 29, 34, 0.14);
+			}
+
+			button:disabled {
+				cursor: not-allowed;
+				opacity: 0.45;
+			}
+
+			button.secondary {
+				color: #1b1d22;
+				background: transparent;
+			}
+
+			.lab {
+				width: min(1180px, calc(100% - 2rem));
+				margin: 0 auto;
+				padding: 3.5rem 0 2.5rem;
+			}
+
+			.lab[hidden] {
+				display: none;
+			}
+
+			.hero {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(17rem, 0.62fr);
+				gap: 2rem;
+				align-items: end;
+				margin-bottom: 2rem;
+			}
+
+			.eyebrow {
+				margin: 0 0 0.65rem;
+				color: #5a4bf4;
+				font-size: 0.76rem;
+				font-weight: 750;
+				letter-spacing: 0.12em;
+				text-transform: uppercase;
+			}
+
+			h1,
+			h2,
+			p {
+				margin-top: 0;
+			}
+
+			h1 {
+				max-width: 14ch;
+				margin-bottom: 0;
+				font-size: clamp(2.7rem, 6vw, 5.4rem);
+				line-height: 0.94;
+				letter-spacing: -0.065em;
+			}
+
+			.lede {
+				margin-bottom: 0;
+				color: #5d6069;
+				font-size: 1.04rem;
+				line-height: 1.6;
+			}
+
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(12, minmax(0, 1fr));
+				gap: 1rem;
+			}
+
+			.card {
+				grid-column: span 6;
+				border: 1px solid rgba(27, 29, 34, 0.13);
+				border-radius: 1.15rem;
+				padding: 1.25rem;
+				background: rgba(255, 255, 255, 0.82);
+				box-shadow: 0 18px 50px rgba(34, 36, 42, 0.06);
+				backdrop-filter: blur(12px);
+			}
+
+			.card.full {
+				grid-column: 1 / -1;
+			}
+
+			.card h2 {
+				margin-bottom: 1rem;
+				font-size: 1rem;
+				letter-spacing: -0.015em;
+			}
+
+			.status-grid {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 0.75rem;
+			}
+
+			.stat {
+				min-width: 0;
+				border-radius: 0.85rem;
+				padding: 0.85rem;
+				background: #f4f3f0;
+			}
+
+			.stat span {
+				display: block;
+				margin-bottom: 0.35rem;
+				color: #777a82;
+				font-size: 0.73rem;
+				text-transform: uppercase;
+				letter-spacing: 0.08em;
+			}
+
+			.stat output {
+				display: block;
+				overflow: hidden;
+				font-weight: 700;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			progress {
+				width: 100%;
+				height: 0.55rem;
+				margin: 1rem 0 0.55rem;
+				accent-color: #5a4bf4;
+			}
+
+			.progress-label,
+			.hint {
+				margin-bottom: 0;
+				color: #777a82;
+				font-size: 0.82rem;
+				line-height: 1.5;
+			}
+
+			.actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.65rem;
+				margin-top: 1rem;
+			}
+
+			label {
+				display: block;
+				margin-bottom: 0.45rem;
+				font-size: 0.82rem;
+				font-weight: 700;
+			}
+
+			textarea,
+			input,
+			select {
+				width: 100%;
+				border: 1px solid #c9c8c3;
+				border-radius: 0.75rem;
+				padding: 0.78rem 0.85rem;
+				color: #1b1d22;
+				background: #fff;
+				outline: none;
+			}
+
+			textarea:focus,
+			input:focus,
+			select:focus {
+				border-color: #5a4bf4;
+				box-shadow: 0 0 0 3px rgba(90, 75, 244, 0.13);
+			}
+
+			textarea {
+				min-height: 7.6rem;
+				resize: vertical;
+				line-height: 1.55;
+			}
+
+			pre {
+				max-height: 25rem;
+				overflow: auto;
+				margin: 0;
+				border-radius: 0.85rem;
+				padding: 1rem;
+				color: #dcdde4;
+				background: #202228;
+				font:
+					0.76rem/1.55 ui-monospace,
+					SFMono-Regular,
+					Menlo,
+					Consolas,
+					monospace;
+				white-space: pre-wrap;
+				word-break: break-word;
+			}
+
+			details + details {
+				margin-top: 0.7rem;
+			}
+
+			summary {
+				margin-bottom: 0.65rem;
+				cursor: pointer;
+				font-size: 0.84rem;
+				font-weight: 700;
+			}
+
+			.fixture-shell {
+				width: min(720px, calc(100% - 2rem));
+				margin: 2rem auto 4rem;
+			}
+
+			.fixture {
+				border: 1px solid rgba(27, 29, 34, 0.15);
+				border-radius: 1.25rem;
+				padding: clamp(1.35rem, 4vw, 2.2rem);
+				background: #fff;
+				box-shadow: 0 24px 70px rgba(34, 36, 42, 0.09);
+			}
+
+			.fixture h2 {
+				margin-bottom: 0.35rem;
+				font-size: 1.7rem;
+				letter-spacing: -0.035em;
+			}
+
+			.fixture-description {
+				margin-bottom: 1.4rem;
+				color: #696c74;
+			}
+
+			.fixture-form {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 1rem;
+			}
+
+			.fixture-form button {
+				grid-column: 1 / -1;
+				justify-self: start;
+				margin-top: 0.25rem;
+			}
+
+			.fixture-result {
+				display: block;
+				margin-top: 1.2rem;
+				border-radius: 0.8rem;
+				padding: 0.9rem;
+				color: #555963;
+				background: #f1f0ec;
+				font-weight: 700;
+			}
+
+			.fixture-result[data-saved='true'] {
+				color: #215f42;
+				background: #e5f5eb;
+			}
+
+			.fixture-running {
+				display: none;
+				margin: 0 0 1rem;
+				color: #5a4bf4;
+				font-size: 0.8rem;
+				font-weight: 750;
+			}
+
+			body[data-agent-running='true'] .fixture-running {
+				display: block;
+			}
+
+			@media (max-width: 760px) {
+				.hero,
+				.fixture-form {
+					grid-template-columns: 1fr;
+				}
+
+				.card {
+					grid-column: 1 / -1;
+				}
+
+				.status-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main id="lab" class="lab" data-page-agent-ignore="true">
+			<header class="hero">
+				<div>
+					<p class="eyebrow">Chrome on-device experiment</p>
+					<h1>Structured action lab.</h1>
+				</div>
+				<p class="lede">
+					Runs Page Agent's real macro-tool schema through Chrome's Prompt API. No request leaves
+					this browser.
+				</p>
+			</header>
+
+			<section class="grid" aria-label="Experiment controls">
+				<article class="card">
+					<h2>Model readiness</h2>
+					<div class="status-grid">
+						<div class="stat">
+							<span>Prompt API</span>
+							<output id="api-status">Checking…</output>
+						</div>
+						<div class="stat">
+							<span>Availability</span>
+							<output id="availability-status">Unknown</output>
+						</div>
+						<div class="stat">
+							<span>Base session</span>
+							<output id="session-status">Cold</output>
+						</div>
+					</div>
+					<progress id="download-progress" value="0" max="1"></progress>
+					<p id="progress-label" class="progress-label">No download started.</p>
+					<div class="actions">
+						<button id="check-button" class="secondary" type="button">Check availability</button>
+						<button id="prepare-button" type="button">Prepare model</button>
+					</div>
+				</article>
+
+				<article class="card">
+					<h2>Controlled run</h2>
+					<label for="task-input">Task</label>
+					<textarea id="task-input">
+Set the profile name to "Ramen", choose "Researcher" as the role, click "Save profile", then finish with the exact confirmation shown on the page.</textarea>
+					<p class="hint">
+						The lab UI is excluded from Page Agent's DOM view. Press Escape to stop.
+					</p>
+					<div class="actions">
+						<button id="run-button" type="button" disabled>Run Page Agent</button>
+						<button id="reset-button" class="secondary" type="button">Reset fixture</button>
+					</div>
+				</article>
+
+				<article class="card full">
+					<h2>Measurements</h2>
+					<pre id="metrics-output">No requests yet.</pre>
+				</article>
+
+				<article class="card full">
+					<h2>Trace</h2>
+					<details open>
+						<summary>Agent result</summary>
+						<pre id="result-output">No run yet.</pre>
+					</details>
+					<details>
+						<summary>Latest AgentOutput JSON Schema</summary>
+						<pre id="schema-output">Captured on first request.</pre>
+					</details>
+					<details>
+						<summary>Errors</summary>
+						<pre id="errors-output">No errors.</pre>
+					</details>
+				</article>
+			</section>
+		</main>
+
+		<section class="fixture-shell" aria-label="Page Agent test fixture">
+			<article class="fixture">
+				<p class="fixture-running">Page Agent is running</p>
+				<p class="eyebrow">Controlled fixture</p>
+				<h2>Profile editor</h2>
+				<p class="fixture-description">Create a small team profile and save it.</p>
+				<form id="profile-form" class="fixture-form">
+					<div>
+						<label for="profile-name">Profile name</label>
+						<input id="profile-name" name="name" type="text" autocomplete="off" />
+					</div>
+					<div>
+						<label for="profile-role">Role</label>
+						<select id="profile-role" name="role">
+							<option value="">Choose a role</option>
+							<option value="Designer">Designer</option>
+							<option value="Engineer">Engineer</option>
+							<option value="Researcher">Researcher</option>
+						</select>
+					</div>
+					<button type="submit">Save profile</button>
+				</form>
+				<output id="fixture-result" class="fixture-result" data-saved="false"
+					>No profile saved.</output
+				>
+			</article>
+		</section>
+
+		<script type="module" src="./main.ts"></script>
+	</body>
+</html>

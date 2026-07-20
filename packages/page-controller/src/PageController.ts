@@ -18,7 +18,7 @@ import * as dom from './dom'
 import type { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
 import { getPageInfo } from './dom/getPageInfo'
 import { patchReact } from './patches/react'
-import { isAnchorElement } from './utils'
+import { isAnchorElement, isInputElement, isSelectElement } from './utils'
 
 /**
  * Configuration for PageController
@@ -246,6 +246,12 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
+			if (isSelectElement(element)) {
+				return {
+					success: false,
+					message: `⚠️ Element ${index} is a <select>. Use select_dropdown_option({ index: ${index}, text: "<visible option text>" }).`,
+				}
+			}
 			await clickElement(element)
 
 			// Handle links that open in new tabs
@@ -276,6 +282,24 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
+			if (isSelectElement(element)) {
+				return {
+					success: false,
+					message: `⚠️ Element ${index} is a <select>. Use select_dropdown_option({ index: ${index}, text: "<visible option text>" }).`,
+				}
+			}
+			if (isInputElement(element) && ['checkbox', 'radio'].includes(element.type)) {
+				return {
+					success: false,
+					message: `❌ Element ${index} is input[type="${element.type}"]. Use click_element_by_index({ index: ${index} }) to toggle it.`,
+				}
+			}
+			if (isInputElement(element) && element.type === 'file') {
+				return {
+					success: false,
+					message: `❌ Element ${index} is input[type="file"], which input_text cannot operate. Ask the user to choose a file.`,
+				}
+			}
 			await inputTextElement(element, text)
 
 			return {

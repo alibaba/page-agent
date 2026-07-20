@@ -62,6 +62,12 @@ function blurLastClickedElement() {
  * @private Internal method, subject to change at any time.
  */
 export async function clickElement(element: HTMLElement) {
+	if (isSelectElement(element)) {
+		throw new Error(
+			'Native <select> cannot be completed with click_element_by_index. Use select_dropdown_option with this element index and the visible option text.'
+		)
+	}
+
 	blurLastClickedElement()
 
 	lastClickedElement = element
@@ -131,7 +137,12 @@ export async function clickElement(element: HTMLElement) {
 export async function inputTextElement(element: HTMLElement, text: string) {
 	const isContentEditable = element.isContentEditable
 	if (!isInputElement(element) && !isTextAreaElement(element) && !isContentEditable) {
-		throw new Error('Element is not an input, textarea, or contenteditable')
+		if (isSelectElement(element)) {
+			throw new Error(
+				'Native <select> does not accept text input. Use select_dropdown_option with this element index and the visible option text.'
+			)
+		}
+		throw new Error('Element does not accept text input')
 	}
 
 	await clickElement(element)
@@ -226,9 +237,18 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		element.dispatchEvent(new Event('input', { bubbles: true }))
 	}
 
+	blurLastClickedElement()
 	await waitFor(0.1)
 
-	blurLastClickedElement()
+	const actualText = isContentEditable
+		? element.innerText.trim()
+		: (element as HTMLInputElement | HTMLTextAreaElement).value
+	const expectedText = isContentEditable ? text.trim() : text
+	if (actualText !== expectedText) {
+		throw new Error(
+			`Input did not persist. Expected value ${JSON.stringify(expectedText)}, but the element contains ${JSON.stringify(actualText)}. Inspect the current page state before retrying.`
+		)
+	}
 }
 
 /**
@@ -247,10 +267,21 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 		throw new Error(`Option with text "${optionText}" not found in select element`)
 	}
 
-	selectElement.value = option.value
+	const expectedText = option.textContent?.trim() ?? ''
+	const expectedValue = option.value
+	selectElement.selectedIndex = option.index
+	selectElement.dispatchEvent(new Event('input', { bubbles: true }))
 	selectElement.dispatchEvent(new Event('change', { bubbles: true }))
 
 	await waitFor(0.1) // Wait to ensure change event processing completes
+
+	const selectedOption = selectElement.selectedOptions.item(0)
+	const actualText = selectedOption?.textContent?.trim() ?? ''
+	if (!selectedOption || selectElement.value !== expectedValue || actualText !== expectedText) {
+		throw new Error(
+			`Selection did not persist. Expected option ${JSON.stringify(expectedText)} with value ${JSON.stringify(expectedValue)}, but the current option is ${JSON.stringify(actualText)} with value ${JSON.stringify(selectElement.value)}. Inspect the current page state before retrying.`
+		)
+	}
 }
 
 interface ScrollableElement extends Element {
