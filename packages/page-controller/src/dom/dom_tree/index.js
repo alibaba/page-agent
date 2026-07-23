@@ -42,8 +42,12 @@ export default (
 	/**
 	 * @edit
 	 */
-	const { interactiveBlacklist, interactiveWhitelist, highlightOpacity, highlightLabelOpacity } =
-		args
+	const {
+		interactiveBlacklist = [],
+		interactiveWhitelist = [],
+		highlightOpacity,
+		highlightLabelOpacity,
+	} = args
 
 	const { doHighlightElements, focusHighlightIndex, viewportExpansion, debugMode } = args
 	let highlightIndex = 0 // Reset highlight index
@@ -958,6 +962,64 @@ export default (
 	}
 
 	/**
+	 * Intersects a rect with any ancestor clipping boxes so clipped descendants are not treated as visible.
+	 *
+	 * @param {HTMLElement} element - The element to clip.
+	 * @param {{left:number, top:number, right:number, bottom:number, width:number, height:number}} rect - The rect to clip.
+	 * @returns {{left:number, top:number, right:number, bottom:number, width:number, height:number} | null} The clipped rect, or null if nothing remains visible.
+	 */
+	function getClippedRect(element, rect) {
+		if (!element || !rect) return null
+
+		let clippedRect = {
+			left: rect.left,
+			top: rect.top,
+			right: rect.right,
+			bottom: rect.bottom,
+			width: rect.width,
+			height: rect.height,
+		}
+
+		let currentElement = element.parentElement
+		while (currentElement) {
+			const currentStyle = getCachedComputedStyle(currentElement)
+			const overflow = currentStyle?.overflow || ''
+			const overflowX = currentStyle?.overflowX || ''
+			const overflowY = currentStyle?.overflowY || ''
+			const isClippingContainer = ['hidden', 'clip', 'auto', 'scroll', 'overlay'].some((value) =>
+				[overflow, overflowX, overflowY].includes(value)
+			)
+
+			if (isClippingContainer) {
+				const ancestorRect = currentElement.getBoundingClientRect()
+				const clippedLeft = Math.max(clippedRect.left, ancestorRect.left)
+				const clippedTop = Math.max(clippedRect.top, ancestorRect.top)
+				const clippedRight = Math.min(clippedRect.right, ancestorRect.right)
+				const clippedBottom = Math.min(clippedRect.bottom, ancestorRect.bottom)
+				clippedRect = {
+					left: clippedLeft,
+					top: clippedTop,
+					right: clippedRight,
+					bottom: clippedBottom,
+					width: Math.max(0, clippedRight - clippedLeft),
+					height: Math.max(0, clippedBottom - clippedTop),
+				}
+
+				if (clippedRect.width <= 0 || clippedRect.height <= 0) {
+					return null
+				}
+			}
+
+			if (currentElement === element.ownerDocument?.documentElement) {
+				break
+			}
+			currentElement = currentElement.parentElement
+		}
+
+		return clippedRect
+	}
+
+	/**
 	 * Checks if an element is the topmost element at its position.
 	 *
 	 * @param {HTMLElement} element - The element to check.
@@ -977,16 +1039,19 @@ export default (
 
 		let isAnyRectInViewport = false
 		for (const rect of rects) {
+			const visibleRect = getClippedRect(element, rect)
+			if (!visibleRect) continue
+
 			// Use the same logic as isInExpandedViewport check
 			if (
-				rect.width > 0 &&
-				rect.height > 0 &&
+				visibleRect.width > 0 &&
+				visibleRect.height > 0 &&
 				!(
 					// Only check non-empty rects
-					rect.bottom < -viewportExpansion ||
-					rect.top > window.innerHeight + viewportExpansion ||
-					rect.right < -viewportExpansion ||
-					rect.left > window.innerWidth + viewportExpansion
+					visibleRect.bottom < -viewportExpansion ||
+					visibleRect.top > window.innerHeight + viewportExpansion ||
+					visibleRect.right < -viewportExpansion ||
+					visibleRect.left > window.innerWidth + viewportExpansion
 				)
 			) {
 				isAnyRectInViewport = true
@@ -1015,11 +1080,16 @@ export default (
 			return false // No valid rect found
 		}
 
+		const visibleRect = getClippedRect(element, rect)
+		if (!visibleRect) {
+			return false
+		}
+
 		// For shadow DOM, we need to check within its own root context
 		const shadowRoot = element.getRootNode()
 		if (shadowRoot instanceof ShadowRoot) {
-			const centerX = rect.left + rect.width / 2
-			const centerY = rect.top + rect.height / 2
+			const centerX = visibleRect.left + visibleRect.width / 2
+			const centerY = visibleRect.top + visibleRect.height / 2
 
 			try {
 				const topEl = shadowRoot.elementFromPoint(centerX, centerY)
@@ -1042,11 +1112,11 @@ export default (
 		// center of the element and at the corners to ensure we catch more cases.
 		const checkPoints = [
 			// Initially only this was used, but it was not enough
-			{ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 },
-			{ x: rect.left + margin, y: rect.top + margin }, // top left
-			// { x: rect.right - margin, y: rect.top + margin },    // top right
-			// { x: rect.left + margin, y: rect.bottom - margin },  // bottom left
-			{ x: rect.right - margin, y: rect.bottom - margin }, // bottom right
+			{ x: visibleRect.left + visibleRect.width / 2, y: visibleRect.top + visibleRect.height / 2 },
+			{ x: visibleRect.left + margin, y: visibleRect.top + margin }, // top left
+			// { x: visibleRect.right - margin, y: visibleRect.top + margin },    // top right
+			// { x: visibleRect.left + margin, y: visibleRect.bottom - margin },  // bottom left
+			{ x: visibleRect.right - margin, y: visibleRect.bottom - margin }, // bottom right
 		]
 
 		return checkPoints.some(({ x, y }) => {
@@ -1095,17 +1165,18 @@ export default (
 			)
 		}
 
-		// Check if *any* client rect is within the viewport
+		// Check if *any* clipped rect is within the viewport
 		for (const rect of rects) {
-			if (rect.width === 0 || rect.height === 0) continue // Skip empty rects
+			const visibleRect = getClippedRect(element, rect)
+			if (!visibleRect || visibleRect.width === 0 || visibleRect.height === 0) continue // Skip empty rects
 
 			if (!(
-				rect.bottom < -viewportExpansion ||
-				rect.top > window.innerHeight + viewportExpansion ||
-				rect.right < -viewportExpansion ||
-				rect.left > window.innerWidth + viewportExpansion
+				visibleRect.bottom < -viewportExpansion ||
+				visibleRect.top > window.innerHeight + viewportExpansion ||
+				visibleRect.right < -viewportExpansion ||
+				visibleRect.left > window.innerWidth + viewportExpansion
 			)) {
-				return true // Found at least one rect in the viewport
+				return true // Found at least one clipped rect in the viewport
 			}
 		}
 
