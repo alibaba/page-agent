@@ -44,12 +44,18 @@ mcpServer.registerTool(
 				.describe(
 					'Task description. Give specific instructions for the task. Steps preferable. And the information you want to get after the task is done.'
 				),
+			files: z
+				.array(z.string())
+				.optional()
+				.describe(
+					'Absolute paths (on the machine running this MCP server) of files the agent may upload into file inputs on the page.'
+				),
 		},
 	},
-	async ({ task }) => {
+	async ({ task, files }) => {
 		try {
 			const config = Object.keys(llmConfig).length > 0 ? llmConfig : undefined
-			const result = await hub.executeTask(task, config)
+			const result = await hub.executeTask(task, config, files)
 			return {
 				content: [
 					{

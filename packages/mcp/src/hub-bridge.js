@@ -1,6 +1,9 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs'
+import { randomUUID } from 'node:crypto'
+import { createReadStream, readFileSync } from 'node:fs'
+import { stat } from 'node:fs/promises'
 import http from 'node:http'
+import { basename, extname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { WebSocketServer } from 'ws'
 
@@ -12,6 +15,27 @@ const launcherTemplate = readFileSync(
 	fileURLToPath(new URL('./launcher.html', import.meta.url)),
 	'utf-8'
 )
+
+/** Minimal ext → MIME map for common upload types */
+const MIME_TYPES = {
+	'.pdf': 'application/pdf',
+	'.png': 'image/png',
+	'.jpg': 'image/jpeg',
+	'.jpeg': 'image/jpeg',
+	'.gif': 'image/gif',
+	'.webp': 'image/webp',
+	'.svg': 'image/svg+xml',
+	'.txt': 'text/plain',
+	'.csv': 'text/csv',
+	'.json': 'application/json',
+	'.zip': 'application/zip',
+	'.mp4': 'video/mp4',
+	'.mp3': 'audio/mpeg',
+	'.doc': 'application/msword',
+	'.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+	'.xls': 'application/vnd.ms-excel',
+	'.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+}
 
 /**
  * HTTP + WebSocket bridge to the hub.html extension tab.
@@ -34,10 +58,22 @@ export class HubBridge {
 	/** @type {{ resolve: (r: {success: boolean, data: string}) => void, reject: (e: Error) => void } | null} */
 	#pendingTask = null
 
+	/**
+	 * Files offered to the current task, keyed by unguessable random id.
+	 * Only registered paths are ever served — the HTTP bridge cannot be used
+	 * to read arbitrary local files.
+	 * @type {Map<string, { path: string, name: string, mime: string, size: number }>}
+	 */
+	#taskFiles = new Map()
+
 	/** @param {number} port */
 	constructor(port) {
 		this.port = port
-		this.#httpServer = http.createServer((_req, res) => {
+		this.#httpServer = http.createServer((req, res) => {
+			if (req.url?.startsWith('/files/')) {
+				this.#serveFile(req.url.slice('/files/'.length), res)
+				return
+			}
 			const html = launcherTemplate
 				.replaceAll('__EXT_ID__', EXT_ID)
 				.replaceAll('__STORE_URL__', STORE_URL)
@@ -77,17 +113,68 @@ export class HubBridge {
 	}
 
 	/**
+	 * Validate file paths and register them for the next task.
+	 * @param {string[]} paths absolute paths on this machine
+	 * @returns {Promise<{ id: string, name: string, mime: string, size: number }[]>}
+	 */
+	async registerFiles(paths) {
+		this.#taskFiles.clear()
+		const metas = []
+		for (const path of paths) {
+			const info = await stat(path).catch(() => null)
+			if (!info || !info.isFile()) {
+				this.#taskFiles.clear()
+				throw new Error(`File not found or not a regular file: ${path}`)
+			}
+			const id = randomUUID()
+			const meta = {
+				path,
+				name: basename(path),
+				mime: MIME_TYPES[extname(path).toLowerCase()] ?? 'application/octet-stream',
+				size: info.size,
+			}
+			this.#taskFiles.set(id, meta)
+			metas.push({ id, name: meta.name, mime: meta.mime, size: meta.size })
+		}
+		return metas
+	}
+
+	/**
+	 * @param {string} id
+	 * @param {http.ServerResponse} res
+	 */
+	#serveFile(id, res) {
+		const meta = this.#taskFiles.get(id)
+		if (!meta) {
+			res.writeHead(404)
+			res.end('Not found')
+			return
+		}
+		res.writeHead(200, {
+			'Content-Type': meta.mime,
+			'Content-Length': meta.size,
+			'Access-Control-Allow-Origin': '*',
+		})
+		createReadStream(meta.path)
+			.on('error', () => res.destroy())
+			.pipe(res)
+	}
+
+	/**
 	 * @param {string} task
 	 * @param {Record<string, unknown>} [config]
+	 * @param {string[]} [filePaths] absolute paths of files to offer for upload
 	 * @returns {Promise<{success: boolean, data: string}>}
 	 */
-	async executeTask(task, config) {
+	async executeTask(task, config, filePaths) {
 		if (!this.connected) throw new Error('Hub is not connected. Is the extension running?')
 		if (this.#pendingTask) throw new Error('Agent is already running a task.')
 
+		const files = filePaths?.length ? await this.registerFiles(filePaths) : undefined
+
 		return new Promise((resolve, reject) => {
 			this.#pendingTask = { resolve, reject }
-			this.#hub.send(JSON.stringify({ type: 'execute', task, config }))
+			this.#hub.send(JSON.stringify({ type: 'execute', task, config, files }))
 		})
 	}
 
@@ -121,9 +208,11 @@ export class HubBridge {
 			if (msg.type === 'result') {
 				this.#pendingTask?.resolve({ success: msg.success ?? false, data: msg.data ?? '' })
 				this.#pendingTask = null
+				this.#taskFiles.clear()
 			} else if (msg.type === 'error') {
 				this.#pendingTask?.reject(new Error(msg.message ?? 'Unknown error from hub'))
 				this.#pendingTask = null
+				this.#taskFiles.clear()
 			}
 		})
 
