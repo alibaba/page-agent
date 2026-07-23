@@ -6,7 +6,11 @@ import * as z from 'zod/v4'
 
 import type { Tool } from './types'
 
-const debug = console.debug.bind(console, chalk.gray('[LLM]'))
+// Keep console access inside the wrapper so bundlers can drop it without
+// replacing the callable logger itself with `undefined`.
+function debug(...args: unknown[]) {
+	console.debug(chalk.gray('[LLM]'), ...args)
+}
 
 /**
  * Convert Zod schema to OpenAI tool format
