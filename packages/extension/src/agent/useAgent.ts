@@ -48,6 +48,50 @@ export function useAgent(): UseAgentResult {
 	const [currentTask, setCurrentTask] = useState('')
 	const [config, setConfig] = useState<ExtConfig | null>(null)
 
+	const cleanupRef = useRef<(() => void) | null>(null)
+
+	const setupAgent = useCallback((newConfig: ExtConfig) => {
+		if (cleanupRef.current) {
+			cleanupRef.current()
+			cleanupRef.current = null
+		}
+
+		const { systemInstruction, ...agentConfig } = newConfig
+		const agent = new MultiPageAgent({
+			...agentConfig,
+			instructions: systemInstruction ? { system: systemInstruction } : undefined,
+		})
+		agentRef.current = agent
+
+		const handleStatusChange = () => {
+			const newStatus = agent.status as AgentStatus
+			setStatus(newStatus)
+			if (newStatus !== 'running') {
+				setActivity(null)
+			}
+		}
+
+		const handleHistoryChange = () => {
+			setHistory([...agent.history])
+		}
+
+		const handleActivity = (e: Event) => {
+			const newActivity = (e as CustomEvent).detail as AgentActivity
+			setActivity(newActivity)
+		}
+
+		agent.addEventListener('statuschange', handleStatusChange)
+		agent.addEventListener('historychange', handleHistoryChange)
+		agent.addEventListener('activity', handleActivity)
+
+		cleanupRef.current = () => {
+			agent.removeEventListener('statuschange', handleStatusChange)
+			agent.removeEventListener('historychange', handleHistoryChange)
+			agent.removeEventListener('activity', handleActivity)
+			agent.dispose()
+		}
+	}, [])
+
 	useEffect(() => {
 		chrome.storage.local.get(['llmConfig', 'language', 'advancedConfig']).then((result) => {
 			let llmConfig = (result.llmConfig as LLMConfig) ?? DEMO_CONFIG
@@ -63,48 +107,18 @@ export function useAgent(): UseAgentResult {
 				chrome.storage.local.set({ llmConfig: DEMO_CONFIG })
 			}
 
-			setConfig({ ...llmConfig, ...advancedConfig, language })
+			const initialConfig = { ...llmConfig, ...advancedConfig, language }
+			setConfig(initialConfig)
+			setupAgent(initialConfig)
 		})
-	}, [])
-
-	useEffect(() => {
-		if (!config) return
-
-		const { systemInstruction, ...agentConfig } = config
-		const agent = new MultiPageAgent({
-			...agentConfig,
-			instructions: systemInstruction ? { system: systemInstruction } : undefined,
-		})
-		agentRef.current = agent
-
-		const handleStatusChange = (e: Event) => {
-			const newStatus = agent.status as AgentStatus
-			setStatus(newStatus)
-			if (newStatus !== 'running') {
-				setActivity(null)
-			}
-		}
-
-		const handleHistoryChange = (e: Event) => {
-			setHistory([...agent.history])
-		}
-
-		const handleActivity = (e: Event) => {
-			const newActivity = (e as CustomEvent).detail as AgentActivity
-			setActivity(newActivity)
-		}
-
-		agent.addEventListener('statuschange', handleStatusChange)
-		agent.addEventListener('historychange', handleHistoryChange)
-		agent.addEventListener('activity', handleActivity)
 
 		return () => {
-			agent.removeEventListener('statuschange', handleStatusChange)
-			agent.removeEventListener('historychange', handleHistoryChange)
-			agent.removeEventListener('activity', handleActivity)
-			agent.dispose()
+			if (cleanupRef.current) {
+				cleanupRef.current()
+				cleanupRef.current = null
+			}
 		}
-	}, [config])
+	}, [setupAgent])
 
 	const execute = useCallback(async (task: string) => {
 		const agent = agentRef.current
@@ -143,9 +157,11 @@ export function useAgent(): UseAgentResult {
 				disableNamedToolChoice,
 			}
 			await chrome.storage.local.set({ advancedConfig })
-			setConfig({ ...llmConfig, ...advancedConfig, language })
+			const newConfig = { ...llmConfig, ...advancedConfig, language }
+			setConfig(newConfig)
+			setupAgent(newConfig)
 		},
-		[]
+		[setupAgent]
 	)
 
 	return {
