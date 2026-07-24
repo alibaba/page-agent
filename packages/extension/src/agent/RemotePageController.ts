@@ -1,4 +1,4 @@
-import type { BrowserState } from '@page-agent/page-controller'
+import type { BrowserState } from '@page-os/page-controller'
 
 import type { TabsController } from './TabsController'
 

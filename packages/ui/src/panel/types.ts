@@ -18,7 +18,7 @@ export type AgentActivity =
 
 /**
  * Minimal interface that Panel expects from an agent.
- * Panel does not depend on PageAgent directly - it only requires this interface.
+ * Panel does not depend on PageOS directly - it only requires this interface.
  * This enables decoupling and allows any agent implementation to work with Panel.
  *
  * Events:
@@ -67,8 +67,13 @@ export interface PanelAgentAdapter extends EventTarget {
 	 * If unset, the `ask_user` tool will be disabled.
 	 * Panel will set this to handle user questions via its UI.
 	 * The optional `signal` aborts when the task is stopped or disposed.
+	 * `choices` renders as clickable answer buttons; `inputType` switches the
+	 * free-form answer field between text and number input.
 	 */
-	onAskUser?: (question: string, options?: { signal: AbortSignal }) => Promise<string>
+	onAskUser?: (
+		question: string,
+		options?: { signal: AbortSignal; choices?: string[]; inputType?: 'text' | 'number' }
+	) => Promise<string>
 
 	/** Execute a task */
 	execute(task: string): Promise<unknown>

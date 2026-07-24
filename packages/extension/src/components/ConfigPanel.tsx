@@ -68,8 +68,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		let interval: NodeJS.Timeout | null = null
 
 		const fetchToken = async () => {
-			const result = await chrome.storage.local.get('PageAgentExtUserAuthToken')
-			const token = result.PageAgentExtUserAuthToken
+			const result = await chrome.storage.local.get('PageOSExtUserAuthToken')
+			const token = result.PageOSExtUserAuthToken
 			if (typeof token === 'string' && token) {
 				setUserAuthToken(token)
 				if (interval) {
@@ -184,7 +184,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				rel="noopener noreferrer"
 				className="flex items-center justify-between p-3 rounded-md border bg-muted/50 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
 			>
-				Manage Page Agent Hub
+				Manage PageOS Hub
 				<ExternalLink className="size-3" />
 			</a>
 
@@ -207,7 +207,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					<Scale className="size-3 inline-block mr-1 -mt-0.5 text-amber-600" />
 					You are using our testing API. By using this you agree to the{' '}
 					<a
-						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
+						href="https://github.com/EqualByte/agentic-page/blob/main/docs/terms-and-privacy.md"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="underline hover:text-foreground"
@@ -348,7 +348,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					</span>
 
 					<a
-						href="https://github.com/alibaba/page-agent"
+						href="https://github.com/EqualByte/agentic-page"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="flex items-center gap-1 hover:text-foreground"
@@ -362,7 +362,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 
 				<div className="flex flex-col items-end">
 					<a
-						href="https://alibaba.github.io/page-agent/"
+						href="https://equalbyte.github.io/agentic-page/"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="flex items-center gap-1 hover:text-foreground"
@@ -372,7 +372,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					</a>
 
 					<a
-						href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
+						href="https://github.com/EqualByte/agentic-page/blob/main/docs/terms-and-privacy.md"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="flex items-center gap-1 hover:text-foreground"
@@ -388,7 +388,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				<span className="leading-loose">
 					Built with ♥️ by{' '}
 					<a
-						href="https://github.com/gaomeng1900"
+						href="https://github.com/EqualByte"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="underline hover:text-foreground"

@@ -1,6 +1,6 @@
-# Page Agent Extension API
+# PageOS Extension API
 
-Integrate the Page Agent extension into your web app and trigger multi-page browser tasks from page JavaScript.
+Integrate the PageOS extension into your web app and trigger multi-page browser tasks from page JavaScript.
 
 ## Installation
 
@@ -8,21 +8,21 @@ Integrate the Page Agent extension into your web app and trigger multi-page brow
 
 Primary channel:
 
-- Chrome Web Store: https://chromewebstore.google.com/detail/page-agent-ext/akldabonmimlicnjlflnapfeklbfemhj
+- Chrome Web Store: https://chromewebstore.google.com/detail/page-os-ext/akldabonmimlicnjlflnapfeklbfemhj
 
 Latest updates are often published earlier on:
 
-- GitHub Releases: https://github.com/alibaba/page-agent/releases
+- GitHub Releases: https://github.com/EqualByte/agentic-page/releases
 
 ### 2. Install type definitions (recommended)
 
 ```bash
-npm install @page-agent/core --save-dev
+npm install @page-os/core --save-dev
 ```
 
 ### 3. Authorization (Token)
 
-The token allows your page JS to call the extension API (`window.PAGE_AGENT_EXT`) and execute multi-page tasks.
+The token allows your page JS to call the extension API (`window.PAGE_OS_EXT`) and execute multi-page tasks.
 
 Why token-based access is required:
 
@@ -36,19 +36,19 @@ Setup:
 2. Set the token in your page:
 
 ```typescript
-localStorage.setItem('PageAgentExtUserAuthToken', 'your-token')
+localStorage.setItem('PageOSExtUserAuthToken', 'your-token')
 ```
 
 ## Quick Start
 
 ```typescript
-import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-agent/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-os/core'
 
 // Wait for extension injection (up to 1 second)
 async function waitForExtension(timeout = 1000): Promise<boolean> {
     const start = Date.now()
     while (Date.now() - start < timeout) {
-        if (window.PAGE_AGENT_EXT) return true
+        if (window.PAGE_OS_EXT) return true
         await new Promise((r) => setTimeout(r, 100))
     }
     return false
@@ -56,8 +56,8 @@ async function waitForExtension(timeout = 1000): Promise<boolean> {
 
 // Usage
 if (await waitForExtension()) {
-    const result = await window.PAGE_AGENT_EXT!.execute('Click the login button', {
-        baseURL: 'https://api.openai.com/v1',
+    const result = await window.PAGE_OS_EXT!.execute('Click the login button', {
+        baseURL: 'https://api.deepseek.com',
         apiKey: 'your-api-key',
         model: 'gpt-5.2',
         onStatusChange: (status) => console.log('Status:', status),
@@ -71,15 +71,15 @@ if (await waitForExtension()) {
 
 After token match, the extension injects APIs into `window`.
 
-### `window.PAGE_AGENT_EXT_VERSION`
+### `window.PAGE_OS_EXT_VERSION`
 
 Extension version string (for capability checks before using the main API).
 
-### `window.PAGE_AGENT_EXT`
+### `window.PAGE_OS_EXT`
 
 Main namespace object.
 
-#### `PAGE_AGENT_EXT.execute(task, config)`
+#### `PAGE_OS_EXT.execute(task, config)`
 
 Execute one agent task.
 
@@ -92,7 +92,7 @@ Parameters:
 
 Returns: `Promise<ExecutionResult>`
 
-#### `PAGE_AGENT_EXT.stop()`
+#### `PAGE_OS_EXT.stop()`
 
 Stop the current task.
 
@@ -102,10 +102,10 @@ Stop the current task.
 
 ## Types
 
-Install `@page-agent/core` for complete types:
+Install `@page-os/core` for complete types:
 
 ```typescript
-import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-agent/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-os/core'
 
 export interface ExecuteConfig {
     baseURL: string
@@ -175,10 +175,10 @@ interface ExecutionResult {
 ### Basic Execution
 
 ```typescript
-const result = await window.PAGE_AGENT_EXT!.execute(
+const result = await window.PAGE_OS_EXT!.execute(
     'Fill in the email field with test@example.com and click Submit',
     {
-        baseURL: 'https://api.openai.com/v1',
+        baseURL: 'https://api.deepseek.com',
         apiKey: process.env.OPENAI_API_KEY!,
         model: 'gpt-5.2',
         includeInitialTab: false, // Optional: exclude current tab
@@ -191,15 +191,15 @@ const result = await window.PAGE_AGENT_EXT!.execute(
 ### Stop the Current Task
 
 ```typescript
-window.PAGE_AGENT_EXT!.stop()
+window.PAGE_OS_EXT!.stop()
 ```
 
 ## Window Type Declaration
 
-If you are not importing `@page-agent/core`, add:
+If you are not importing `@page-os/core`, add:
 
 ```typescript
-import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-agent/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-os/core'
 
 interface ExecuteConfig {
     baseURL: string
@@ -217,8 +217,8 @@ interface ExecuteConfig {
 
 declare global {
     interface Window {
-        PAGE_AGENT_EXT_VERSION?: string
-        PAGE_AGENT_EXT?: {
+        PAGE_OS_EXT_VERSION?: string
+        PAGE_OS_EXT?: {
             version: string
             execute: Execute
             stop: () => void

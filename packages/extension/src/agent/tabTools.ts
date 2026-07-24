@@ -10,7 +10,7 @@ import * as z from 'zod/v4'
 
 import type { TabsController } from './TabsController'
 
-/** Tool definition compatible with PageAgentCore customTools */
+/** Tool definition compatible with PageOSCore customTools */
 interface TabTool {
 	description: string
 	inputSchema: z.ZodType
@@ -19,7 +19,7 @@ interface TabTool {
 
 /**
  * Create tab control tools bound to a TabsManager instance.
- * These tools are injected into PageAgentCore via customTools config.
+ * These tools are injected into PageOSCore via customTools config.
  */
 export function createTabTools(tabsController: TabsController): Record<string, TabTool> {
 	return {

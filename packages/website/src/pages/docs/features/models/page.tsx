@@ -143,11 +143,11 @@ export default function Models() {
 			<section className="mb-10">
 				<Heading id="configuration">{isZh ? '配置方式' : 'Configuration'}</Heading>
 				<CodeEditor
-					code={`// OpenAI-compatible services (e.g., Alibaba Bailian)
-const pageAgent = new PageAgent({
-  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+					code={`// OpenAI-compatible services (e.g., OpenAI, Azure OpenAI, OpenRouter)
+const pageOS = new PageOS({
+  baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
-  model: 'qwen3.5-plus'
+  model: 'deepseek-chat'
 });
 `}
 				/>
@@ -157,16 +157,16 @@ const pageAgent = new PageAgent({
 				<Heading id="free-testing-api">{isZh ? '免费测试接口' : 'Free Testing API'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? '以下免费测试接口仅供 PageAgent.js 和 PageAgent Extension 的技术评估和测试使用。'
+						? '以下免费测试接口仅供 PageOS.js 和 PageOS Extension 的技术评估和测试使用。'
 						: 'The following free testing endpoint is provided for testing and technical evaluation.'}
 				</p>
 				<div className="my-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
 					<p className="text-xs text-gray-600 dark:text-gray-400">
 						{isZh
-							? '⚠️ 仅供技术评估和研发用途，禁止用于生产环境。数据通过中国大陆服务器处理。请勿输入任何个人身份信息或敏感数据。使用即表示您同意'
-							: '⚠️ Strictly for technical evaluation and R&D only. Data is processed via servers in Mainland China. Do not input any PII or sensitive data. By using this API you agree to the'}{' '}
+							? '⚠️ 仅供技术评估和研发用途，禁止用于生产环境。请勿输入任何个人身份信息或敏感数据。使用即表示您同意'
+							: '⚠️ Strictly for technical evaluation and R&D only. Do not input any PII or sensitive data. By using this API you agree to the'}{' '}
 						<a
-							href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+							href="https://github.com/EqualByte/agentic-page/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-blue-500 hover:underline"
@@ -177,15 +177,15 @@ const pageAgent = new PageAgent({
 				</div>
 				<div className="bg-gray-50 dark:bg-gray-900/30 rounded-lg p-5 border border-gray-200 dark:border-gray-800">
 					<h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
-						Qwen (Alibaba Cloud China)
+						EqualByte Managed (example)
 					</h3>
 					<p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
 						{isZh
-							? '通过阿里云函数计算（中国大陆）转发至百炼 Qwen 模型'
-							: 'Proxied via Alibaba Cloud FC (Mainland China) to BaiLian Qwen models'}
+							? '通过 EqualByte 网关转发至你配置的模型'
+							: 'Proxied via the EqualByte gateway to your configured model'}
 						{' · '}
 						<a
-							href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+							href="https://github.com/EqualByte/agentic-page/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-blue-500 hover:underline"
@@ -194,9 +194,9 @@ const pageAgent = new PageAgent({
 						</a>
 					</p>
 					<CodeEditor
-						code={`# qwen3.5-plus / qwen3.5-flash
-LLM_BASE_URL="https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run"
-LLM_MODEL_NAME="qwen3.5-plus"`}
+						code={`# Configure your model via the EqualByte gateway
+LLM_BASE_URL="https://gateway.equalbyte.example/v1"
+LLM_MODEL_NAME="deepseek-chat"`}
 					/>
 				</div>
 			</section>
@@ -225,7 +225,7 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 					)}
 				</p>
 				<CodeEditor
-					code={`const agent = new PageAgent({
+					code={`const agent = new PageOS({
   baseURL: '/api/llm-proxy',
   model: 'gpt-5.1',
   customFetch: (url, init) =>
@@ -248,7 +248,7 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 						<>
 							一些 LLM 能从主动缓存中受益很多。由于各个供应商的主动缓存接口不同，推荐使用{' '}
 							<Link
-								href="/advanced/page-agent-core#configuration"
+								href="/advanced/page-os-core#configuration"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
 							>
 								transformRequestBody
@@ -260,7 +260,7 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 							Some LLMs benefit significantly from prompt caching. Because each provider exposes
 							caching differently, use{' '}
 							<Link
-								href="/advanced/page-agent-core#configuration"
+								href="/advanced/page-os-core#configuration"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
 							>
 								transformRequestBody
@@ -282,7 +282,7 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 						</p>
 						<CodeEditor
 							language="typescript"
-							code={`const pageAgent = new PageAgent({
+							code={`const pageOS = new PageOS({
   baseURL: 'https://your-claude-proxy.example/v1',
   apiKey: 'your-api-key',
   model: 'claude-sonnet-5',
@@ -295,14 +295,14 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 					</section>
 					<section>
 						<Heading id="prompt-caching-qwen" level={3}>
-							{isZh ? '阿里云百炼 Qwen' : 'Alibaba Cloud Bailian Qwen'}
+							{isZh ? '自定义服务商' : 'Custom Provider'}
 						</Heading>
 						<CodeEditor
 							language="typescript"
-							code={`const pageAgent = new PageAgent({
-  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+							code={`const pageOS = new PageOS({
+  baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
-  model: 'qwen3.5-plus',
+  model: 'deepseek-chat',
   transformRequestBody: (requestBody) => {
     const [systemMessage, ...restMessages] = requestBody.messages
 
@@ -337,8 +337,8 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 				<Heading id="local-runtimes">{isZh ? '本地 LLMs' : 'Local LLMs'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
 					{isZh
-						? '通过 Ollama、LM Studio 等本地 OpenAI-compatible 运行时接入 PageAgent，实现离线或局域网部署。'
-						: 'Use local OpenAI-compatible runtimes such as Ollama and LM Studio with PageAgent for offline or LAN deployments.'}
+						? '通过 Ollama、LM Studio 等本地 OpenAI-compatible 运行时接入 PageOS，实现离线或局域网部署。'
+						: 'Use local OpenAI-compatible runtimes such as Ollama and LM Studio with PageOS for offline or LAN deployments.'}
 				</p>
 
 				<div className="space-y-10">
@@ -376,15 +376,15 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 						</Heading>
 						<CodeEditor
 							code={`// Local OpenAI-compatible runtime - no apiKey needed
-const pageAgent = new PageAgent({
+const pageOS = new PageOS({
   baseURL: 'http://localhost:11434/v1',
-  model: 'qwen3:14b'
+  model: 'llama3.1:8b'
 });
 
 // Or connect to LM Studio
-const lmStudioAgent = new PageAgent({
+const lmStudioAgent = new PageOS({
   baseURL: 'http://127.0.0.1:1234/v1',
-  model: 'qwen/qwen3.5-27b'
+  model: 'llama-3.1-8b'
 });
 `}
 						/>
@@ -396,12 +396,12 @@ const lmStudioAgent = new PageAgent({
 						</Heading>
 						<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 							{isZh
-								? '已在 Ollama 0.15 + qwen3:14b (RTX3090 24GB) 上测试通过。'
-								: 'Tested on Ollama 0.15 with qwen3:14b (RTX3090 24GB).'}
+								? '已在 Ollama 0.15 + llama3.1:8b (RTX3090 24GB) 上测试通过。'
+								: 'Tested on Ollama 0.15 with llama3.1:8b (RTX3090 24GB).'}
 						</p>
 						<CodeEditor
 							code={`LLM_BASE_URL="http://localhost:11434/v1"
-LLM_MODEL_NAME="qwen3:14b"`}
+LLM_MODEL_NAME="llama3.1:8b"`}
 						/>
 						<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
 							<h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
@@ -448,7 +448,7 @@ LLM_MODEL_NAME="qwen3:14b"`}
 						</Heading>
 						<CodeEditor
 							code={`LLM_BASE_URL="http://127.0.0.1:1234/v1"
-LLM_MODEL_NAME="qwen/qwen3.5-27b"`}
+LLM_MODEL_NAME="llama-3.1-8b"`}
 						/>
 						<div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
 							<h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-2">

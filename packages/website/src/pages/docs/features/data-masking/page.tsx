@@ -22,7 +22,7 @@ export default function DataMasking() {
 
 				<CodeEditor
 					className="mb-6"
-					code={`interface PageAgentConfig {
+					code={`interface PageOSConfig {
   /**
    * Transform page content before sending to LLM.
    * Called after DOM extraction and simplification.
@@ -44,7 +44,7 @@ export default function DataMasking() {
 				</p>
 
 				<CodeEditor
-					code={`const agent = new PageAgent({
+					code={`const agent = new PageOS({
   transformPageContent: async (content) => {
     // China phone number (11 digits starting with 1)
     content = content.replace(/\\b(1[3-9]\\d)(\\d{4})(\\d{4})\\b/g, '$1****$3')

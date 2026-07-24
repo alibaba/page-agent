@@ -1,4 +1,4 @@
-import { type AgentConfig, PageAgentCore } from '@page-agent/core'
+import { type AgentConfig, PageOSCore } from '@page-os/core'
 
 import { RemotePageController } from './RemotePageController'
 import { TabsController } from './TabsController'
@@ -21,7 +21,7 @@ interface MultiPageAgentConfig extends AgentConfig {
  * - use with extension
  * - can be used from a side panel or a content script
  */
-export class MultiPageAgent extends PageAgentCore {
+export class MultiPageAgent extends PageOSCore {
 	constructor(config: MultiPageAgentConfig) {
 		// multi page controller
 		const tabsController = new TabsController()

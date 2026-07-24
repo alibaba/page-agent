@@ -1,5 +1,5 @@
 {
-    "name": "@page-agent/ui",
+    "name": "@page-os/ui",
     "version": "1.11.0",
     "type": "module",
     "main": "./src/index.ts",
@@ -11,35 +11,35 @@
         }
     },
     "publishConfig": {
-        "main": "./dist/lib/page-agent-ui.js",
-        "module": "./dist/lib/page-agent-ui.js",
+        "main": "./dist/lib/page-os-ui.js",
+        "module": "./dist/lib/page-os-ui.js",
         "types": "./dist/lib/index.d.ts",
         "exports": {
             ".": {
                 "types": "./dist/lib/index.d.ts",
-                "import": "./dist/lib/page-agent-ui.js",
-                "default": "./dist/lib/page-agent-ui.js"
+                "import": "./dist/lib/page-os-ui.js",
+                "default": "./dist/lib/page-os-ui.js"
             }
         }
     },
     "files": [
         "dist/"
     ],
-    "description": "UI components for page-agent - Panel and i18n",
+    "description": "UI components for page-os - Panel and i18n",
     "keywords": [
-        "page-agent",
+        "page-os",
         "ui",
         "panel",
         "i18n"
     ],
-    "author": "Simon<gaomeng1900>",
+    "author": "EqualByte",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git",
+        "url": "https://github.com/EqualByte/agentic-page.git",
         "directory": "packages/ui"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://equalbyte.github.io/agentic-page/",
     "scripts": {
         "build": "vite build",
         "prepublishOnly": "node ../../scripts/pre-publish.js",

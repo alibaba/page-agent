@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Multi-window extension tabs** - Resolved the active tab/window from the caller's window context instead of the global active tab.
 - **chat-latest model compatibility** - Skip `reasoning_effort` and `temperature` patches for `*-chat-latest` models.
 - **OpenRouter defaults** - Do not enable reasoning by default on OpenRouter.
-- **Asset URLs** - Migrated `img.alicdn.com` links to `page-agent.github.io`.
+- **Asset URLs** - Migrated `img.alicdn.com` links to `equalbyte.github.io/agentic-page`.
 
 ## [1.10.0] - 2026-06-15
 
@@ -50,14 +50,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
-- **Robust abort handling** - Rewrote the aborting system; sync tools, loop execution, and LLM clients now correctly respect task abort signals (`ctx.signal`). Also decoupled `AbortError` from `InvokeError` in `@page-agent/llms`.
+- **Robust abort handling** - Rewrote the aborting system; sync tools, loop execution, and LLM clients now correctly respect task abort signals (`ctx.signal`). Also decoupled `AbortError` from `InvokeError` in `@page-os/llms`.
 - **Claude Opus 4.8 support** - Added support for Claude Opus 4.8 model.
 
 ### Improvements
 
-- **Concurrency guard** - Prevented concurrent `execute()` calls on a single PageAgent/Core instance to avoid race conditions.
+- **Concurrency guard** - Prevented concurrent `execute()` calls on a single PageOS/Core instance to avoid race conditions.
 - **Model recommendations refresh** - Updated default and tested model list recommendations.
-- **Test coverage** - Added comprehensive Vitest unit tests for the `@page-agent/llms` package.
+- **Test coverage** - Added comprehensive Vitest unit tests for the `@page-os/llms` package.
 - **Improved documentation** - Added website documentation for the `ctx.signal` abort contract and `execute()` concurrency rules.
 
 ### Bug Fixes
@@ -170,7 +170,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
-- **Beta MCP support** - New `@page-agent/mcp` package lets MCP clients such as Claude Desktop and Copilot control the browser through the Page Agent extension
+- **Beta MCP support** - New `@page-os/mcp` package lets MCP clients such as Claude Desktop and Copilot control the browser through the PageOS extension
 - **Better iframe handling** - Same-origin iframe elements are handled more reliably during DOM extraction and actions
 - **Extension history workflows** - Users can rerun past tasks, export history sessions as JSON, and approve MCP-triggered tasks before execution
 
@@ -195,8 +195,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
-- **`data-browser-use-ignore` → `data-page-agent-ignore`** - DOM ignore attribute renamed to match the project identity
-- **Config types restructured** - `PageAgentConfig` split into `AgentConfig` + `PageAgentCoreConfig`; config definitions moved from `config/index.ts` to `types.ts`
+- **`data-browser-use-ignore` → `data-page-os-ignore`** - DOM ignore attribute renamed to match the project identity
+- **Config types restructured** - `PageOSConfig` split into `AgentConfig` + `PageOSCoreConfig`; config definitions moved from `config/index.ts` to `types.ts`
 - **Zod v3/v4 dual support** - Libraries now accept both `zod@^3.25` and `zod@^4.0` as peer dependencies
 
 ### Features
@@ -214,7 +214,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Extension v0.1.9
 
-> PageAgent 1.5.1
+> PageOS 1.5.1
 
 - **Advanced config panel** - New collapsible section exposing Max Steps, System Instruction, and experimental `llms.txt` toggle
 - Streamlined User Auth Token description
@@ -236,8 +236,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Unified zod imports (`* as z`) across all packages for consistency
 - Better Zod error formatting with `z.prettifyError()` in LLM client
-- Exported `InvokeError` and `InvokeErrorType` as values (not just types) from `@page-agent/llms`
-- Exported `SupportedLanguage` type from `@page-agent/core`
+- Exported `InvokeError` and `InvokeErrorType` as values (not just types) from `@page-os/llms`
+- Exported `SupportedLanguage` type from `@page-os/core`
 
 ### Extension v0.1.8
 
@@ -252,7 +252,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
-- **Lifecycle: `stop()` vs `dispose()`** - New `stop()` method to cancel the current task while keeping the agent reusable. `dispose()` is now terminal — a disposed agent cannot be reused. This affects both `PageAgentCore` and `PanelAgentAdapter`.
+- **Lifecycle: `stop()` vs `dispose()`** - New `stop()` method to cancel the current task while keeping the agent reusable. `dispose()` is now terminal — a disposed agent cannot be reused. This affects both `PageOSCore` and `PanelAgentAdapter`.
 
 ### Features
 
@@ -311,14 +311,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🎉 First Stable Release
 
-PageAgent is now ready for production use. The API is stable and breaking changes will follow semantic versioning.
+PageOS is now ready for production use. The API is stable and breaking changes will follow semantic versioning.
 
 ### Features
 
 #### Core
 
-- **PageAgent** - Main entry class with built-in UI Panel
-- **PageAgentCore** - Headless agent class for custom UI or programmatic use
+- **PageOS** - Main entry class with built-in UI Panel
+- **PageOSCore** - Headless agent class for custom UI or programmatic use
 - **DOM Analysis** - Text-based DOM extraction with high-intensity dehydration
 - **LLM Support** - Works with OpenAI, Claude, DeepSeek, Qwen, and other OpenAI-compatible APIs
 - **Tool System** - Built-in tools for click, input, scroll, select, and more
@@ -343,18 +343,18 @@ PageAgent is now ready for production use. The API is stable and breaking change
 
 | Package                       | Description                        |
 | ----------------------------- | ---------------------------------- |
-| `page-agent`                  | Main entry with UI Panel           |
-| `@page-agent/core`            | Core agent logic without UI        |
-| `@page-agent/llms`            | LLM client with retry logic        |
-| `@page-agent/page-controller` | DOM operations and visual feedback |
-| `@page-agent/ui`              | Panel and i18n                     |
+| `page-os`                  | Main entry with UI Panel           |
+| `@page-os/core`            | Core agent logic without UI        |
+| `@page-os/llms`            | LLM client with retry logic        |
+| `@page-os/page-controller` | DOM operations and visual feedback |
+| `@page-os/ui`              | Panel and i18n                     |
 
 ### Known Limitations
 
 - Single-page application only (cannot navigate across pages)
 - No visual recognition (relies on DOM structure)
 - Limited interaction support (no hover, drag-drop, canvas operations)
-- See [Limitations](https://alibaba.github.io/page-agent/docs/introduction/limitations) for details
+- See [Limitations](https://equalbyte.github.io/agentic-page/docs/introduction/limitations) for details
 
 ### Acknowledgments
 

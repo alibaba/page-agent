@@ -4,16 +4,16 @@
 
 This is a **monorepo** with npm workspaces:
 
-- **Page Agent** (`packages/page-agent/`) - Main entry with built-in UI Panel, published as `page-agent` on npm
+- **PageOS** (`packages/page-os/`) - Main entry with built-in UI Panel, published as `page-os` on npm
 - **Extension** (`packages/extension/`) - Browser extension (WXT + React)
 - **Website** (`packages/website/`) - React docs and landing page. **When working on website, follow `packages/website/AGENTS.md`**
 
 Internal packages:
 
-- **Core** (`packages/core/`) - PageAgentCore without UI (npm: `@page-agent/core`)
+- **Core** (`packages/core/`) - PageOSCore without UI (npm: `@page-os/core`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback (SimulatorMask), independent of LLM
-- **UI** (`packages/ui/`) - Panel and i18n. Decoupled from PageAgent
+- **UI** (`packages/ui/`) - Panel and i18n. Decoupled from PageOS
 
 ## Development Commands
 
@@ -35,31 +35,31 @@ Source-first monorepo: library `package.json` exports point to `src/*.ts` during
 
 ```
 packages/
-├── core/                    # npm: "@page-agent/core" ⭐ Core agent logic (headless)
-├── page-agent/              # npm: "page-agent" entry class (with UI + controller + demo builds)
-├── website/                 # @page-agent/website (private)
-├── llms/                    # @page-agent/llms
+├── core/                    # npm: "@page-os/core" ⭐ Core agent logic (headless)
+├── page-os/              # npm: "page-os" entry class (with UI + controller + demo builds)
+├── website/                 # @page-os/website (private)
+├── llms/                    # @page-os/llms
 ├── extension/               # Browser extension
-├── page-controller/         # @page-agent/page-controller
-└── ui/                      # @page-agent/ui
+├── page-controller/         # @page-os/page-controller
+└── ui/                      # @page-os/ui
 ```
 
 `workspaces` in `package.json` must be in topological order.
 
 ### Module Boundaries
 
-- **Page Agent**: Main entry with UI. Extends PageAgentCore and adds Panel. Imports from `@page-agent/core`, `@page-agent/ui`
-- **Core**: PageAgentCore without UI. Imports from `@page-agent/llms`, `@page-agent/page-controller`
-- **LLMs**: LLM client with MacroToolInput contract. No dependency on page-agent
-- **UI**: Panel and i18n. Decoupled from PageAgent via PanelAgentAdapter interface
+- **PageOS**: Main entry with UI. Extends PageOSCore and adds Panel. Imports from `@page-os/core`, `@page-os/ui`
+- **Core**: PageOSCore without UI. Imports from `@page-os/llms`, `@page-os/page-controller`
+- **LLMs**: LLM client with MacroToolInput contract. No dependency on page-os
+- **UI**: Panel and i18n. Decoupled from PageOS via PanelAgentAdapter interface
 - **Page Controller**: DOM operations with optional visual feedback (SimulatorMask). No LLM dependency. Enable mask via `enableMask: true` config
 
-### PageController ↔ PageAgent Communication
+### PageController ↔ PageOS Communication
 
 All communication is async and isolated:
 
 ```typescript
-// PageAgent delegates DOM operations to PageController
+// PageOS delegates DOM operations to PageController
 await this.pageController.updateTree()
 await this.pageController.clickElement(index)
 await this.pageController.inputText(index, text)
@@ -74,23 +74,23 @@ const pageInfo = await this.pageController.getPageInfo()
 
 1. **DOM Extraction**: Live DOM → `FlatDomTree` via `page-controller/src/dom/dom_tree/`
 2. **Dehydration**: DOM tree → simplified text for LLM
-3. **LLM Processing**: AI returns action plans (page-agent)
-4. **Indexed Operations**: PageAgent calls PageController by element index
+3. **LLM Processing**: AI returns action plans (page-os)
+4. **Indexed Operations**: PageOS calls PageController by element index
 
 ## Key Files Reference
 
-### Page Agent (`packages/page-agent/`)
+### PageOS (`packages/page-os/`)
 
 | File               | Description                                  |
 | ------------------ | -------------------------------------------- |
-| `src/PageAgent.ts` | ⭐ Main class with UI, extends PageAgentCore |
+| `src/PageOS.ts` | ⭐ Main class with UI, extends PageOSCore |
 | `src/demo.ts`      | IIFE demo entry (auto-init with demo API)    |
 
 ### Core (`packages/core/`)
 
 | File                   | Description                             |
 | ---------------------- | --------------------------------------- |
-| `src/PageAgentCore.ts` | ⭐ Core agent class without UI          |
+| `src/PageOSCore.ts` | ⭐ Core agent class without UI          |
 | `src/tools/`           | Tool definitions calling PageController |
 | `src/config/`          | Configuration types and constants       |
 | `src/prompts/`         | System prompt templates                 |
@@ -132,11 +132,11 @@ const pageInfo = await this.pageController.getPageInfo()
 - **Location**: co-located, `src/foo.test.ts` next to `src/foo.ts`
 - **Coverage today**: `packages/llms` only — other packages will follow incrementally
 - **Adding tests to a new package**: create `vitest.config.ts` in the package and add a `"test": "vitest run"` script. Root `npm test` and `node scripts/ci.js` pick it up through npm workspaces.
-- **Template**: See @page-agent/llms
+- **Template**: See @page-os/llms
 
 ```bash
 npm test                            # all packages with a test script
-npm test -w @page-agent/llms        # single package
+npm test -w @page-os/llms        # single package
 cd packages/llms && npx vitest      # watch mode in one package
 ```
 

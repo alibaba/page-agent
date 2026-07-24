@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2025 Alibaba Group Holding Limited
+ * Copyright (C) 2025 EqualByte
  * All rights reserved.
  *
  * PageController - Manages DOM operations and element interactions.
@@ -185,7 +185,7 @@ export class PageController extends EventTarget {
 
 		const blacklist = [
 			...(this.config.interactiveBlacklist || []),
-			...Array.from(document.querySelectorAll('[data-page-agent-not-interactive]')),
+			...Array.from(document.querySelectorAll('[data-page-os-not-interactive]')),
 		]
 
 		this.flatTree = dom.getFlatTree({

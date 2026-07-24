@@ -84,14 +84,14 @@ export function parseLLMConfig(config: LLMConfig): ResolvedLLMConfig {
 	// Runtime validation as defensive programming (types already guarantee these)
 	if (!config.baseURL || !config.model) {
 		throw new Error(
-			'[PageAgent] LLM configuration required. Please provide: baseURL, model. ' +
-				'See: https://alibaba.github.io/page-agent/docs/features/models'
+			'[PageOS] LLM configuration required. Please provide: baseURL, model. ' +
+				'See: https://equalbyte.github.io/agentic-page/docs/features/models'
 		)
 	}
 
 	if (config.temperature !== undefined) {
 		console.warn(
-			'[PageAgent] LLMConfig.temperature is deprecated and will be removed in a future version. ' +
+			'[PageOS] LLMConfig.temperature is deprecated and will be removed in a future version. ' +
 				'Use transformRequestBody to set it only for models you have verified accept it.'
 		)
 	}

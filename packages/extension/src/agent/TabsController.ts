@@ -236,7 +236,7 @@ export class TabsController {
 			payload: {
 				groupId: this.tabGroupId,
 				properties: {
-					title: `PageAgent(${this.task})`,
+					title: `PageOS(${this.task})`,
 					color: randomColor(),
 					collapsed: false,
 				},

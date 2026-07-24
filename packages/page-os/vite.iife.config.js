@@ -23,8 +23,8 @@ export default defineConfig(() => ({
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/demo.ts'),
-			name: 'PageAgent',
-			fileName: () => `page-agent.demo.js`,
+			name: 'PageOS',
+			fileName: () => `page-os.demo.js`,
 			formats: ['iife'],
 		},
 		outDir: resolve(__dirname, 'dist', 'iife'),
@@ -33,7 +33,7 @@ export default defineConfig(() => ({
 		rollupOptions: {
 			// output: {
 			// 	// force use .js as extension
-			// 	entryFileNames: 'page-agent.js',
+			// 	entryFileNames: 'page-os.js',
 			// },
 			onwarn: function (message, handler) {
 				if (message.code === 'EVAL') return
@@ -43,7 +43,12 @@ export default defineConfig(() => ({
 	},
 	define: {
 		'import.meta.env.LLM_MODEL_NAME': JSON.stringify(process.env.LLM_MODEL_NAME),
-		'import.meta.env.LLM_API_KEY': JSON.stringify(process.env.LLM_API_KEY),
+		// SECURITY: never inline the API key — this bundle is distributed publicly
+		// (CDN + npm tarball). For a private local test build only, set
+		// INLINE_DEMO_API_KEY=true in the environment.
+		'import.meta.env.LLM_API_KEY': JSON.stringify(
+			process.env.INLINE_DEMO_API_KEY === 'true' ? process.env.LLM_API_KEY : undefined
+		),
 		'import.meta.env.LLM_BASE_URL': JSON.stringify(process.env.LLM_BASE_URL),
 	},
 }))

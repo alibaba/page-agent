@@ -14,29 +14,29 @@ export default function LimitationsPage() {
 				</h1>
 				<p className="text-xl text-gray-600 dark:text-gray-300">
 					{isZh
-						? 'Page Agent 基于 DOM 理解网页并执行操作。这决定了它的能力边界。'
-						: 'Page Agent understands web pages via DOM and performs actions accordingly. This defines its capability boundary.'}
+						? 'PageOS 基于 DOM 理解网页并执行操作。这决定了它的能力边界。'
+						: 'PageOS understands web pages via DOM and performs actions accordingly. This defines its capability boundary.'}
 				</p>
 			</div>
 
 			<div className="prose prose-lg dark:prose-invert max-w-none">
-				{/* PageAgent.js vs PageAgentExt */}
-				<Heading id="pageagent-js-vs-pageagentext" className="text-2xl font-bold mb-3">
-					{isZh ? 'PageAgent.js vs PageAgentExt' : 'PageAgent.js vs PageAgentExt'}
+				{/* PageOS.js vs PageOSExt */}
+				<Heading id="pageos-js-vs-pageosext" className="text-2xl font-bold mb-3">
+					{isZh ? 'PageOS.js vs PageOSExt' : 'PageOS.js vs PageOSExt'}
 				</Heading>
 				<p className="text-gray-600 dark:text-gray-300 mb-4">
 					{isZh
-						? 'PageAgent.js 是核心库，运行在页面内。PageAgentExt 是可选的浏览器扩展，提供额外的浏览器级控制能力。'
-						: 'PageAgent.js is the core library running inside a page. PageAgentExt is an optional browser extension that adds browser-level control.'}
+						? 'PageOS.js 是核心库，运行在页面内。PageOSExt 是可选的浏览器扩展，提供额外的浏览器级控制能力。'
+						: 'PageOS.js is the core library running inside a page. PageOSExt is an optional browser extension that adds browser-level control.'}
 				</p>
 				<div className="overflow-x-auto mb-6">
 					<table className="w-full text-sm border-collapse">
 						<thead>
 							<tr className="border-b border-gray-200 dark:border-gray-700">
 								<th className="text-left py-3 pr-4"></th>
-								<th className="text-left py-3 px-4 font-semibold">PageAgent.js</th>
+								<th className="text-left py-3 px-4 font-semibold">PageOS.js</th>
 								<th className="text-left py-3 pl-4 font-semibold">
-									PageAgentExt{' '}
+									PageOSExt{' '}
 									<Link
 										href="/features/chrome-extension"
 										className="text-xs font-normal text-blue-600 dark:text-blue-400 hover:underline"
@@ -139,8 +139,8 @@ export default function LimitationsPage() {
 
 				<p className="mb-2 font-medium">
 					{isZh
-						? 'Page Agent 不使用多模态模型，不截图，没有视觉能力。仅通过 DOM 结构理解页面。'
-						: 'Page Agent does not use multimodal models, does not take screenshots, and has no visual capability. It reads pages through DOM structure only.'}
+						? 'PageOS 不使用多模态模型，不截图，没有视觉能力。仅通过 DOM 结构理解页面。'
+						: 'PageOS does not use multimodal models, does not take screenshots, and has no visual capability. It reads pages through DOM structure only.'}
 				</p>
 				<p className="mb-2 font-medium">
 					{isZh

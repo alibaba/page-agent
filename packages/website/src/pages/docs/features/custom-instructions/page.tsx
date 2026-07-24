@@ -29,7 +29,7 @@ export default function Instructions() {
 
 				<CodeEditor
 					className="mb-6"
-					code={`const agent = new PageAgent({
+					code={`const agent = new PageOS({
   // ...other config
   instructions: {
     system: \`
@@ -59,7 +59,7 @@ Guidelines:
 
 				<CodeEditor
 					className="mb-6"
-					code={`const agent = new PageAgent({
+					code={`const agent = new PageOS({
   // ...other config
   instructions: {
     system: 'You are an order management assistant.',
@@ -97,8 +97,8 @@ This is the product listing page.
 
 				<p className="text-gray-600 dark:text-gray-300 mb-4">
 					{isZh
-						? '在每个执行步骤之前，page-agent 会将 instructions 拼接到用户提示词中：'
-						: 'Before each execution step, page-agent prepends the instructions to the user prompt:'}
+						? '在每个执行步骤之前，page-os 会将 instructions 拼接到用户提示词中：'
+						: 'Before each execution step, page-os prepends the instructions to the user prompt:'}
 				</p>
 
 				<CodeEditor

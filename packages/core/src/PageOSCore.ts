@@ -1,10 +1,9 @@
 /**
- * Copyright (C) 2025 Alibaba Group Holding Limited
- * Copyright (C) 2026 SimonLuvRamen
+ * Copyright (c) 2026 EqualByte
  * All rights reserved.
  */
-import { InvokeError, LLM, type Tool } from '@page-agent/llms'
-import type { BrowserState, PageController } from '@page-agent/page-controller'
+import { InvokeError, LLM, type Tool } from '@page-os/llms'
+import type { BrowserState, PageController } from '@page-os/page-controller'
 import chalk from 'chalk'
 import * as z from 'zod/v4'
 
@@ -23,10 +22,10 @@ import type {
 } from './types'
 import { assert, fetchLlmsTxt, normalizeResponse, suppress, uid, waitFor } from './utils'
 
-export { tool, type PageAgentTool } from './tools'
+export { tool, type PageOSTool } from './tools'
 export type * from './types'
 
-export type PageAgentCoreConfig = AgentConfig & { pageController: PageController }
+export type PageOSCoreConfig = AgentConfig & { pageController: PageController }
 
 /**
  * AI agent for browser automation.
@@ -58,9 +57,9 @@ export type PageAgentCoreConfig = AgentConfig & { pageController: PageController
  *    - NOT included in LLM context
  *    - Types: thinking, executing, executed, retrying, error
  */
-export class PageAgentCore extends EventTarget {
+export class PageOSCore extends EventTarget {
 	readonly id = uid()
-	readonly config: PageAgentCoreConfig & { maxSteps: number }
+	readonly config: PageOSCoreConfig & { maxSteps: number }
 	readonly tools: typeof tools
 	/** PageController for DOM operations */
 	readonly pageController: PageController
@@ -76,9 +75,14 @@ export class PageAgentCore extends EventTarget {
 	 * Called when the agent needs to ask the user questions.
 	 * If unset, the `ask_user` tool will be disabled.
 	 * Implementations should reject the promise when `signal` aborts.
+	 * `choices` (answer options to present as buttons) and `inputType` (expected
+	 * free-form answer type) are hints from the LLM that UIs may honor.
 	 * @example onAskUser: (q) => window.prompt(q) || ''
 	 */
-	onAskUser?: (question: string, options?: { signal: AbortSignal }) => Promise<string>
+	onAskUser?: (
+		question: string,
+		options?: { signal: AbortSignal; choices?: string[]; inputType?: 'text' | 'number' }
+	) => Promise<string>
 
 	#status: AgentStatus = 'idle'
 	#llm: LLM
@@ -105,7 +109,7 @@ export class PageAgentCore extends EventTarget {
 		browserState: null as BrowserState | null,
 	}
 
-	constructor(config: PageAgentCoreConfig) {
+	constructor(config: PageOSCoreConfig) {
 		super()
 
 		this.config = { ...config, maxSteps: config.maxSteps ?? 40 }
@@ -209,7 +213,7 @@ export class PageAgentCore extends EventTarget {
 	 */
 	async execute(task: string): Promise<ExecutionResult> {
 		// pre-checks
-		if (this.disposed) throw new Error('PageAgent has been disposed. Create a new instance.')
+		if (this.disposed) throw new Error('PageOS has been disposed. Create a new instance.')
 		if (this.#status === 'running') throw new Error('A task is already running.')
 		if (!task) throw new Error('Task is required')
 
@@ -500,10 +504,7 @@ export class PageAgentCore extends EventTarget {
 			try {
 				pageInstructions = instructions.getPageInstructions(url)?.trim()
 			} catch (error) {
-				console.error(
-					chalk.red('[PageAgent] Failed to execute getPageInstructions callback:'),
-					error
-				)
+				console.error(chalk.red('[PageOS] Failed to execute getPageInstructions callback:'), error)
 			}
 		}
 
@@ -647,7 +648,7 @@ export class PageAgentCore extends EventTarget {
 	}
 
 	dispose() {
-		console.log('Disposing PageAgent...')
+		console.log('Disposing PageOS...')
 		this.disposed = true
 		this.pageController.dispose()
 		// this.history = []

@@ -24,6 +24,7 @@ dist-ssr
 *.sln
 *.sw?
 .qoder
+.txt
 
 # publish backup
 package.json.bak

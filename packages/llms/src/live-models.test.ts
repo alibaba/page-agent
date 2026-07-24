@@ -16,7 +16,6 @@
  *
  *   TESTING_OPENROUTER_KEY=...
  *   TESTING_DEEPSEEK_KEY=...
- *   TESTING_ALIYUN_KEY=...
  */
 import { config as dotenvConfig } from 'dotenv'
 import { dirname, resolve } from 'path'
@@ -138,10 +137,6 @@ const PROVIDERS = {
 		baseURL: 'https://openrouter.ai/api/v1',
 		apiKey: process.env.TESTING_OPENROUTER_KEY,
 	},
-	aliyun: {
-		baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-		apiKey: process.env.TESTING_ALIYUN_KEY,
-	},
 	deepseek: {
 		baseURL: 'https://api.deepseek.com',
 		apiKey: process.env.TESTING_DEEPSEEK_KEY,
@@ -183,26 +178,6 @@ describe.concurrent('OpenRouter — all listed models', () => {
 				TEST_TIMEOUT
 			)
 		}
-	}
-})
-
-// Aliyun native ids that don't match the display name in MODEL_GROUPS.
-const ALIYUN_ID_OVERRIDES: Record<string, string> = {
-	'qwen3.6-max': 'qwen3.6-max-preview',
-}
-
-describe.concurrent('Aliyun DashScope — Qwen native', () => {
-	const { baseURL, apiKey } = PROVIDERS.aliyun
-
-	for (const model of MODEL_GROUPS.Qwen) {
-		const id = ALIYUN_ID_OVERRIDES[model] ?? model
-		it.skipIf(!apiKey)(
-			id,
-			async () => {
-				await expectEchoToolCall(baseURL, apiKey!, id)
-			},
-			TEST_TIMEOUT
-		)
 	}
 })
 

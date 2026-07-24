@@ -27,12 +27,12 @@ await hub.start()
 const url = `http://localhost:${port}`
 const cmd = platform() === 'darwin' ? 'open' : platform() === 'win32' ? 'start ""' : 'xdg-open'
 exec(`${cmd} "${url}"`, (err) => {
-	if (err) console.error(`[page-agent-mcp] Could not open browser: ${err.message}`)
+	if (err) console.error(`[page-os-mcp] Could not open browser: ${err.message}`)
 })
 
 // --- MCP server (stdio) ---
 
-const mcpServer = new McpServer({ name: 'page-agent', version })
+const mcpServer = new McpServer({ name: 'page-os', version })
 
 mcpServer.registerTool(
 	'execute_task',
@@ -72,7 +72,7 @@ mcpServer.registerTool(
 mcpServer.registerTool(
 	'get_status',
 	{
-		description: 'Check the current status of the Page Agent hub.',
+		description: 'Check the current status of the PageOS hub.',
 	},
 	async () => ({
 		content: [
@@ -97,4 +97,4 @@ mcpServer.registerTool(
 
 const transport = new StdioServerTransport()
 await mcpServer.connect(transport)
-console.error('[page-agent-mcp] MCP server ready (stdio)')
+console.error('[page-os-mcp] MCP server ready (stdio)')

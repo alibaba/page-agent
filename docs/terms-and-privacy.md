@@ -2,7 +2,7 @@
 
 **Last updated:** March 2026
 
-"We" in this document refers to the maintainers of the open-source Page Agent project (https://github.com/alibaba/page-agent). "The software" refers to Page Agent (the JavaScript library) and Page Agent Ext (the browser extension). This document covers the software itself and the testing API we provide — **not** any third-party product or service built with it.
+"We" in this document refers to the maintainers of the open-source PageOS project (https://github.com/EqualByte/agentic-page). "The software" refers to PageOS (the JavaScript library) and PageOS Ext (the browser extension). This document covers the software itself and the testing API we provide — **not** any third-party product or service built with it.
 
 ---
 
@@ -12,7 +12,7 @@ The software is a **client-side only** tool with a "Bring Your Own Key" (BYOK) a
 
 All data transmission occurs **only** between your browser and the LLM provider you configure. You are in full control of which provider receives your data.
 
-The project is open source under the [MIT License](https://github.com/alibaba/page-agent/blob/main/LICENSE) and can be audited at: https://github.com/alibaba/page-agent
+The project is open source under the [MIT License](https://github.com/EqualByte/agentic-page/blob/main/LICENSE) and can be audited at: https://github.com/EqualByte/agentic-page
 
 ---
 
@@ -26,9 +26,9 @@ This free testing API is provided **strictly for technical evaluation and R&D pu
 
 - **No Sensitive Data**: You are strictly prohibited from inputting any Personal Identifiable Information (PII), confidential business data, financial/medical records, or using this agent on web pages containing such sensitive information.
 
-- **Data Processing**: We do not store or log your prompts, webpage data (HTML), or any submitted content, nor do we use such data for model training. All data is processed in-transit and immediately discarded. We perform in-memory request validation to prevent abuse of the testing API, and temporarily process IP addresses for rate-limiting purposes. No data from these processes is retained. Data is processed through Alibaba Cloud infrastructure, which is subject to its own privacy policy.
+- **Data Processing**: We do not store or log your prompts, webpage data (HTML), or any submitted content, nor do we use such data for model training. All data is processed in-transit and immediately discarded. We perform in-memory request validation to prevent abuse of the testing API, and temporarily process IP addresses for rate-limiting purposes. No data from these processes is retained.
 
-- **Independent Infrastructure**: The software is completely frontend-based with a "Bring Your Own Key" (BYOK) architecture and **no built-in backend**. To facilitate easy testing, the maintainers have purchased public cloud services from Alibaba Cloud China ([aliyun.com](https://www.aliyun.com) Function Compute and BaiLian Qwen models). This project is not a product of, nor endorsed by, Alibaba Cloud.
+- **Independent Infrastructure**: The software is completely frontend-based with a "Bring Your Own Key" (BYOK) architecture and **no built-in backend**. Any optional managed testing endpoint is operated by EqualByte and may be rate-limited or discontinued at any time.
 
 - **No Guaranteed Availability**: This testing API may be rate-limited, degraded, or discontinued at any time without prior notice.
 
@@ -42,7 +42,7 @@ This free testing API is provided **strictly for technical evaluation and R&D pu
 
 ---
 
-## 3. Browser Extension (Page Agent Ext)
+## 3. Browser Extension (PageOS Ext)
 
 ### Data Processing
 
@@ -82,4 +82,4 @@ We may update these terms at our discretion.
 
 ## Contact
 
-https://github.com/alibaba/page-agent/issues
+https://github.com/EqualByte/agentic-page/issues

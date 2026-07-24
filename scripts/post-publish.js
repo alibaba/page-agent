@@ -24,7 +24,7 @@ console.log('  ✓ package.json restored from backup')
 rmSync(join(process.cwd(), 'LICENSE'), { force: true })
 console.log('  ✓ LICENSE removed')
 
-if (name === 'page-agent') {
+if (name === 'page-os') {
 	rmSync(join(process.cwd(), 'README.md'), { force: true })
 	console.log('  ✓ README.md removed')
 }

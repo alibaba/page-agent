@@ -138,7 +138,7 @@ export default function App() {
 			<header className="flex items-center justify-between border-b px-3 py-2">
 				<div className="flex items-center gap-2">
 					<Logo className="size-5" />
-					<span className="text-sm font-medium">Page Agent Ext</span>
+					<span className="text-sm font-medium">PageOS Ext</span>
 				</div>
 				<div className="flex items-center gap-1">
 					<StatusDot status={status} />

@@ -27,17 +27,17 @@ export default function Header() {
 						<Link
 							href="/"
 							className="flex items-center gap-2 sm:gap-3 group shrink-0"
-							aria-label={isZh ? 'page-agent 首页' : 'page-agent home'}
+							aria-label={isZh ? 'PageOS 首页' : 'PageOS home'}
 							onClick={() => setMobileMenuOpen(false)}
 						>
 							<img
-								src="https://page-agent.github.io/assets/brand/page-agent-color-128.webp"
-								alt="PageAgent Logo"
+								src="/page-os/assets/brand/page-os.webp"
+								alt="PageOS Logo"
 								className="w-10 h-10 rounded-xl group-hover:scale-110 transition-transform duration-200"
 							/>
 							<div>
 								<span className="text-base sm:text-xl font-bold text-gray-900 dark:text-white leading-tight flex items-baseline gap-1.5">
-									page-agent
+									PageOS
 									<span className="hidden sm:inline text-[10px] font-mono font-normal text-gray-400 dark:text-gray-500 tabular-nums before:content-['v']">
 										{import.meta.env.VERSION}
 									</span>
@@ -68,7 +68,7 @@ export default function Header() {
 								<BookOpen className="w-5 h-5" />
 							</Link>
 							<a
-								href="https://github.com/alibaba/page-agent"
+								href="https://github.com/EqualByte/agentic-page"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="flex items-center gap-1 p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 shrink-0"
@@ -102,7 +102,7 @@ export default function Header() {
 								{isZh ? '文档' : 'Docs'}
 							</Link>
 							<a
-								href="https://github.com/alibaba/page-agent"
+								href="https://github.com/EqualByte/agentic-page"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
@@ -154,7 +154,7 @@ export default function Header() {
 								{isZh ? '文档' : 'Docs'}
 							</Link>
 							<a
-								href="https://github.com/alibaba/page-agent"
+								href="https://github.com/EqualByte/agentic-page"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"

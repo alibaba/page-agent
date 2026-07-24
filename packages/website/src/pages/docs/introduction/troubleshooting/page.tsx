@@ -71,8 +71,8 @@ function FormatErrorsContent(isZh: boolean) {
 				<strong>{isZh ? '确认模型是否支持' : 'Verify model compatibility'}</strong>
 				<p className="mt-1">
 					{isZh
-						? '并非所有模型都能正确处理 page-agent 的 tool 定义。请查看'
-						: 'Not all models can handle page-agent tool definitions correctly. Check the '}
+						? '并非所有模型都能正确处理 page-os 的 tool 定义。请查看'
+						: 'Not all models can handle page-os tool definitions correctly. Check the '}
 					<Link
 						href="/features/models"
 						className="text-blue-600 dark:text-blue-400 underline underline-offset-2"
@@ -103,7 +103,7 @@ function FormatErrorsContent(isZh: boolean) {
 						<>
 							如果以上步骤无法解决问题，欢迎在{' '}
 							<a
-								href="https://github.com/alibaba/page-agent/issues"
+								href="https://github.com/EqualByte/agentic-page/issues"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-blue-600 dark:text-blue-400 underline underline-offset-2"
@@ -116,7 +116,7 @@ function FormatErrorsContent(isZh: boolean) {
 						<>
 							If the above steps don't help, open a{' '}
 							<a
-								href="https://github.com/alibaba/page-agent/issues"
+								href="https://github.com/EqualByte/agentic-page/issues"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-blue-600 dark:text-blue-400 underline underline-offset-2"
@@ -271,7 +271,7 @@ function ApiErrorsContent(isZh: boolean) {
 						: 'Use the customFetch config to intercept requests and adapt parameters before sending them to the target provider.'}
 				</p>
 				<CodeEditor
-					code={`const agent = new PageAgent({
+					code={`const agent = new PageOS({
   // ...
   customFetch: async (url, init) => {
     // Adapt parameters for your provider
@@ -287,10 +287,10 @@ function ApiErrorsContent(isZh: boolean) {
 			<p className="text-sm">
 				{isZh ? '参见 ' : 'See '}
 				<Link
-					href="/advanced/page-agent-core"
+					href="/advanced/page-os-core"
 					className="text-blue-600 dark:text-blue-400 underline underline-offset-2"
 				>
-					PageAgentCore API
+					PageOSCore API
 				</Link>
 				{isZh ? ' 了解 customFetch 的完整用法。' : ' for full customFetch documentation.'}
 			</p>

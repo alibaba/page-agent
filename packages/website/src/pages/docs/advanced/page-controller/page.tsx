@@ -22,16 +22,14 @@ export default function PageControllerDocs() {
 			<section className="mb-10">
 				<Heading id="basic-usage">{isZh ? '基本用法' : 'Basic Usage'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
-					{isZh
-						? 'PageAgent 接受 PageController 配置项：'
-						: 'PageAgent accepts PageController options:'}
+					{isZh ? 'PageOS 接受 PageController 配置项：' : 'PageOS accepts PageController options:'}
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgent } from 'page-agent'
+					code={`import { PageOS } from 'page-os'
 
-const agent = new PageAgent({
-  baseURL: 'https://api.openai.com/v1',
+const agent = new PageOS({
+  baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
   model: 'gpt-5.2',
 
@@ -42,22 +40,22 @@ const agent = new PageAgent({
 				/>
 				<p className="text-gray-600 dark:text-gray-400 mt-4">
 					{isZh
-						? 'PageAgentCore 接受 PageController 实例：'
-						: 'PageAgentCore accepts a PageController instance:'}
+						? 'PageOSCore 接受 PageController 实例：'
+						: 'PageOSCore accepts a PageController instance:'}
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgentCore } from '@page-agent/core'
-import { PageController } from '@page-agent/page-controller'
+					code={`import { PageOSCore } from '@page-os/core'
+import { PageController } from '@page-os/page-controller'
 
 const pageController = new PageController({
   enableMask: true,
   viewportExpansion: -1,  // extract full page
 })
 
-const agent = new PageAgentCore({
+const agent = new PageOSCore({
   pageController,
-  baseURL: 'https://api.openai.com/v1',
+  baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
   model: 'gpt-5.2',
 })`}
@@ -76,8 +74,8 @@ const agent = new PageAgentCore({
 							type: 'boolean',
 							defaultValue: 'false',
 							description: isZh
-								? '启用视觉遮罩覆盖层，在自动化期间阻止用户操作页面。通过 PageAgent 创建时默认为 true。'
-								: 'Enable visual mask overlay that blocks user interaction during automation. Defaults to true when created via PageAgent.',
+								? '启用视觉遮罩覆盖层，在自动化期间阻止用户操作页面。通过 PageOS 创建时默认为 true。'
+								: 'Enable visual mask overlay that blocks user interaction during automation. Defaults to true when created via PageOS.',
 						},
 						{
 							name: 'viewportExpansion',
@@ -270,8 +268,8 @@ const agent = new PageAgentCore({
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgentCore } from '@page-agent/core'
-import type { PageController } from '@page-agent/page-controller'
+					code={`import { PageOSCore } from '@page-os/core'
+import type { PageController } from '@page-os/page-controller'
 
 class PuppeteerPageController implements PageController {
   async getBrowserState() { /* ... */ }
@@ -281,9 +279,9 @@ class PuppeteerPageController implements PageController {
   // ... other methods
 }
 
-const agent = new PageAgentCore({
+const agent = new PageOSCore({
   pageController: new PuppeteerPageController(),
-  baseURL: 'https://api.openai.com/v1',
+  baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
   model: 'gpt-5.2',
 })`}

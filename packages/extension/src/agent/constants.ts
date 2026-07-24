@@ -1,9 +1,10 @@
-import type { LLMConfig } from '@page-agent/llms'
+import type { LLMConfig } from '@page-os/llms'
 
-// Demo LLM for testing
-export const DEMO_MODEL = 'qwen3.5-plus'
-export const DEMO_BASE_URL = 'https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run'
-// export const DEMO_API_KEY = 'NA'
+// Demo LLM for testing.
+// TODO: point at the EqualByte LLM gateway (see PRODUCTIZATION-TASKS.md Phase 2/3).
+export const DEMO_MODEL = 'deepseek-chat'
+export const DEMO_BASE_URL = 'https://api.deepseek.com'
+// export const DEMO_API_KEY = ''
 
 export const DEMO_CONFIG: LLMConfig = {
 	baseURL: DEMO_BASE_URL,
@@ -12,9 +13,7 @@ export const DEMO_CONFIG: LLMConfig = {
 }
 
 /** Legacy testing endpoints that should be auto-migrated to DEMO_BASE_URL */
-export const LEGACY_TESTING_ENDPOINTS = [
-	'https://hwcxiuzfylggtcktqgij.supabase.co/functions/v1/llm-testing-proxy',
-]
+export const LEGACY_TESTING_ENDPOINTS: string[] = []
 
 export function isTestingEndpoint(url: string): boolean {
 	const normalized = url.replace(/\/+$/, '')

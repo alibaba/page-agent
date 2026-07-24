@@ -7,8 +7,8 @@ import type {
 	ExecutionResult,
 	HistoricalEvent,
 	SupportedLanguage,
-} from '@page-agent/core'
-import type { LLMConfig } from '@page-agent/llms'
+} from '@page-os/core'
+import type { LLMConfig } from '@page-os/llms'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { MultiPageAgent } from './MultiPageAgent'

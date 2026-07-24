@@ -8,31 +8,31 @@
         "packages/ui",
         "packages/llms",
         "packages/core",
-        "packages/page-agent",
+        "packages/page-os",
         "packages/mcp",
         "packages/extension",
         "packages/website"
     ],
     "description": "AI-powered UI agent for web applications",
-    "author": "Simon<gaomeng1900>",
+    "author": "EqualByte",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git"
+        "url": "https://github.com/EqualByte/agentic-page.git"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://equalbyte.github.io/agentic-page/",
     "engines": {
         "node": "^22.22.1 || >=24",
         "npm": "^11.6.3"
     },
     "scripts": {
-        "start": "npm run dev --workspace=@page-agent/website",
-        "dev:ext": "npm run dev -w @page-agent/ext",
-        "dev:demo": "npm run dev:demo --workspace=page-agent",
+        "start": "npm run dev --workspace=@page-os/website",
+        "dev:ext": "npm run dev -w @page-os/ext",
+        "dev:demo": "npm run dev:demo --workspace=page-os",
         "build": "node scripts/build.js",
         "build:libs": "node scripts/build-libs.js",
-        "build:website": "npm run build:website --workspace=@page-agent/website",
-        "build:ext": "npm run zip -w @page-agent/ext",
+        "build:website": "npm run build:website --workspace=@page-os/website",
+        "build:ext": "npm run zip -w @page-os/ext",
         "version": "node scripts/sync-version.js",
         "postpublish": "npm run postpublish --workspaces --if-present",
         "typecheck": "tsc --noEmit -p tsconfig.typecheck.json && tsc --noEmit -p packages/extension/tsconfig.json",

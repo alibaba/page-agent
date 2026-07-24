@@ -7,7 +7,7 @@ We provide security fixes on a best-effort basis for:
 | Version                                                   | Supported |
 | --------------------------------------------------------- | --------- |
 | `main`                                                    | Yes       |
-| Latest npm release of `page-agent` and workspace packages | Yes       |
+| Latest npm release of `page-os` and workspace packages | Yes       |
 | Older releases                                            | No        |
 
 Please upgrade to the latest release before reporting an issue against an older build.
@@ -18,7 +18,7 @@ Please do not report security vulnerabilities through public GitHub issues, disc
 
 Use GitHub's private vulnerability reporting flow:
 
-- Open https://github.com/alibaba/page-agent/security/policy
+- Open https://github.com/EqualByte/agentic-page/security/policy
 - Click `Report a vulnerability`
 
 If private reporting is unavailable, open a minimal public issue only to request a private contact channel. Do not include exploit details.

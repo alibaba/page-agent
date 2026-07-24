@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://alibaba.github.io/page-agent/sitemap.xml
+Sitemap: https://equalbyte.github.io/agentic-page/sitemap.xml

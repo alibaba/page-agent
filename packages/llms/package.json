@@ -1,5 +1,5 @@
 {
-    "name": "@page-agent/llms",
+    "name": "@page-os/llms",
     "version": "1.11.0",
     "type": "module",
     "main": "./src/index.ts",
@@ -11,36 +11,36 @@
         }
     },
     "publishConfig": {
-        "main": "./dist/lib/page-agent-llms.js",
-        "module": "./dist/lib/page-agent-llms.js",
+        "main": "./dist/lib/page-os-llms.js",
+        "module": "./dist/lib/page-os-llms.js",
         "types": "./dist/lib/index.d.ts",
         "exports": {
             ".": {
                 "types": "./dist/lib/index.d.ts",
-                "import": "./dist/lib/page-agent-llms.js",
-                "default": "./dist/lib/page-agent-llms.js"
+                "import": "./dist/lib/page-os-llms.js",
+                "default": "./dist/lib/page-os-llms.js"
             }
         }
     },
     "files": [
         "dist/"
     ],
-    "description": "LLM client with reflection-before-action mental model for page-agent",
+    "description": "LLM client with reflection-before-action mental model for page-os",
     "keywords": [
-        "page-agent",
+        "page-os",
         "llm",
         "openai",
         "tool-calling",
         "agent"
     ],
-    "author": "Simon<gaomeng1900>",
+    "author": "EqualByte",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git",
+        "url": "https://github.com/EqualByte/agentic-page.git",
         "directory": "packages/llms"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://equalbyte.github.io/agentic-page/",
     "scripts": {
         "build": "vite build",
         "test": "vitest run",

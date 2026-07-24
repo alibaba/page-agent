@@ -33,10 +33,7 @@ export default function Router() {
 				<ScrollToTop />
 				<Switch>
 					<Route path="/">
-						<main
-							id="main-content"
-							className="flex-1 bg-linear-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800"
-						>
+						<main id="main-content" className="flex-1 bg-white dark:bg-gray-950">
 							<HomePage />
 						</main>
 					</Route>

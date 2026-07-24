@@ -8,7 +8,7 @@ export default function McpServerPage() {
 			<h1 className="text-4xl font-bold mb-6">MCP Server (Beta)</h1>
 			<BetaNotice />
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-				Use the MCP server to let your local agent send natural-language browser tasks to Page Agent
+				Use the MCP server to let your local agent send natural-language browser tasks to PageOS
 				Ext.
 			</p>
 
@@ -19,7 +19,7 @@ export default function McpServerPage() {
 				<div className="space-y-4">
 					<div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
 						<p className="text-sm text-blue-900 dark:text-blue-200 leading-7">
-							1. Install Page Agent Ext in Chrome.
+							1. Install PageOS Ext in Chrome.
 							<br />
 							2. Add the MCP server to your local agent client.
 							<br />
@@ -33,11 +33,11 @@ export default function McpServerPage() {
 					<CodeEditor
 						code={`{
   "mcpServers": {
-    "page-agent": {
+    "page-os": {
       "command": "npx",
-      "args": ["-y", "@page-agent/mcp"],
+      "args": ["-y", "@page-os/mcp"],
       "env": {
-        "LLM_BASE_URL": "https://api.openai.com/v1",
+        "LLM_BASE_URL": "https://api.deepseek.com",
         "LLM_API_KEY": "sk-xxx",
         "LLM_MODEL_NAME": "gpt-5.2"
       }
@@ -55,8 +55,7 @@ export default function McpServerPage() {
 				</Heading>
 
 				<p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-					The Hub is the control center for communication between Page Agent Ext and external
-					callers.
+					The Hub is the control center for communication between PageOS Ext and external callers.
 				</p>
 				<p className="text-gray-700 dark:text-gray-300 leading-relaxed">
 					When the MCP server starts, it opens a local launcher page. The launcher asks the

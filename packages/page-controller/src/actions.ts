@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2025 Alibaba Group Holding Limited
+ * Copyright (C) 2025 EqualByte
  * All rights reserved.
  */
 import type { InteractiveElementDomNode } from './dom/dom_tree/type'

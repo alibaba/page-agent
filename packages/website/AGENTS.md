@@ -7,7 +7,7 @@
 - **Tailwind CSS** for styling
 - **shadcn/ui** (new-york style) for UI components — **do NOT hand-edit `src/components/ui/` files**
 - **Magic UI** for animations and effects
-- **wouter** with browser routing (`base: "/page-agent"`)
+- **wouter** with browser routing (`base: "/page-os"`)
 - **lucide-react** for icons
 
 ## Component Guidelines
@@ -80,19 +80,19 @@ src/
 
 ## Routing
 
-Uses wouter browser routing with base path for GitHub Pages deployment at `https://alibaba.github.io/page-agent/`.
+Uses wouter browser routing with base path for GitHub Pages deployment at `https://equalbyte.github.io/agentic-page/`.
 
 ```tsx
 // main.tsx
-<Router base="/page-agent">
+<Router base="/page-os">
     <PagesRouter />
 </Router>
 ```
 
 **Key rules:**
 
-- Header and Footer live in `router.tsx` **outside** `<Switch>`, so they always see the root router context (`base="/page-agent"`)
-- Docs pages are nested via `<Route path="/docs" nest>`, which creates a child context (`base="/page-agent/docs"`)
+- Header and Footer live in `router.tsx` **outside** `<Switch>`, so they always see the root router context (`base="/page-os"`)
+- Docs pages are nested via `<Route path="/docs" nest>`, which creates a child context (`base="/page-os/docs"`)
 - Inside the docs nest, Link hrefs are relative to `/docs` (e.g. `href="/features/models"`, NOT `href="/docs/features/models"`)
 - **Never use `~` prefix** in Link hrefs — it bypasses the base path entirely
 - Doc page headings use `<Heading id="slug" level={2}>` for anchor links

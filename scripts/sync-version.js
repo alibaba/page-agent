@@ -51,10 +51,10 @@ const packages = readdirSync(packagesDir, { withFileTypes: true })
 let hasChanges = !!versionArg
 
 /**
- * Check if a dependency name is a page-agent internal package
+ * Check if a dependency name is a page-os internal package
  */
 function isInternalPackage(name) {
-	return name === 'page-agent' || name.startsWith('@page-agent/')
+	return name === 'page-os' || name.startsWith('@page-os/')
 }
 
 /**
@@ -105,10 +105,10 @@ for (const pkg of packages) {
 }
 
 // Update CDN URLs in documentation and source files
-const CDN_DEMO_URL_OLD = `https://cdn.jsdelivr.net/npm/page-agent@${oldVersion}/dist/iife/page-agent.demo.js`
-const CDN_DEMO_URL_NEW = `https://cdn.jsdelivr.net/npm/page-agent@${newVersion}/dist/iife/page-agent.demo.js`
-const CDN_DEMO_CN_URL_OLD = `https://registry.npmmirror.com/page-agent/${oldVersion}/files/dist/iife/page-agent.demo.js`
-const CDN_DEMO_CN_URL_NEW = `https://registry.npmmirror.com/page-agent/${newVersion}/files/dist/iife/page-agent.demo.js`
+const CDN_DEMO_URL_OLD = `https://cdn.jsdelivr.net/npm/page-os@${oldVersion}/dist/iife/page-os.demo.js`
+const CDN_DEMO_URL_NEW = `https://cdn.jsdelivr.net/npm/page-os@${newVersion}/dist/iife/page-os.demo.js`
+const CDN_DEMO_CN_URL_OLD = `https://registry.npmmirror.com/page-os/${oldVersion}/files/dist/iife/page-os.demo.js`
+const CDN_DEMO_CN_URL_NEW = `https://registry.npmmirror.com/page-os/${newVersion}/files/dist/iife/page-os.demo.js`
 
 const filesToUpdateCdn = ['README.md', 'docs/README-zh.md', 'packages/website/src/constants.ts']
 

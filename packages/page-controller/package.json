@@ -1,5 +1,5 @@
 {
-    "name": "@page-agent/page-controller",
+    "name": "@page-os/page-controller",
     "version": "1.11.0",
     "type": "module",
     "main": "./src/PageController.ts",
@@ -25,21 +25,21 @@
     "files": [
         "dist/"
     ],
-    "description": "Page controller for page-agent - DOM operations and element interactions",
+    "description": "Page controller for page-os - DOM operations and element interactions",
     "keywords": [
-        "page-agent",
+        "page-os",
         "dom",
         "browser-automation",
         "web-automation"
     ],
-    "author": "Simon<gaomeng1900>",
+    "author": "EqualByte",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git",
+        "url": "https://github.com/EqualByte/agentic-page.git",
         "directory": "packages/page-controller"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://equalbyte.github.io/agentic-page/",
     "scripts": {
         "build": "vite build",
         "test": "vitest run",

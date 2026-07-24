@@ -1,8 +1,8 @@
-import { InvokeError, InvokeErrorTypes } from '@page-agent/llms'
+import { InvokeError, InvokeErrorTypes } from '@page-os/llms'
 import chalk from 'chalk'
 import * as z from 'zod/v4'
 
-import type { PageAgentTool } from '../tools'
+import type { PageOSTool } from '../tools'
 
 const log = console.log.bind(console, chalk.yellow('[autoFixer]'))
 
@@ -18,7 +18,7 @@ const log = console.log.bind(console, chalk.yellow('[autoFixer]'))
  * - Primitive action input for single-field tools (e.g. `{"click_element_by_index": 2}`)
  * - etc.
  */
-export function normalizeResponse(response: any, tools?: Map<string, PageAgentTool>): any {
+export function normalizeResponse(response: any, tools?: Map<string, PageOSTool>): any {
 	let resolvedArguments: any
 
 	const choice = (response as { choices?: Choice[] }).choices?.[0]
@@ -127,7 +127,7 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
  * Also coerces primitive inputs for single-field tools:
  * e.g. `{"click_element_by_index": 2}` → `{"click_element_by_index": {"index": 2}}`
  */
-function validateAction(action: any, tools: Map<string, PageAgentTool>): any {
+function validateAction(action: any, tools: Map<string, PageOSTool>): any {
 	if (typeof action !== 'object' || action === null) return action
 
 	const toolName = Object.keys(action)[0]

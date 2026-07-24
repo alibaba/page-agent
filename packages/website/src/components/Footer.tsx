@@ -15,7 +15,7 @@ export default function Footer() {
 					<div className="text-gray-600 dark:text-gray-300 text-sm text-center md:text-left">
 						<p>
 							<a
-								href="https://x.com/simonluvramen"
+								href="https://x.com/equalbyte"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="inline-block bg-[linear-gradient(60deg,#39b6ff_0%,#bd45fb_33%,#ff5733_66%,#ffd600_100%)] bg-clip-text text-xs leading-none text-transparent font-mono transition-opacity duration-200 hover:opacity-85"
@@ -24,13 +24,13 @@ export default function Footer() {
 							</a>
 						</p>
 						<p className="text-gray-600 dark:text-gray-300 text-xs mt-0.5">
-							© 2026 page-agent. All rights reserved.
+							© 2026 PageOS. All rights reserved.
 						</p>
 					</div>
 
 					<div className="flex items-center">
 						<a
-							href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md"
+							href="https://github.com/EqualByte/agentic-page/blob/main/docs/terms-and-privacy.md"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 text-sm mr-4"
@@ -38,7 +38,7 @@ export default function Footer() {
 							{isZh ? '使用条款与隐私' : 'Terms & Privacy'}
 						</a>
 						<a
-							href="https://x.com/simonluvramen"
+							href="https://x.com/equalbyte"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200 mr-4"
@@ -54,7 +54,7 @@ export default function Footer() {
 							</svg>
 						</a>
 						<a
-							href="https://github.com/alibaba/page-agent"
+							href="https://github.com/EqualByte/agentic-page"
 							target="_blank"
 							rel="noopener noreferrer"
 							className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"

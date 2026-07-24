@@ -11,7 +11,7 @@ export default function QuickStart() {
 			<h1 className="text-4xl font-bold mb-6">Quick Start</h1>
 
 			<p className=" mb-6 leading-relaxed">
-				{isZh ? '几分钟内完成 page-agent 的集成。' : 'Integrate page-agent in minutes.'}
+				{isZh ? '几分钟内完成 page-os 的集成。' : 'Integrate page-os in minutes.'}
 			</p>
 
 			<Heading id="installation-steps" className="text-2xl font-bold mb-3">
@@ -31,7 +31,7 @@ export default function QuickStart() {
 								<>
 									该 Demo CDN 使用了免费的测试 LLM API，使用即表示您同意其
 									<a
-										href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+										href="https://github.com/EqualByte/agentic-page/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
 										target="_blank"
 										rel="noopener noreferrer"
 										className="underline"
@@ -43,7 +43,7 @@ export default function QuickStart() {
 								<>
 									This demo CDN uses our free testing LLM API. By using it you agree to the{' '}
 									<a
-										href="https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
+										href="https://github.com/EqualByte/agentic-page/blob/main/docs/terms-and-privacy.md#2-testing-api-and-demo-disclaimer--terms-of-use"
 										target="_blank"
 										rel="noopener noreferrer"
 										className="underline"
@@ -60,8 +60,8 @@ export default function QuickStart() {
 					/>
 					<p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
 						{isZh
-							? '在 URL 后添加 ?autoInit=false 可只加载脚本，不自动创建 Demo Agent；之后可通过 new window.PageAgent(...) 手动初始化。'
-							: 'Add ?autoInit=false to load the script without creating the demo agent automatically. You can then instantiate it with new window.PageAgent(...).'}
+							? '在 URL 后添加 ?autoInit=false 可只加载脚本，不自动创建 Demo Agent；之后可通过 new window.PageOS(...) 手动初始化。'
+							: 'Add ?autoInit=false to load the script without creating the demo agent automatically. You can then instantiate it with new window.PageOS(...).'}
 					</p>
 					<table className="w-full border-collapse text-sm">
 						<thead>
@@ -91,9 +91,9 @@ export default function QuickStart() {
 						{isZh ? '📦 NPM 安装（推荐）' : '📦 NPM Install (Recommended)'}
 					</h3>
 					<CodeEditor
-						code={`// npm install page-agent
+						code={`// npm install page-os
 
-import { PageAgent } from 'page-agent'`}
+import { PageOS } from 'page-os'`}
 						language="bash"
 					/>
 				</div>
@@ -103,9 +103,9 @@ import { PageAgent } from 'page-agent'`}
 						{isZh ? '2. 初始化配置' : '2. Initialize Configuration'}
 					</h3>
 					<CodeEditor
-						code={`const agent = new PageAgent({
-  model: 'qwen3.5-plus',
-  baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+						code={`const agent = new PageOS({
+  model: 'deepseek-chat',
+  baseURL: 'https://api.deepseek.com',
   apiKey: 'YOUR_API_KEY',
   language: '${isZh ? 'zh-CN' : 'en-US'}'
 })`}

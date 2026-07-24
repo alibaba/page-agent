@@ -27,9 +27,9 @@ export default defineConfig({
 	publicDir: false,
 	build: {
 		lib: {
-			entry: resolve(__dirname, 'src/PageAgent.ts'),
-			name: 'PageAgent',
-			fileName: 'page-agent',
+			entry: resolve(__dirname, 'src/PageOS.ts'),
+			name: 'PageOS',
+			fileName: 'page-os',
 			formats: ['es'],
 		},
 		outDir: resolve(__dirname, 'dist', 'esm'),
@@ -38,8 +38,9 @@ export default defineConfig({
 				'chalk',
 				'zod',
 				'zod/v4',
-				// all the internal packages
-				/^@page-agent\//,
+				// NOTE: internal @page-os/* packages are deliberately BUNDLED here.
+				// They are not published to any registry, so the tarball must be
+				// self-contained for consumers installing from the .tgz.
 			],
 		},
 		minify: false,

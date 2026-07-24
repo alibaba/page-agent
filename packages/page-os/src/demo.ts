@@ -1,30 +1,32 @@
 /**
  * IIFE demo entry - auto-initializes with built-in demo API for testing
  */
-import { PageAgent, type PageAgentConfig } from './PageAgent'
+import { PageOS, type PageOSConfig } from './PageOS'
 
 const currentScript = document.currentScript as HTMLScriptElement | null
 const currentScriptURL = currentScript?.src ? new URL(currentScript.src) : null
 const autoInit = currentScriptURL?.searchParams.get('autoInit') !== 'false'
 
 // Clean up existing instances to prevent multiple injections from bookmarklet
-if (autoInit && window.pageAgent) {
-	window.pageAgent.dispose()
+if (autoInit && window.pageOS) {
+	window.pageOS.dispose()
 }
 
 // Mount to global window object
-window.PageAgent = PageAgent
+window.PageOS = PageOS
 
-console.log('🚀 page-agent.js loaded!')
+console.log('🚀 page-os.js loaded!')
 
-const DEMO_MODEL = 'qwen3.5-plus'
-const DEMO_BASE_URL = 'https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run'
-const DEMO_API_KEY = 'NA'
+// TODO: point these at the EqualByte LLM gateway (see PRODUCTIZATION-TASKS.md Phase 2/3).
+// Generic OpenAI-compatible placeholders — a real key/endpoint must be supplied via config.
+const DEMO_MODEL = 'deepseek-chat'
+const DEMO_BASE_URL = 'https://api.deepseek.com'
+const DEMO_API_KEY = ''
 
 // in case document.x is not ready yet
 if (autoInit) {
 	setTimeout(() => {
-		let config: PageAgentConfig
+		let config: PageOSConfig
 		let showPanel = true
 
 		if (currentScriptURL) {
@@ -36,7 +38,7 @@ if (autoInit) {
 			showPanel = ((url.searchParams.get('showPanel') as 'true' | 'false') || 'true') === 'true'
 			config = { model, baseURL, apiKey, language }
 		} else {
-			console.log('🚀 page-agent.js no current script detected, using default demo config')
+			console.log('🚀 page-os.js no current script detected, using default demo config')
 			config = {
 				model: import.meta.env.LLM_MODEL_NAME ? import.meta.env.LLM_MODEL_NAME : DEMO_MODEL,
 				baseURL: import.meta.env.LLM_BASE_URL ? import.meta.env.LLM_BASE_URL : DEMO_BASE_URL,
@@ -45,11 +47,11 @@ if (autoInit) {
 		}
 
 		// Create agent
-		window.pageAgent = new PageAgent(config)
+		window.pageOS = new PageOS(config)
 		if (showPanel) {
-			window.pageAgent.panel.show()
+			window.pageOS.panel.show()
 		}
 
-		console.log('🚀 page-agent.js initialized with config:', window.pageAgent.config)
+		console.log('🚀 page-os.js initialized with config:', window.pageOS.config)
 	})
 }

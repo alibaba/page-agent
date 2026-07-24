@@ -1,25 +1,25 @@
 {
-    "name": "@page-agent/core",
+    "name": "@page-os/core",
     "private": false,
     "version": "1.11.0",
     "type": "module",
-    "main": "./src/PageAgentCore.ts",
-    "types": "./src/PageAgentCore.ts",
+    "main": "./src/PageOSCore.ts",
+    "types": "./src/PageOSCore.ts",
     "exports": {
         ".": {
-            "types": "./src/PageAgentCore.ts",
-            "default": "./src/PageAgentCore.ts"
+            "types": "./src/PageOSCore.ts",
+            "default": "./src/PageOSCore.ts"
         }
     },
     "publishConfig": {
-        "main": "./dist/esm/page-agent-core.js",
-        "module": "./dist/esm/page-agent-core.js",
-        "types": "./dist/esm/PageAgentCore.d.ts",
+        "main": "./dist/esm/page-os-core.js",
+        "module": "./dist/esm/page-os-core.js",
+        "types": "./dist/esm/PageOSCore.d.ts",
         "exports": {
             ".": {
-                "types": "./dist/esm/PageAgentCore.d.ts",
-                "import": "./dist/esm/page-agent-core.js",
-                "default": "./dist/esm/page-agent-core.js"
+                "types": "./dist/esm/PageOSCore.d.ts",
+                "import": "./dist/esm/page-os-core.js",
+                "default": "./dist/esm/page-os-core.js"
             }
         }
     },
@@ -39,13 +39,13 @@
         "web-automation",
         "GUI-simulation"
     ],
-    "author": "Simon<gaomeng1900>",
+    "author": "EqualByte",
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/alibaba/page-agent.git"
+        "url": "https://github.com/EqualByte/agentic-page.git"
     },
-    "homepage": "https://alibaba.github.io/page-agent/",
+    "homepage": "https://equalbyte.github.io/agentic-page/",
     "scripts": {
         "build": "vite build",
         "test": "vitest run",
@@ -55,8 +55,8 @@
     },
     "dependencies": {
         "chalk": "^5.6.2",
-        "@page-agent/llms": "1.11.0",
-        "@page-agent/page-controller": "1.11.0"
+        "@page-os/llms": "1.11.0",
+        "@page-os/page-controller": "1.11.0"
     },
     "peerDependencies": {
         "zod": "^3.25.0 || ^4.0.0"

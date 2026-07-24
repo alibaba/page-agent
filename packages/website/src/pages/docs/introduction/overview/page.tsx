@@ -10,8 +10,8 @@ export default function Overview() {
 				<h1 className="text-4xl font-bold mb-4">Overview</h1>
 				<p className="text-xl text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
 					{isZh
-						? 'page-agent 是一个完全基于 Web 技术的 GUI Agent，简单几步，让你的网站拥有 AI 操作员。'
-						: 'page-agent is a purely web-based GUI Agent. Gives your website an AI operator in simple steps.'}
+						? 'page-os 是一个完全基于 Web 技术的 GUI Agent，简单几步，让你的网站拥有 AI 操作员。'
+						: 'page-os is a purely web-based GUI Agent. Gives your website an AI operator in simple steps.'}
 				</p>
 
 				{/* Status Badges */}
@@ -25,23 +25,23 @@ export default function Overview() {
 							alt="TypeScript"
 						/>
 					</a>
+					<a href="https://www.npmjs.com/package/page-os" target="_blank" rel="noopener noreferrer">
+						<img src="https://img.shields.io/npm/dt/page-os.svg" alt="Downloads" />
+					</a>
 					<a
-						href="https://www.npmjs.com/package/page-agent"
+						href="https://bundlephobia.com/package/page-os"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<img src="https://img.shields.io/npm/dt/page-agent.svg" alt="Downloads" />
+						<img src="https://img.shields.io/bundlephobia/minzip/page-os" alt="Bundle Size" />
 					</a>
 					<a
-						href="https://bundlephobia.com/package/page-agent"
+						href="https://github.com/EqualByte/agentic-page"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<img src="https://img.shields.io/bundlephobia/minzip/page-agent" alt="Bundle Size" />
-					</a>
-					<a href="https://github.com/alibaba/page-agent" target="_blank" rel="noopener noreferrer">
 						<img
-							src="https://img.shields.io/github/stars/alibaba/page-agent.svg"
+							src="https://img.shields.io/github/stars/EqualByte/agentic-page.svg"
 							alt="GitHub stars"
 						/>
 					</a>
@@ -49,14 +49,14 @@ export default function Overview() {
 			</div>
 
 			<section>
-				<Heading id="what-is-page-agent" className="text-2xl font-bold mb-4">
-					{isZh ? '什么是 page-agent？' : 'What is page-agent?'}
+				<Heading id="what-is-page-os" className="text-2xl font-bold mb-4">
+					{isZh ? '什么是 page-os？' : 'What is page-os?'}
 				</Heading>
 
 				<p className="text-gray-600 dark:text-gray-300 mb-8 leading-relaxed ">
 					{isZh
-						? 'page-agent 是一个页面内嵌式 GUI Agent。与传统的浏览器自动化工具不同，page-agent 面向网站开发者，而非爬虫或Agent客户端开发者；将 Agent 集成到你的网站中，让用户可以通过自然语言与页面进行交互。'
-						: 'page-agent is an embedded GUI Agent. Unlike traditional browser automation tools, page-agent is built for web developers and web applications first. Integrate it into your site to let users interact with pages through natural language.'}
+						? 'page-os 是一个页面内嵌式 GUI Agent。与传统的浏览器自动化工具不同，page-os 面向网站开发者，而非爬虫或Agent客户端开发者；将 Agent 集成到你的网站中，让用户可以通过自然语言与页面进行交互。'
+						: 'page-os is an embedded GUI Agent. Unlike traditional browser automation tools, page-os is built for web developers and web applications first. Integrate it into your site to let users interact with pages through natural language.'}
 				</p>
 			</section>
 
@@ -121,7 +121,7 @@ export default function Overview() {
 							<tr className="bg-gray-50 dark:bg-gray-800">
 								<th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left"></th>
 								<th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left">
-									page-agent
+									page-os
 								</th>
 								<th className="border border-gray-300 dark:border-gray-600 px-4 py-3 text-left">
 									browser-use

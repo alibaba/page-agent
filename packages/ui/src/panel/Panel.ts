@@ -1,6 +1,6 @@
 import { I18n, type SupportedLanguage } from '../i18n'
 import { truncate } from '../utils'
-import { createCard, createReflectionLines } from './cards'
+import { UI_ICONS, createCard, createReflectionLines } from './cards'
 import type { AgentActivity, PanelAgentAdapter } from './types'
 
 import styles from './Panel.module.css'
@@ -35,7 +35,7 @@ export class Panel {
 	#expandButton: HTMLElement
 	#actionButton: HTMLElement
 	#inputSection: HTMLElement
-	#taskInput: HTMLInputElement
+	#taskInput: HTMLTextAreaElement
 
 	#agent: PanelAgentAdapter
 	#config: PanelConfig
@@ -43,6 +43,7 @@ export class Panel {
 	#i18n: I18n
 	#userAnswerResolver: ((input: string) => void) | null = null
 	#isWaitingForUserAnswer: boolean = false
+	#isNumericInput: boolean = false
 	#headerUpdateTimer: ReturnType<typeof setInterval> | null = null
 	#pendingHeaderText: string | null = null
 	#isAnimating = false
@@ -68,7 +69,7 @@ export class Panel {
 		this.#i18n = new I18n(config.language ?? 'en-US')
 
 		// Set up askUser callback on agent
-		this.#agent.onAskUser = (question, options) => this.#askUser(question, options?.signal)
+		this.#agent.onAskUser = (question, options) => this.#askUser(question, options)
 
 		// Create UI elements
 		this.#wrapper = this.#createWrapper()
@@ -105,12 +106,12 @@ export class Panel {
 		const failed = status === 'completed' && this.#agent.lastResult?.success === false
 		this.#updateStatusIndicator(failed ? 'error' : status)
 
-		// Morph action button: running = stop (■), not running = close (X)
+		// Morph action button: running = stop, not running = close
 		if (status === 'running') {
-			this.#actionButton.textContent = '■'
+			this.#actionButton.innerHTML = UI_ICONS.stop
 			this.#actionButton.title = this.#i18n.t('ui.panel.stop')
 		} else {
-			this.#actionButton.textContent = 'X'
+			this.#actionButton.innerHTML = UI_ICONS.close
 			this.#actionButton.title = this.#i18n.t('ui.panel.close')
 		}
 
@@ -153,7 +154,7 @@ export class Panel {
 				break
 
 			case 'executed':
-				this.#pendingHeaderText = truncate(activity.output, 50)
+				this.#pendingHeaderText = truncate(this.#stripStatusEmoji(activity.output), 50)
 				break
 
 			case 'retrying':
@@ -170,10 +171,16 @@ export class Panel {
 
 	/**
 	 * Ask for user input (internal, called by agent via onAskUser).
+	 * When `choices` are provided they render as clickable answer buttons;
+	 * `inputType: 'number'` switches the free-form field to a number input.
 	 * Rejects when `signal` aborts (task stopped or disposed), cleaning up the
 	 * question card and pending state so the agent loop can settle.
 	 */
-	#askUser(question: string, signal?: AbortSignal): Promise<string> {
+	#askUser(
+		question: string,
+		options?: { signal?: AbortSignal; choices?: string[]; inputType?: 'text' | 'number' }
+	): Promise<string> {
+		const { signal, choices, inputType } = options ?? {}
 		return new Promise((resolve, reject) => {
 			// Set `waiting for user answer` state
 			this.#isWaitingForUserAnswer = true
@@ -187,16 +194,43 @@ export class Panel {
 			// Add temporary question card so user can see the full question
 			const tempCard = document.createElement('div')
 			tempCard.innerHTML = createCard({
-				icon: '❓',
-				content: `Question: ${question}`,
+				icon: 'question',
+				content: this.#i18n.t('ui.panel.question', { question }),
 				type: 'question',
 			})
 			const cardElement = tempCard.firstElementChild as HTMLElement
 			cardElement.setAttribute('data-temp-card', 'true')
 			this.#historySection.appendChild(cardElement)
+
+			// Render answer choices as buttons (inside the question card)
+			if (choices && choices.length > 0) {
+				const optionsRow = document.createElement('div')
+				optionsRow.className = styles.optionsRow
+				for (const choice of choices) {
+					const button = document.createElement('button')
+					button.type = 'button'
+					button.className = styles.optionButton
+					button.textContent = choice
+					button.addEventListener('click', (e) => {
+						e.stopPropagation()
+						if (!this.#isWaitingForUserAnswer) return
+						this.#hideInputArea()
+						this.#handleUserAnswer(choice)
+					})
+					optionsRow.appendChild(button)
+				}
+				cardElement.appendChild(optionsRow)
+			}
+
 			this.#scrollToBottom()
 
-			this.#showInputArea(this.#i18n.t('ui.panel.userAnswerPrompt'))
+			// Free-form answer field (numeric keyboard/filtering when a numeric answer is expected)
+			this.#setNumericMode(inputType === 'number')
+			this.#showInputArea(
+				choices && choices.length > 0
+					? this.#i18n.t('ui.panel.userAnswerPromptOptions')
+					: this.#i18n.t('ui.panel.userAnswerPrompt')
+			)
 
 			signal?.addEventListener(
 				'abort',
@@ -204,6 +238,7 @@ export class Panel {
 					this.#removeTempCards()
 					this.#isWaitingForUserAnswer = false
 					this.#userAnswerResolver = null
+					this.#setNumericMode(false)
 					// reason is a DOMException AbortError (abort() takes no args).
 					reject(signal.reason as DOMException)
 				},
@@ -244,6 +279,7 @@ export class Panel {
 		// Reset user input state
 		this.#isWaitingForUserAnswer = false
 		this.#userAnswerResolver = null
+		this.#setNumericMode(false)
 		// Show input area
 		this.#showInputArea()
 	}
@@ -334,6 +370,7 @@ export class Panel {
 
 		// Reset state
 		this.#isWaitingForUserAnswer = false
+		this.#setNumericMode(false)
 
 		// Call resolver to return user input
 		if (this.#userAnswerResolver) {
@@ -349,11 +386,34 @@ export class Panel {
 		// Clear input field
 		this.#taskInput.value = ''
 		this.#taskInput.placeholder = placeholder || this.#i18n.t('ui.panel.taskInput')
+		this.#autoGrowInput()
 		this.#inputSection.classList.remove(styles.hidden)
 		// Focus on input field
 		setTimeout(() => {
 			this.#taskInput.focus()
 		}, 100)
+	}
+
+	/**
+	 * Toggle numeric-answer mode. Textareas have no native `type="number"`,
+	 * so we switch the mobile keyboard hint and filter non-numeric keystrokes instead.
+	 */
+	#setNumericMode(enabled: boolean): void {
+		this.#isNumericInput = enabled
+		this.#taskInput.inputMode = enabled ? 'decimal' : 'text'
+	}
+
+	/** Grow the textarea to fit its content, up to the CSS max-height (which then scrolls). */
+	#autoGrowInput(): void {
+		this.#taskInput.style.height = 'auto'
+		this.#taskInput.style.height = `${this.#taskInput.scrollHeight}px`
+	}
+
+	/** Whether a keydown event should be allowed while in numeric-answer mode. */
+	#isNumericKey(e: KeyboardEvent): boolean {
+		if (e.ctrlKey || e.metaKey || e.altKey) return true // allow shortcuts (copy/paste/select-all)
+		if (e.key.length !== 1) return true // allow control keys (Backspace, arrows, Tab, etc.)
+		return /[0-9.-]/.test(e.key)
 	}
 
 	/**
@@ -389,21 +449,16 @@ export class Panel {
 	#createWrapper(): HTMLElement {
 		const taskInputMaxLength = 1000
 		const wrapper = document.createElement('div')
-		wrapper.id = 'page-agent-runtime_agent-panel'
+		wrapper.id = 'page-os-runtime_agent-panel'
 		wrapper.className = styles.wrapper
 		wrapper.setAttribute('data-browser-use-ignore', 'true')
-		wrapper.setAttribute('data-page-agent-ignore', 'true')
+		wrapper.setAttribute('data-page-os-ignore', 'true')
 
 		wrapper.innerHTML = `
 			<div class="${styles.background}"></div>
 			<div class="${styles.historySectionWrapper}">
 				<div class="${styles.historySection}">
-					<div class="${styles.historyItem}">
-						<div class="${styles.historyContent}">
-							<span class="${styles.statusIcon}">🧠</span>
-							<span>${this.#i18n.t('ui.panel.waitingPlaceholder')}</span>
-						</div>
-					</div>
+					${createCard({ icon: 'brain', content: this.#i18n.t('ui.panel.waitingPlaceholder') })}
 				</div>
 			</div>
 			<div class="${styles.header}">
@@ -413,20 +468,20 @@ export class Panel {
 				</div>
 				<div class="${styles.controls}">
 					<button class="${styles.controlButton} ${styles.expandButton}" title="${this.#i18n.t('ui.panel.expand')}">
-						▼
+						${UI_ICONS.chevronDown}
 					</button>
 					<button class="${styles.controlButton} ${styles.stopButton}" title="${this.#i18n.t('ui.panel.close')}">
-						X
+						${UI_ICONS.close}
 					</button>
 				</div>
 			</div>
 			<div class="${styles.inputSectionWrapper} ${styles.hidden}">
 				<div class="${styles.inputSection}">
-					<input 
-						type="text" 
-						class="${styles.taskInput}" 
+					<textarea
+						class="${styles.taskInput}"
+						rows="1"
 						maxlength="${taskInputMaxLength}"
-					/>
+					></textarea>
 				</div>
 			</div>
 		`
@@ -464,8 +519,15 @@ export class Panel {
 			if (e.key === 'Enter') {
 				e.preventDefault()
 				this.#submitTask()
+				return
+			}
+			if (this.#isNumericInput && !this.#isNumericKey(e)) {
+				e.preventDefault()
 			}
 		})
+
+		// Auto-grow the textarea as the user types (up to the CSS max-height)
+		this.#taskInput.addEventListener('input', () => this.#autoGrowInput())
 
 		// Prevent input area click event bubbling
 		this.#inputSection.addEventListener('click', (e) => {
@@ -484,13 +546,15 @@ export class Panel {
 	#expand(): void {
 		this.#isExpanded = true
 		this.wrapper.classList.add(styles.expanded)
-		this.#expandButton.textContent = '▲'
+		this.#expandButton.innerHTML = UI_ICONS.chevronUp
+		this.#expandButton.title = this.#i18n.t('ui.panel.collapse')
 	}
 
 	#collapse(): void {
 		this.#isExpanded = false
 		this.wrapper.classList.remove(styles.expanded)
-		this.#expandButton.textContent = '▼'
+		this.#expandButton.innerHTML = UI_ICONS.chevronDown
+		this.#expandButton.title = this.#i18n.t('ui.panel.expand')
 	}
 
 	/**
@@ -614,7 +678,12 @@ export class Panel {
 	}
 
 	#createTaskCard(task: string): string {
-		return createCard({ icon: '🎯', content: task, type: 'input' })
+		return createCard({ icon: 'task', content: task, type: 'input' })
+	}
+
+	/** Strip decorative status emojis from tool outputs (kept in the LLM protocol) */
+	#stripStatusEmoji(text: string): string {
+		return text.replace(/(^|\s)(✅|❌|⚠️)\s*/g, '$1').trim()
 	}
 
 	/** Create cards for a history event */
@@ -630,9 +699,13 @@ export class Panel {
 		if (event.type === 'step') {
 			// Reflection card
 			if (event.reflection) {
-				const lines = createReflectionLines(event.reflection)
+				const lines = createReflectionLines(event.reflection, {
+					evaluation: this.#i18n.t('ui.panel.reflectionEval'),
+					memory: this.#i18n.t('ui.panel.reflectionMemory'),
+					next: this.#i18n.t('ui.panel.reflectionNext'),
+				})
 				if (lines.length > 0) {
-					cards.push(createCard({ icon: '🧠', content: lines, meta }))
+					cards.push(createCard({ icon: 'brain', content: lines, meta }))
 				}
 			}
 
@@ -643,16 +716,16 @@ export class Panel {
 			}
 		} else if (event.type === 'observation') {
 			cards.push(
-				createCard({ icon: '👁️', content: event.content || '', meta, type: 'observation' })
+				createCard({ icon: 'eye', content: event.content || '', meta, type: 'observation' })
 			)
 		} else if (event.type === 'user_takeover') {
-			cards.push(createCard({ icon: '👤', content: 'User takeover', meta, type: 'input' }))
+			cards.push(createCard({ icon: 'user', content: 'User takeover', meta, type: 'input' }))
 		} else if (event.type === 'retry') {
 			const retryInfo = `${event.message || 'Retrying'} (${event.attempt}/${event.maxAttempts})`
-			cards.push(createCard({ icon: '🔄', content: retryInfo, meta, type: 'observation' }))
+			cards.push(createCard({ icon: 'retry', content: retryInfo, meta, type: 'observation' }))
 		} else if (event.type === 'error') {
 			cards.push(
-				createCard({ icon: '❌', content: event.message || 'Error', meta, type: 'observation' })
+				createCard({ icon: 'error', content: event.message || 'Error', meta, type: 'observation' })
 			)
 		}
 
@@ -670,25 +743,39 @@ export class Panel {
 			const input = action.input as { text?: string }
 			const text = input.text || action.output || ''
 			if (text) {
-				cards.push(createCard({ icon: '🤖', content: text, meta, type: 'output' }))
+				cards.push(createCard({ icon: 'agent', content: text, meta, type: 'output' }))
 			}
 		} else if (action.name === 'ask_user') {
 			const input = action.input as { question?: string }
 			const answer = action.output.replace(/^User answered:\s*/i, '')
 			cards.push(
 				createCard({
-					icon: '❓',
-					content: `Question: ${input.question || ''}`,
+					icon: 'question',
+					content: this.#i18n.t('ui.panel.question', { question: input.question || '' }),
 					meta,
 					type: 'question',
 				})
 			)
-			cards.push(createCard({ icon: '💬', content: `Answer: ${answer}`, meta, type: 'input' }))
+			cards.push(
+				createCard({
+					icon: 'answer',
+					content: this.#i18n.t('ui.panel.userAnswer', { input: answer }),
+					meta,
+					type: 'input',
+				})
+			)
 		} else {
 			const toolText = this.#getToolExecutingText(action.name, action.input)
-			cards.push(createCard({ icon: '🔨', content: toolText, meta }))
+			cards.push(createCard({ icon: 'tool', content: toolText, meta }))
 			if (action.output?.length > 0) {
-				cards.push(createCard({ icon: '🔨', content: action.output, meta, type: 'output' }))
+				cards.push(
+					createCard({
+						icon: 'check',
+						content: this.#stripStatusEmoji(action.output),
+						meta,
+						type: 'output',
+					})
+				)
 			}
 		}
 

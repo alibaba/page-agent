@@ -1,4 +1,4 @@
-import type { AgentStatus } from '@page-agent/core'
+import type { AgentStatus } from '@page-os/core'
 import { Motion } from 'ai-motion'
 import { BookOpen, Globe } from 'lucide-react'
 import { useEffect, useRef } from 'react'
@@ -36,7 +36,7 @@ export function StatusDot({ status }: { status: AgentStatus }) {
 }
 
 export function Logo({ className }: { className?: string }) {
-	return <img src="/assets/page-agent-256.webp" alt="Page Agent" className={cn('', className)} />
+	return <img src="/assets/page-os.webp" alt="PageOS" className={cn('', className)} />
 }
 
 // Full-screen ai-motion glow overlay, shown only while running
@@ -102,7 +102,7 @@ export function EmptyState() {
 				<Logo className="relative size-20 opacity-80" />
 			</div>
 			<div>
-				<h2 className="text-base font-medium text-foreground mb-1">Page Agent Ext</h2>
+				<h2 className="text-base font-medium text-foreground mb-1">PageOS Ext</h2>
 				<TypingAnimation
 					className="text-sm text-muted-foreground"
 					words={[
@@ -121,7 +121,7 @@ export function EmptyState() {
 			</div>
 			<div className="flex items-center gap-3 mt-1 text-muted-foreground">
 				<a
-					href="https://github.com/alibaba/page-agent"
+					href="https://github.com/EqualByte/agentic-page"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="hover:text-foreground transition-colors"
@@ -132,7 +132,7 @@ export function EmptyState() {
 					</svg>
 				</a>
 				<a
-					href="https://alibaba.github.io/page-agent/docs/features/chrome-extension"
+					href="https://equalbyte.github.io/agentic-page/docs/features/chrome-extension"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="hover:text-foreground transition-colors"
@@ -141,7 +141,7 @@ export function EmptyState() {
 					<BookOpen className="size-4" />
 				</a>
 				<a
-					href="https://alibaba.github.io/page-agent"
+					href="https://equalbyte.github.io/agentic-page"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="hover:text-foreground transition-colors"

@@ -1,8 +1,8 @@
-import type { BrowserState, PageController } from '@page-agent/page-controller'
+import type { BrowserState, PageController } from '@page-os/page-controller'
 import { describe, expect, it, vi } from 'vitest'
 import * as z from 'zod/v4'
 
-import { PageAgentCore, tool } from './PageAgentCore'
+import { PageOSCore, tool } from './PageOSCore'
 import type { ExecutionResult } from './types'
 
 type TestFetch = (...args: Parameters<typeof globalThis.fetch>) => Promise<Response>
@@ -51,9 +51,9 @@ function createPageController(): PageController {
 
 function createAgent(
 	customFetch: TestFetch,
-	options: Partial<ConstructorParameters<typeof PageAgentCore>[0]> = {}
-): PageAgentCore {
-	return new PageAgentCore({
+	options: Partial<ConstructorParameters<typeof PageOSCore>[0]> = {}
+): PageOSCore {
+	return new PageOSCore({
 		baseURL: 'https://llm.test',
 		model: 'test-model',
 		maxRetries: 0,
@@ -69,10 +69,7 @@ function createFetchMock() {
 	return vi.fn<TestFetch>()
 }
 
-function onceActivity(
-	agent: PageAgentCore,
-	predicate: (detail: unknown) => boolean
-): Promise<void> {
+function onceActivity(agent: PageOSCore, predicate: (detail: unknown) => boolean): Promise<void> {
 	return new Promise((resolve) => {
 		const onActivity = (event: Event) => {
 			if (!predicate((event as CustomEvent).detail)) return
@@ -108,7 +105,7 @@ function waitResponse(seconds = 10): Response {
  * The running promise is wrapped so awaiting this helper does not await the task.
  */
 async function startBlockedTask(
-	agent: PageAgentCore,
+	agent: PageOSCore,
 	task = 'first'
 ): Promise<{ result: Promise<ExecutionResult> }> {
 	const waitStarted = onceActivity(agent, (detail) => isExecutingTool(detail, 'wait'))
@@ -117,7 +114,7 @@ async function startBlockedTask(
 	return { result }
 }
 
-describe.concurrent('PageAgentCore lifecycle', () => {
+describe.concurrent('PageOSCore lifecycle', () => {
 	describe('normal execution', () => {
 		it('runs a task to natural completion', async () => {
 			const fetchMock = createFetchMock().mockResolvedValueOnce(doneResponse('all done'))

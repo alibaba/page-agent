@@ -1,10 +1,10 @@
 /**
- * Internal tools for PageAgent.
+ * Internal tools for PageOS.
  * @note Adapted from browser-use
  */
 import * as z from 'zod/v4'
 
-import type { PageAgentCore } from '../PageAgentCore'
+import type { PageOSCore } from '../PageOSCore'
 import { waitFor } from '../utils'
 
 /**
@@ -16,24 +16,24 @@ export interface ToolContext {
 }
 
 /**
- * Internal tool definition that has access to PageAgent `this` context
+ * Internal tool definition that has access to PageOS `this` context
  */
-export interface PageAgentTool<TParams = any> {
+export interface PageOSTool<TParams = any> {
 	// name: string
 	description: string
 	inputSchema: z.ZodType<TParams>
-	execute: (this: PageAgentCore, args: TParams, ctx: ToolContext) => Promise<string>
+	execute: (this: PageOSCore, args: TParams, ctx: ToolContext) => Promise<string>
 }
 
-export function tool<TParams>(options: PageAgentTool<TParams>): PageAgentTool<TParams> {
+export function tool<TParams>(options: PageOSTool<TParams>): PageOSTool<TParams> {
 	return options
 }
 
 /**
- * Internal tools for PageAgent.
+ * Internal tools for PageOS.
  * Note: Using any to allow different parameter types for each tool
  */
-export const tools = new Map<string, PageAgentTool>()
+export const tools = new Map<string, PageOSTool>()
 
 tools.set(
 	'done',
@@ -44,7 +44,7 @@ tools.set(
 			text: z.string(),
 			success: z.boolean().default(true),
 		}),
-		execute: async function (this: PageAgentCore, input) {
+		execute: async function (this: PageOSCore, input) {
 			// @note main loop will handle this one
 			return Promise.resolve('Task completed')
 		},
@@ -58,7 +58,7 @@ tools.set(
 		inputSchema: z.object({
 			seconds: z.number().min(1).max(10).default(1),
 		}),
-		execute: async function (this: PageAgentCore, input, { signal }) {
+		execute: async function (this: PageOSCore, input, { signal }) {
 			// try to subtract LLM calling time from the actual wait time
 			const lastTimeUpdate = await this.pageController.getLastUpdateTime()
 			const secondsSinceLastUpdate = (Date.now() - lastTimeUpdate) / 1000
@@ -76,15 +76,30 @@ tools.set(
 	'ask_user',
 	tool({
 		description:
-			'Ask the user a question and wait for their answer. Use this if you need more information or clarification.',
+			'Ask the user a question and wait for their answer. Use this if you need more information or clarification. ' +
+			'When the answer is a choice between known values, ALWAYS pass them as `options` so the user can pick one instead of typing. ' +
+			'Set `input_type` to "number" when you expect a numeric answer.',
 		inputSchema: z.object({
 			question: z.string(),
+			options: z
+				.array(z.string())
+				.max(8)
+				.optional()
+				.describe('Mutually exclusive answer choices, shown to the user as buttons'),
+			input_type: z
+				.enum(['text', 'number'])
+				.optional()
+				.describe('Expected free-form answer type when no option fits'),
 		}),
-		execute: async function (this: PageAgentCore, input, { signal }) {
+		execute: async function (this: PageOSCore, input, { signal }) {
 			if (!this.onAskUser) {
 				throw new Error('ask_user tool requires onAskUser callback to be set')
 			}
-			const answer = await this.onAskUser(input.question, { signal })
+			const answer = await this.onAskUser(input.question, {
+				signal,
+				choices: input.options,
+				inputType: input.input_type,
+			})
 			return `User answered: ${answer}`
 		},
 	})
@@ -97,7 +112,7 @@ tools.set(
 		inputSchema: z.object({
 			index: z.int().min(0),
 		}),
-		execute: async function (this: PageAgentCore, input) {
+		execute: async function (this: PageOSCore, input) {
 			const result = await this.pageController.clickElement(input.index)
 			return result.message
 		},
@@ -112,7 +127,7 @@ tools.set(
 			index: z.int().min(0),
 			text: z.string(),
 		}),
-		execute: async function (this: PageAgentCore, input) {
+		execute: async function (this: PageOSCore, input) {
 			const result = await this.pageController.inputText(input.index, input.text)
 			return result.message
 		},
@@ -128,7 +143,7 @@ tools.set(
 			index: z.int().min(0),
 			text: z.string(),
 		}),
-		execute: async function (this: PageAgentCore, input) {
+		execute: async function (this: PageOSCore, input) {
 			const result = await this.pageController.selectOption(input.index, input.text)
 			return result.message
 		},
@@ -149,7 +164,7 @@ tools.set(
 			pixels: z.number().int().min(0).optional(),
 			index: z.number().int().min(0).optional(),
 		}),
-		execute: async function (this: PageAgentCore, input) {
+		execute: async function (this: PageOSCore, input) {
 			const result = await this.pageController.scroll({
 				...input,
 				numPages: input.num_pages,
@@ -172,7 +187,7 @@ tools.set(
 			pixels: z.number().int().min(0),
 			index: z.number().int().min(0).optional(),
 		}),
-		execute: async function (this: PageAgentCore, input) {
+		execute: async function (this: PageOSCore, input) {
 			const result = await this.pageController.scrollHorizontally(input)
 			return result.message
 		},
@@ -189,7 +204,7 @@ tools.set(
 		inputSchema: z.object({
 			script: z.string(),
 		}),
-		execute: async function (this: PageAgentCore, input, { signal }) {
+		execute: async function (this: PageOSCore, input, { signal }) {
 			const result = await this.pageController.executeJavascript(input.script, signal)
 			signal.throwIfAborted()
 			return result.message

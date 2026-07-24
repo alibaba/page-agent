@@ -2,8 +2,8 @@
 /**
  * Full build pipeline. Equivalent to:
  *   npm run cleanup && npm run build --workspaces --if-present
- *                    && npm run build:website -w @page-agent/website
- *                    && npm run zip -w @page-agent/ext
+ *                    && npm run build:website -w @page-os/website
+ *                    && npm run zip -w @page-os/ext
  *
  * 1. cleanup
  * 2. build everything in parallel (libs + website + extension)
@@ -35,11 +35,11 @@ const tasks = rootPkg.workspaces
 
 tasks.push(
 	{
-		label: '@page-agent/website',
+		label: '@page-os/website',
 		command: 'npm run build:website',
 		cwd: join(rootDir, 'packages/website'),
 	},
-	{ label: '@page-agent/ext', command: 'npm run zip', cwd: join(rootDir, 'packages/extension') }
+	{ label: '@page-os/ext', command: 'npm run zip', cwd: join(rootDir, 'packages/extension') }
 )
 
 await parallelTask(tasks, { timeoutMs: 120_000 })

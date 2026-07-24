@@ -1,10 +1,10 @@
-// Demo build (auto-init with demo LLM, for quick testing)
-export const CDN_DEMO_URL =
-	'https://cdn.jsdelivr.net/npm/page-agent@1.11.0/dist/iife/page-agent.demo.js'
-export const CDN_DEMO_CN_URL =
-	'https://registry.npmmirror.com/page-agent/1.11.0/files/dist/iife/page-agent.demo.js'
+// Demo build (auto-init with demo LLM, for quick testing).
+// TODO: publish the bundle to the EqualByte CDN and point these at it (PRODUCTIZATION-TASKS.md Phase 2).
+export const CDN_DEMO_URL = 'https://cdn.equalbyte.example/agentic-page/latest/agent.demo.js'
+export const CDN_DEMO_CN_URL = 'https://cdn.equalbyte.example/agentic-page/latest/agent.demo.js'
 
-// Demo LLM for website testing (homepage quick trial uses flash)
-export const DEMO_MODEL = 'qwen3.5-flash'
-export const DEMO_BASE_URL = 'https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run'
+// Demo LLM for website testing.
+// TODO: point at the EqualByte LLM gateway (PRODUCTIZATION-TASKS.md Phase 2/3).
+export const DEMO_MODEL = 'deepseek-chat'
+export const DEMO_BASE_URL = 'https://api.deepseek.com'
 // export const DEMO_API_KEY = ''

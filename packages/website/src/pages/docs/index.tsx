@@ -3,10 +3,10 @@ import { Route, Switch } from 'wouter'
 
 import DocsLayout from './Layout'
 import CustomUIDocs from './advanced/custom-ui/page'
-import PageAgentCoreDocs from './advanced/page-agent-core/page'
-// Advanced
-import PageAgentDocs from './advanced/page-agent/page'
 import PageControllerDocs from './advanced/page-controller/page'
+import PageOSCoreDocs from './advanced/page-os-core/page'
+// Advanced
+import PageOSDocs from './advanced/page-os/page'
 import SecurityPermissions from './advanced/security-permissions/page'
 // Features
 import ChromeExtension from './features/chrome-extension/page'
@@ -93,14 +93,14 @@ export default function DocsRouter() {
 			</Route>
 
 			{/* Advanced */}
-			<Route path="/advanced/page-agent">
+			<Route path="/advanced/page-os">
 				<DocsPage>
-					<PageAgentDocs />
+					<PageOSDocs />
 				</DocsPage>
 			</Route>
-			<Route path="/advanced/page-agent-core">
+			<Route path="/advanced/page-os-core">
 				<DocsPage>
-					<PageAgentCoreDocs />
+					<PageOSCoreDocs />
 				</DocsPage>
 			</Route>
 			<Route path="/advanced/page-controller">

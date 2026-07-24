@@ -2,7 +2,7 @@
 // Run: tsc --noEmit -p tsconfig.typecheck.json
 // Extension is checked separately (WXT has its own tsconfig base).
 //
-// With source-first package.json exports, TS resolves @page-agent/*
+// With source-first package.json exports, TS resolves @page-os/*
 // to sibling src/ via workspace symlinks — no paths mapping needed.
 {
     "extends": "./tsconfig.base.json",
@@ -19,7 +19,7 @@
         "packages/page-controller/src/**/*",
         "packages/ui/src/**/*",
         "packages/core/src/**/*",
-        "packages/page-agent/src/**/*",
+        "packages/page-os/src/**/*",
         "packages/website/src/**/*"
     ]
 }

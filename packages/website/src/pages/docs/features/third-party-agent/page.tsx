@@ -12,8 +12,8 @@ export default function ThirdPartyAgentPage() {
 			</h1>
 			<p className="mb-6 leading-relaxed text-gray-600 dark:text-gray-300">
 				{isZh
-					? '将 pageAgent 作为工具接入你的答疑助手或 Agent 系统，成为你 Agent 的眼和手。'
-					: 'Integrate pageAgent as a tool in your support assistant or Agent system, becoming the eyes and hands of your Agent.'}
+					? '将 pageOS 作为工具接入你的答疑助手或 Agent 系统，成为你 Agent 的眼和手。'
+					: 'Integrate pageOS as a tool in your support assistant or Agent system, becoming the eyes and hands of your Agent.'}
 			</p>
 
 			<Heading id="integration-method" className="text-2xl font-bold mb-4">
@@ -27,8 +27,8 @@ export default function ThirdPartyAgentPage() {
 					</h3>
 					<CodeEditor
 						code={`// ${isZh ? '定义工具' : 'Define tool'}
-const pageAgentTool = {
-  name: "page_agent",
+const pageOSTool = {
+  name: "page_os",
   description: "${isZh ? '执行网页操作' : 'Execute web page operations'}",
   parameters: {
     type: "object",
@@ -38,7 +38,7 @@ const pageAgentTool = {
     required: ["instruction"]
   },
   execute: async (params) => {
-    const result = await pageAgent.execute(params.instruction)
+    const result = await pageOS.execute(params.instruction)
     return { success: result.success, message: result.data }
   }
 }

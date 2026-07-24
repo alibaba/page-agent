@@ -56,8 +56,8 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
 		{
 			title: isZh ? '高级' : 'Advanced',
 			items: [
-				{ title: 'PageAgent', path: '/advanced/page-agent' },
-				{ title: 'PageAgentCore', path: '/advanced/page-agent-core' },
+				{ title: 'PageOS', path: '/advanced/page-os' },
+				{ title: 'PageOSCore', path: '/advanced/page-os-core' },
 				{ title: 'PageController', path: '/advanced/page-controller' },
 				{ title: isZh ? '自定义 UI' : 'Custom UI', path: '/advanced/custom-ui' },
 				{

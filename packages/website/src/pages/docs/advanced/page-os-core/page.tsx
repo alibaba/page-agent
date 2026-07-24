@@ -5,23 +5,23 @@ import CodeEditor from '@/components/CodeEditor'
 import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
-export default function PageAgentCoreDocs() {
+export default function PageOSCoreDocs() {
 	const { isZh } = useLanguage()
 
 	return (
 		<div>
-			<h1 className="text-4xl font-bold mb-6">PageAgentCore</h1>
+			<h1 className="text-4xl font-bold mb-6">PageOSCore</h1>
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
 				{isZh
-					? 'PageAgentCore 是不带 UI 的核心 Agent 类。用于需要自定义 UI 或无头运行的场景。'
-					: 'PageAgentCore is the core Agent class without UI. Use it for custom UI or headless scenarios.'}
+					? 'PageOSCore 是不带 UI 的核心 Agent 类。用于需要自定义 UI 或无头运行的场景。'
+					: 'PageOSCore is the core Agent class without UI. Use it for custom UI or headless scenarios.'}
 			</p>
 
 			{/* When to use */}
 			<section className="mb-10">
-				<Heading id="when-to-use-pageagentcore">
-					{isZh ? '何时使用 PageAgentCore' : 'When to Use PageAgentCore'}
+				<Heading id="when-to-use-pageoscore">
+					{isZh ? '何时使用 PageOSCore' : 'When to Use PageOSCore'}
 				</Heading>
 				<ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2">
 					<li>{isZh ? '需要自定义 UI 界面' : 'Need a custom UI interface'}</li>
@@ -32,9 +32,7 @@ export default function PageAgentCoreDocs() {
 							: 'Running in non-browser environments (requires custom PageController)'}
 					</li>
 					<li>
-						{isZh
-							? '将 PageAgent 嵌入其他 Agent 系统'
-							: 'Embedding PageAgent in other agent systems'}
+						{isZh ? '将 PageOS 嵌入其他 Agent 系统' : 'Embedding PageOS in other agent systems'}
 					</li>
 				</ul>
 			</section>
@@ -44,12 +42,12 @@ export default function PageAgentCoreDocs() {
 				<Heading id="basic-usage">{isZh ? '基本用法' : 'Basic Usage'}</Heading>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageAgentCore } from '@page-agent/core'
-import { PageController } from '@page-agent/page-controller'
+					code={`import { PageOSCore } from '@page-os/core'
+import { PageController } from '@page-os/page-controller'
 
-const agent = new PageAgentCore({
+const agent = new PageOSCore({
   pageController: new PageController({ enableMask: true }),
-  baseURL: 'https://api.openai.com/v1',
+  baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
   model: 'gpt-5.2',
 })
@@ -73,11 +71,11 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* Configuration */}
 			<section className="mb-10">
-				<Heading id="configuration">PageAgentCoreConfig</Heading>
+				<Heading id="configuration">PageOSCoreConfig</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? 'PageAgentCoreConfig = AgentConfig & { pageController: PageController }。AgentConfig 包含以下配置项：'
-						: 'PageAgentCoreConfig = AgentConfig & { pageController: PageController }. AgentConfig contains the following options:'}
+						? 'PageOSCoreConfig = AgentConfig & { pageController: PageController }。AgentConfig 包含以下配置项：'
+						: 'PageOSCoreConfig = AgentConfig & { pageController: PageController }. AgentConfig contains the following options:'}
 				</p>
 
 				{/* PageController */}
@@ -126,8 +124,8 @@ const result = await agent.execute('Fill in the form with test data')`}
 							type: 'string',
 							required: true,
 							description: isZh
-								? 'LLM API 的基础 URL（如 https://api.openai.com/v1）'
-								: 'Base URL of the LLM API (e.g., https://api.openai.com/v1)',
+								? 'LLM API 的基础 URL（如 https://api.deepseek.com）'
+								: 'Base URL of the LLM API (e.g., https://api.deepseek.com)',
 						},
 						{
 							name: 'model',
@@ -215,7 +213,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 						},
 						{
 							name: 'customTools',
-							type: 'Record<string, PageAgentTool | null>',
+							type: 'Record<string, PageOSTool | null>',
 							status: 'experimental',
 							description: isZh
 								? '自定义工具，可扩展或覆盖内置工具。设为 null 可移除工具。'
@@ -342,15 +340,15 @@ const result = await agent.execute('Fill in the form with test data')`}
 						},
 						{
 							name: 'tools',
-							type: 'Map<string, PageAgentTool>',
+							type: 'Map<string, PageOSTool>',
 							description: isZh ? '可用工具的 Map' : 'Map of available tools',
 						},
 						{
 							name: 'onAskUser',
-							type: '(question: string, options?: { signal: AbortSignal }) => Promise<string>',
+							type: "(question: string, options?: { signal: AbortSignal; choices?: string[]; inputType?: 'text' | 'number' }) => Promise<string>",
 							description: isZh
-								? '当 agent 需要向用户提问时调用。未设置则禁用 `ask_user` 工具。实现应在 options.signal 触发 abort 时 reject promise。'
-								: 'Called when the agent needs to ask the user questions. If unset, the `ask_user` tool will be disabled. Implementations should reject the promise when options.signal aborts.',
+								? '当 agent 需要向用户提问时调用。未设置则禁用 `ask_user` 工具。`choices` 是 LLM 给出的备选答案（可渲染为按钮），`inputType` 提示期望的回答类型。实现应在 options.signal 触发 abort 时 reject promise。'
+								: 'Called when the agent needs to ask the user questions. If unset, the `ask_user` tool will be disabled. `choices` carries LLM-suggested answer options (render as buttons) and `inputType` hints the expected answer type. Implementations should reject the promise when options.signal aborts.',
 						},
 					]}
 				/>
@@ -393,12 +391,11 @@ const result = await agent.execute('Fill in the form with test data')`}
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh ? (
 						<>
-							PageAgentCore 继承自 <TypeRef>EventTarget</TypeRef>，提供以下事件：
+							PageOSCore 继承自 <TypeRef>EventTarget</TypeRef>，提供以下事件：
 						</>
 					) : (
 						<>
-							PageAgentCore extends <TypeRef>EventTarget</TypeRef> and provides the following
-							events:
+							PageOSCore extends <TypeRef>EventTarget</TypeRef> and provides the following events:
 						</>
 					)}
 				</p>

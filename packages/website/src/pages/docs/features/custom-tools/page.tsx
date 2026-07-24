@@ -22,8 +22,8 @@ export default function CustomTools() {
 					</Heading>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
-							? 'Page Agent 使用 Zod 定义工具的输入 schema。支持 Zod 3 (>=3.25.0) 和 Zod 4，请从 zod/v4 子路径导入。不支持 Zod Mini。'
-							: 'Page Agent uses Zod for tool input schemas. Both Zod 3 (>=3.25.0) and Zod 4 are supported. Always import from the zod/v4 subpath. Zod Mini is not supported.'}
+							? 'PageOS 使用 Zod 定义工具的输入 schema。支持 Zod 3 (>=3.25.0) 和 Zod 4，请从 zod/v4 子路径导入。不支持 Zod Mini。'
+							: 'PageOS uses Zod for tool input schemas. Both Zod 3 (>=3.25.0) and Zod 4 are supported. Always import from the zod/v4 subpath. Zod Mini is not supported.'}
 					</p>
 					<CodeEditor
 						code={`// Zod 3 (>=3.25.0) or Zod 4
@@ -44,9 +44,9 @@ import { z } from 'zod/v4'`}
 
 					<CodeEditor
 						code={`import { z } from 'zod/v4'
-import { PageAgent, tool } from 'page-agent'
+import { PageOS, tool } from 'page-os'
 
-const pageAgent = new PageAgent({
+const pageOS = new PageOS({
   customTools: {
   
 	// 
@@ -99,7 +99,7 @@ const pageAgent = new PageAgent({
 					</p>
 
 					<CodeEditor
-						code={`const pageAgent = new PageAgent({
+						code={`const pageOS = new PageOS({
   customTools: {
     scroll: null, // remove scroll tool
     execute_javascript: null, // remove script execution

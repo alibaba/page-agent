@@ -8,9 +8,7 @@ import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const pageAgentPkg = JSON.parse(
-	readFileSync(resolve(__dirname, '../page-agent/package.json'), 'utf-8')
-)
+const pageOSPkg = JSON.parse(readFileSync(resolve(__dirname, '../page-os/package.json'), 'utf-8'))
 
 // Load .env from repo root
 dotenvConfig({ path: resolve(__dirname, '../../.env'), quiet: true })
@@ -30,14 +28,14 @@ const SPA_ROUTES = [
 	'docs/features/chrome-extension',
 	'docs/features/mcp-server',
 	'docs/features/third-party-agent',
-	'docs/advanced/page-agent',
-	'docs/advanced/page-agent-core',
+	'docs/advanced/page-os',
+	'docs/advanced/page-os-core',
 	'docs/advanced/page-controller',
 	'docs/advanced/custom-ui',
 	'docs/advanced/security-permissions',
 ]
 
-const SITE_URL = 'https://alibaba.github.io/page-agent'
+const SITE_URL = 'https://equalbyte.github.io/agentic-page'
 
 function spaRoutes() {
 	return {
@@ -70,7 +68,7 @@ function spaRoutes() {
 
 // Website Config (React Documentation Site)
 export default defineConfig(({ mode }) => ({
-	base: '/page-agent/',
+	base: '/page-os/',
 	clearScreen: false,
 	plugins: [react(), tailwindcss(), spaRoutes()],
 	build: {
@@ -101,6 +99,6 @@ export default defineConfig(({ mode }) => ({
 			'import.meta.env.LLM_API_KEY': JSON.stringify(process.env.LLM_API_KEY),
 			'import.meta.env.LLM_BASE_URL': JSON.stringify(process.env.LLM_BASE_URL),
 		}),
-		'import.meta.env.VERSION': JSON.stringify(pageAgentPkg.version),
+		'import.meta.env.VERSION': JSON.stringify(pageOSPkg.version),
 	},
 }))
