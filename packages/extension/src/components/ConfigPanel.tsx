@@ -265,6 +265,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 					<option value="">System</option>
 					<option value="en-US">English</option>
 					<option value="zh-CN">中文</option>
+					<option value="ar-EG">العربية</option>
 				</select>
 			</div>
 

@@ -94,6 +94,54 @@ const zhCN = {
 	},
 } as const
 
+// Arabic translations (must match the structure of enUS)
+const arEG = {
+	ui: {
+		panel: {
+			ready: 'جاهز',
+			thinking: 'جاري التفكير...',
+			taskInput: 'أدخل مهمة جديدة، واشرح الخطوات بالتفصيل، واضغط Enter للإرسال',
+			userAnswerPrompt: 'يرجى الإجابة على السؤال أعلاه، واضغط Enter للإرسال',
+			taskTerminated: 'تم إنهاء المهمة',
+			taskCompleted: 'تمت المهمة',
+			userAnswer: 'إجابة المستخدم: {{input}}',
+			question: 'سؤال: {{question}}',
+			waitingPlaceholder: 'في انتظار بدء المهمة...',
+			stop: 'إيقاف',
+			close: 'إغلاق',
+			expand: 'توسيع السجل',
+			collapse: 'طي السجل',
+			step: 'الخطوة {{number}}',
+		},
+		tools: {
+			clicking: 'جاري النقر على العنصر [{{index}}]...',
+			inputting: 'جاري إدخال النص في العنصر [{{index}}]...',
+			selecting: 'جاري تحديد الخيار "{{text}}"...',
+			scrolling: 'جاري التمرير في الصفحة...',
+			waiting: 'جاري الانتظار {{seconds}} ثوانٍ...',
+			askingUser: 'جاري سؤال المستخدم...',
+			done: 'انتهت المهمة',
+			clicked: '🖱️ تم النقر على العنصر [{{index}}]',
+			inputted: '⌨️ تم إدخال النص "{{text}}"',
+			selected: '☑️ تم تحديد الخيار "{{text}}"',
+			scrolled: '🛞 تم تمرير الصفحة',
+			waited: '⌛️ اكتمل الانتظار',
+			executing: 'جاري تنفيذ {{toolName}}...',
+			resultSuccess: 'نجاح',
+			resultFailure: 'فشل',
+			resultError: 'خطأ',
+		},
+		errors: {
+			elementNotFound: 'لم يتم العثور على عنصر تفاعلي عند الفهرس {{index}}',
+			taskRequired: 'وصف المهمة مطلوب',
+			executionFailed: 'فشل تنفيذ المهمة',
+			notInputElement: 'العنصر ليس حقل إدخال أو منطقة نصية',
+			notSelectElement: 'العنصر ليس قائمة اختيار',
+			optionNotFound: 'لم يتم العثور على الخيار "{{text}}"',
+		},
+	},
+} as const
+
 // Type definitions generated from English base structure (but with string values)
 type DeepStringify<T> = {
 	[K in keyof T]: T[K] extends string ? string : T[K] extends object ? DeepStringify<T[K]> : T[K]
@@ -117,6 +165,8 @@ export type TranslationParams = Record<string, string | number>
 export const locales = {
 	'en-US': enUS,
 	'zh-CN': zhCN,
+	'ar-EG': arEG,
+	ar: arEG,
 } as const
 
 export type SupportedLanguage = keyof typeof locales
