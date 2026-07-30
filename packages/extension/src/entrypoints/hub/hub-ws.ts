@@ -219,7 +219,11 @@ export function useHubWs(
 			{
 				onExecute: async (task, incomingConfig) => {
 					const { execute, configure, config } = latestRef.current
-					if (incomingConfig) {
+					//  issue#69 Only reconfigure when incoming values actually differ from current config.
+					// Otherwise every execute() call from MCP (which always sends env vars) would
+					// trigger setConfig -> useEffect cleanup -> agent.dispose() -> recreate,
+					// racing with the in-flight execute and causing an infinite retry loop.
+					if (incomingConfig && hasConfigDiff(config, incomingConfig)) {
 						await configure({ ...config, ...incomingConfig } as ExtConfig)
 					}
 					const result = await execute(task)
@@ -240,4 +244,17 @@ export function useHubWs(
 	}, [wsPort])
 
 	return { wsState }
+}
+
+/**
+ * Shallow diff between the current config and an incoming partial config.
+ * Returns true if any key in `incoming` has a value different from `current`.
+ * Used to skip no-op reconfigure calls that would otherwise recreate the agent.
+ */
+function hasConfigDiff(current: ExtConfig | null, incoming: Record<string, unknown>): boolean {
+	if (!current) return true
+	for (const key of Object.keys(incoming)) {
+		if ((current as unknown as Record<string, unknown>)[key] !== incoming[key]) return true
+	}
+	return false
 }
