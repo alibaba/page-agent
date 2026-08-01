@@ -40,6 +40,7 @@ interface ResultMessage {
 	type: 'result'
 	success: boolean
 	data: string
+	reason?: ExecutionResult['reason']
 }
 
 interface ErrorMessage {
@@ -57,7 +58,7 @@ export interface HubWsHandlers {
 	onExecute: (
 		task: string,
 		config?: Record<string, unknown>
-	) => Promise<{ success: boolean; data: string }>
+	) => Promise<{ success: boolean; data: string; reason?: ExecutionResult['reason'] }>
 	onStop: () => void
 }
 
@@ -181,7 +182,12 @@ export class HubWs {
 		this.#busy = true
 		try {
 			const result = await this.#handlers.onExecute(msg.task, msg.config)
-			this.#send({ type: 'result', success: result.success, data: result.data })
+			this.#send({
+				type: 'result',
+				success: result.success,
+				data: result.data,
+				reason: result.reason,
+			})
 		} catch (err) {
 			this.#send({ type: 'error', message: err instanceof Error ? err.message : String(err) })
 		} finally {
@@ -223,7 +229,7 @@ export function useHubWs(
 						await configure({ ...config, ...incomingConfig } as ExtConfig)
 					}
 					const result = await execute(task)
-					return { success: result.success, data: result.data }
+					return { success: result.success, data: result.data, reason: result.reason }
 				},
 				onStop: () => latestRef.current.stop(),
 			},

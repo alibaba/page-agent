@@ -331,7 +331,12 @@ export class PageAgentCore extends EventTarget {
 					const message = isAbortError ? 'Task aborted' : String(error)
 					this.#emitActivity({ type: 'error', message: message })
 					this.#emitHistoryChange({ type: 'error', message: message, rawResponse: error })
-					taskResult = { success: false, data: message, history: this.history }
+					taskResult = {
+						success: false,
+						data: message,
+						history: this.history,
+						reason: isAbortError ? (this.disposed ? 'disposed' : 'user_stop') : 'error',
+					}
 					this.#lastResult = taskResult
 					finalStatus = isAbortError ? 'stopped' : 'error'
 					break

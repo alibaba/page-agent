@@ -79,7 +79,7 @@ export class HubBridge {
 	/**
 	 * @param {string} task
 	 * @param {Record<string, unknown>} [config]
-	 * @returns {Promise<{success: boolean, data: string}>}
+	 * @returns {Promise<{success: boolean, data: string, reason?: string}>}
 	 */
 	async executeTask(task, config) {
 		if (!this.connected) throw new Error('Hub is not connected. Is the extension running?')
@@ -110,7 +110,7 @@ export class HubBridge {
 		console.error('[page-agent-mcp] Hub connected')
 
 		ws.on('message', (/** @type {Buffer} */ rawData) => {
-			/** @type {{ type: string, success?: boolean, data?: string, message?: string }} */
+			/** @type {{ type: string, success?: boolean, data?: string, reason?: string, message?: string }} */
 			let msg
 			try {
 				msg = JSON.parse(rawData.toString('utf-8'))
@@ -119,7 +119,11 @@ export class HubBridge {
 			}
 
 			if (msg.type === 'result') {
-				this.#pendingTask?.resolve({ success: msg.success ?? false, data: msg.data ?? '' })
+				this.#pendingTask?.resolve({
+					success: msg.success ?? false,
+					data: msg.data ?? '',
+					reason: msg.reason,
+				})
 				this.#pendingTask = null
 			} else if (msg.type === 'error') {
 				this.#pendingTask?.reject(new Error(msg.message ?? 'Unknown error from hub'))

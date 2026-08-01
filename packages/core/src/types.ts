@@ -282,4 +282,5 @@ export interface ExecutionResult {
 	success: boolean
 	data: string
 	history: HistoricalEvent[]
+	reason?: 'completed' | 'user_stop' | 'disposed' | 'error'
 }

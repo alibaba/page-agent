@@ -162,7 +162,11 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 
 			await agent.stop()
 			expect(agent.status).toBe('stopped')
-			await expect(firstTask).resolves.toMatchObject({ success: false, data: 'Task aborted' })
+			await expect(firstTask).resolves.toMatchObject({
+				success: false,
+				data: 'Task aborted',
+				reason: 'user_stop',
+			})
 
 			const secondTask = await agent.execute('second')
 			expect(secondTask).toMatchObject({ success: true, data: 'second task' })
@@ -195,7 +199,11 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 			const { result: task } = await startBlockedTask(agent)
 
 			agent.dispose()
-			await expect(task).resolves.toMatchObject({ success: false, data: 'Task aborted' })
+			await expect(task).resolves.toMatchObject({
+				success: false,
+				data: 'Task aborted',
+				reason: 'disposed',
+			})
 
 			expect(agent.disposed).toBe(true)
 			await expect(agent.execute('again')).rejects.toThrow('has been disposed')
