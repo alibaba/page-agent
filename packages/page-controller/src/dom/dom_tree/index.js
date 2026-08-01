@@ -721,6 +721,21 @@ export default (
 	}
 
 	/**
+	 * @edit cap dropdown options per container (#348)
+	 * A select/dropdown with hundreds of options would blow up the LLM payload;
+	 * index at most MAX_DROPDOWN_OPTIONS_PER_CONTAINER options and fold the rest
+	 * into a hint on the container.
+	 */
+	const MAX_DROPDOWN_OPTIONS_PER_CONTAINER = 20
+	const dropdownOptionCounts = new WeakMap() // container element -> indexed option count
+
+	function getDropdownOptionContainer(element) {
+		if (!element || element.nodeType !== Node.ELEMENT_NODE) return null
+		if (!isDropdownOptionElement(element)) return null
+		return element.closest(DROPDOWN_CONTAINER_SELECTOR)
+	}
+
+	/**
 	 * Checks if an element is interactive.
 	 *
 	 * lots of comments, and uncommented code - to show the logic of what we already tried
@@ -1676,6 +1691,24 @@ export default (
 			nodeData.isVisible = isElementVisible(node) // isElementVisible uses offsetWidth/Height, which is fine
 			if (nodeData.isVisible) {
 				nodeData.isTopElement = isTopElement(node)
+
+				/**
+				 * @edit cap dropdown options per container (#348)
+				 * A dropdown with hundreds of options would blow up the LLM payload;
+				 * index at most MAX_DROPDOWN_OPTIONS_PER_CONTAINER options per container
+				 * and fold the excess into a hint on the container.
+				 */
+				if (isDropdownOptionElement(node)) {
+					const container = getDropdownOptionContainer(node)
+					const used = dropdownOptionCounts.get(container) || 0
+					if (used >= MAX_DROPDOWN_OPTIONS_PER_CONTAINER) {
+						addExtraData(container, {
+							droppedOptions: (extraData.get(container)?.droppedOptions || 0) + 1,
+						})
+						return null // Skip excess options entirely (text included)
+					}
+					dropdownOptionCounts.set(container, used + 1)
+				}
 
 				// Special handling for ARIA menu containers - check interactivity even if not top element
 				const role = node.getAttribute('role')

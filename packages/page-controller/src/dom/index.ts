@@ -432,6 +432,14 @@ export function flatTreeToString(
 				processNode(child, nextDepth, result)
 			}
 
+			/**
+			 * @edit dropdown options are capped per container (#348);
+			 * render a hint so the LLM knows more options exist.
+			 */
+			if (node.extra?.droppedOptions) {
+				result.push(`${depthStr}... ${node.extra.droppedOptions} more option(s) not shown ...`)
+			}
+
 			if (emitSemantic) {
 				// empty tag should be removed
 				if (result.length === mark + 1) {
