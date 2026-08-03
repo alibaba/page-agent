@@ -135,6 +135,22 @@ tools.set(
 	})
 )
 
+tools.set(
+	'hover_element_by_index',
+	tool({
+		// @experimental Tool surface gated by `experimentalPointerActions` in PageAgentCore.
+		description:
+			'Hover over element by index. Use this to reveal dropdown menus or hidden submenus before clicking on their items. Requires the `experimentalPointerActions` flag to be enabled.',
+		inputSchema: z.object({
+			index: z.int().min(0),
+		}),
+		execute: async function (this: PageAgentCore, input) {
+			const result = await this.pageController.hoverElement(input.index)
+			return result.message
+		},
+	})
+)
+
 /**
  * @note Reference from browser-use
  */
