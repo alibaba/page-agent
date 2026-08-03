@@ -11,7 +11,7 @@ export class I18n {
 	private translations: TranslationSchema
 
 	constructor(language: SupportedLanguage = 'en-US') {
-		this.language = language in locales ? language : 'en-US'
+		this.language = Object.hasOwn(locales, language) ? language : 'en-US'
 		this.translations = locales[this.language]
 	}
 
