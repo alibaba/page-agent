@@ -92,8 +92,8 @@ export class PageController extends EventTarget {
 	/** Whether the tree has been indexed at least once */
 	private isIndexed = false
 
-	/** Last element that received synthetic hover events in this controller. */
-	private lastHoveredElement: HTMLElement | null = null
+	/** Elements that currently represent the synthetic hover ancestry, outermost first. */
+	private syntheticHoverPath: HTMLElement[] = []
 
 	/** Visual mask overlay for blocking user interaction during automation */
 	private mask: InstanceType<typeof import('./mask/SimulatorMask').SimulatorMask> | null = null
@@ -253,11 +253,11 @@ export class PageController extends EventTarget {
 
 	/** Clear synthetic hover state before a pointer action targets another subtree. */
 	private clearSyntheticHover(nextElement: HTMLElement): void {
-		if (!this.lastHoveredElement || this.lastHoveredElement === nextElement) return
-		if (!this.lastHoveredElement.contains(nextElement)) {
-			dispatchHoverLeave(this.lastHoveredElement, nextElement)
-			this.lastHoveredElement = null
+		const retained = this.syntheticHoverPath.filter((element) => element.contains(nextElement))
+		for (const element of [...this.syntheticHoverPath].reverse()) {
+			if (!element.contains(nextElement)) dispatchHoverLeave(element, nextElement)
 		}
+		this.syntheticHoverPath = retained
 	}
 
 	/**
@@ -356,8 +356,9 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
-			await hoverElement(element, this.lastHoveredElement)
-			this.lastHoveredElement = element
+			await hoverElement(element, this.syntheticHoverPath)
+			const retained = this.syntheticHoverPath.filter((hovered) => hovered.contains(element))
+			this.syntheticHoverPath = retained.includes(element) ? retained : [...retained, element]
 
 			return {
 				success: true,
@@ -486,7 +487,7 @@ export class PageController extends EventTarget {
 		this.elementTextMap.clear()
 		this.simplifiedHTML = '<EMPTY>'
 		this.isIndexed = false
-		this.lastHoveredElement = null
+		this.syntheticHoverPath = []
 		this.mask?.dispose()
 		this.mask = null
 	}

@@ -48,9 +48,23 @@ export function getElementByIndex(
  * CSS `:hover` state.
  * @private Internal method, subject to change at any time.
  */
-export async function hoverElement(element: HTMLElement, previousElement?: HTMLElement | null) {
+
+export async function hoverElement(
+	element: HTMLElement,
+	previousElementOrPath?: HTMLElement | null | readonly HTMLElement[]
+) {
+	const previousPath = Array.isArray(previousElementOrPath)
+		? previousElementOrPath
+		: previousElementOrPath
+			? [previousElementOrPath]
+			: []
+	const previousElement = previousPath.at(-1)
+
 	if (previousElement && previousElement !== element) {
 		dispatchHoverLeave(previousElement, element)
+		for (const ancestor of [...previousPath.slice(0, -1)].reverse()) {
+			if (!ancestor.contains(element)) dispatchHoverLeave(ancestor, element)
+		}
 	}
 
 	await scrollIntoViewIfNeeded(element)

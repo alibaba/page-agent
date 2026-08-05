@@ -148,5 +148,38 @@ describe('PageController', () => {
 			expect(result.success).toBe(true)
 			expect(left).toEqual(['pointerout', 'mouseout', 'pointerleave', 'mouseleave'])
 		})
+
+		it('clears the full hover ancestry after entering a descendant', async () => {
+			document.body.innerHTML =
+				'<div id="menu"><button id="item">Item</button></div><button id="outside">Outside</button>'
+			const menu = document.querySelector<HTMLDivElement>('#menu')!
+			const item = document.querySelector<HTMLButtonElement>('#item')!
+			const outside = document.querySelector<HTMLButtonElement>('#outside')!
+			const menuLeaves: string[] = []
+			const itemLeaves: string[] = []
+			for (const evt of ['pointerleave', 'mouseleave']) {
+				menu.addEventListener(evt, () => menuLeaves.push(evt))
+				item.addEventListener(evt, () => itemLeaves.push(evt))
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: menu,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(1, {
+				ref: item,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(2, {
+				ref: outside,
+			})
+
+			await controller.hoverElement(0)
+			await controller.hoverElement(1)
+			await controller.clickElement(2)
+
+			expect(itemLeaves).toEqual(['pointerleave', 'mouseleave'])
+			expect(menuLeaves).toEqual(['pointerleave', 'mouseleave'])
+		})
 	})
 })
