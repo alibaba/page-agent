@@ -41,6 +41,38 @@ export function getElementByIndex(
 	return element
 }
 
+/**
+ * @experimental Pointer hover — opt-in via PageControllerConfig.experimentalPointerActions.
+ * Move the pointer over the element and dispatch hover-related events without clicking
+ * or focusing it. Intended for revealing dropdown menus / hidden submenus before
+ * clicking on their items.
+ * @private Internal method, subject to change at any time.
+ */
+export async function hoverElement(element: HTMLElement) {
+	await scrollIntoViewIfNeeded(element)
+
+	const rect = element.getBoundingClientRect()
+	const x = rect.left + rect.width / 2
+	const y = rect.top + rect.height / 2
+
+	await movePointerToElement(element, x, y)
+
+	const pointerOpts = {
+		bubbles: true,
+		cancelable: true,
+		clientX: x,
+		clientY: y,
+		pointerType: 'mouse',
+	}
+	const mouseOpts = { bubbles: true, cancelable: true, clientX: x, clientY: y }
+
+	// Hover — pointer events first, then mouse events (spec order)
+	element.dispatchEvent(new PointerEvent('pointerover', pointerOpts))
+	element.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
+	element.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
+	element.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
+}
+
 let lastClickedElement: HTMLElement | null = null
 
 function blurLastClickedElement() {

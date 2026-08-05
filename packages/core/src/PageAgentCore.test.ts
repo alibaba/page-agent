@@ -363,3 +363,25 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 		})
 	})
 })
+
+describe.concurrent('experimental tool gating', () => {
+	it('omits hover_element_by_index by default', () => {
+		const agent = createAgent(createFetchMock())
+		expect(agent.tools.has('hover_element_by_index')).toBe(false)
+	})
+
+	it('keeps hover_element_by_index available when experimentalPointerActions is true', () => {
+		const agent = createAgent(createFetchMock(), { experimentalPointerActions: true })
+		expect(agent.tools.has('hover_element_by_index')).toBe(true)
+	})
+
+	it('removes execute_javascript when experimentalScriptExecutionTool is false', () => {
+		const agent = createAgent(createFetchMock())
+		expect(agent.tools.has('execute_javascript')).toBe(false)
+	})
+
+	it('keeps execute_javascript when experimentalScriptExecutionTool is true', () => {
+		const agent = createAgent(createFetchMock(), { experimentalScriptExecutionTool: true })
+		expect(agent.tools.has('execute_javascript')).toBe(true)
+	})
+})

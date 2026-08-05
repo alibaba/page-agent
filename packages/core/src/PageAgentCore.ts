@@ -144,6 +144,10 @@ export class PageAgentCore extends EventTarget {
 		if (!this.config.experimentalScriptExecutionTool) {
 			this.tools.delete('execute_javascript')
 		}
+
+		if (!this.config.experimentalPointerActions) {
+			this.tools.delete('hover_element_by_index')
+		}
 	}
 
 	/** Get current agent status */

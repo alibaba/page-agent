@@ -9,6 +9,7 @@
 import {
 	clickElement,
 	getElementByIndex,
+	hoverElement,
 	inputTextElement,
 	scrollHorizontally,
 	scrollVertically,
@@ -26,6 +27,14 @@ import { isAnchorElement } from './utils'
 export interface PageControllerConfig extends dom.DomConfig {
 	/** Enable visual mask overlay during operations (default: false) */
 	enableMask?: boolean
+
+	/**
+	 * Enable experimental pointer-based actions (currently only hover).
+	 * @experimental Disabled by default. Tool registration in `PageAgentCore` is gated on
+	 * this flag — see `AgentConfig.experimentalPointerActions`.
+	 * @default false
+	 */
+	experimentalPointerActions?: boolean
 }
 
 /**
@@ -308,6 +317,39 @@ export class PageController extends EventTarget {
 			return {
 				success: false,
 				message: `❌ Failed to select option: ${error}`,
+			}
+		}
+	}
+
+	/**
+	 * Hover over element by index (reveal dropdown menus / hidden submenus before clicking).
+	 * Requires `experimentalPointerActions: true` in PageControllerConfig — the matching
+	 * `hover_element_by_index` tool is gated on `AgentConfig.experimentalPointerActions`.
+	 * @experimental
+	 */
+	async hoverElement(index: number): Promise<ActionResult> {
+		if (!this.config.experimentalPointerActions) {
+			return {
+				success: false,
+				message:
+					'❌ hoverElement is disabled. Set `experimentalPointerActions: true` in PageControllerConfig to enable it.',
+			}
+		}
+
+		try {
+			this.assertIndexed()
+			const element = getElementByIndex(this.selectorMap, index)
+			const elemText = this.elementTextMap.get(index)
+			await hoverElement(element)
+
+			return {
+				success: true,
+				message: `✅ Hovered over element (${elemText ?? index}).`,
+			}
+		} catch (error) {
+			return {
+				success: false,
+				message: `❌ Failed to hover over element: ${error}`,
 			}
 		}
 	}
