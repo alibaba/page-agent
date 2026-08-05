@@ -356,9 +356,7 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
-			await hoverElement(element, this.syntheticHoverPath)
-			const retained = this.syntheticHoverPath.filter((hovered) => hovered.contains(element))
-			this.syntheticHoverPath = retained.includes(element) ? retained : [...retained, element]
+			this.syntheticHoverPath = await hoverElement(element, this.syntheticHoverPath)
 
 			return {
 				success: true,

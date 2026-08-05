@@ -90,6 +90,33 @@ describe('PageController', () => {
 			expect(entered).toEqual(['pointerenter', 'mouseenter'])
 		})
 
+		it('clears ancestor hover after hovering a descendant directly', async () => {
+			document.body.innerHTML =
+				'<div id="menu"><button id="item">Item</button></div><button id="outside">Outside</button>'
+			const menu = document.querySelector<HTMLDivElement>('#menu')!
+			const item = document.querySelector<HTMLButtonElement>('#item')!
+			const outside = document.querySelector<HTMLButtonElement>('#outside')!
+			const menuLeaves: string[] = []
+			for (const evt of ['pointerleave', 'mouseleave']) {
+				menu.addEventListener(evt, () => menuLeaves.push(evt))
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: item,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(1, {
+				ref: outside,
+			})
+
+			await controller.hoverElement(0)
+			const result = await controller.clickElement(1)
+
+			expect(result.success).toBe(true)
+			expect(menuLeaves).toEqual(['pointerleave', 'mouseleave'])
+		})
+
 		it('dispatches leave events when moving synthetic hover to another element', async () => {
 			document.body.innerHTML =
 				'<button id="first">First</button><button id="second">Second</button>'

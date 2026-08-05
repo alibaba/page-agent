@@ -52,7 +52,7 @@ export function getElementByIndex(
 export async function hoverElement(
 	element: HTMLElement,
 	previousElementOrPath?: HTMLElement | null | readonly HTMLElement[]
-) {
+): Promise<HTMLElement[]> {
 	const previousPath = Array.isArray(previousElementOrPath)
 		? previousElementOrPath
 		: previousElementOrPath
@@ -110,6 +110,8 @@ export async function hoverElement(
 		}
 	}
 	element.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
+
+	return ancestorPath
 }
 
 /**
