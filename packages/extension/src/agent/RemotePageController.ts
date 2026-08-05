@@ -11,6 +11,7 @@ function sendMessage(message: {
 	action: string
 	targetTabId: number
 	payload?: any
+	experimentalPointerActions?: boolean
 }): Promise<any> {
 	return chrome.runtime.sendMessage(message).catch((error) => {
 		console.error(PREFIX, message.action, error)
@@ -25,9 +26,14 @@ function sendMessage(message: {
  */
 export class RemotePageController {
 	tabsController: TabsController
+	private experimentalPointerActions: boolean
 
-	constructor(tabsController: TabsController) {
+	constructor(
+		tabsController: TabsController,
+		config: { experimentalPointerActions?: boolean } = {}
+	) {
 		this.tabsController = tabsController
+		this.experimentalPointerActions = config.experimentalPointerActions === true
 	}
 
 	get currentTabId(): number | null {
@@ -52,6 +58,7 @@ export class RemotePageController {
 			type: 'PAGE_CONTROL',
 			action: 'get_last_update_time',
 			targetTabId: this.currentTabId,
+			experimentalPointerActions: this.experimentalPointerActions,
 		})
 	}
 
@@ -75,6 +82,7 @@ export class RemotePageController {
 				type: 'PAGE_CONTROL',
 				action: 'get_browser_state',
 				targetTabId: this.currentTabId,
+				experimentalPointerActions: this.experimentalPointerActions,
 			})
 		}
 
@@ -95,6 +103,7 @@ export class RemotePageController {
 			type: 'PAGE_CONTROL',
 			action: 'update_tree',
 			targetTabId: this.currentTabId,
+			experimentalPointerActions: this.experimentalPointerActions,
 		})
 	}
 
@@ -107,6 +116,7 @@ export class RemotePageController {
 			type: 'PAGE_CONTROL',
 			action: 'clean_up_highlights',
 			targetTabId: this.currentTabId,
+			experimentalPointerActions: this.experimentalPointerActions,
 		})
 	}
 
@@ -131,6 +141,10 @@ export class RemotePageController {
 
 	async scrollHorizontally(...args: any[]): Promise<DomActionReturn> {
 		return this.remoteCallDomAction('scroll_horizontally', args)
+	}
+
+	async hoverElement(...args: any[]): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('hover_element_by_index', args)
 	}
 
 	// `execute_javascript` is intentionally not implemented: AbortSignal cannot cross context
@@ -160,6 +174,7 @@ export class RemotePageController {
 			action: action,
 			targetTabId: this.currentTabId!,
 			payload,
+			experimentalPointerActions: this.experimentalPointerActions,
 		})
 	}
 }

@@ -1,11 +1,16 @@
 /**
  * content script for RemotePageController
  */
-import { PageController } from '@page-agent/page-controller'
+import { PageController, type PageControllerConfig } from '@page-agent/page-controller'
 
 export function initPageController() {
 	let pageController: PageController | null = null
 	let intervalID: number | null = null
+	const pageControllerConfig: PageControllerConfig = {
+		enableMask: false,
+		viewportExpansion: 400,
+		experimentalPointerActions: false,
+	}
 
 	const myTabIdPromise = chrome.runtime
 		.sendMessage({ type: 'PAGE_CONTROL', action: 'get_my_tab_id' })
@@ -17,12 +22,12 @@ export function initPageController() {
 			return null
 		})
 
-	function getPC(): PageController {
+	function getPC(experimentalPointerActions = false): PageController {
+		// PageController retains this config object, so a later PAGE_CONTROL message
+		// can enable the experimental action without losing the indexed tree.
+		pageControllerConfig.experimentalPointerActions ||= experimentalPointerActions
 		if (!pageController) {
-			pageController = new PageController({
-				enableMask: false,
-				viewportExpansion: 400,
-			})
+			pageController = new PageController(pageControllerConfig)
 		}
 		return pageController
 	}
@@ -66,10 +71,10 @@ export function initPageController() {
 			return
 		}
 
-		const { action, payload } = message
+		const { action, payload, experimentalPointerActions } = message
 		const methodName = getMethodName(action)
 
-		const pc = getPC() as any
+		const pc = getPC(experimentalPointerActions === true) as any
 
 		switch (action) {
 			case 'get_last_update_time':
@@ -81,6 +86,7 @@ export function initPageController() {
 			case 'select_option':
 			case 'scroll':
 			case 'scroll_horizontally':
+			case 'hover_element_by_index':
 			case 'execute_javascript':
 				pc[methodName](...(payload || []))
 					.then((result: any) => sendResponse(result))
@@ -126,6 +132,8 @@ function getMethodName(action: string): string {
 			return 'scroll' as const
 		case 'scroll_horizontally':
 			return 'scrollHorizontally' as const
+		case 'hover_element_by_index':
+			return 'hoverElement' as const
 		case 'execute_javascript':
 			return 'executeJavascript' as const
 
