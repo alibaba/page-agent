@@ -59,6 +59,10 @@ export async function hoverElement(
 			? [previousElementOrPath]
 			: []
 	const previousElement = previousPath.at(-1)
+	const ancestorPath: HTMLElement[] = []
+	for (let ancestor: HTMLElement | null = element; ancestor; ancestor = ancestor.parentElement) {
+		ancestorPath.unshift(ancestor)
+	}
 
 	if (previousElement && previousElement !== element) {
 		dispatchHoverLeave(previousElement, element)
@@ -93,8 +97,18 @@ export async function hoverElement(
 
 	// Hover — pointer events first, then mouse events (spec order)
 	element.dispatchEvent(new PointerEvent('pointerover', pointerOpts))
+	for (const ancestor of ancestorPath) {
+		if (ancestor !== element && !previousPath.includes(ancestor)) {
+			ancestor.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
+		}
+	}
 	element.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
 	element.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
+	for (const ancestor of ancestorPath) {
+		if (ancestor !== element && !previousPath.includes(ancestor)) {
+			ancestor.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
+		}
+	}
 	element.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
 }
 
