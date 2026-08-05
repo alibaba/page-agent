@@ -8,6 +8,7 @@
  */
 import {
 	clickElement,
+	dispatchHoverLeave,
 	getElementByIndex,
 	hoverElement,
 	inputTextElement,
@@ -250,6 +251,15 @@ export class PageController extends EventTarget {
 		}
 	}
 
+	/** Clear synthetic hover state before a pointer action targets another subtree. */
+	private clearSyntheticHover(nextElement: HTMLElement): void {
+		if (!this.lastHoveredElement || this.lastHoveredElement === nextElement) return
+		if (!this.lastHoveredElement.contains(nextElement)) {
+			dispatchHoverLeave(this.lastHoveredElement, nextElement)
+			this.lastHoveredElement = null
+		}
+	}
+
 	/**
 	 * Click element by index
 	 */
@@ -258,6 +268,7 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
+			this.clearSyntheticHover(element)
 			await clickElement(element)
 
 			// Handle links that open in new tabs
@@ -288,6 +299,7 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
+			this.clearSyntheticHover(element)
 			await inputTextElement(element, text)
 
 			return {
@@ -310,6 +322,7 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
+			this.clearSyntheticHover(element)
 			await selectOptionElement(element as HTMLSelectElement, optionText)
 
 			return {

@@ -122,5 +122,31 @@ describe('PageController', () => {
 				{ type: 'mouseout', relatedTarget: item },
 			])
 		})
+
+		it('clears synthetic hover before clicking outside the hovered subtree', async () => {
+			document.body.innerHTML =
+				'<button id="first">First</button><button id="second">Second</button>'
+			const first = document.querySelector<HTMLButtonElement>('#first')!
+			const second = document.querySelector<HTMLButtonElement>('#second')!
+			const left: string[] = []
+			for (const evt of ['pointerout', 'pointerleave', 'mouseout', 'mouseleave']) {
+				first.addEventListener(evt, () => left.push(evt))
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: first,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(1, {
+				ref: second,
+			})
+
+			await controller.hoverElement(0)
+			const result = await controller.clickElement(1)
+
+			expect(result.success).toBe(true)
+			expect(left).toEqual(['pointerout', 'mouseout', 'pointerleave', 'mouseleave'])
+		})
 	})
 })

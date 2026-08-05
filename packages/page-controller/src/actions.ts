@@ -50,25 +50,7 @@ export function getElementByIndex(
  */
 export async function hoverElement(element: HTMLElement, previousElement?: HTMLElement | null) {
 	if (previousElement && previousElement !== element) {
-		const movingWithinPreviousElement = previousElement.contains(element)
-		previousElement.dispatchEvent(
-			new PointerEvent('pointerout', { bubbles: true, relatedTarget: element })
-		)
-		previousElement.dispatchEvent(
-			new MouseEvent('mouseout', { bubbles: true, relatedTarget: element })
-		)
-
-		// Native pointer/mouse leave events do not fire when moving from an element
-		// into one of its descendants. Keeping relatedTarget on the bubbling out
-		// events also lets React derive the same containment check for onMouseLeave.
-		if (!movingWithinPreviousElement) {
-			previousElement.dispatchEvent(
-				new PointerEvent('pointerleave', { bubbles: false, relatedTarget: element })
-			)
-			previousElement.dispatchEvent(
-				new MouseEvent('mouseleave', { bubbles: false, relatedTarget: element })
-			)
-		}
+		dispatchHoverLeave(previousElement, element)
 	}
 
 	await scrollIntoViewIfNeeded(element)
@@ -100,6 +82,29 @@ export async function hoverElement(element: HTMLElement, previousElement?: HTMLE
 	element.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
 	element.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
 	element.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
+}
+
+/**
+ * Dispatch the leave half of a synthetic pointer transition. Native leave
+ * events do not fire when moving into a descendant, while bubbling out events
+ * retain relatedTarget so delegated handlers can perform the same check.
+ */
+export function dispatchHoverLeave(
+	previousElement: HTMLElement,
+	relatedTarget: HTMLElement | null
+) {
+	const movingWithinPreviousElement = relatedTarget
+		? previousElement.contains(relatedTarget)
+		: false
+	previousElement.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, relatedTarget }))
+	previousElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget }))
+
+	if (!movingWithinPreviousElement) {
+		previousElement.dispatchEvent(
+			new PointerEvent('pointerleave', { bubbles: false, relatedTarget })
+		)
+		previousElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false, relatedTarget }))
+	}
 }
 
 let lastClickedElement: HTMLElement | null = null

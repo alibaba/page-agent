@@ -25,7 +25,7 @@ export function initPageController() {
 	function getPC(experimentalPointerActions = false): PageController {
 		// PageController retains this config object, so a later PAGE_CONTROL message
 		// can enable the experimental action without losing the indexed tree.
-		pageControllerConfig.experimentalPointerActions ||= experimentalPointerActions
+		pageControllerConfig.experimentalPointerActions = experimentalPointerActions
 		if (!pageController) {
 			pageController = new PageController(pageControllerConfig)
 		}
