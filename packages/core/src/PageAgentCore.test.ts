@@ -375,6 +375,18 @@ describe.concurrent('experimental tool gating', () => {
 		expect(agent.tools.has('hover_element_by_index')).toBe(true)
 	})
 
+	it('preserves a caller-provided hover tool when the built-in gate is disabled', () => {
+		const customHover = tool({
+			description: 'caller-provided hover tool',
+			inputSchema: z.object({}),
+			execute: async () => 'custom hover',
+		})
+		const agent = createAgent(createFetchMock(), {
+			customTools: { hover_element_by_index: customHover },
+		})
+		expect(agent.tools.get('hover_element_by_index')).toBe(customHover)
+	})
+
 	it('removes execute_javascript when experimentalScriptExecutionTool is false', () => {
 		const agent = createAgent(createFetchMock())
 		expect(agent.tools.has('execute_javascript')).toBe(false)

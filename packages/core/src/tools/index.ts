@@ -140,7 +140,7 @@ tools.set(
 	tool({
 		// @experimental Tool surface gated by `experimentalPointerActions` in PageAgentCore.
 		description:
-			'Hover over element by index. Use this to reveal dropdown menus or hidden submenus before clicking on their items. Requires the `experimentalPointerActions` flag to be enabled.',
+			'Dispatch synthetic pointer/mouse hover events to an element by index for JavaScript hover handlers. This does not activate CSS :hover. Requires the `experimentalPointerActions` flag to be enabled.',
 		inputSchema: z.object({
 			index: z.int().min(0),
 		}),

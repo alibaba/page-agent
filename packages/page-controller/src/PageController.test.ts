@@ -64,10 +64,33 @@ describe('PageController', () => {
 
 			const result = await controller.hoverElement(0)
 			expect(result.success).toBe(true)
-			expect(result.message).toContain('Hovered over element')
+			expect(result.message).toContain('Dispatched synthetic hover events')
 			expect(seen).toEqual(
 				expect.arrayContaining(['pointerover', 'pointerenter', 'mouseover', 'mouseenter'])
 			)
+		})
+
+		it('dispatches leave events when moving synthetic hover to another element', async () => {
+			document.body.innerHTML = '<button id="first">First</button><button id="second">Second</button>'
+			const first = document.querySelector<HTMLButtonElement>('#first')!
+			const second = document.querySelector<HTMLButtonElement>('#second')!
+			const left: string[] = []
+			for (const evt of ['pointerout', 'pointerleave', 'mouseout', 'mouseleave']) {
+				first.addEventListener(evt, () => left.push(evt))
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: first,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(1, {
+				ref: second,
+			})
+
+			await controller.hoverElement(0)
+			await controller.hoverElement(1)
+			expect(left).toEqual(['pointerout', 'mouseout', 'pointerleave', 'mouseleave'])
 		})
 	})
 })

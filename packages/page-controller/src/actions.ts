@@ -43,12 +43,19 @@ export function getElementByIndex(
 
 /**
  * @experimental Pointer hover — opt-in via PageControllerConfig.experimentalPointerActions.
- * Move the pointer over the element and dispatch hover-related events without clicking
- * or focusing it. Intended for revealing dropdown menus / hidden submenus before
- * clicking on their items.
+ * Dispatch synthetic hover-related events without clicking or focusing the element.
+ * This can invoke JavaScript hover handlers, but does not activate the browser's
+ * CSS `:hover` state.
  * @private Internal method, subject to change at any time.
  */
-export async function hoverElement(element: HTMLElement) {
+export async function hoverElement(element: HTMLElement, previousElement?: HTMLElement | null) {
+	if (previousElement && previousElement !== element) {
+		previousElement.dispatchEvent(new PointerEvent('pointerout', { bubbles: true }))
+		previousElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
+		previousElement.dispatchEvent(new PointerEvent('pointerleave', { bubbles: false }))
+		previousElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
+	}
+
 	await scrollIntoViewIfNeeded(element)
 
 	const rect = element.getBoundingClientRect()

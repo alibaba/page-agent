@@ -91,6 +91,9 @@ export class PageController extends EventTarget {
 	/** Whether the tree has been indexed at least once */
 	private isIndexed = false
 
+	/** Last element that received synthetic hover events in this controller. */
+	private lastHoveredElement: HTMLElement | null = null
+
 	/** Visual mask overlay for blocking user interaction during automation */
 	private mask: InstanceType<typeof import('./mask/SimulatorMask').SimulatorMask> | null = null
 	private maskReady: Promise<void> | null = null
@@ -340,11 +343,12 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
-			await hoverElement(element)
+			await hoverElement(element, this.lastHoveredElement)
+			this.lastHoveredElement = element
 
 			return {
 				success: true,
-				message: `✅ Hovered over element (${elemText ?? index}).`,
+				message: `✅ Dispatched synthetic hover events to element (${elemText ?? index}). CSS :hover is not activated.`,
 			}
 		} catch (error) {
 			return {
@@ -469,6 +473,7 @@ export class PageController extends EventTarget {
 		this.elementTextMap.clear()
 		this.simplifiedHTML = '<EMPTY>'
 		this.isIndexed = false
+		this.lastHoveredElement = null
 		this.mask?.dispose()
 		this.mask = null
 	}
