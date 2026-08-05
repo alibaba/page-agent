@@ -50,10 +50,25 @@ export function getElementByIndex(
  */
 export async function hoverElement(element: HTMLElement, previousElement?: HTMLElement | null) {
 	if (previousElement && previousElement !== element) {
-		previousElement.dispatchEvent(new PointerEvent('pointerout', { bubbles: true }))
-		previousElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
-		previousElement.dispatchEvent(new PointerEvent('pointerleave', { bubbles: false }))
-		previousElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
+		const movingWithinPreviousElement = previousElement.contains(element)
+		previousElement.dispatchEvent(
+			new PointerEvent('pointerout', { bubbles: true, relatedTarget: element })
+		)
+		previousElement.dispatchEvent(
+			new MouseEvent('mouseout', { bubbles: true, relatedTarget: element })
+		)
+
+		// Native pointer/mouse leave events do not fire when moving from an element
+		// into one of its descendants. Keeping relatedTarget on the bubbling out
+		// events also lets React derive the same containment check for onMouseLeave.
+		if (!movingWithinPreviousElement) {
+			previousElement.dispatchEvent(
+				new PointerEvent('pointerleave', { bubbles: false, relatedTarget: element })
+			)
+			previousElement.dispatchEvent(
+				new MouseEvent('mouseleave', { bubbles: false, relatedTarget: element })
+			)
+		}
 	}
 
 	await scrollIntoViewIfNeeded(element)
@@ -70,8 +85,15 @@ export async function hoverElement(element: HTMLElement, previousElement?: HTMLE
 		clientX: x,
 		clientY: y,
 		pointerType: 'mouse',
+		relatedTarget: previousElement ?? null,
 	}
-	const mouseOpts = { bubbles: true, cancelable: true, clientX: x, clientY: y }
+	const mouseOpts = {
+		bubbles: true,
+		cancelable: true,
+		clientX: x,
+		clientY: y,
+		relatedTarget: previousElement ?? null,
+	}
 
 	// Hover — pointer events first, then mouse events (spec order)
 	element.dispatchEvent(new PointerEvent('pointerover', pointerOpts))

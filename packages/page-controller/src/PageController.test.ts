@@ -71,7 +71,8 @@ describe('PageController', () => {
 		})
 
 		it('dispatches leave events when moving synthetic hover to another element', async () => {
-			document.body.innerHTML = '<button id="first">First</button><button id="second">Second</button>'
+			document.body.innerHTML =
+				'<button id="first">First</button><button id="second">Second</button>'
 			const first = document.querySelector<HTMLButtonElement>('#first')!
 			const second = document.querySelector<HTMLButtonElement>('#second')!
 			const left: string[] = []
@@ -91,6 +92,35 @@ describe('PageController', () => {
 			await controller.hoverElement(0)
 			await controller.hoverElement(1)
 			expect(left).toEqual(['pointerout', 'mouseout', 'pointerleave', 'mouseleave'])
+		})
+
+		it('preserves hover when moving from a menu trigger into its descendant', async () => {
+			document.body.innerHTML = '<div id="trigger">Open<div id="item">Item</div></div>'
+			const trigger = document.querySelector<HTMLDivElement>('#trigger')!
+			const item = document.querySelector<HTMLDivElement>('#item')!
+			const events: Array<{ type: string; relatedTarget: EventTarget | null }> = []
+			for (const evt of ['pointerout', 'pointerleave', 'mouseout', 'mouseleave']) {
+				trigger.addEventListener(evt, (event) =>
+					events.push({ type: event.type, relatedTarget: event.relatedTarget })
+				)
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: trigger,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(1, {
+				ref: item,
+			})
+
+			await controller.hoverElement(0)
+			await controller.hoverElement(1)
+
+			expect(events).toEqual([
+				{ type: 'pointerout', relatedTarget: item },
+				{ type: 'mouseout', relatedTarget: item },
+			])
 		})
 	})
 })
