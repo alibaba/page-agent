@@ -141,6 +141,33 @@ describe('PageController', () => {
 			expect(menuLeaves).toEqual(['pointerleave', 'mouseleave'])
 		})
 
+		it('preserves mouse pointer metadata when clearing synthetic hover', async () => {
+			document.body.innerHTML =
+				'<button id="item">Item</button><button id="outside">Outside</button>'
+			const item = document.querySelector<HTMLButtonElement>('#item')!
+			const outside = document.querySelector<HTMLButtonElement>('#outside')!
+			const pointerTypes: string[] = []
+			for (const evt of ['pointerout', 'pointerleave']) {
+				item.addEventListener(evt, (event) =>
+					pointerTypes.push((event as PointerEvent).pointerType)
+				)
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: item,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(1, {
+				ref: outside,
+			})
+
+			await controller.hoverElement(0)
+			await controller.hoverElement(1)
+
+			expect(pointerTypes).toEqual(['mouse', 'mouse'])
+		})
+
 		it('dispatches leave events when moving synthetic hover to another element', async () => {
 			document.body.innerHTML =
 				'<button id="first">First</button><button id="second">Second</button>'

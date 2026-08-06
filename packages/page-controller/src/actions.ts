@@ -126,12 +126,13 @@ export function dispatchHoverLeave(
 	const movingWithinPreviousElement = relatedTarget
 		? previousElement.contains(relatedTarget)
 		: false
-	previousElement.dispatchEvent(new PointerEvent('pointerout', { bubbles: true, relatedTarget }))
+	const pointerLeaveOpts = { bubbles: true, pointerType: 'mouse', relatedTarget }
+	previousElement.dispatchEvent(new PointerEvent('pointerout', pointerLeaveOpts))
 	previousElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget }))
 
 	if (!movingWithinPreviousElement) {
 		previousElement.dispatchEvent(
-			new PointerEvent('pointerleave', { bubbles: false, relatedTarget })
+			new PointerEvent('pointerleave', { ...pointerLeaveOpts, bubbles: false })
 		)
 		previousElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false, relatedTarget }))
 	}
