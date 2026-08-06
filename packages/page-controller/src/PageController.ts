@@ -251,9 +251,11 @@ export class PageController extends EventTarget {
 		}
 	}
 
-	/** Clear synthetic hover state before a pointer action targets another subtree. */
-	private clearSyntheticHover(nextElement: HTMLElement): void {
-		const retained = this.syntheticHoverPath.filter((element) => element.contains(nextElement))
+	/** Clear synthetic hover state before a pointer action or controller teardown. */
+	private clearSyntheticHover(nextElement: HTMLElement | null): void {
+		const retained = nextElement
+			? this.syntheticHoverPath.filter((element) => element.contains(nextElement))
+			: []
 		for (const element of [...this.syntheticHoverPath].reverse()) {
 			if (!element.contains(nextElement)) dispatchHoverLeave(element, nextElement)
 		}
@@ -479,13 +481,13 @@ export class PageController extends EventTarget {
 	 * Dispose and clean up resources
 	 */
 	dispose(): void {
+		this.clearSyntheticHover(null)
 		dom.cleanUpHighlights()
 		this.flatTree = null
 		this.selectorMap.clear()
 		this.elementTextMap.clear()
 		this.simplifiedHTML = '<EMPTY>'
 		this.isIndexed = false
-		this.syntheticHoverPath = []
 		this.mask?.dispose()
 		this.mask = null
 	}

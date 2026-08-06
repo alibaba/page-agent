@@ -117,6 +117,30 @@ describe('PageController', () => {
 			expect(menuLeaves).toEqual(['pointerleave', 'mouseleave'])
 		})
 
+		it('clears synthetic hover when the controller is disposed', async () => {
+			document.body.innerHTML = '<div id="menu"><button id="item">Item</button></div>'
+			const menu = document.querySelector<HTMLDivElement>('#menu')!
+			const item = document.querySelector<HTMLButtonElement>('#item')!
+			const menuLeaves: string[] = []
+			const itemLeaves: string[] = []
+			for (const evt of ['pointerleave', 'mouseleave']) {
+				menu.addEventListener(evt, () => menuLeaves.push(evt))
+				item.addEventListener(evt, () => itemLeaves.push(evt))
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: item,
+			})
+
+			await controller.hoverElement(0)
+			controller.dispose()
+
+			expect(itemLeaves).toEqual(['pointerleave', 'mouseleave'])
+			expect(menuLeaves).toEqual(['pointerleave', 'mouseleave'])
+		})
+
 		it('dispatches leave events when moving synthetic hover to another element', async () => {
 			document.body.innerHTML =
 				'<button id="first">First</button><button id="second">Second</button>'
