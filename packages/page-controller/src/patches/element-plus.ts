@@ -3,32 +3,47 @@ import type { PageController } from '../PageController'
 const clearFunctions: (() => void)[] = []
 
 /**
+ * Patch a single Element Plus clear control so the DOM extractor recognizes it
+ * as a distinct interactive element (cursor + role="button" + aria-label).
+ *
+ * Element Plus uses different class names for clear controls depending on the
+ * component: `.el-input__clear` (plain Input), `.clear-icon` (DatePicker /
+ * TimePicker single clear icon), and `.el-range__close-icon` (RangePicker clear
+ * icon). Patching all three ensures every clear control is actionable.
+ */
+function patchClearControl(clearControl: Element | null) {
+	if (!(clearControl instanceof HTMLElement)) return
+
+	clearControl.style.setProperty('cursor', 'pointer', 'important')
+	if (!clearControl.hasAttribute('role')) {
+		clearControl.setAttribute('role', 'button')
+	}
+	if (!clearControl.hasAttribute('aria-label')) {
+		clearControl.setAttribute('aria-label', 'Clear')
+	}
+}
+
+/**
  * Patch Element Plus Input components to make the clear button recognizable.
  * The clear button (.el-input__clear) needs cursor: pointer to be detected.
  * We patch on every update to handle dynamic clear button creation/removal.
  */
 function fixElementPlusInputs() {
-	const inputs = [...document.querySelectorAll('.el-input__inner')]
-	for (const input of inputs) {
-		const wrapper = input.closest('.el-input')
-		if (!wrapper || !(wrapper instanceof HTMLElement)) continue
+	// Collect unique wrappers. Plain inputs (and single DatePicker/TimePicker,
+	// which reuse `.el-input`) are covered by `.el-input`; RangePicker uses
+	// `.el-range-editor` with `.el-range-input` (not `.el-input__inner`).
+	const wrappers = new Set<HTMLElement>()
+	for (const el of document.querySelectorAll('.el-input, .el-range-editor')) {
+		if (el instanceof HTMLElement) wrappers.add(el)
+	}
 
-		// Always check and patch the clear button on every update
-		// This handles cases where the clear button is dynamically created/removed
-		// (e.g., when input value changes, or disabled/readonly/clearable props change)
-		const clearButton = wrapper.querySelector('.el-input__clear')
-		if (clearButton instanceof HTMLElement) {
-			// Add cursor: pointer and role="button" so the clear button is
-			// recognized as a distinct interactive element by the DOM extractor
-			// (isElementDistinctInteraction checks for role="button").
-			clearButton.style.setProperty('cursor', 'pointer', 'important')
-			if (!clearButton.hasAttribute('role')) {
-				clearButton.setAttribute('role', 'button')
-			}
-			if (!clearButton.hasAttribute('aria-label')) {
-				clearButton.setAttribute('aria-label', 'Clear')
-			}
-		}
+	for (const wrapper of wrappers) {
+		// Always check and patch every clear-control variant on each update.
+		// This handles dynamically created/removed clear buttons (e.g., when
+		// input value changes, or disabled/readonly/clearable props change).
+		patchClearControl(wrapper.querySelector('.el-input__clear'))
+		patchClearControl(wrapper.querySelector('.clear-icon'))
+		patchClearControl(wrapper.querySelector('.el-range__close-icon'))
 	}
 }
 
