@@ -53,6 +53,7 @@ export async function hoverElement(
 	element: HTMLElement,
 	previousElementOrPath?: HTMLElement | null | readonly HTMLElement[]
 ): Promise<HTMLElement[]> {
+	clearLastClickedElement()
 	const previousPath = Array.isArray(previousElementOrPath)
 		? previousElementOrPath
 		: previousElementOrPath
@@ -140,10 +141,11 @@ export function dispatchHoverLeave(
 
 let lastClickedElement: HTMLElement | null = null
 
-function blurLastClickedElement() {
+export function clearLastClickedElement() {
 	if (lastClickedElement) {
-		lastClickedElement.dispatchEvent(new PointerEvent('pointerout', { bubbles: true }))
-		lastClickedElement.dispatchEvent(new PointerEvent('pointerleave', { bubbles: false }))
+		const pointerLeaveOpts = { bubbles: true, pointerType: 'mouse' as const }
+		lastClickedElement.dispatchEvent(new PointerEvent('pointerout', pointerLeaveOpts))
+		lastClickedElement.dispatchEvent(new PointerEvent('pointerleave', { ...pointerLeaveOpts, bubbles: false }))
 		lastClickedElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
 		lastClickedElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
 		lastClickedElement.blur()
@@ -159,7 +161,7 @@ function blurLastClickedElement() {
  * @private Internal method, subject to change at any time.
  */
 export async function clickElement(element: HTMLElement) {
-	blurLastClickedElement()
+	clearLastClickedElement()
 
 	lastClickedElement = element
 
@@ -325,7 +327,7 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 
 	await waitFor(0.1)
 
-	blurLastClickedElement()
+	clearLastClickedElement()
 }
 
 /**

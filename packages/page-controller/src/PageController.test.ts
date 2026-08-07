@@ -196,10 +196,10 @@ describe('PageController', () => {
 			document.body.innerHTML = '<div id="trigger">Open<div id="item">Item</div></div>'
 			const trigger = document.querySelector<HTMLDivElement>('#trigger')!
 			const item = document.querySelector<HTMLDivElement>('#item')!
-			const events: Array<{ type: string; relatedTarget: EventTarget | null }> = []
+			const events: { type: string; relatedTarget: EventTarget | null }[] = []
 			for (const evt of ['pointerout', 'pointerleave', 'mouseout', 'mouseleave']) {
 				trigger.addEventListener(evt, (event) =>
-					events.push({ type: event.type, relatedTarget: event.relatedTarget })
+					events.push({ type: event.type, relatedTarget: (event as MouseEvent).relatedTarget })
 				)
 			}
 
@@ -245,6 +245,36 @@ describe('PageController', () => {
 
 			expect(result.success).toBe(true)
 			expect(left).toEqual(['pointerout', 'mouseout', 'pointerleave', 'mouseleave'])
+		})
+
+		it('clears click hover before hovering another element', async () => {
+			document.body.innerHTML =
+				'<button id="clicked">Clicked</button><button id="hovered">Hovered</button>'
+			const clicked = document.querySelector<HTMLButtonElement>('#clicked')!
+			const hovered = document.querySelector<HTMLButtonElement>('#hovered')!
+			const left: string[] = []
+			const pointerTypes: string[] = []
+			for (const evt of ['pointerout', 'pointerleave', 'mouseout', 'mouseleave']) {
+				clicked.addEventListener(evt, (event) => {
+					left.push(evt)
+					if (event instanceof PointerEvent) pointerTypes.push(event.pointerType)
+				})
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: clicked,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(1, {
+				ref: hovered,
+			})
+
+			await controller.clickElement(0)
+			await controller.hoverElement(1)
+
+			expect(left).toEqual(['pointerout', 'pointerleave', 'mouseout', 'mouseleave'])
+			expect(pointerTypes).toEqual(['mouse', 'mouse'])
 		})
 
 		it('clears the full hover ancestry after entering a descendant', async () => {
