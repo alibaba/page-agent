@@ -158,6 +158,39 @@ const pageAgent = new PageAgent({
 			</section>
 
 			<section className="mb-10">
+				<Heading id="orcarouter" className="text-2xl font-semibold mb-3">
+					OrcaRouter
+				</Heading>
+				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+					{isZh
+						? 'OrcaRouter 是一个 OpenAI 兼容网关，可将请求路由到多家上游模型（OpenAI、Anthropic、Google 等）。将 baseURL 指向 OrcaRouter 端点，并使用带命名空间的模型 ID。'
+						: 'OrcaRouter is an OpenAI-compatible gateway that routes requests to upstream models from multiple providers (OpenAI, Anthropic, Google, and more). Point baseURL at the OrcaRouter endpoint and use a namespaced model ID.'}
+				</p>
+				<CodeEditor
+					code={`// OpenAI-compatible gateway
+const pageAgent = new PageAgent({
+  baseURL: 'https://api.orcarouter.ai/v1',
+  apiKey: 'sk-orca-...',
+  model: 'openai/gpt-5.5' // or 'anthropic/claude-sonnet-4.6', 'orcarouter/auto'
+});`}
+				/>
+				<div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+					<ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-disc pl-5">
+						<li>
+							{isZh
+								? 'OrcaRouter 使用带命名空间的模型 ID（如 openai/gpt-5.5、anthropic/claude-sonnet-4.6）。'
+								: 'OrcaRouter uses namespaced model IDs such as openai/gpt-5.5 and anthropic/claude-sonnet-4.6.'}
+						</li>
+						<li>
+							{isZh
+								? 'orcarouter/auto 是自适应路由，会按请求选择上游模型；如需稳定的 tool call，建议固定一个支持 tool call 的模型（如 openai/gpt-5.5 或 anthropic/claude-sonnet-4.6）。'
+								: 'orcarouter/auto is an adaptive router that picks an upstream model per request; for reliable tool calls, pin a tool-call-capable model such as openai/gpt-5.5 or anthropic/claude-sonnet-4.6.'}
+						</li>
+					</ul>
+				</div>
+			</section>
+
+			<section className="mb-10">
 				<Heading id="free-testing-api">{isZh ? '免费测试接口' : 'Free Testing API'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
