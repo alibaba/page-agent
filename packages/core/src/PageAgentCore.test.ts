@@ -140,6 +140,30 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 			expect(agent.status).toBe('completed')
 		})
 
+		it('does not execute more than maxSteps steps', async () => {
+			const fetchMock = createFetchMock().mockImplementation(async () =>
+				agentResponse({ action: { noop: {} } })
+			)
+			const agent = createAgent(fetchMock, {
+				maxSteps: 1,
+				customTools: {
+					noop: tool({
+						description: 'Do nothing.',
+						inputSchema: z.object({}),
+						execute: async () => 'ok',
+					}),
+				},
+			})
+
+			const result = await agent.execute('keep going')
+
+			expect(result).toMatchObject({
+				success: false,
+				data: 'Step count exceeded maximum limit',
+			})
+			expect(fetchMock).toHaveBeenCalledTimes(1)
+		})
+
 		it('throws when a task is already running', async () => {
 			const fetchMock = createFetchMock().mockResolvedValueOnce(waitResponse())
 			const agent = createAgent(fetchMock)
