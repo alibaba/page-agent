@@ -346,7 +346,7 @@ export class PageAgentCore extends EventTarget {
 				}
 
 				step++
-				if (step > maxSteps) {
+				if (step >= maxSteps) {
 					const message = 'Step count exceeded maximum limit'
 					console.error(message)
 					this.#emitActivity({ type: 'error', message: message })
