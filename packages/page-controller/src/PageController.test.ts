@@ -51,8 +51,12 @@ describe('PageController', () => {
 			const target = document.querySelector<HTMLButtonElement>('#target')!
 
 			const seen: string[] = []
+			const composed: boolean[] = []
 			for (const evt of ['pointerover', 'pointerenter', 'mouseover', 'mouseenter']) {
-				target.addEventListener(evt, () => seen.push(evt))
+				target.addEventListener(evt, (event) => {
+					seen.push(evt)
+					if (evt === 'pointerover' || evt === 'mouseover') composed.push(event.composed)
+				})
 			}
 
 			// Stub index 0 -> our target.
@@ -68,6 +72,7 @@ describe('PageController', () => {
 			expect(seen).toEqual(
 				expect.arrayContaining(['pointerover', 'pointerenter', 'mouseover', 'mouseenter'])
 			)
+			expect(composed).toEqual([true, true])
 		})
 
 		it('dispatches enter events on ancestors when hovering a descendant directly', async () => {

@@ -87,6 +87,7 @@ export async function hoverElement(
 		clientY: y,
 		pointerType: 'mouse',
 		relatedTarget: previousElement ?? null,
+		composed: true,
 	}
 	const mouseOpts = {
 		bubbles: true,
@@ -94,6 +95,7 @@ export async function hoverElement(
 		clientX: x,
 		clientY: y,
 		relatedTarget: previousElement ?? null,
+		composed: true,
 	}
 
 	// Hover — pointer events first, then mouse events (spec order)
@@ -145,7 +147,9 @@ export function clearLastClickedElement() {
 	if (lastClickedElement) {
 		const pointerLeaveOpts = { bubbles: true, pointerType: 'mouse' as const }
 		lastClickedElement.dispatchEvent(new PointerEvent('pointerout', pointerLeaveOpts))
-		lastClickedElement.dispatchEvent(new PointerEvent('pointerleave', { ...pointerLeaveOpts, bubbles: false }))
+		lastClickedElement.dispatchEvent(
+			new PointerEvent('pointerleave', { ...pointerLeaveOpts, bubbles: false })
+		)
 		lastClickedElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
 		lastClickedElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
 		lastClickedElement.blur()
