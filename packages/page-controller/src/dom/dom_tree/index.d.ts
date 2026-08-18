@@ -9,6 +9,7 @@ interface DomTreeArgs {
 	interactiveWhitelist?: Element[]
 	highlightOpacity?: number
 	highlightLabelOpacity?: number
+	highlightLabelTextOpacity?: number
 }
 
 declare const domTree: (args?: DomTreeArgs) => FlatDomTree
