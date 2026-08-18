@@ -1,9 +1,21 @@
 import { I18n, type SupportedLanguage } from '../i18n'
 import { truncate } from '../utils'
 import { createCard, createReflectionLines } from './cards'
+import { DRAG_THRESHOLD, type DragOffset, clampDragOffset } from './drag'
 import type { AgentActivity, PanelAgentAdapter } from './types'
 
 import styles from './Panel.module.css'
+
+/**
+ * Drag offset carried in the wrapper transform.
+ *
+ * show()/hide() set `transform` inline, which overrides the class rule, so both
+ * must re-append this or the panel would jump back to its default position.
+ */
+const DRAG_TRANSFORM = 'translate(var(--drag-x, 0px), var(--drag-y, 0px))'
+
+/** How long the wrapper's entrance takes, matching `transition` in Panel.module.css */
+const ENTRANCE_MS = 300
 
 /**
  * Panel configuration
@@ -46,12 +58,44 @@ export class Panel {
 	#headerUpdateTimer: ReturnType<typeof setInterval> | null = null
 	#pendingHeaderText: string | null = null
 	#isAnimating = false
+	/** Current drag offset, mirrored into `--drag-x` / `--drag-y` */
+	#dragOffset: DragOffset = { x: 0, y: 0 }
+	/**
+	 * Set when a gesture ends after really dragging, cleared by the next press
+	 * and consumed by the click that follows the gesture.
+	 *
+	 * A flag rather than a one-shot listener on the header: a gesture that ends in
+	 * `pointercancel` (touch interrupted, palm rejected) is followed by no click at
+	 * all, so a listener would survive and swallow the user's next genuine press.
+	 */
+	#draggedSincePress = false
+	/**
+	 * Tears down the gesture currently in flight, or `null` when none is.
+	 *
+	 * The move/end handlers live on `window` for the length of one gesture, so a
+	 * `dispose()` mid-drag would otherwise leave them attached to a panel that is
+	 * already off the page, still writing offsets to the detached wrapper.
+	 */
+	#endActiveDrag: (() => void) | null = null
+	/** Pending post-entrance re-clamp scheduled by `show()` */
+	#entranceTimer: ReturnType<typeof setTimeout> | null = null
 
 	// Event handlers (bound for removal)
 	#onStatusChange = () => this.#handleStatusChange()
 	#onHistoryChange = () => this.#handleHistoryChange()
 	#onActivity = (e: Event) => this.#handleActivity((e as CustomEvent<AgentActivity>).detail)
 	#onAgentDispose = () => this.dispose()
+	/**
+	 * Re-clamp on resize, or shrinking the window would strand the panel off-screen.
+	 *
+	 * Not while the entrance is still running: that measures the box mid-animation,
+	 * which is the same reading `show()` refuses to trust. The re-clamp already
+	 * scheduled for when it settles sees the new viewport anyway.
+	 */
+	#onWindowResize = () => {
+		if (this.#entranceTimer !== null) return
+		this.#setDragOffset(this.#dragOffset)
+	}
 
 	get wrapper(): HTMLElement {
 		return this.#wrapper
@@ -85,6 +129,7 @@ export class Panel {
 		this.#agent.addEventListener('historychange', this.#onHistoryChange)
 		this.#agent.addEventListener('activity', this.#onActivity)
 		this.#agent.addEventListener('dispose', this.#onAgentDispose)
+		window.addEventListener('resize', this.#onWindowResize)
 
 		this.#setupEventListeners()
 		this.#startHeaderUpdateLoop()
@@ -227,12 +272,23 @@ export class Panel {
 		this.wrapper.style.display = 'block'
 		void this.wrapper.offsetHeight
 		this.wrapper.style.opacity = '1'
-		this.wrapper.style.transform = 'translateX(-50%) translateY(0)'
+		this.wrapper.style.transform = `translateX(-50%) translateY(0) ${DRAG_TRANSFORM}`
+		// A hidden panel measures zero, so resizes that happened while it was hidden
+		// never re-clamped it. Do that here, or a shrunken window strands the panel
+		// off-screen with its only drag handle out of reach.
+		//
+		// Once the entrance has settled, not now: `getBoundingClientRect()` reports
+		// the box as it is being animated, which puts the base a whole entrance
+		// offset out. A panel left against the bottom edge would then be clamped
+		// that far up by every hide/show.
+		this.#reclampWhenEntranceSettles()
 	}
 
 	hide(): void {
+		// Hidden again before the entrance settled: nothing left to measure
+		this.#cancelEntranceReclamp()
 		this.wrapper.style.opacity = '0'
-		this.wrapper.style.transform = 'translateX(-50%) translateY(20px)'
+		this.wrapper.style.transform = `translateX(-50%) translateY(20px) ${DRAG_TRANSFORM}`
 		this.wrapper.style.display = 'none'
 	}
 
@@ -265,6 +321,9 @@ export class Panel {
 		this.#agent.removeEventListener('historychange', this.#onHistoryChange)
 		this.#agent.removeEventListener('activity', this.#onActivity)
 		this.#agent.removeEventListener('dispose', this.#onAgentDispose)
+		window.removeEventListener('resize', this.#onWindowResize)
+		this.#endActiveDrag?.()
+		this.#cancelEntranceReclamp()
 
 		// Clean up UI
 		this.#isWaitingForUserAnswer = false
@@ -437,8 +496,15 @@ export class Panel {
 
 	#setupEventListeners(): void {
 		// Click header area to expand/collapse
-		const header = this.wrapper.querySelector(`.${styles.header}`)!
+		const header = this.wrapper.querySelector<HTMLElement>(`.${styles.header}`)!
+		this.#setupDragging(header)
 		header.addEventListener('click', (e) => {
+			// The click that ends a drag must not toggle as well. Read and clear, so
+			// the very next click works normally.
+			if (this.#draggedSincePress) {
+				this.#draggedSincePress = false
+				return
+			}
 			// Don't trigger expand/collapse if clicking on buttons
 			if ((e.target as HTMLElement).closest(`.${styles.controlButton}`)) {
 				return
@@ -471,6 +537,162 @@ export class Panel {
 		this.#inputSection.addEventListener('click', (e) => {
 			e.stopPropagation()
 		})
+	}
+
+	/**
+	 * Make the panel draggable by its header.
+	 *
+	 * Pointer Events cover mouse, touch and pen with one code path. A press only
+	 * becomes a drag once it travels past `DRAG_THRESHOLD`; below that it stays a
+	 * plain click and still toggles expand/collapse.
+	 */
+	#setupDragging(header: HTMLElement): void {
+		header.addEventListener('pointerdown', (e: PointerEvent) => {
+			if (e.button !== 0) return // primary button / contact only
+			// A second finger must not hijack a drag already in progress
+			if (!e.isPrimary) return
+			// Nor a second primary pointer. A mouse and a pen are primary at the same
+			// time, so the guard above lets both through, and the later press would
+			// overwrite the teardown handle for the gesture still running — leaving
+			// its listeners with nothing able to remove them.
+			if (this.#endActiveDrag) return
+
+			// Every press that could produce a click clears the flag: a cancelled drag
+			// leaves it set, and no click reaches the header without a pointerdown
+			// first. Deliberately after the two guards above, since a secondary button
+			// or a second finger landing between a drag's `pointerup` and its trailing
+			// `click` would otherwise clear the flag early and let that click toggle
+			// after all.
+			this.#draggedSincePress = false
+
+			// Let the control buttons keep their own behaviour
+			if ((e.target as HTMLElement).closest(`.${styles.controlButton}`)) return
+
+			const origin = { ...this.#dragOffset }
+			let dragging = false
+
+			// Keeps the gesture alive when the pointer leaves the header.
+			// Absent in some test DOMs and old browsers, hence the guard.
+			header.setPointerCapture?.(e.pointerId)
+
+			const onMove = (ev: PointerEvent) => {
+				if (ev.pointerId !== e.pointerId) return
+				const dx = ev.clientX - e.clientX
+				const dy = ev.clientY - e.clientY
+
+				if (!dragging) {
+					if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return
+					dragging = true
+					this.wrapper.classList.add(styles.dragging)
+				}
+
+				this.#setDragOffset({ x: origin.x + dx, y: origin.y + dy })
+			}
+
+			const detach = () => {
+				window.removeEventListener('pointermove', onMove)
+				window.removeEventListener('pointerup', onEnd)
+				window.removeEventListener('pointercancel', onEnd)
+				this.#endActiveDrag = null
+			}
+
+			const onEnd = (ev: PointerEvent) => {
+				if (ev.pointerId !== e.pointerId) return
+				detach()
+
+				if (!dragging) return
+				this.wrapper.classList.remove(styles.dragging)
+				// A `pointerup` after a real drag is followed by a `click` on the header;
+				// the header's click handler consumes this flag instead of toggling.
+				this.#draggedSincePress = true
+			}
+
+			window.addEventListener('pointermove', onMove)
+			window.addEventListener('pointerup', onEnd)
+			window.addEventListener('pointercancel', onEnd)
+			// `dispose()` can land mid-gesture; give it a way to drop these again.
+			this.#endActiveDrag = detach
+		})
+	}
+
+	/**
+	 * Re-clamp once the entrance transition has finished.
+	 *
+	 * Timed rather than driven by `transitionend`: the wrapper transitions several
+	 * properties, and a panel shown while already visible fires nothing at all.
+	 */
+	#reclampWhenEntranceSettles(): void {
+		this.#cancelEntranceReclamp()
+		this.#entranceTimer = setTimeout(() => {
+			this.#entranceTimer = null
+			this.#setDragOffset(this.#dragOffset)
+		}, ENTRANCE_MS)
+	}
+
+	#cancelEntranceReclamp(): void {
+		if (this.#entranceTimer === null) return
+		clearTimeout(this.#entranceTimer)
+		this.#entranceTimer = null
+	}
+
+	/**
+	 * Clamp `next` into the viewport and write it to the CSS custom properties.
+	 *
+	 * The measured box is the wrapper — the collapsed header — not the expanded
+	 * panel: the history list and input row are absolutely positioned siblings that
+	 * sit outside it. Clamping their union would make a tall history exceed the
+	 * viewport and lock the drag through `clampDragOffset`'s degenerate branch,
+	 * which is far worse than letting them clip while the handle stays grabbable.
+	 *
+	 * The cost lands on the input row, which sits below the header: at the bottom
+	 * clamp only its top few pixels remain on screen, so a panel parked there
+	 * cannot be typed into until it is dragged back up. Reserving its height would
+	 * mean clamping against a box that changes with the panel's own state, so this
+	 * stays a known limitation rather than a special case here.
+	 */
+	/**
+	 * The box to clamp the panel inside.
+	 *
+	 * `documentElement.clientWidth/Height` is the layout viewport, which leaves out
+	 * a classic scrollbar; `innerWidth/Height` counts it, so the panel's edge would
+	 * come to rest underneath one.
+	 *
+	 * Capped by the window all the same. In quirks mode `clientHeight` is the
+	 * `<html>` box rather than the viewport, so on a long page it reads as the whole
+	 * document and the panel could be dragged below the fold with nothing to stop
+	 * it. Zero means an environment that lays nothing out, where only the window is
+	 * meaningful.
+	 */
+	#viewportSize(): { width: number; height: number } {
+		const doc = document.documentElement
+		return {
+			width: Math.min(doc.clientWidth || window.innerWidth, window.innerWidth),
+			height: Math.min(doc.clientHeight || window.innerHeight, window.innerHeight),
+		}
+	}
+
+	#setDragOffset(next: DragOffset): void {
+		const rect = this.wrapper.getBoundingClientRect()
+		// A zero-size rect means the panel is not rendered (e.g. hidden). Clamping
+		// against it would move the panel for no reason, so keep the offset as is.
+		// Either axis being zero is enough: clamping the other one against a zero
+		// size lets the panel travel a full box-width past the viewport edge.
+		if (rect.width === 0 || rect.height === 0) return
+
+		this.#dragOffset = clampDragOffset(
+			next,
+			{
+				// The rect already includes the current offset; undo it to get the base box.
+				left: rect.left - this.#dragOffset.x,
+				top: rect.top - this.#dragOffset.y,
+				width: rect.width,
+				height: rect.height,
+			},
+			this.#viewportSize()
+		)
+
+		this.wrapper.style.setProperty('--drag-x', `${this.#dragOffset.x}px`)
+		this.wrapper.style.setProperty('--drag-y', `${this.#dragOffset.y}px`)
 	}
 
 	#toggle(): void {
