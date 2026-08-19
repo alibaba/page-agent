@@ -467,6 +467,60 @@ LLM_MODEL_NAME="qwen/qwen3.5-27b"`}
 							</ul>
 						</div>
 					</section>
+					<section>
+						<Heading id=orcarouter\ level={3}>
+							OrcaRouter
+						</Heading>
+						<p className=	ext-sm
+text-gray-600
+dark:text-gray-400
+mb-4\>
+							{isZh
+								? 'OrcaRouter 是一个 OpenAI 兼容的网关，支持多个模型提供商。'
+								: 'OrcaRouter is an OpenAI-compatible gateway supporting multiple providers.'}
+						</p>
+						<CodeEditor
+							code={// OrcaRouter gateway configuration
+const pageAgent = new PageAgent({
+  baseURL: 'https://api.orcarouter.ai/v1',
+  apiKey: 'sk-orca-...',
+  model: 'openai/gpt-5.5'
+});
+
+// Using adaptive router
+const autoAgent = new PageAgent({
+  baseURL: 'https://api.orcarouter.ai/v1',
+  apiKey: 'sk-orca-...',
+  model: 'orcarouter/auto'
+});}
+						/>
+						<div className=\mt-4
+p-4
+bg-blue-50
+dark:bg-blue-950/20
+rounded-lg
+border
+border-blue-200
+dark:border-blue-800\>
+							<h3 className=ont-semibold
+text-blue-900
+dark:text-blue-200
+mb-2\>
+								{isZh ? 'Supported Models' : 'Supported Models'}
+							</h3>
+							<ul className=	ext-sm
+text-gray-700
+dark:text-gray-300
+space-y-1
+list-disc
+pl-5\>
+								<li>openai/gpt-5.5</li>
+								<li>anthropic/claude-sonnet-4.6</li>
+								<li>orcarouter/auto</li>
+							</ul>
+						</div>
+					</section>
+
 				</div>
 			</section>
 		</div>
