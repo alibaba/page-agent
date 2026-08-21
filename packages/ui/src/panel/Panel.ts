@@ -47,6 +47,30 @@ export class Panel {
 	#pendingHeaderText: string | null = null
 	#isAnimating = false
 
+	// Drag state
+	#isDragging = false
+	#dragPointerId: number | null = null
+	#dragStartPointerX = 0
+	#dragStartPointerY = 0
+	#dragStartOffsetX = 0
+	#dragStartOffsetY = 0
+	#dragBaseLeft = 0
+	#dragBaseTop = 0
+	#dragOffsetX = 0
+	#dragOffsetY = 0
+	#dragPanelW = 0
+	#dragPanelH = 0
+	#dragThreshold = 4
+	#dragMargin = 8
+	#suppressHeaderClick = false
+
+	// Drag handlers (stable references so listeners can be removed)
+	#onDragPointerDown = (e: Event) => this.#onPointerDown(e)
+	#onDragPointerMove = (e: Event) => this.#onPointerMove(e as PointerEvent)
+	#onDragPointerUp = (e: Event) => this.#onPointerUp(e as PointerEvent)
+	#onDragPointerCancel = (e: Event) => this.#onPointerCancel(e as PointerEvent)
+	#onDragResize = () => this.#onResize()
+
 	// Event handlers (bound for removal)
 	#onStatusChange = () => this.#handleStatusChange()
 	#onHistoryChange = () => this.#handleHistoryChange()
@@ -90,6 +114,7 @@ export class Panel {
 		this.#startHeaderUpdateLoop()
 
 		this.#showInputArea()
+		this.#setupDrag()
 
 		this.hide() // Start hidden
 	}
@@ -227,12 +252,22 @@ export class Panel {
 		this.wrapper.style.display = 'block'
 		void this.wrapper.offsetHeight
 		this.wrapper.style.opacity = '1'
-		this.wrapper.style.transform = 'translateX(-50%) translateY(0)'
+		this.wrapper.style.transform =
+			'translateX(-50%) translateY(0) translate(' +
+			this.#dragOffsetX +
+			'px,' +
+			this.#dragOffsetY +
+			'px)'
 	}
 
 	hide(): void {
 		this.wrapper.style.opacity = '0'
-		this.wrapper.style.transform = 'translateX(-50%) translateY(20px)'
+		this.wrapper.style.transform =
+			'translateX(-50%) translateY(20px) translate(' +
+			this.#dragOffsetX +
+			'px,' +
+			this.#dragOffsetY +
+			'px)'
 		this.wrapper.style.display = 'none'
 	}
 
@@ -269,6 +304,7 @@ export class Panel {
 		// Clean up UI
 		this.#isWaitingForUserAnswer = false
 		this.#stopHeaderUpdateLoop()
+		this.#disposeDrag()
 		this.wrapper.remove()
 	}
 
@@ -438,6 +474,18 @@ export class Panel {
 	#setupEventListeners(): void {
 		// Click header area to expand/collapse
 		const header = this.wrapper.querySelector(`.${styles.header}`)!
+		// Swallow the click that follows a drag (capture phase so buttons are covered too)
+		header.addEventListener(
+			'click',
+			(e) => {
+				if (this.#suppressHeaderClick) {
+					this.#suppressHeaderClick = false
+					e.preventDefault()
+					e.stopPropagation()
+				}
+			},
+			true
+		)
 		header.addEventListener('click', (e) => {
 			// Don't trigger expand/collapse if clicking on buttons
 			if ((e.target as HTMLElement).closest(`.${styles.controlButton}`)) {
@@ -693,5 +741,207 @@ export class Panel {
 		}
 
 		return cards
+	}
+
+	// ========== Drag functionality ==========
+
+	/**
+	 * Setup drag functionality on the header
+	 */
+	#setupDrag(): void {
+		const header = this.#wrapper.querySelector('.' + styles.header)!
+		if (!header) return
+
+		header.addEventListener('pointerdown', this.#onDragPointerDown)
+		header.addEventListener('pointermove', this.#onDragPointerMove)
+		header.addEventListener('pointerup', this.#onDragPointerUp)
+		header.addEventListener('pointercancel', this.#onDragPointerCancel)
+		window.addEventListener('resize', this.#onDragResize)
+	}
+
+	/**
+	 * Handle pointer down on header
+	 */
+	#onPointerDown(e: Event): void {
+		const pe = e as PointerEvent
+		// Ignore non-primary buttons and secondary contacts
+		if (pe.button !== 0 || this.#dragPointerId !== null) return
+
+		// Ignore clicks on control buttons
+		const target = pe.target as HTMLElement
+		if (target.closest('.' + styles.expandButton) || target.closest('.' + styles.stopButton)) {
+			return
+		}
+
+		pe.preventDefault()
+
+		this.#dragPointerId = pe.pointerId
+		this.#dragStartPointerX = pe.clientX
+		this.#dragStartPointerY = pe.clientY
+		this.#dragStartOffsetX = this.#dragOffsetX
+		this.#dragStartOffsetY = this.#dragOffsetY
+		this.#isDragging = false
+
+		// Capture pointer
+		const header = this.#wrapper.querySelector('.' + styles.header)!
+		header.setPointerCapture(pe.pointerId)
+	}
+
+	/**
+	 * Handle pointer move
+	 */
+	#onPointerMove(e: PointerEvent): void {
+		if (e.pointerId !== this.#dragPointerId) return
+
+		if (!this.#isDragging) {
+			const dx = e.clientX - this.#dragStartPointerX
+			const dy = e.clientY - this.#dragStartPointerY
+			if (Math.sqrt(dx * dx + dy * dy) < this.#dragThreshold) {
+				return
+			}
+			this.#startDragging()
+		}
+
+		const dx = e.clientX - this.#dragStartPointerX
+		const dy = e.clientY - this.#dragStartPointerY
+		let nx = this.#dragStartOffsetX + dx
+		let ny = this.#dragStartOffsetY + dy
+
+		const vw = document.documentElement.clientWidth || window.innerWidth
+		const vh = document.documentElement.clientHeight || window.innerHeight
+		const m = this.#dragMargin
+
+		nx = Math.max(
+			-this.#dragBaseLeft + m,
+			Math.min(vw - (this.#dragBaseLeft + this.#dragPanelW) - m, nx)
+		)
+		ny = Math.max(
+			-this.#dragBaseTop + m,
+			Math.min(vh - (this.#dragBaseTop + this.#dragPanelH) - m, ny)
+		)
+
+		if (nx === this.#dragOffsetX && ny === this.#dragOffsetY) return
+		this.#dragOffsetX = nx
+		this.#dragOffsetY = ny
+
+		this.#wrapper.style.transform =
+			'translateX(-50%) translateY(0) translate(' + nx + 'px,' + ny + 'px)'
+	}
+
+	/**
+	 * Handle pointer up
+	 */
+	#onPointerUp(e: PointerEvent): void {
+		if (e.pointerId !== this.#dragPointerId) return
+
+		// If we didn't drag, it was a click - let it propagate
+		if (this.#isDragging) {
+			this.#suppressHeaderClick = true
+		}
+
+		this.#cleanupDrag()
+	}
+
+	/**
+	 * Handle pointer cancel
+	 */
+	#onPointerCancel(e: PointerEvent): void {
+		if (e.pointerId !== this.#dragPointerId) return
+
+		// Revert to the position where this drag started
+		this.#dragOffsetX = this.#dragStartOffsetX
+		this.#dragOffsetY = this.#dragStartOffsetY
+		this.#applyDragTransform()
+
+		this.#cleanupDrag()
+	}
+
+	/**
+	 * Clean up drag state
+	 */
+	#cleanupDrag(): void {
+		this.#isDragging = false
+		this.#wrapper.classList.remove(styles.dragging)
+		this.#wrapper.style.cursor = ''
+		this.#dragPointerId = null
+	}
+
+	/**
+	 * Begin dragging: snapshot the panel geometry once
+	 */
+	#startDragging(): void {
+		this.#isDragging = true
+		const r = this.#wrapper.getBoundingClientRect()
+		this.#dragBaseLeft = r.left - this.#dragOffsetX
+		this.#dragBaseTop = r.top - this.#dragOffsetY
+		this.#dragPanelW = r.width
+		this.#dragPanelH = r.height
+		this.#wrapper.classList.add(styles.dragging)
+		this.#wrapper.style.cursor = 'grabbing'
+	}
+
+	/**
+	 * Apply the current drag offset to the panel
+	 */
+	#applyDragTransform(): void {
+		this.#wrapper.style.transform =
+			'translateX(-50%) translateY(0) translate(' +
+			this.#dragOffsetX +
+			'px,' +
+			this.#dragOffsetY +
+			'px)'
+	}
+
+	/**
+	 * Handle window resize
+	 */
+	#onResize(): void {
+		if (this.#dragOffsetX === 0 && this.#dragOffsetY === 0) {
+			return
+		}
+
+		const rect = this.#wrapper.getBoundingClientRect()
+		this.#dragBaseLeft = rect.left - this.#dragOffsetX
+		this.#dragBaseTop = rect.top - this.#dragOffsetY
+		this.#dragPanelW = rect.width
+		this.#dragPanelH = rect.height
+
+		this.#clampDragOffset()
+		this.#applyDragTransform()
+	}
+
+	/**
+	 * Clamp drag offset to keep panel within viewport
+	 */
+	#clampDragOffset(): void {
+		const vw = document.documentElement.clientWidth || window.innerWidth
+		const vh = document.documentElement.clientHeight || window.innerHeight
+		const m = this.#dragMargin
+
+		this.#dragOffsetX = Math.max(
+			-this.#dragBaseLeft + m,
+			Math.min(vw - (this.#dragBaseLeft + this.#dragPanelW) - m, this.#dragOffsetX)
+		)
+		this.#dragOffsetY = Math.max(
+			-this.#dragBaseTop + m,
+			Math.min(vh - (this.#dragBaseTop + this.#dragPanelH) - m, this.#dragOffsetY)
+		)
+	}
+
+	/**
+	 * Clean up drag on dispose
+	 */
+	#disposeDrag(): void {
+		if (this.#dragPointerId !== null) {
+			this.#cleanupDrag()
+		}
+		window.removeEventListener('resize', this.#onDragResize)
+		const header = this.#wrapper.querySelector('.' + styles.header)
+		if (header) {
+			header.removeEventListener('pointerdown', this.#onDragPointerDown)
+			header.removeEventListener('pointermove', this.#onDragPointerMove)
+			header.removeEventListener('pointerup', this.#onDragPointerUp)
+			header.removeEventListener('pointercancel', this.#onDragPointerCancel)
+		}
 	}
 }
