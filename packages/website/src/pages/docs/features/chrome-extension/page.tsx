@@ -287,10 +287,9 @@ window.PAGE_AGENT_EXT.stop()`
 						className="text-2xl font-bold mb-4"
 					>
 						{isZh
-							? '将 MultiPageAgent 集成你自己的插件'
+							? '将 MultiPageAgent 集成到你自己的插件'
 							: 'Integrate MultiPageAgent into Your Extension'}
 					</Heading>
-					<p>@TODO</p>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
 							? '建议先阅读扩展 API 文档，再参考 background entry implementation。'
