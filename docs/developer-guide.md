@@ -10,7 +10,7 @@ For contribution rules and expectations, see [../CONTRIBUTING.md](../CONTRIBUTIN
 
 1. **Prerequisites**
     - `macOS` / `Linux` / `WSL`
-    - `node.js ^22.13 || >=24` with `npm >= 11`
+    - `node.js ^22.22.1 || >=24` with `npm ^11.6.3`
     - An editor that supports `ts/eslint/prettier`
     - Make sure `eslint`, `prettier` and `commitlint` work well. Un-linted code won't pass the CI.
 
