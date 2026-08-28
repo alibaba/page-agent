@@ -1,6 +1,7 @@
-import { type AgentConfig, PageOSCore } from '@page-os/core'
+import { type AgentConfig, EBAgentCore } from '@eb-agent/core'
 
 import { RemotePageController } from './RemotePageController'
+import { RemoteWebMCPAdapter } from './RemoteWebMCPAdapter'
 import { TabsController } from './TabsController'
 import SYSTEM_PROMPT from './system_prompt.md?raw'
 import { createTabTools } from './tabTools'
@@ -21,7 +22,7 @@ interface MultiPageAgentConfig extends AgentConfig {
  * - use with extension
  * - can be used from a side panel or a content script
  */
-export class MultiPageAgent extends PageOSCore {
+export class MultiPageAgent extends EBAgentCore {
 	constructor(config: MultiPageAgentConfig) {
 		// multi page controller
 		const tabsController = new TabsController()
@@ -56,6 +57,17 @@ export class MultiPageAgent extends PageOSCore {
 			// Disabled: AbortSignal cannot cross contexts
 			experimentalScriptExecutionTool: false,
 			pageController: pageController as any,
+
+			capabilities: {
+				...config.capabilities,
+				// The agent lives in an isolated world, so `document.modelContext` is
+				// unreachable from here — go through the main-world bridge instead.
+				webmcpPort: new RemoteWebMCPAdapter(pageController),
+				// Generating tools from a third-party page's UI, and publishing tools
+				// into it, are both the in-page library's job — not the extension's.
+				generateFromDom: config.capabilities?.generateFromDom ?? false,
+				publishToWebMCP: config.capabilities?.publishToWebMCP ?? false,
+			},
 			customTools: customTools,
 			customSystemPrompt: systemPrompt,
 

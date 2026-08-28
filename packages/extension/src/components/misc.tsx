@@ -1,4 +1,4 @@
-import type { AgentStatus } from '@page-os/core'
+import type { AgentStatus } from '@eb-agent/core'
 import { Motion } from 'ai-motion'
 import { BookOpen, Globe } from 'lucide-react'
 import { useEffect, useRef } from 'react'
@@ -36,7 +36,7 @@ export function StatusDot({ status }: { status: AgentStatus }) {
 }
 
 export function Logo({ className }: { className?: string }) {
-	return <img src="/assets/page-os.webp" alt="PageOS" className={cn('', className)} />
+	return <img src="/assets/eb-agent.webp" alt="EBAgent" className={cn('', className)} />
 }
 
 // Full-screen ai-motion glow overlay, shown only while running
@@ -102,7 +102,7 @@ export function EmptyState() {
 				<Logo className="relative size-20 opacity-80" />
 			</div>
 			<div>
-				<h2 className="text-base font-medium text-foreground mb-1">PageOS Ext</h2>
+				<h2 className="text-base font-medium text-foreground mb-1">EBAgent Ext</h2>
 				<TypingAnimation
 					className="text-sm text-muted-foreground"
 					words={[

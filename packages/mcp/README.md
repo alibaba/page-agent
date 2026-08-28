@@ -1,11 +1,11 @@
-# @page-os/mcp
+# @eb-agent/mcp
 
-MCP server that lets AI agent clients (Claude Desktop, Copilot, etc.) control your browser through the [PageOS](https://github.com/EqualByte/agentic-page) extension.
+MCP server that lets AI agent clients (Claude Desktop, Copilot, etc.) control your browser through the [EBAgent](https://github.com/EqualByte/agentic-page) extension.
 
 ## Prerequisites
 
 - Node.js >= 20
-- [PageOS Extension](https://chromewebstore.google.com/detail/page-os-ext/akldabonmimlicnjlflnapfeklbfemhj) installed in Chrome
+- [EBAgent Extension](https://chromewebstore.google.com/detail/eb-agent-ext/akldabonmimlicnjlflnapfeklbfemhj) installed in Chrome
 - An LLM API key (OpenAI-compatible)
 
 ## Installation
@@ -17,9 +17,9 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```json
 {
     "mcpServers": {
-        "page-os": {
+        "eb-agent": {
             "command": "npx",
-            "args": ["-y", "@page-os/mcp"],
+            "args": ["-y", "@eb-agent/mcp"],
             "env": {
                 "LLM_BASE_URL": "https://api.deepseek.com",
                 "LLM_API_KEY": "sk-xxx",
@@ -55,7 +55,7 @@ Same format — add the config to the MCP settings of your client.
 
 ```
 ┌──────────────┐  stdio   ┌──────────────────┐  WebSocket   ┌──────────────┐
-│ Claude /     │◄────────►│ @page-os/mcp  │◄────────────►│ Hub tab      │
+│ Claude /     │◄────────►│ @eb-agent/mcp  │◄────────────►│ Hub tab      │
 │ Copilot      │  (MCP)   │ (Node.js)        │  (localhost) │ (extension)  │
 └──────────────┘          └──────────────────┘              └──────┬───────┘
                                    │                               │
@@ -67,7 +67,7 @@ Same format — add the config to the MCP settings of your client.
                           └──────────────────┘              └──────────────┘
 ```
 
-1. Agent client starts the MCP server via stdio (`npx @page-os/mcp`).
+1. Agent client starts the MCP server via stdio (`npx @eb-agent/mcp`).
 2. Server starts HTTP + WS on `localhost:PORT`, opens the launcher page in browser.
 3. Launcher page triggers the extension to open a **hub tab** (`hub.html?ws=PORT`).
 4. Hub connects to the WS server. MCP tools now proxy tasks to the hub.

@@ -5,23 +5,23 @@ import CodeEditor from '@/components/CodeEditor'
 import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
-export default function PageOSCoreDocs() {
+export default function EBAgentCoreDocs() {
 	const { isZh } = useLanguage()
 
 	return (
 		<div>
-			<h1 className="text-4xl font-bold mb-6">PageOSCore</h1>
+			<h1 className="text-4xl font-bold mb-6">EBAgentCore</h1>
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
 				{isZh
-					? 'PageOSCore 是不带 UI 的核心 Agent 类。用于需要自定义 UI 或无头运行的场景。'
-					: 'PageOSCore is the core Agent class without UI. Use it for custom UI or headless scenarios.'}
+					? 'EBAgentCore 是不带 UI 的核心 Agent 类。用于需要自定义 UI 或无头运行的场景。'
+					: 'EBAgentCore is the core Agent class without UI. Use it for custom UI or headless scenarios.'}
 			</p>
 
 			{/* When to use */}
 			<section className="mb-10">
-				<Heading id="when-to-use-pageoscore">
-					{isZh ? '何时使用 PageOSCore' : 'When to Use PageOSCore'}
+				<Heading id="when-to-use-eb-agent-core">
+					{isZh ? '何时使用 EBAgentCore' : 'When to Use EBAgentCore'}
 				</Heading>
 				<ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2">
 					<li>{isZh ? '需要自定义 UI 界面' : 'Need a custom UI interface'}</li>
@@ -32,7 +32,7 @@ export default function PageOSCoreDocs() {
 							: 'Running in non-browser environments (requires custom PageController)'}
 					</li>
 					<li>
-						{isZh ? '将 PageOS 嵌入其他 Agent 系统' : 'Embedding PageOS in other agent systems'}
+						{isZh ? '将 EBAgent 嵌入其他 Agent 系统' : 'Embedding EBAgent in other agent systems'}
 					</li>
 				</ul>
 			</section>
@@ -42,10 +42,10 @@ export default function PageOSCoreDocs() {
 				<Heading id="basic-usage">{isZh ? '基本用法' : 'Basic Usage'}</Heading>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageOSCore } from '@page-os/core'
-import { PageController } from '@page-os/page-controller'
+					code={`import { EBAgentCore } from '@eb-agent/core'
+import { PageController } from '@eb-agent/page-controller'
 
-const agent = new PageOSCore({
+const agent = new EBAgentCore({
   pageController: new PageController({ enableMask: true }),
   baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
@@ -71,11 +71,11 @@ const result = await agent.execute('Fill in the form with test data')`}
 
 			{/* Configuration */}
 			<section className="mb-10">
-				<Heading id="configuration">PageOSCoreConfig</Heading>
+				<Heading id="configuration">EBAgentCoreConfig</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? 'PageOSCoreConfig = AgentConfig & { pageController: PageController }。AgentConfig 包含以下配置项：'
-						: 'PageOSCoreConfig = AgentConfig & { pageController: PageController }. AgentConfig contains the following options:'}
+						? 'EBAgentCoreConfig = AgentConfig & { pageController: PageController }。AgentConfig 包含以下配置项：'
+						: 'EBAgentCoreConfig = AgentConfig & { pageController: PageController }. AgentConfig contains the following options:'}
 				</p>
 
 				{/* PageController */}
@@ -213,7 +213,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 						},
 						{
 							name: 'customTools',
-							type: 'Record<string, PageOSTool | null>',
+							type: 'Record<string, EBAgentTool | null>',
 							status: 'experimental',
 							description: isZh
 								? '自定义工具，可扩展或覆盖内置工具。设为 null 可移除工具。'
@@ -340,7 +340,7 @@ const result = await agent.execute('Fill in the form with test data')`}
 						},
 						{
 							name: 'tools',
-							type: 'Map<string, PageOSTool>',
+							type: 'Map<string, EBAgentTool>',
 							description: isZh ? '可用工具的 Map' : 'Map of available tools',
 						},
 						{
@@ -391,11 +391,11 @@ const result = await agent.execute('Fill in the form with test data')`}
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh ? (
 						<>
-							PageOSCore 继承自 <TypeRef>EventTarget</TypeRef>，提供以下事件：
+							EBAgentCore 继承自 <TypeRef>EventTarget</TypeRef>，提供以下事件：
 						</>
 					) : (
 						<>
-							PageOSCore extends <TypeRef>EventTarget</TypeRef> and provides the following events:
+							EBAgentCore extends <TypeRef>EventTarget</TypeRef> and provides the following events:
 						</>
 					)}
 				</p>

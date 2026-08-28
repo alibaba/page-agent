@@ -7,7 +7,7 @@ import { useLanguage } from '@/i18n/context'
 export default function ChromeExtension() {
 	const { isZh } = useLanguage()
 	const chromeWebStoreUrl =
-		'https://chromewebstore.google.com/detail/page-os-ext/akldabonmimlicnjlflnapfeklbfemhj'
+		'https://chromewebstore.google.com/detail/eb-agent-ext/akldabonmimlicnjlflnapfeklbfemhj'
 	const githubReleasesUrl = 'https://github.com/EqualByte/agentic-page/releases'
 
 	return (
@@ -16,8 +16,8 @@ export default function ChromeExtension() {
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
 				{isZh
-					? '可选的 Chrome 扩展。PageOS.js 继续负责页面内自动化；扩展 API 额外提供多页面任务、浏览器级控制，以及从浏览器外部发起任务的能力。'
-					: 'An optional Chrome extension. PageOS.js keeps handling in-page automation, while the extension API adds multi-page tasks, browser-level control, and tasks initiated from outside the browser.'}
+					? '可选的 Chrome 扩展。EBAgent.js 继续负责页面内自动化；扩展 API 额外提供多页面任务、浏览器级控制，以及从浏览器外部发起任务的能力。'
+					: 'An optional Chrome extension. EBAgent.js keeps handling in-page automation, while the extension API adds multi-page tasks, browser-level control, and tasks initiated from outside the browser.'}
 			</p>
 
 			<div className="space-y-8 mt-8">
@@ -89,16 +89,16 @@ export default function ChromeExtension() {
 					</div>
 				</section>
 
-				{/* Relationship with PageOS.js */}
+				{/* Relationship with EBAgent.js */}
 				<section>
-					<Heading id="how-it-relates-to-page-os-js" className="text-2xl font-bold mb-4">
-						{isZh ? '与 PageOS.js 的关系' : 'How It Relates to PageOS.js'}
+					<Heading id="how-it-relates-to-eb-agent-js" className="text-2xl font-bold mb-4">
+						{isZh ? '与 EBAgent.js 的关系' : 'How It Relates to EBAgent.js'}
 					</Heading>
 					<div className="p-5 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-3 text-gray-600 dark:text-gray-300">
 						<p>
 							{isZh
-								? 'PageOS.js 本身即可在页面内完成自动化。Chrome 扩展是可选的能力扩展。'
-								: 'PageOS.js already works for in-page automation. The Chrome extension is optional, not a dependency.'}
+								? 'EBAgent.js 本身即可在页面内完成自动化。Chrome 扩展是可选的能力扩展。'
+								: 'EBAgent.js already works for in-page automation. The Chrome extension is optional, not a dependency.'}
 						</p>
 						<p>
 							{isZh
@@ -115,8 +115,8 @@ export default function ChromeExtension() {
 					</Heading>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh
-							? '通过页面 JavaScript 调用 `window.PAGE_OS_EXT`，你的应用可以发起跨页面任务并控制浏览器行为。'
-							: 'By calling `window.PAGE_OS_EXT` from page JavaScript, your app can trigger multi-page tasks and control browser behavior.'}
+							? '通过页面 JavaScript 调用 `window.EB_AGENT_EXT`，你的应用可以发起跨页面任务并控制浏览器行为。'
+							: 'By calling `window.EB_AGENT_EXT` from page JavaScript, your app can trigger multi-page tasks and control browser behavior.'}
 					</p>
 
 					<h3 className="text-xl font-semibold mb-3">
@@ -133,16 +133,16 @@ export default function ChromeExtension() {
 							isZh
 								? `// 1) 用户在扩展侧边栏获取 auth token
 // 2) 仅在可信应用中设置该 token
-// 3) token 匹配后，扩展会暴露 window.PAGE_OS_EXT
+// 3) token 匹配后，扩展会暴露 window.EB_AGENT_EXT
 
 // ⚠️ 不要把 token 提供给不可信页面或脚本
-localStorage.setItem('PageOSExtUserAuthToken', '<从扩展中获取的-token>')`
+localStorage.setItem('EBAgentExtUserAuthToken', '<从扩展中获取的-token>')`
 								: `// 1) Get auth token from the extension side panel
 // 2) Set it only in trusted applications
-// 3) After token match, extension exposes window.PAGE_OS_EXT
+// 3) After token match, extension exposes window.EB_AGENT_EXT
 
 // ⚠️ Never provide the token to untrusted pages or scripts
-localStorage.setItem('PageOSExtUserAuthToken', '<your-token-from-extension>')`
+localStorage.setItem('EBAgentExtUserAuthToken', '<your-token-from-extension>')`
 						}
 						language="javascript"
 					/>
@@ -161,8 +161,8 @@ localStorage.setItem('PageOSExtUserAuthToken', '<your-token-from-extension>')`
 						</h3>
 						<p className="text-gray-600 dark:text-gray-300 mb-3 text-sm">
 							{isZh
-								? '如果你在使用 AI 编程助手（如 Cursor、GitHub Copilot），可以将以下文档链接提供给它，让它更好地理解和使用 PageOS 扩展 API：'
-								: 'If you are using an AI coding assistant (like Cursor, GitHub Copilot), share these documentation links with it for better understanding of PageOS Extension API:'}
+								? '如果你在使用 AI 编程助手（如 Cursor、GitHub Copilot），可以将以下文档链接提供给它，让它更好地理解和使用 EBAgent 扩展 API：'
+								: 'If you are using an AI coding assistant (like Cursor, GitHub Copilot), share these documentation links with it for better understanding of EBAgent Extension API:'}
 						</p>
 						<div className="space-y-2">
 							<a
@@ -192,7 +192,7 @@ localStorage.setItem('PageOSExtUserAuthToken', '<your-token-from-extension>')`
 	AgentStatus,
 	ExecutionResult,
 	HistoricalEvent
-} from '@page-os/core'
+} from '@eb-agent/core'
 
 interface ExecuteConfig {
 	baseURL: string   // LLM API endpoint
@@ -211,8 +211,8 @@ type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
 
 declare global {
 	interface Window {
-		PAGE_OS_EXT_VERSION?: string
-		PAGE_OS_EXT?: {
+		EB_AGENT_EXT_VERSION?: string
+		EB_AGENT_EXT?: {
 			version: string
 			execute: Execute
 			stop: () => void
@@ -222,14 +222,14 @@ declare global {
 						language="typescript"
 					/>
 
-					<h3 className="text-xl font-semibold mt-6 mb-3">PAGE_OS_EXT.execute(task, config)</h3>
+					<h3 className="text-xl font-semibold mt-6 mb-3">EB_AGENT_EXT.execute(task, config)</h3>
 
 					<CodeEditor
 						code={
 							isZh
 								? `// 使用配置执行任务
-const result = await window.PAGE_OS_EXT.execute(
-	'在 GitHub 上搜索 "page-os" 并打开第一个结果',
+const result = await window.EB_AGENT_EXT.execute(
+	'在 GitHub 上搜索 "eb-agent" 并打开第一个结果',
 	{
 		baseURL: 'https://api.deepseek.com',
 		apiKey: 'your-api-key',
@@ -244,8 +244,8 @@ const result = await window.PAGE_OS_EXT.execute(
 
 console.log(result) // 任务执行结果`
 								: `// Execute a task with configuration
-const result = await window.PAGE_OS_EXT.execute(
-	'Search for "page-os" on GitHub and open the first result',
+const result = await window.EB_AGENT_EXT.execute(
+	'Search for "eb-agent" on GitHub and open the first result',
 	{
 		baseURL: 'https://api.deepseek.com',
 		apiKey: 'your-api-key',
@@ -263,7 +263,7 @@ console.log(result) // Task execution result`
 						language="javascript"
 					/>
 
-					<h3 className="text-xl font-semibold mt-6 mb-3">PAGE_OS_EXT.stop()</h3>
+					<h3 className="text-xl font-semibold mt-6 mb-3">EB_AGENT_EXT.stop()</h3>
 					<p className="text-gray-600 dark:text-gray-300 mb-4">
 						{isZh ? '停止当前正在运行的任务。' : 'Stop the current running task.'}
 					</p>
@@ -272,9 +272,9 @@ console.log(result) // Task execution result`
 						code={
 							isZh
 								? `// 停止当前任务
-window.PAGE_OS_EXT.stop()`
+window.EB_AGENT_EXT.stop()`
 								: `// Stop current task execution
-window.PAGE_OS_EXT.stop()`
+window.EB_AGENT_EXT.stop()`
 						}
 						language="javascript"
 					/>

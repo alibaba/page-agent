@@ -1,5 +1,5 @@
 {
-    "name": "@page-os/website",
+    "name": "@eb-agent/website",
     "private": true,
     "version": "1.11.0",
     "type": "module",

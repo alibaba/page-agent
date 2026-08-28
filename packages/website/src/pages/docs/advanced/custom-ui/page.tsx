@@ -12,8 +12,8 @@ export default function CustomUIDocs() {
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
 				{isZh
-					? 'PageOS 的核心逻辑（PageOSCore）和 UI 完全解耦，通过事件通讯。你可以用自己的 UI 替换内置 Panel。'
-					: 'PageOS core logic (PageOSCore) is fully decoupled from UI through events. You can replace the built-in Panel with your own UI.'}
+					? 'EBAgent 的核心逻辑（EBAgentCore）和 UI 完全解耦，通过事件通讯。你可以用自己的 UI 替换内置 Panel。'
+					: 'EBAgent core logic (EBAgentCore) is fully decoupled from UI through events. You can replace the built-in Panel with your own UI.'}
 			</p>
 
 			{/* Architecture */}
@@ -21,12 +21,12 @@ export default function CustomUIDocs() {
 				<Heading id="architecture">{isZh ? '架构' : 'Architecture'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? 'PageOS 由三个独立模块组成，可自由组合：'
-						: 'PageOS consists of three independent modules that can be freely combined:'}
+						? 'EBAgent 由三个独立模块组成，可自由组合：'
+						: 'EBAgent consists of three independent modules that can be freely combined:'}
 				</p>
 				<ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 mb-4">
 					<li>
-						<strong>PageOSCore</strong> -{' '}
+						<strong>EBAgentCore</strong> -{' '}
 						{isZh ? '核心 Agent 逻辑，不包含 UI' : 'Core agent logic, no UI'}
 					</li>
 					<li>
@@ -49,8 +49,8 @@ export default function CustomUIDocs() {
 				<Heading id="two-event-streams">{isZh ? '两个事件流' : 'Two Event Streams'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? 'PageOSCore 提供两种不同性质的事件流，方便 UI 渲染：'
-						: 'PageOSCore provides two distinct event streams for UI rendering:'}
+						? 'EBAgentCore 提供两种不同性质的事件流，方便 UI 渲染：'
+						: 'EBAgentCore provides two distinct event streams for UI rendering:'}
 				</p>
 
 				{/* Comparison Table */}
@@ -198,7 +198,7 @@ export default function CustomUIDocs() {
 				</p>
 				<CodeEditor
 					language="tsx"
-					code={`function useAgent(agent: PageOSCore) {
+					code={`function useAgent(agent: EBAgentCore) {
   const [status, setStatus] = useState(agent.status)
   const [history, setHistory] = useState(agent.history)
   const [activity, setActivity] = useState<AgentActivity | null>(null)
@@ -233,19 +233,19 @@ export default function CustomUIDocs() {
 				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? '参考内置 PageOS 的实现方式，用自定义 UI 替换 Panel：'
-						: 'Following the built-in PageOS pattern, replace Panel with custom UI:'}
+						? '参考内置 EBAgent 的实现方式，用自定义 UI 替换 Panel：'
+						: 'Following the built-in EBAgent pattern, replace Panel with custom UI:'}
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageOSCore } from '@page-os/core'
-import { PageController } from '@page-os/page-controller'
+					code={`import { EBAgentCore } from '@eb-agent/core'
+import { PageController } from '@eb-agent/page-controller'
 
 // 1. Create PageController
 const pageController = new PageController({ enableMask: true })
 
-// 2. Create PageOSCore with controller
-const agent = new PageOSCore({
+// 2. Create EBAgentCore with controller
+const agent = new EBAgentCore({
   pageController,
   baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',

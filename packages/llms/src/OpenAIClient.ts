@@ -12,7 +12,7 @@ import type {
 	ResolvedLLMConfig,
 	Tool,
 } from './types'
-import { modelPatch, zodToOpenAITool } from './utils'
+import { getProvider, modelPatch, zodToOpenAITool } from './utils'
 
 /**
  * Client for OpenAI compatible APIs
@@ -78,6 +78,12 @@ export class OpenAIClient implements LLMClient {
 				headers: {
 					'Content-Type': 'application/json',
 					...(this.config.apiKey && { Authorization: `Bearer ${this.config.apiKey}` }),
+					// Anthropic's API rejects browser-origin requests unless this is set.
+					// It forces an explicit opt-in, since calling it directly from a browser
+					// exposes the API key to anyone reading the page's network traffic.
+					...(getProvider(this.config.baseURL) === 'anthropic' && {
+						'anthropic-dangerous-direct-browser-access': 'true',
+					}),
 				},
 				body: JSON.stringify(finalRequestBody),
 				signal: abortSignal,
@@ -116,6 +122,15 @@ export class OpenAIClient implements LLMClient {
 				throw new InvokeError(
 					InvokeErrorTypes.SERVER_ERROR,
 					`Server error: ${errorMessage}`,
+					errorData
+				)
+			}
+			// Other 4xx: malformed/unsupported request (e.g. bad params, unsupported content type).
+			// Deterministic — retrying the identical request will not succeed.
+			if (response.status >= 400) {
+				throw new InvokeError(
+					InvokeErrorTypes.CLIENT_ERROR,
+					`HTTP ${response.status}: ${errorMessage}`,
 					errorData
 				)
 			}
@@ -173,8 +188,25 @@ export class OpenAIClient implements LLMClient {
 				)
 		}
 
-		// Apply normalizeResponse if provided (for fixing format issues automatically)
-		const normalizedData = options?.normalizeResponse ? options.normalizeResponse(data) : data
+		// Apply normalizeResponse if provided (for fixing format issues automatically).
+		// Wrapped because normalizeResponse repairs whatever malformed shape the model
+		// returned — an unanticipated shape can throw a native error (e.g. writing a
+		// property onto a string) which must still be classified as a retryable
+		// InvokeError, not escape uncaught and abort the whole run.
+		let normalizedData: any = data
+		if (options?.normalizeResponse) {
+			try {
+				normalizedData = options.normalizeResponse(data)
+			} catch (error) {
+				if (error instanceof InvokeError) throw error
+				throw new InvokeError(
+					InvokeErrorTypes.INVALID_TOOL_ARGS,
+					`Failed to normalize model response: ${error instanceof Error ? error.message : String(error)}`,
+					error,
+					data
+				)
+			}
+		}
 		const normalizedChoice = (normalizedData as any).choices?.[0]
 
 		// Get tool name from response
@@ -224,10 +256,11 @@ export class OpenAIClient implements LLMClient {
 		// Validate with schema
 		const validation = tool.inputSchema.safeParse(parsedArgs)
 		if (!validation.success) {
-			console.error(z.prettifyError(validation.error))
+			const details = z.prettifyError(validation.error)
+			console.error(details)
 			throw new InvokeError(
 				InvokeErrorTypes.INVALID_TOOL_ARGS,
-				'Tool arguments validation failed',
+				`Tool arguments validation failed for "${toolCallName}": ${details}`,
 				validation.error,
 				data
 			)

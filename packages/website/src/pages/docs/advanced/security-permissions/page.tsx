@@ -13,8 +13,8 @@ export default function SecurityPermissions() {
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
 				{isZh
-					? 'page-os 提供多种安全机制，确保 AI 操作在可控范围内进行。'
-					: 'page-os provides multiple security mechanisms to ensure AI operations stay within controlled boundaries.'}
+					? 'eb-agent 提供多种安全机制，确保 AI 操作在可控范围内进行。'
+					: 'eb-agent provides multiple security mechanisms to ensure AI operations stay within controlled boundaries.'}
 			</p>
 
 			<div className="space-y-6">

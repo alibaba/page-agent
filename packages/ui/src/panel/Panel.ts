@@ -5,6 +5,9 @@ import type { AgentActivity, PanelAgentAdapter } from './types'
 
 import styles from './Panel.module.css'
 
+/** Safety cap on attached image size (base64-encoded, sent inline to the LLM) */
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024
+
 /**
  * Panel configuration
  */
@@ -36,6 +39,9 @@ export class Panel {
 	#actionButton: HTMLElement
 	#inputSection: HTMLElement
 	#taskInput: HTMLTextAreaElement
+	#attachButton: HTMLElement
+	#imageFileInput: HTMLInputElement
+	#imagePreviewRow: HTMLElement
 
 	#agent: PanelAgentAdapter
 	#config: PanelConfig
@@ -44,6 +50,8 @@ export class Panel {
 	#userAnswerResolver: ((input: string) => void) | null = null
 	#isWaitingForUserAnswer: boolean = false
 	#isNumericInput: boolean = false
+	/** Data URL of the image attached to the next task, or null if none */
+	#pendingImage: string | null = null
 	#headerUpdateTimer: ReturnType<typeof setInterval> | null = null
 	#pendingHeaderText: string | null = null
 	#isAnimating = false
@@ -80,6 +88,9 @@ export class Panel {
 		this.#actionButton = this.#wrapper.querySelector(`.${styles.stopButton}`)!
 		this.#inputSection = this.#wrapper.querySelector(`.${styles.inputSectionWrapper}`)!
 		this.#taskInput = this.#wrapper.querySelector(`.${styles.taskInput}`)!
+		this.#attachButton = this.#wrapper.querySelector(`.${styles.attachButton}`)!
+		this.#imageFileInput = this.#wrapper.querySelector(`.${styles.imageFileInput}`)!
+		this.#imagePreviewRow = this.#wrapper.querySelector(`.${styles.imagePreviewRow}`)!
 
 		// Listen to agent events
 		this.#agent.addEventListener('statuschange', this.#onStatusChange)
@@ -185,6 +196,8 @@ export class Panel {
 			// Set `waiting for user answer` state
 			this.#isWaitingForUserAnswer = true
 			this.#userAnswerResolver = resolve
+			// An image attaches to the next task, not to a question answer — drop any stale pending one
+			this.#clearPendingImage()
 
 			// Expand history panel
 			if (!this.#isExpanded) {
@@ -325,6 +338,8 @@ export class Panel {
 				return this.#i18n.t('ui.tools.waiting', { seconds: a.seconds })
 			case 'ask_user':
 				return this.#i18n.t('ui.tools.askingUser')
+			case 'identify_image':
+				return this.#i18n.t('ui.tools.identifyingImage')
 			case 'done':
 				return this.#i18n.t('ui.tools.done')
 			default:
@@ -348,18 +363,85 @@ export class Panel {
 	 */
 	#submitTask() {
 		const input = this.#taskInput.value.trim()
-		if (!input) return
-
-		// Hide input area
-		this.#hideInputArea()
 
 		if (this.#isWaitingForUserAnswer) {
-			// Handle user input mode
+			// Answers always require typed text; an image never attaches to a question
+			if (!input) return
+			this.#hideInputArea()
 			this.#handleUserAnswer(input)
-		} else {
-			// Execute task via agent
-			this.#agent.execute(input)
+			return
 		}
+
+		// A task can be submitted with just an attached image and no typed text
+		if (!input && !this.#pendingImage) return
+
+		this.#hideInputArea()
+
+		const image = this.#pendingImage ?? undefined
+		this.#clearPendingImage()
+		const task = input || this.#i18n.t('ui.panel.defaultImageTask')
+		this.#agent.execute(task, image ? { image } : undefined)
+	}
+
+	/** Read an image file as a data URL and store it as the pending attachment */
+	#handleImageFileSelected(file: File): void {
+		if (!file.type.startsWith('image/')) return
+
+		if (file.size > MAX_IMAGE_BYTES) {
+			this.#flashInputPlaceholder(this.#i18n.t('ui.panel.imageTooLarge'))
+			return
+		}
+
+		const reader = new FileReader()
+		reader.onload = () => {
+			this.#pendingImage = reader.result as string
+			this.#renderImagePreview()
+		}
+		reader.readAsDataURL(file)
+	}
+
+	/** Briefly replace the task input placeholder with a message (e.g. a validation error) */
+	#flashInputPlaceholder(message: string): void {
+		const original = this.#taskInput.placeholder
+		this.#taskInput.placeholder = message
+		setTimeout(() => {
+			if (this.#taskInput.placeholder === message) {
+				this.#taskInput.placeholder = original
+			}
+		}, 3000)
+	}
+
+	/** Render (or hide) the attached-image preview chip above the task input */
+	#renderImagePreview(): void {
+		if (!this.#pendingImage) {
+			this.#imagePreviewRow.classList.add(styles.hidden)
+			this.#imagePreviewRow.innerHTML = ''
+			return
+		}
+
+		this.#imagePreviewRow.classList.remove(styles.hidden)
+		this.#imagePreviewRow.innerHTML = `
+			<div class="${styles.imageChip}">
+				<img src="${this.#pendingImage}" class="${styles.imageChipThumb}" alt="" />
+				<span>${this.#i18n.t('ui.panel.imageAttached')}</span>
+				<button type="button" class="${styles.imageChipRemove}" title="${this.#i18n.t('ui.panel.removeImage')}">
+					${UI_ICONS.close}
+				</button>
+			</div>
+		`
+		this.#imagePreviewRow
+			.querySelector(`.${styles.imageChipRemove}`)
+			?.addEventListener('click', (e) => {
+				e.stopPropagation()
+				this.#clearPendingImage()
+			})
+	}
+
+	/** Clear the pending image attachment and its preview */
+	#clearPendingImage(): void {
+		this.#pendingImage = null
+		this.#imageFileInput.value = ''
+		this.#renderImagePreview()
 	}
 
 	/**
@@ -371,6 +453,8 @@ export class Panel {
 		// Reset state
 		this.#isWaitingForUserAnswer = false
 		this.#setNumericMode(false)
+		// Answering a question never attaches an image — drop anything selected during Q&A
+		this.#clearPendingImage()
 
 		// Call resolver to return user input
 		if (this.#userAnswerResolver) {
@@ -449,10 +533,10 @@ export class Panel {
 	#createWrapper(): HTMLElement {
 		const taskInputMaxLength = 1000
 		const wrapper = document.createElement('div')
-		wrapper.id = 'page-os-runtime_agent-panel'
+		wrapper.id = 'eb-agent-runtime_agent-panel'
 		wrapper.className = styles.wrapper
 		wrapper.setAttribute('data-browser-use-ignore', 'true')
-		wrapper.setAttribute('data-page-os-ignore', 'true')
+		wrapper.setAttribute('data-eb-agent-ignore', 'true')
 
 		wrapper.innerHTML = `
 			<div class="${styles.background}"></div>
@@ -476,7 +560,16 @@ export class Panel {
 				</div>
 			</div>
 			<div class="${styles.inputSectionWrapper} ${styles.hidden}">
+				<div class="${styles.imagePreviewRow} ${styles.hidden}"></div>
 				<div class="${styles.inputSection}">
+					<input type="file" accept="image/*" class="${styles.imageFileInput}" />
+					<button
+						type="button"
+						class="${styles.attachButton}"
+						title="${this.#i18n.t('ui.panel.attachImage')}"
+					>
+						${UI_ICONS.attachImage}
+					</button>
 					<textarea
 						class="${styles.taskInput}"
 						rows="1"
@@ -528,6 +621,32 @@ export class Panel {
 
 		// Auto-grow the textarea as the user types (up to the CSS max-height)
 		this.#taskInput.addEventListener('input', () => this.#autoGrowInput())
+
+		// Attach-image button opens the hidden file picker
+		this.#attachButton.addEventListener('click', (e) => {
+			e.stopPropagation()
+			this.#imageFileInput.click()
+		})
+
+		// Read the selected image file into the pending attachment
+		this.#imageFileInput.addEventListener('change', () => {
+			const file = this.#imageFileInput.files?.[0]
+			if (file) this.#handleImageFileSelected(file)
+		})
+
+		// Paste an image from the clipboard directly into the task input
+		this.#taskInput.addEventListener('paste', (e) => {
+			const items = e.clipboardData?.items
+			if (!items) return
+			for (const item of items) {
+				if (item.type.startsWith('image/')) {
+					e.preventDefault()
+					const file = item.getAsFile()
+					if (file) this.#handleImageFileSelected(file)
+					break
+				}
+			}
+		})
 
 		// Prevent input area click event bubbling
 		this.#inputSection.addEventListener('click', (e) => {
@@ -715,9 +834,14 @@ export class Panel {
 				cards.push(...this.#createActionCards(action, meta))
 			}
 		} else if (event.type === 'observation') {
-			cards.push(
-				createCard({ icon: 'eye', content: event.content || '', meta, type: 'observation' })
-			)
+			// Internal guardrail/self-correction messages (see ObservationEvent.internal) are
+			// addressed to the model, not the user — they still reach the LLM via <agent_history>,
+			// but shouldn't render as a user-facing status card here.
+			if (!event.internal) {
+				cards.push(
+					createCard({ icon: 'eye', content: event.content || '', meta, type: 'observation' })
+				)
+			}
 		} else if (event.type === 'user_takeover') {
 			cards.push(createCard({ icon: 'user', content: 'User takeover', meta, type: 'input' }))
 		} else if (event.type === 'retry') {

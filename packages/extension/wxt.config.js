@@ -37,7 +37,7 @@ export default defineConfig({
 		},
 	}),
 	zip: {
-		artifactTemplate: 'page-os-ext-{{version}}-{{browser}}.zip',
+		artifactTemplate: 'eb-agent-ext-{{version}}-{{browser}}.zip',
 	},
 	manifest: {
 		key: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqbzT0iTYeYlnCvDJIGDnGU8oarJgZILDzSfLi/ufuSxXEPDKuMyD892GhvrMCZNVHS11Sh6NYUOc/PcUOhtaR2urHtcNkrpSJNV10zUamY7fxBdVEkOucfyLu8INVy+teis62MoRWYPaUPkfZUjrLGW8MsZ9aFzARfu9GGDEp2EAYsWDN6w6vyz9LJ82pm542EWnVT4MjmDPgvYFCWGBtaU/dfHD+GAX6URJFapsCvryVURKJ+76c/GO9/I3EX1IBfbY6dec78bLCMvVxiTmiv36KyGPwX1OpakW8IiCpXWdbAxjm+plbYlp5t5zTyyoE3sOSFeXsBH0Kg27o8GcvQIDAQAB',
@@ -48,14 +48,16 @@ export default defineConfig({
 		permissions: ['tabs', 'tabGroups', 'sidePanel', 'storage'],
 		host_permissions: ['<all_urls>'],
 		icons: {
-			64: 'assets/page-os-64.png',
+			64: 'assets/eb-agent-64.png',
 		},
 		action: {
 			default_title: '__MSG_extActionTitle__',
 		},
 		web_accessible_resources: [
 			{
-				resources: ['main-world.js'],
+				// `webmcp-world.js` reaches `document.modelContext`, which is only
+				// visible from the page's MAIN world.
+				resources: ['main-world.js', 'webmcp-world.js'],
 				matches: ['*://*/*'],
 			},
 		],

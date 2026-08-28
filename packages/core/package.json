@@ -1,25 +1,25 @@
 {
-    "name": "@page-os/core",
+    "name": "@eb-agent/core",
     "private": false,
     "version": "1.11.0",
     "type": "module",
-    "main": "./src/PageOSCore.ts",
-    "types": "./src/PageOSCore.ts",
+    "main": "./src/EBAgentCore.ts",
+    "types": "./src/EBAgentCore.ts",
     "exports": {
         ".": {
-            "types": "./src/PageOSCore.ts",
-            "default": "./src/PageOSCore.ts"
+            "types": "./src/EBAgentCore.ts",
+            "default": "./src/EBAgentCore.ts"
         }
     },
     "publishConfig": {
-        "main": "./dist/esm/page-os-core.js",
-        "module": "./dist/esm/page-os-core.js",
-        "types": "./dist/esm/PageOSCore.d.ts",
+        "main": "./dist/esm/eb-agent-core.js",
+        "module": "./dist/esm/eb-agent-core.js",
+        "types": "./dist/esm/EBAgentCore.d.ts",
         "exports": {
             ".": {
-                "types": "./dist/esm/PageOSCore.d.ts",
-                "import": "./dist/esm/page-os-core.js",
-                "default": "./dist/esm/page-os-core.js"
+                "types": "./dist/esm/EBAgentCore.d.ts",
+                "import": "./dist/esm/eb-agent-core.js",
+                "default": "./dist/esm/eb-agent-core.js"
             }
         }
     },
@@ -55,8 +55,10 @@
     },
     "dependencies": {
         "chalk": "^5.6.2",
-        "@page-os/llms": "1.11.0",
-        "@page-os/page-controller": "1.11.0"
+        "jsonrepair": "^3.15.0",
+        "@eb-agent/llms": "1.11.0",
+        "@eb-agent/page-controller": "1.11.0",
+        "@eb-agent/capabilities": "1.11.0"
     },
     "peerDependencies": {
         "zod": "^3.25.0 || ^4.0.0"

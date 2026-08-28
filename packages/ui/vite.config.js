@@ -8,7 +8,7 @@ import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-console.log(chalk.cyan(`📦 Building @page-os/ui`))
+console.log(chalk.cyan(`📦 Building @eb-agent/ui`))
 
 export default defineConfig({
 	clearScreen: false,
@@ -30,8 +30,8 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/index.ts'),
-			name: 'PageOSUI',
-			fileName: 'page-os-ui',
+			name: 'EBAgentUI',
+			fileName: 'eb-agent-ui',
 			formats: ['es'],
 		},
 		outDir: resolve(__dirname, 'dist', 'lib'),

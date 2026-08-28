@@ -2,7 +2,7 @@ import { FoldVertical, Plug, PlugZap, Square, UnfoldVertical, Unplug } from 'luc
 import { useEffect, useRef, useState } from 'react'
 
 import { useAgent } from '@/agent/useAgent'
-import { ActivityCard, EventCard } from '@/components/cards'
+import { TaskProgress } from '@/components/TaskProgress'
 import { Logo, MotionOverlay, StatusDot } from '@/components/misc'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -40,7 +40,7 @@ export default function App() {
 					className="flex items-center gap-2 px-5 h-12 border-b hover:bg-muted/30 transition-colors"
 				>
 					<Logo className="size-5" />
-					<span className="text-sm font-semibold tracking-tight">PageOS Hub</span>
+					<span className="text-sm font-semibold tracking-tight">EBAgent Hub</span>
 					<span className="text-[9px] font-medium uppercase tracking-wider text-amber-600 bg-amber-500/10 border border-amber-500/30 rounded px-1.5 py-0.5">
 						Beta
 					</span>
@@ -49,7 +49,7 @@ export default function App() {
 				<div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
 					<div className="text-xs text-muted-foreground leading-relaxed space-y-2">
 						<p>
-							PageOS Hub lets local apps (e.g. MCP servers) control the PageOS extension via
+							EBAgent Hub lets local apps (e.g. MCP servers) control the EBAgent extension via
 							WebSocket.
 						</p>
 						<p>
@@ -81,7 +81,7 @@ export default function App() {
 							rel="noopener noreferrer"
 							className="underline hover:text-foreground"
 						>
-							@Simon
+							@EqualByte
 						</a>
 					</span>
 				</div>
@@ -132,11 +132,7 @@ export default function App() {
 						</div>
 					)}
 
-					{history.map((event, index) => (
-						<EventCard key={index} event={event} />
-					))}
-
-					{activity && <ActivityCard activity={activity} />}
+					<TaskProgress history={history} activity={activity} isRunning={isRunning} />
 				</div>
 			</main>
 		</div>

@@ -1,32 +1,32 @@
 /**
  * IIFE demo entry - auto-initializes with built-in demo API for testing
  */
-import { PageOS, type PageOSConfig } from './PageOS'
+import { EBAgent, type EBAgentConfig } from './EBAgent'
 
 const currentScript = document.currentScript as HTMLScriptElement | null
 const currentScriptURL = currentScript?.src ? new URL(currentScript.src) : null
 const autoInit = currentScriptURL?.searchParams.get('autoInit') !== 'false'
 
 // Clean up existing instances to prevent multiple injections from bookmarklet
-if (autoInit && window.pageOS) {
-	window.pageOS.dispose()
+if (autoInit && window.ebAgent) {
+	window.ebAgent.dispose()
 }
 
 // Mount to global window object
-window.PageOS = PageOS
+window.EBAgent = EBAgent
 
-console.log('🚀 page-os.js loaded!')
+console.log('🚀 eb-agent.js loaded!')
 
 // TODO: point these at the EqualByte LLM gateway (see PRODUCTIZATION-TASKS.md Phase 2/3).
 // Generic OpenAI-compatible placeholders — a real key/endpoint must be supplied via config.
-const DEMO_MODEL = 'deepseek-chat'
-const DEMO_BASE_URL = 'https://api.deepseek.com'
+const DEMO_MODEL = 'claude-haiku-4-5'
+const DEMO_BASE_URL = 'https://api.anthropic.com/v1'
 const DEMO_API_KEY = ''
 
 // in case document.x is not ready yet
 if (autoInit) {
 	setTimeout(() => {
-		let config: PageOSConfig
+		let config: EBAgentConfig
 		let showPanel = true
 
 		if (currentScriptURL) {
@@ -38,20 +38,27 @@ if (autoInit) {
 			showPanel = ((url.searchParams.get('showPanel') as 'true' | 'false') || 'true') === 'true'
 			config = { model, baseURL, apiKey, language }
 		} else {
-			console.log('🚀 page-os.js no current script detected, using default demo config')
+			console.log('🚀 eb-agent.js no current script detected, using default demo config')
+			const baseURL = import.meta.env.LLM_BASE_URL ? import.meta.env.LLM_BASE_URL : DEMO_BASE_URL
+			const apiKey = import.meta.env.LLM_API_KEY ? import.meta.env.LLM_API_KEY : DEMO_API_KEY
 			config = {
 				model: import.meta.env.LLM_MODEL_NAME ? import.meta.env.LLM_MODEL_NAME : DEMO_MODEL,
-				baseURL: import.meta.env.LLM_BASE_URL ? import.meta.env.LLM_BASE_URL : DEMO_BASE_URL,
-				apiKey: import.meta.env.LLM_API_KEY ? import.meta.env.LLM_API_KEY : DEMO_API_KEY,
+				baseURL,
+				apiKey,
+				// identify_image needs a vision-capable model; the main automation model
+				// above may not support image input. Reuses baseURL/apiKey unless unset.
+				visionModel: import.meta.env.LLM_VISION_MODEL_NAME
+					? { model: import.meta.env.LLM_VISION_MODEL_NAME, baseURL, apiKey }
+					: undefined,
 			}
 		}
 
 		// Create agent
-		window.pageOS = new PageOS(config)
+		window.ebAgent = new EBAgent(config)
 		if (showPanel) {
-			window.pageOS.panel.show()
+			window.ebAgent.panel.show()
 		}
 
-		console.log('🚀 page-os.js initialized with config:', window.pageOS.config)
+		console.log('🚀 eb-agent.js initialized with config:', window.ebAgent.config)
 	})
 }

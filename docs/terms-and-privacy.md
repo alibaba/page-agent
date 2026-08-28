@@ -2,7 +2,7 @@
 
 **Last updated:** March 2026
 
-"We" in this document refers to the maintainers of the open-source PageOS project (https://github.com/EqualByte/agentic-page). "The software" refers to PageOS (the JavaScript library) and PageOS Ext (the browser extension). This document covers the software itself and the testing API we provide — **not** any third-party product or service built with it.
+"We" in this document refers to the maintainers of the open-source EBAgent project (https://github.com/EqualByte/agentic-page). "The software" refers to EBAgent (the JavaScript library) and EBAgent Ext (the browser extension). This document covers the software itself and the testing API we provide — **not** any third-party product or service built with it.
 
 ---
 
@@ -42,7 +42,7 @@ This free testing API is provided **strictly for technical evaluation and R&D pu
 
 ---
 
-## 3. Browser Extension (PageOS Ext)
+## 3. Browser Extension (EBAgent Ext)
 
 ### Data Processing
 

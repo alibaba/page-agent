@@ -20,6 +20,7 @@ export const InvokeErrorTypes = {
 	AUTH_ERROR: 'auth_error', // Authentication failed
 	CONTEXT_LENGTH: 'context_length', // Prompt too long
 	CONTENT_FILTER: 'content_filter', // Content filtered
+	CLIENT_ERROR: 'client_error', // 4xx other than auth/rate-limit — malformed request, will not succeed on retry
 } as const
 
 type InvokeErrorType = (typeof InvokeErrorTypes)[keyof typeof InvokeErrorTypes]

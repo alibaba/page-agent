@@ -18,7 +18,7 @@ export type AgentActivity =
 
 /**
  * Minimal interface that Panel expects from an agent.
- * Panel does not depend on PageOS directly - it only requires this interface.
+ * Panel does not depend on EBAgent directly - it only requires this interface.
  * This enables decoupling and allows any agent implementation to work with Panel.
  *
  * Events:
@@ -52,6 +52,8 @@ export interface PanelAgentAdapter extends EventTarget {
 		}
 		/** For 'observation' type */
 		content?: string
+		/** For 'observation' type: internal guardrail messages addressed to the model, not the user */
+		internal?: boolean
 		/** For 'retry' type */
 		attempt?: number
 		maxAttempts?: number
@@ -75,8 +77,8 @@ export interface PanelAgentAdapter extends EventTarget {
 		options?: { signal: AbortSignal; choices?: string[]; inputType?: 'text' | 'number' }
 	) => Promise<string>
 
-	/** Execute a task */
-	execute(task: string): Promise<unknown>
+	/** Execute a task, optionally with an attached image (data URL) the agent can analyze via `identify_image` */
+	execute(task: string, options?: { image?: string }): Promise<unknown>
 
 	/** Stop the current task (agent remains reusable) */
 	stop(): Promise<void>

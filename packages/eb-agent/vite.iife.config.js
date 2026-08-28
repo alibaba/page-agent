@@ -23,8 +23,8 @@ export default defineConfig(() => ({
 	build: {
 		lib: {
 			entry: resolve(__dirname, 'src/demo.ts'),
-			name: 'PageOS',
-			fileName: () => `page-os.demo.js`,
+			name: 'EBAgent',
+			fileName: () => `eb-agent.demo.js`,
 			formats: ['iife'],
 		},
 		outDir: resolve(__dirname, 'dist', 'iife'),
@@ -33,7 +33,7 @@ export default defineConfig(() => ({
 		rollupOptions: {
 			// output: {
 			// 	// force use .js as extension
-			// 	entryFileNames: 'page-os.js',
+			// 	entryFileNames: 'eb-agent.js',
 			// },
 			onwarn: function (message, handler) {
 				if (message.code === 'EVAL') return
@@ -50,5 +50,8 @@ export default defineConfig(() => ({
 			process.env.INLINE_DEMO_API_KEY === 'true' ? process.env.LLM_API_KEY : undefined
 		),
 		'import.meta.env.LLM_BASE_URL': JSON.stringify(process.env.LLM_BASE_URL),
+		// Vision-capable model used only by the identify_image tool. Falls back to the
+		// main model/baseURL/apiKey above when unset (see demo.ts).
+		'import.meta.env.LLM_VISION_MODEL_NAME': JSON.stringify(process.env.LLM_VISION_MODEL_NAME),
 	},
 }))

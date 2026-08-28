@@ -41,15 +41,15 @@ export default function ScenariosSection() {
 										<span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80"></span>
 									</div>
 									<div>
-										<span className="text-purple-400">import</span> {'{ PageOS }'}{' '}
+										<span className="text-purple-400">import</span> {'{ EBAgent }'}{' '}
 										<span className="text-purple-400">from</span>{' '}
-										<span className="text-emerald-400">&apos;page-os&apos;</span>
+										<span className="text-emerald-400">&apos;eb-agent&apos;</span>
 									</div>
 									<div className="mt-2">
 										<span className="text-purple-400">const</span>{' '}
 										<span className="text-blue-300">copilot</span> ={' '}
 										<span className="text-purple-400">new</span>{' '}
-										<span className="text-yellow-300">PageOS</span>
+										<span className="text-yellow-300">EBAgent</span>
 										{'({'}
 									</div>
 									<div className="pl-4">

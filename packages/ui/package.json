@@ -1,5 +1,5 @@
 {
-    "name": "@page-os/ui",
+    "name": "@eb-agent/ui",
     "version": "1.11.0",
     "type": "module",
     "main": "./src/index.ts",
@@ -11,23 +11,23 @@
         }
     },
     "publishConfig": {
-        "main": "./dist/lib/page-os-ui.js",
-        "module": "./dist/lib/page-os-ui.js",
+        "main": "./dist/lib/eb-agent-ui.js",
+        "module": "./dist/lib/eb-agent-ui.js",
         "types": "./dist/lib/index.d.ts",
         "exports": {
             ".": {
                 "types": "./dist/lib/index.d.ts",
-                "import": "./dist/lib/page-os-ui.js",
-                "default": "./dist/lib/page-os-ui.js"
+                "import": "./dist/lib/eb-agent-ui.js",
+                "default": "./dist/lib/eb-agent-ui.js"
             }
         }
     },
     "files": [
         "dist/"
     ],
-    "description": "UI components for page-os - Panel and i18n",
+    "description": "UI components for eb-agent - Panel and i18n",
     "keywords": [
-        "page-os",
+        "eb-agent",
         "ui",
         "panel",
         "i18n"

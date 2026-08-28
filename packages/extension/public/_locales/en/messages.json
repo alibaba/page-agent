@@ -1,11 +1,11 @@
 {
     "extName": {
-        "message": "PageOS Ext"
+        "message": "EBAgent Ext"
     },
     "extDescription": {
         "message": "AI-powered browser automation assistant. Control web pages with natural language."
     },
     "extActionTitle": {
-        "message": "Open PageOS"
+        "message": "Open EBAgent"
     }
 }

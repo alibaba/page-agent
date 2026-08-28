@@ -1,7 +1,14 @@
 /**
  * content script for RemotePageController
  */
-import { PageController } from '@page-os/page-controller'
+import { PageController } from '@eb-agent/page-controller'
+
+import {
+	consumeToolChange,
+	executeWebMCPTool,
+	getWebMCPTools,
+	isWebMCPSupported,
+} from './webmcpBridge.content'
 
 export function initPageController() {
 	let pageController: PageController | null = null
@@ -81,6 +88,7 @@ export function initPageController() {
 			case 'select_option':
 			case 'scroll':
 			case 'scroll_horizontally':
+			case 'send_keys':
 			case 'execute_javascript':
 				pc[methodName](...(payload || []))
 					.then((result: any) => sendResponse(result))
@@ -90,6 +98,30 @@ export function initPageController() {
 							error: error instanceof Error ? error.message : String(error),
 						})
 					)
+				break
+
+			// WebMCP lives in the page's MAIN world, which this isolated content
+			// script cannot reach directly — these delegate to the injected bridge.
+			// Kept out of the PageController group above: they are not DOM methods.
+
+			case 'webmcp_is_supported':
+				isWebMCPSupported()
+					.then((result) => sendResponse({ ...result, toolsChanged: consumeToolChange() }))
+					.catch((error: unknown) =>
+						sendResponse({ supported: false, canDiscover: false, error: String(error) })
+					)
+				break
+
+			case 'webmcp_get_tools':
+				getWebMCPTools()
+					.then((tools) => sendResponse(tools))
+					.catch(() => sendResponse([]))
+				break
+
+			case 'webmcp_execute_tool':
+				executeWebMCPTool(payload?.[0], payload?.[1])
+					.then((result) => sendResponse({ success: true, result }))
+					.catch((error: unknown) => sendResponse({ success: false, error: String(error) }))
 				break
 
 			default:
@@ -126,6 +158,8 @@ function getMethodName(action: string): string {
 			return 'scroll' as const
 		case 'scroll_horizontally':
 			return 'scrollHorizontally' as const
+		case 'send_keys':
+			return 'sendKeys' as const
 		case 'execute_javascript':
 			return 'executeJavascript' as const
 

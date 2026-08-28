@@ -1,31 +1,63 @@
-import type { LLMConfig } from '@page-os/llms'
+import type { LLMConfig } from '@eb-agent/llms'
 
 // @note circular dependency but okay
-import type { PageOSCore } from './PageOSCore'
-import type { PageOSTool } from './tools'
+import type { EBAgentCore } from './EBAgentCore'
+import type { CapabilityConfig } from './capabilities/CapabilityManager'
+import type { EBAgentTool } from './tools'
 
 /** Supported UI languages */
 export type SupportedLanguage = 'en-US' | 'zh-CN'
+
+/**
+ * Options for a single `execute()` call.
+ */
+export interface ExecuteOptions {
+	/**
+	 * An image attached to the task (data URL or publicly reachable http(s) URL),
+	 * e.g. a photo the user uploaded. When set, the `identify_image` tool becomes
+	 * available so the agent can inspect it with a vision-capable model before acting.
+	 */
+	image?: string
+}
+
+/**
+ * Structured result from analyzing an attached image via a vision-capable model.
+ * @see EBAgentCore.identifyImage
+ */
+export interface IdentifyImageResult {
+	/** General category, e.g. "shoes", "medicine", "gemstone", "clothing" */
+	category: string
+	/** Best-guess specific name, e.g. "Nike Air Max 90" */
+	name: string
+	/** Concise visual description including color, material, notable features */
+	description: string
+	/** Additional key-value attributes, e.g. { color: "red", brand: "Nike" } */
+	attributes?: Record<string, string>
+}
 
 export interface AgentConfig extends LLMConfig {
 	language?: SupportedLanguage
 
 	/**
 	 * Maximum number of steps the agent can take per task.
-	 * @default 40
+	 * @remarks Tasks that repeat a multi-step workflow across several records (e.g. "for each
+	 * of the top 5 leads: update status, add a note, convert to deal...") need roughly
+	 * (steps per record × number of records) raw actions, which is easy to underestimate —
+	 * size this generously for that kind of batch task.
+	 * @default 60
 	 */
 	maxSteps?: number
 
 	/**
-	 * Custom tools to extend PageOS capabilities
+	 * Custom tools to extend EBAgent capabilities
 	 * @experimental
 	 * @note You can also override or remove internal tools by using the same name.
-	 * @see PageOSTool
+	 * @see EBAgentTool
 	 *
 	 * @example
 	 * // override internal tool
 	 * import { z } from 'zod/v4'
-	 * import { tool } from 'page-os'
+	 * import { tool } from 'eb-agent'
 	 * const customTools = {
 	 * ask_user: tool({
 	 * 	description:
@@ -33,7 +65,7 @@ export interface AgentConfig extends LLMConfig {
 	 * 	inputSchema: z.object({
 	 * 		question: z.string(),
 	 * 	}),
-	 * 	execute: async function (this: PageOS, input) {
+	 * 	execute: async function (this: EBAgent, input) {
 	 * 		const answer = await do_some_thing(input.question)
 	 * 		return "✅ Received user answer: " + answer
 	 * 	},
@@ -46,7 +78,26 @@ export interface AgentConfig extends LLMConfig {
 	 * 	ask_user: null // never ask user questions
 	 * }
 	 */
-	customTools?: Record<string, PageOSTool | null>
+	customTools?: Record<string, EBAgentTool | null>
+
+	/**
+	 * Capability layer: discovery of WebMCP tools the page declares, generation of
+	 * business actions from the page's own UI, risk policy, human approval and audit.
+	 *
+	 * @remarks
+	 * Every part of it is optional and additive. Omitting this config leaves the agent
+	 * behaving exactly as it did before capabilities existed — DOM automation only —
+	 * except that tools a page declares natively are discovered and preferred.
+	 *
+	 * @example
+	 * capabilities: {
+	 *   generateFromDom: true,
+	 *   policy: { autoApproveReversible: true },
+	 *   onApproval: async ({ summary }) => confirm(summary),
+	 *   onAudit: (event) => console.log(event),
+	 * }
+	 */
+	capabilities?: CapabilityConfig
 
 	/**
 	 * Instructions to guide the agent's behavior
@@ -76,42 +127,42 @@ export interface AgentConfig extends LLMConfig {
 	/**
 	 * Called before each step execution.
 	 * @experimental
-	 * @param agent - The PageOSCore instance
+	 * @param agent - The EBAgentCore instance
 	 * @param stepCount - Current step number (0-indexed)
 	 */
-	onBeforeStep?: (agent: PageOSCore, stepCount: number) => Promise<void> | void
+	onBeforeStep?: (agent: EBAgentCore, stepCount: number) => Promise<void> | void
 
 	/**
 	 * Called after each step execution.
 	 * @experimental
-	 * @param agent - The PageOSCore instance
+	 * @param agent - The EBAgentCore instance
 	 * @param history - Current history of events
 	 */
-	onAfterStep?: (agent: PageOSCore, history: HistoricalEvent[]) => Promise<void> | void
+	onAfterStep?: (agent: EBAgentCore, history: HistoricalEvent[]) => Promise<void> | void
 
 	/**
 	 * Called before task execution starts.
 	 * @experimental
-	 * @param agent - The PageOSCore instance
+	 * @param agent - The EBAgentCore instance
 	 */
-	onBeforeTask?: (agent: PageOSCore) => Promise<void> | void
+	onBeforeTask?: (agent: EBAgentCore) => Promise<void> | void
 
 	/**
 	 * Called after task execution completes (success or failure).
 	 * @experimental
-	 * @param agent - The PageOSCore instance
+	 * @param agent - The EBAgentCore instance
 	 * @param result - The execution result
 	 */
-	onAfterTask?: (agent: PageOSCore, result: ExecutionResult) => Promise<void> | void
+	onAfterTask?: (agent: EBAgentCore, result: ExecutionResult) => Promise<void> | void
 
 	/**
 	 * Called when the agent is disposed.
 	 * @experimental
 	 * @note This hook can block the disposal process if it's async.
-	 * @param agent - The PageOSCore instance
+	 * @param agent - The EBAgentCore instance
 	 * @param reason - Optional reason for disposal
 	 */
-	onDispose?: (agent: PageOSCore, reason?: string) => void
+	onDispose?: (agent: EBAgentCore, reason?: string) => void
 
 	// page behavior hooks
 
@@ -158,6 +209,20 @@ export interface AgentConfig extends LLMConfig {
 	 * @default 0.4
 	 */
 	stepDelay?: number
+
+	/**
+	 * Separate model configuration for the `identify_image` tool's vision call.
+	 * Many fast/cheap text models (the usual choice for the browsing loop) do not
+	 * accept image input at all. Set this to a vision-capable model (e.g. `gpt-4o`)
+	 * to power `identify_image` without changing the model used for the rest of the task.
+	 * `baseURL`/`apiKey` fall back to the top-level config when omitted, so a single
+	 * OpenAI-compatible gateway serving multiple models only needs `model` overridden here.
+	 */
+	visionModel?: {
+		model: string
+		baseURL?: string
+		apiKey?: string
+	}
 }
 
 /**
@@ -223,6 +288,13 @@ export interface AgentStepEvent {
 export interface ObservationEvent {
 	type: 'observation'
 	content: string
+	/**
+	 * Internal guardrail/self-correction messages (e.g. "Blocked: `done` was called too early") are
+	 * addressed to the model, not the user — they still need to reach the LLM via <agent_history>,
+	 * but UIs should not render them as user-facing status updates the way they do for e.g.
+	 * "Page navigated to →" or step-remaining warnings. Defaults to false/absent for those.
+	 */
+	internal?: boolean
 }
 
 /**

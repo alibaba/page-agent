@@ -68,8 +68,8 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 		let interval: NodeJS.Timeout | null = null
 
 		const fetchToken = async () => {
-			const result = await chrome.storage.local.get('PageOSExtUserAuthToken')
-			const token = result.PageOSExtUserAuthToken
+			const result = await chrome.storage.local.get('EBAgentExtUserAuthToken')
+			const token = result.EBAgentExtUserAuthToken
 			if (typeof token === 'string' && token) {
 				setUserAuthToken(token)
 				if (interval) {
@@ -184,7 +184,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 				rel="noopener noreferrer"
 				className="flex items-center justify-between p-3 rounded-md border bg-muted/50 text-xs font-medium text-muted-foreground hover:text-foreground hover:border-foreground/20 transition-colors"
 			>
-				Manage PageOS Hub
+				Manage EBAgent Hub
 				<ExternalLink className="size-3" />
 			</a>
 
@@ -287,7 +287,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						<Input
 							id="max-steps"
 							type="number"
-							placeholder="40"
+							placeholder="60"
 							min={1}
 							max={200}
 							value={maxSteps ?? ''}
@@ -393,7 +393,7 @@ export function ConfigPanel({ config, onSave, onClose }: ConfigPanelProps) {
 						rel="noopener noreferrer"
 						className="underline hover:text-foreground"
 					>
-						@Simon
+						@EqualByte
 					</a>
 				</span>
 			</div>

@@ -50,14 +50,14 @@ export default function OneMoreThingSection() {
 								<p className="mx-auto mb-10 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
 									{'* '}
 									{isZh
-										? 'PageOS 本身无需任何扩展即可工作，扩展是额外的能力增强。'
-										: 'PageOS works without any extension — this is a power-up, not a dependency.'}
+										? 'EBAgent 本身无需任何扩展即可工作，扩展是额外的能力增强。'
+										: 'EBAgent works without any extension — this is a power-up, not a dependency.'}
 								</p>
 							</BlurFade>
 
 							<div className="mb-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
 								<a
-									href="https://chromewebstore.google.com/detail/page-os-ext/akldabonmimlicnjlflnapfeklbfemhj"
+									href="https://chromewebstore.google.com/detail/eb-agent-ext/akldabonmimlicnjlflnapfeklbfemhj"
 									target="_blank"
 									rel="noopener noreferrer"
 									className="group inline-flex items-center gap-3 rounded-2xl bg-linear-to-r from-indigo-600 to-fuchsia-600 px-8 py-4 font-medium text-white shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:scale-105 hover:shadow-xl"

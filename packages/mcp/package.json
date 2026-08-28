@@ -1,17 +1,17 @@
 {
-    "name": "@page-os/mcp",
+    "name": "@eb-agent/mcp",
     "private": false,
     "version": "1.11.0",
     "type": "module",
     "bin": {
-        "page-os-mcp": "src/index.js"
+        "eb-agent-mcp": "src/index.js"
     },
     "files": [
         "src/"
     ],
-    "description": "MCP server for controlling the browser via PageOS extension",
+    "description": "MCP server for controlling the browser via EBAgent extension",
     "keywords": [
-        "page-os",
+        "eb-agent",
         "mcp",
         "browser-automation",
         "chrome-extension"

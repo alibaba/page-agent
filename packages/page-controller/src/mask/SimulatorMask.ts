@@ -23,10 +23,10 @@ export class SimulatorMask extends EventTarget {
 	constructor() {
 		super()
 
-		this.wrapper.id = 'page-os-runtime_simulator-mask'
+		this.wrapper.id = 'eb-agent-runtime_simulator-mask'
 		this.wrapper.className = styles.wrapper
 		this.wrapper.setAttribute('data-browser-use-ignore', 'true')
-		this.wrapper.setAttribute('data-page-os-ignore', 'true')
+		this.wrapper.setAttribute('data-eb-agent-ignore', 'true')
 
 		try {
 			const motion = new Motion({
@@ -96,16 +96,16 @@ export class SimulatorMask extends EventTarget {
 			this.wrapper.style.pointerEvents = 'auto'
 		}
 
-		window.addEventListener('PageOS::MovePointerTo', movePointerToListener)
-		window.addEventListener('PageOS::ClickPointer', clickPointerListener)
-		window.addEventListener('PageOS::EnablePassThrough', enablePassThroughListener)
-		window.addEventListener('PageOS::DisablePassThrough', disablePassThroughListener)
+		window.addEventListener('EBAgent::MovePointerTo', movePointerToListener)
+		window.addEventListener('EBAgent::ClickPointer', clickPointerListener)
+		window.addEventListener('EBAgent::EnablePassThrough', enablePassThroughListener)
+		window.addEventListener('EBAgent::DisablePassThrough', disablePassThroughListener)
 
 		this.addEventListener('dispose', () => {
-			window.removeEventListener('PageOS::MovePointerTo', movePointerToListener)
-			window.removeEventListener('PageOS::ClickPointer', clickPointerListener)
-			window.removeEventListener('PageOS::EnablePassThrough', enablePassThroughListener)
-			window.removeEventListener('PageOS::DisablePassThrough', disablePassThroughListener)
+			window.removeEventListener('EBAgent::MovePointerTo', movePointerToListener)
+			window.removeEventListener('EBAgent::ClickPointer', clickPointerListener)
+			window.removeEventListener('EBAgent::EnablePassThrough', enablePassThroughListener)
+			window.removeEventListener('EBAgent::DisablePassThrough', disablePassThroughListener)
 		})
 	}
 

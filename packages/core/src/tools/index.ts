@@ -1,10 +1,10 @@
 /**
- * Internal tools for PageOS.
+ * Internal tools for EBAgent.
  * @note Adapted from browser-use
  */
 import * as z from 'zod/v4'
 
-import type { PageOSCore } from '../PageOSCore'
+import type { EBAgentCore } from '../EBAgentCore'
 import { waitFor } from '../utils'
 
 /**
@@ -16,35 +16,39 @@ export interface ToolContext {
 }
 
 /**
- * Internal tool definition that has access to PageOS `this` context
+ * Internal tool definition that has access to EBAgent `this` context
  */
-export interface PageOSTool<TParams = any> {
+export interface EBAgentTool<TParams = any> {
 	// name: string
 	description: string
 	inputSchema: z.ZodType<TParams>
-	execute: (this: PageOSCore, args: TParams, ctx: ToolContext) => Promise<string>
+	execute: (this: EBAgentCore, args: TParams, ctx: ToolContext) => Promise<string>
 }
 
-export function tool<TParams>(options: PageOSTool<TParams>): PageOSTool<TParams> {
+export function tool<TParams>(options: EBAgentTool<TParams>): EBAgentTool<TParams> {
 	return options
 }
 
 /**
- * Internal tools for PageOS.
+ * Internal tools for EBAgent.
  * Note: Using any to allow different parameter types for each tool
  */
-export const tools = new Map<string, PageOSTool>()
+export const tools = new Map<string, EBAgentTool>()
 
 tools.set(
 	'done',
 	tool({
 		description:
-			'Complete task. Text is your final response to the user — keep it concise unless the user explicitly asks for detail.',
+			'Complete task. Text is your final response to the user — keep it concise unless the user explicitly asks for detail. ' +
+			'This ends the task permanently and nothing runs after it. Do NOT call this while text merely states what you plan ' +
+			'to do next ("let me search...", "I will now...") — if you know the next action, take it instead of narrating it here. ' +
+			'If `text` would end in a question the user needs to answer, use `ask_user` instead — ' +
+			'a question left in this text will never be answered, since the next user message starts an unrelated new task.',
 		inputSchema: z.object({
 			text: z.string(),
 			success: z.boolean().default(true),
 		}),
-		execute: async function (this: PageOSCore, input) {
+		execute: async function (this: EBAgentCore, input) {
 			// @note main loop will handle this one
 			return Promise.resolve('Task completed')
 		},
@@ -58,7 +62,7 @@ tools.set(
 		inputSchema: z.object({
 			seconds: z.number().min(1).max(10).default(1),
 		}),
-		execute: async function (this: PageOSCore, input, { signal }) {
+		execute: async function (this: EBAgentCore, input, { signal }) {
 			// try to subtract LLM calling time from the actual wait time
 			const lastTimeUpdate = await this.pageController.getLastUpdateTime()
 			const secondsSinceLastUpdate = (Date.now() - lastTimeUpdate) / 1000
@@ -76,7 +80,10 @@ tools.set(
 	'ask_user',
 	tool({
 		description:
-			'Ask the user a question and wait for their answer. Use this if you need more information or clarification. ' +
+			'Ask the user a question and wait for their answer. Only use this when genuinely blocked — ' +
+			'e.g. you need credentials you do not have, or must choose between multiple valid interpretations ' +
+			'that only the user can resolve. Do NOT use it to confirm information already visible in browser_state ' +
+			'or already returned by identify_image. ' +
 			'When the answer is a choice between known values, ALWAYS pass them as `options` so the user can pick one instead of typing. ' +
 			'Set `input_type` to "number" when you expect a numeric answer.',
 		inputSchema: z.object({
@@ -91,7 +98,7 @@ tools.set(
 				.optional()
 				.describe('Expected free-form answer type when no option fits'),
 		}),
-		execute: async function (this: PageOSCore, input, { signal }) {
+		execute: async function (this: EBAgentCore, input, { signal }) {
 			if (!this.onAskUser) {
 				throw new Error('ask_user tool requires onAskUser callback to be set')
 			}
@@ -106,13 +113,40 @@ tools.set(
 )
 
 tools.set(
+	'identify_image',
+	tool({
+		description:
+			'Analyze the image attached to this task with a vision model and identify what it depicts — ' +
+			'a product, medicine, gemstone, garment, or anything else. Returns category, best-guess name, ' +
+			'a description, and attributes (e.g. color, brand, material) you can use to decide what to do next ' +
+			'(e.g. what to search for). Only available when an image was attached to the task. ' +
+			'Call this once, near the start of the task, before taking any other action.',
+		inputSchema: z.object({}),
+		execute: async function (this: EBAgentCore) {
+			const result = await this.identifyImage()
+			const attributes = result.attributes
+				? Object.entries(result.attributes)
+						.map(([key, value]) => `${key}: ${value}`)
+						.join(', ')
+				: ''
+			return (
+				`Category: ${result.category}\n` +
+				`Identified as: ${result.name}\n` +
+				`Description: ${result.description}` +
+				(attributes ? `\nAttributes: ${attributes}` : '')
+			)
+		},
+	})
+)
+
+tools.set(
 	'click_element_by_index',
 	tool({
 		description: 'Click element by index',
 		inputSchema: z.object({
 			index: z.int().min(0),
 		}),
-		execute: async function (this: PageOSCore, input) {
+		execute: async function (this: EBAgentCore, input) {
 			const result = await this.pageController.clickElement(input.index)
 			return result.message
 		},
@@ -127,7 +161,7 @@ tools.set(
 			index: z.int().min(0),
 			text: z.string(),
 		}),
-		execute: async function (this: PageOSCore, input) {
+		execute: async function (this: EBAgentCore, input) {
 			const result = await this.pageController.inputText(input.index, input.text)
 			return result.message
 		},
@@ -143,7 +177,7 @@ tools.set(
 			index: z.int().min(0),
 			text: z.string(),
 		}),
-		execute: async function (this: PageOSCore, input) {
+		execute: async function (this: EBAgentCore, input) {
 			const result = await this.pageController.selectOption(input.index, input.text)
 			return result.message
 		},
@@ -164,7 +198,7 @@ tools.set(
 			pixels: z.number().int().min(0).optional(),
 			index: z.number().int().min(0).optional(),
 		}),
-		execute: async function (this: PageOSCore, input) {
+		execute: async function (this: EBAgentCore, input) {
 			const result = await this.pageController.scroll({
 				...input,
 				numPages: input.num_pages,
@@ -187,7 +221,7 @@ tools.set(
 			pixels: z.number().int().min(0),
 			index: z.number().int().min(0).optional(),
 		}),
-		execute: async function (this: PageOSCore, input) {
+		execute: async function (this: EBAgentCore, input) {
 			const result = await this.pageController.scrollHorizontally(input)
 			return result.message
 		},
@@ -204,7 +238,7 @@ tools.set(
 		inputSchema: z.object({
 			script: z.string(),
 		}),
-		execute: async function (this: PageOSCore, input, { signal }) {
+		execute: async function (this: EBAgentCore, input, { signal }) {
 			const result = await this.pageController.executeJavascript(input.script, signal)
 			signal.throwIfAborted()
 			return result.message
@@ -212,6 +246,33 @@ tools.set(
 	})
 )
 
-// @todo send_keys
+tools.set(
+	'send_keys',
+	tool({
+		description:
+			'Send a single key press to element by index. Use this for search boxes and forms that ' +
+			'submit on Enter rather than via a separate visible button — after `input_text`, sending ' +
+			'"Enter" to the same index is often required to actually trigger the search/submit.',
+		inputSchema: z.object({
+			index: z.int().min(0),
+			key: z.enum([
+				'Enter',
+				'Tab',
+				'Escape',
+				'ArrowDown',
+				'ArrowUp',
+				'ArrowLeft',
+				'ArrowRight',
+				'Backspace',
+				'Delete',
+			]),
+		}),
+		execute: async function (this: EBAgentCore, input) {
+			const result = await this.pageController.sendKeys(input.index, input.key)
+			return result.message
+		},
+	})
+)
+
 // @todo upload_file
 // @todo extract_structured_data

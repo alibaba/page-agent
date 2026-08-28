@@ -1,11 +1,11 @@
-# PageOS
+# EBAgent
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://equalbyte.github.io/agentic-page/assets/readme/banner-dark.png">
-  <img alt="PageOS Banner" src="https://equalbyte.github.io/agentic-page/assets/readme/banner-light.png">
+  <img alt="EBAgent Banner" src="https://equalbyte.github.io/agentic-page/assets/readme/banner-light.png">
 </picture>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-auto.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-os)](https://bundlephobia.com/package/page-os) [![Downloads](https://img.shields.io/npm/dt/page-os.svg)](https://www.npmjs.com/package/page-os) [![GitHub stars](https://img.shields.io/github/stars/EqualByte/agentic-page.svg)](https://github.com/EqualByte/agentic-page)
+[![License: MIT](https://img.shields.io/badge/License-MIT-auto.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/eb-agent)](https://bundlephobia.com/package/eb-agent) [![Downloads](https://img.shields.io/npm/dt/eb-agent.svg)](https://www.npmjs.com/package/eb-agent) [![GitHub stars](https://img.shields.io/github/stars/EqualByte/agentic-page.svg)](https://github.com/EqualByte/agentic-page)
 
 The GUI Agent Living in Your Webpage. Control web interfaces with natural language.
 
@@ -13,7 +13,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 <a href="https://equalbyte.github.io/agentic-page/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://equalbyte.github.io/agentic-page/docs/introduction/overview" target="_blank"><b>📖 Docs</b></a> | <a href="https://x.com/equalbyte" target="_blank"><b>𝕏 Follow on X</b></a>
 
-<!-- TODO: record and embed a PageOS demo video (the previous one showed the upstream branding) -->
+<!-- TODO: record and embed a EBAgent demo video (the previous one showed the upstream branding) -->
 
 ---
 
@@ -40,7 +40,7 @@ The GUI Agent Living in Your Webpage. Control web interfaces with natural langua
 
 ### One-line integration
 
-Fastest way to try PageOS with our free Demo LLM:
+Fastest way to try EBAgent with our free Demo LLM:
 
 ```html
 <script src="{URL}" crossorigin="true"></script>
@@ -50,21 +50,21 @@ Fastest way to try PageOS with our free Demo LLM:
 
 | Mirrors | URL                                                                                 |
 | ------- | ----------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-os@1.11.0/dist/iife/page-os.demo.js         |
-| China   | https://registry.npmmirror.com/page-os/1.11.0/files/dist/iife/page-os.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/eb-agent@1.11.0/dist/iife/eb-agent.demo.js         |
+| China   | https://registry.npmmirror.com/eb-agent/1.11.0/files/dist/iife/eb-agent.demo.js |
 
-Add `?autoInit=false` to load the script without creating the demo agent automatically. You can then instantiate it with `new window.PageOS(...)`.
+Add `?autoInit=false` to load the script without creating the demo agent automatically. You can then instantiate it with `new window.EBAgent(...)`.
 
 ### NPM Installation
 
 ```bash
-npm install page-os
+npm install eb-agent
 ```
 
 ```javascript
-import { PageOS } from 'page-os'
+import { EBAgent } from 'eb-agent'
 
-const agent = new PageOS({
+const agent = new EBAgent({
     model: 'deepseek-chat',
     baseURL: 'https://api.deepseek.com',
     apiKey: 'YOUR_API_KEY',
@@ -78,13 +78,13 @@ agent.panel.show()
 await agent.execute('Click the login button')
 ```
 
-> PageOS works with any OpenAI-compatible API — point `baseURL`/`model` at your provider of choice.
+> EBAgent works with any OpenAI-compatible API — point `baseURL`/`model` at your provider of choice.
 
 For more programmatic usage, see [📖 Documentations](https://equalbyte.github.io/agentic-page/docs/introduction/overview).
 
-## 🌟 Awesome PageOS
+## 🌟 Awesome EBAgent
 
-Built something cool with PageOS? Add it here! Open a PR to share your project.
+Built something cool with EBAgent? Add it here! Open a PR to share your project.
 
 > These are community projects — not maintained or endorsed by us. Use at your own discretion.
 
@@ -106,7 +106,7 @@ Contributions generated entirely by **bots or AI** without substantial human inv
 
 This project builds upon the excellent work of **[`browser-use`](https://github.com/browser-use/browser-use)**.
 
-`PageOS` is designed for **client-side web enhancement**, not server-side automation.
+`EBAgent` is designed for **client-side web enhancement**, not server-side automation.
 
 ```
 DOM processing components and prompt are derived from browser-use:
@@ -122,4 +122,4 @@ this project possible.
 
 ---
 
-**⭐ Star this repo if you find PageOS helpful!**
+**⭐ Star this repo if you find EBAgent helpful!**

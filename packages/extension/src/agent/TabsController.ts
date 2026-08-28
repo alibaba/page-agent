@@ -74,6 +74,13 @@ export class TabsController {
 			payload: { windowId: await getOwnWindowId() },
 		})
 
+		// `sendMessage` resolves to null on a dropped connection instead of throwing (e.g. the
+		// background service worker is still spinning up). Without this guard `activeTabResult.tab`
+		// would throw a cryptic TypeError instead of a clear, actionable message.
+		if (!activeTabResult) {
+			throw new Error('Failed to communicate with the background script to get the active tab.')
+		}
+
 		this.initialTabId = activeTabResult.tab?.id
 		this.windowId = activeTabResult.tab?.windowId
 
@@ -93,6 +100,9 @@ export class TabsController {
 				action: 'get_window_tabs',
 				payload: { windowId: this.windowId },
 			})
+			if (!allTabs) {
+				throw new Error('Failed to communicate with the background script to list window tabs.')
+			}
 			for (const tab of allTabs.tabs as chrome.tabs.Tab[]) {
 				if (tab.id && !tab.pinned && isContentScriptAllowed(tab.url)) {
 					this.addTab({
@@ -114,6 +124,9 @@ export class TabsController {
 				action: 'get_tab_info',
 				payload: { tabId: this.initialTabId },
 			})
+			if (!info) {
+				throw new Error('Failed to communicate with the background script to get tab info.')
+			}
 
 			if (isContentScriptAllowed(info.url) && !info.pinned) {
 				this.currentTabId = this.initialTabId
@@ -142,8 +155,13 @@ export class TabsController {
 			payload: { url, windowId: this.windowId },
 		})
 
-		if (!result.success) {
-			throw new Error(`Failed to open new tab: ${result.error}`)
+		// `sendMessage` resolves to null on a dropped connection rather than throwing. This is
+		// still caught by tabTools.ts's try/catch either way, but without this guard the model
+		// would see a raw TypeError instead of an actionable message.
+		if (!result?.success) {
+			throw new Error(
+				`Failed to open new tab: ${result?.error ?? 'lost connection to background script'}`
+			)
 		}
 
 		const tabId = result.tabId as number
@@ -168,6 +186,43 @@ export class TabsController {
 		await this.waitUntilTabLoaded(tabId)
 
 		return `✅ Opened new tab ID ${tabId} with URL ${url}`
+	}
+
+	/**
+	 * Navigate the current tab to a URL in place, instead of opening a new tab.
+	 * Preferred over `openNewTab` for ordinary same-flow navigation so the
+	 * agent doesn't accumulate tabs on every page transition/retry.
+	 */
+	async navigateTab(url: string): Promise<string> {
+		debug('navigateTab', url)
+
+		if (this.currentTabId == null) {
+			throw new Error('No current tab to navigate. Use open_new_tab instead.')
+		}
+		const tabId = this.currentTabId
+
+		const result = await sendMessage({
+			type: 'TAB_CONTROL',
+			action: 'navigate_tab',
+			payload: { tabId, url },
+		})
+
+		if (!result?.success) {
+			throw new Error(
+				`Failed to navigate tab: ${result?.error ?? 'lost connection to background script'}`
+			)
+		}
+
+		// The tab's tracked `status` is still 'complete' from its *previous* page at this
+		// point (the 'updated'/loading port event hasn't arrived yet) — mark it loading now
+		// so `waitUntilTabLoaded` actually waits for the new page instead of returning
+		// immediately on the stale status.
+		const tab = this.tabs.find((t) => t.id === tabId)
+		if (tab) tab.status = 'loading'
+
+		await this.waitUntilTabLoaded(tabId)
+
+		return `✅ Navigated current tab (ID ${tabId}) to ${url}`
 	}
 
 	async switchToTab(tabId: number): Promise<string> {
@@ -200,7 +255,10 @@ export class TabsController {
 			payload: { tabId },
 		})
 
-		if (result.success) {
+		// `sendMessage` resolves to null on a dropped connection rather than throwing. This is
+		// still caught by tabTools.ts's try/catch either way, but without this guard the model
+		// would see a raw TypeError instead of an actionable message.
+		if (result?.success) {
 			this.tabs = this.tabs.filter((t) => t.id !== tabId)
 			if (this.currentTabId === tabId) {
 				const newCurrentTab = this.tabs[this.tabs.length - 1] || null
@@ -213,7 +271,9 @@ export class TabsController {
 
 			return `✅ Closed tab ID ${tabId}.`
 		} else {
-			throw new Error(`Failed to close tab ID ${tabId}: ${result.error}`)
+			throw new Error(
+				`Failed to close tab ID ${tabId}: ${result?.error ?? 'lost connection to background script'}`
+			)
 		}
 	}
 
@@ -236,7 +296,7 @@ export class TabsController {
 			payload: {
 				groupId: this.tabGroupId,
 				properties: {
-					title: `PageOS(${this.task})`,
+					title: `EBAgent(${this.task})`,
 					color: randomColor(),
 					collapsed: false,
 				},
@@ -270,13 +330,19 @@ export class TabsController {
 			action: 'get_tab_info',
 			payload: { tabId },
 		})
+		// `sendMessage` resolves to null on a dropped connection instead of throwing (e.g. the
+		// background script isn't ready yet). This method is called every step via
+		// getBrowserState() → getCurrentUrl()/getCurrentTitle(), with no try/catch above it in
+		// that path, so an unguarded null here would throw and end the whole task over a
+		// transient messaging hiccup. Fall back to any cached info rather than crashing.
+		const info = result ?? { title: tabMeta?.title ?? '', url: tabMeta?.url ?? '' }
 
 		if (tabMeta) {
-			tabMeta.url = result.url
-			tabMeta.title = result.title
+			tabMeta.url = info.url
+			tabMeta.title = info.title
 		}
 
-		return result
+		return info
 	}
 
 	async summarizeTabs(): Promise<string> {
@@ -385,6 +451,7 @@ export type TabAction =
 	| 'get_active_tab'
 	| 'get_tab_info'
 	| 'open_new_tab'
+	| 'navigate_tab'
 	| 'create_tab_group'
 	| 'update_tab_group'
 	| 'add_tab_to_group'

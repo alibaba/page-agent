@@ -61,6 +61,9 @@ export const UI_ICONS = {
 	chevronUp: svg('<path d="m18 15-6-6-6 6"/>'),
 	stop: svg('<rect x="6" y="6" width="12" height="12" rx="1" fill="currentColor" stroke="none"/>'),
 	close: svg('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>'),
+	attachImage: svg(
+		'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/>'
+	),
 } as const
 
 /** A labeled reflection line, e.g. { label: 'Next', text: 'Open the form' } */

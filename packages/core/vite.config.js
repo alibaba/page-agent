@@ -27,9 +27,9 @@ export default defineConfig({
 	publicDir: false,
 	build: {
 		lib: {
-			entry: resolve(__dirname, 'src/PageOSCore.ts'),
-			name: 'PageOSCore',
-			fileName: 'page-os-core',
+			entry: resolve(__dirname, 'src/EBAgentCore.ts'),
+			name: 'EBAgentCore',
+			fileName: 'eb-agent-core',
 			formats: ['es'],
 		},
 		outDir: resolve(__dirname, 'dist', 'esm'),
@@ -39,7 +39,7 @@ export default defineConfig({
 				'zod',
 				'zod/v4',
 				// all the internal packages
-				/^@page-os\//,
+				/^@eb-agent\//,
 			],
 		},
 		minify: false,

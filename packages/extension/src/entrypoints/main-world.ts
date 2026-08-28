@@ -1,4 +1,4 @@
-import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-os/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@eb-agent/core'
 
 export type Execute = (task: string, config: ExecuteConfig) => Promise<ExecutionResult>
 
@@ -49,7 +49,7 @@ export default defineUnlistedScript(() => {
 
 				const data = e.data
 				if (typeof data !== 'object' || data === null) return
-				if (data.channel !== 'PAGE_OS_EXT_RESPONSE') return
+				if (data.channel !== 'EB_AGENT_EXT_RESPONSE') return
 				if (data.id !== id) return
 
 				// events
@@ -88,7 +88,7 @@ export default defineUnlistedScript(() => {
 
 		window.postMessage(
 			{
-				channel: 'PAGE_OS_EXT_REQUEST',
+				channel: 'EB_AGENT_EXT_REQUEST',
 				id,
 				action: 'execute',
 				payload: {
@@ -114,7 +114,7 @@ export default defineUnlistedScript(() => {
 
 		window.postMessage(
 			{
-				channel: 'PAGE_OS_EXT_REQUEST',
+				channel: 'EB_AGENT_EXT_REQUEST',
 				id,
 				action: 'stop',
 			},
@@ -122,8 +122,8 @@ export default defineUnlistedScript(() => {
 		)
 	}
 
-	;(window as any).PAGE_OS_EXT_VERSION = __VERSION__
-	;(window as any).PAGE_OS_EXT = {
+	;(window as any).EB_AGENT_EXT_VERSION = __VERSION__
+	;(window as any).EB_AGENT_EXT = {
 		version: __VERSION__,
 		execute,
 		stop,

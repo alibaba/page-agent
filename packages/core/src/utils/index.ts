@@ -61,11 +61,11 @@ export function randomID(existingIDs?: string[]): string {
 //
 const _global = globalThis as any
 
-if (!_global.__PAGE_OS_IDS__) {
-	_global.__PAGE_OS_IDS__ = []
+if (!_global.__EB_AGENT_IDS__) {
+	_global.__EB_AGENT_IDS__ = []
 }
 
-const ids = _global.__PAGE_OS_IDS__
+const ids = _global.__EB_AGENT_IDS__
 
 /**
  * Generate a random ID.

@@ -1,8 +1,8 @@
-import type { BrowserState, PageController } from '@page-os/page-controller'
+import type { BrowserState, PageController } from '@eb-agent/page-controller'
 import { describe, expect, it, vi } from 'vitest'
 import * as z from 'zod/v4'
 
-import { PageOSCore, tool } from './PageOSCore'
+import { EBAgentCore, tool } from './EBAgentCore'
 import type { ExecutionResult } from './types'
 
 type TestFetch = (...args: Parameters<typeof globalThis.fetch>) => Promise<Response>
@@ -51,9 +51,9 @@ function createPageController(): PageController {
 
 function createAgent(
 	customFetch: TestFetch,
-	options: Partial<ConstructorParameters<typeof PageOSCore>[0]> = {}
-): PageOSCore {
-	return new PageOSCore({
+	options: Partial<ConstructorParameters<typeof EBAgentCore>[0]> = {}
+): EBAgentCore {
+	return new EBAgentCore({
 		baseURL: 'https://llm.test',
 		model: 'test-model',
 		maxRetries: 0,
@@ -69,7 +69,7 @@ function createFetchMock() {
 	return vi.fn<TestFetch>()
 }
 
-function onceActivity(agent: PageOSCore, predicate: (detail: unknown) => boolean): Promise<void> {
+function onceActivity(agent: EBAgentCore, predicate: (detail: unknown) => boolean): Promise<void> {
 	return new Promise((resolve) => {
 		const onActivity = (event: Event) => {
 			if (!predicate((event as CustomEvent).detail)) return
@@ -105,7 +105,7 @@ function waitResponse(seconds = 10): Response {
  * The running promise is wrapped so awaiting this helper does not await the task.
  */
 async function startBlockedTask(
-	agent: PageOSCore,
+	agent: EBAgentCore,
 	task = 'first'
 ): Promise<{ result: Promise<ExecutionResult> }> {
 	const waitStarted = onceActivity(agent, (detail) => isExecutingTool(detail, 'wait'))
@@ -114,7 +114,7 @@ async function startBlockedTask(
 	return { result }
 }
 
-describe.concurrent('PageOSCore lifecycle', () => {
+describe.concurrent('EBAgentCore lifecycle', () => {
 	describe('normal execution', () => {
 		it('runs a task to natural completion', async () => {
 			const fetchMock = createFetchMock().mockResolvedValueOnce(doneResponse('all done'))

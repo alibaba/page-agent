@@ -1,6 +1,6 @@
-# PageOS Extension API
+# EBAgent Extension API
 
-Integrate the PageOS extension into your web app and trigger multi-page browser tasks from page JavaScript.
+Integrate the EBAgent extension into your web app and trigger multi-page browser tasks from page JavaScript.
 
 ## Installation
 
@@ -8,7 +8,7 @@ Integrate the PageOS extension into your web app and trigger multi-page browser 
 
 Primary channel:
 
-- Chrome Web Store: https://chromewebstore.google.com/detail/page-os-ext/akldabonmimlicnjlflnapfeklbfemhj
+- Chrome Web Store: https://chromewebstore.google.com/detail/eb-agent-ext/akldabonmimlicnjlflnapfeklbfemhj
 
 Latest updates are often published earlier on:
 
@@ -17,12 +17,12 @@ Latest updates are often published earlier on:
 ### 2. Install type definitions (recommended)
 
 ```bash
-npm install @page-os/core --save-dev
+npm install @eb-agent/core --save-dev
 ```
 
 ### 3. Authorization (Token)
 
-The token allows your page JS to call the extension API (`window.PAGE_OS_EXT`) and execute multi-page tasks.
+The token allows your page JS to call the extension API (`window.EB_AGENT_EXT`) and execute multi-page tasks.
 
 Why token-based access is required:
 
@@ -36,19 +36,19 @@ Setup:
 2. Set the token in your page:
 
 ```typescript
-localStorage.setItem('PageOSExtUserAuthToken', 'your-token')
+localStorage.setItem('EBAgentExtUserAuthToken', 'your-token')
 ```
 
 ## Quick Start
 
 ```typescript
-import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-os/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@eb-agent/core'
 
 // Wait for extension injection (up to 1 second)
 async function waitForExtension(timeout = 1000): Promise<boolean> {
     const start = Date.now()
     while (Date.now() - start < timeout) {
-        if (window.PAGE_OS_EXT) return true
+        if (window.EB_AGENT_EXT) return true
         await new Promise((r) => setTimeout(r, 100))
     }
     return false
@@ -56,7 +56,7 @@ async function waitForExtension(timeout = 1000): Promise<boolean> {
 
 // Usage
 if (await waitForExtension()) {
-    const result = await window.PAGE_OS_EXT!.execute('Click the login button', {
+    const result = await window.EB_AGENT_EXT!.execute('Click the login button', {
         baseURL: 'https://api.deepseek.com',
         apiKey: 'your-api-key',
         model: 'gpt-5.2',
@@ -71,15 +71,15 @@ if (await waitForExtension()) {
 
 After token match, the extension injects APIs into `window`.
 
-### `window.PAGE_OS_EXT_VERSION`
+### `window.EB_AGENT_EXT_VERSION`
 
 Extension version string (for capability checks before using the main API).
 
-### `window.PAGE_OS_EXT`
+### `window.EB_AGENT_EXT`
 
 Main namespace object.
 
-#### `PAGE_OS_EXT.execute(task, config)`
+#### `EB_AGENT_EXT.execute(task, config)`
 
 Execute one agent task.
 
@@ -92,7 +92,7 @@ Parameters:
 
 Returns: `Promise<ExecutionResult>`
 
-#### `PAGE_OS_EXT.stop()`
+#### `EB_AGENT_EXT.stop()`
 
 Stop the current task.
 
@@ -102,10 +102,10 @@ Stop the current task.
 
 ## Types
 
-Install `@page-os/core` for complete types:
+Install `@eb-agent/core` for complete types:
 
 ```typescript
-import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-os/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@eb-agent/core'
 
 export interface ExecuteConfig {
     baseURL: string
@@ -175,7 +175,7 @@ interface ExecutionResult {
 ### Basic Execution
 
 ```typescript
-const result = await window.PAGE_OS_EXT!.execute(
+const result = await window.EB_AGENT_EXT!.execute(
     'Fill in the email field with test@example.com and click Submit',
     {
         baseURL: 'https://api.deepseek.com',
@@ -191,15 +191,15 @@ const result = await window.PAGE_OS_EXT!.execute(
 ### Stop the Current Task
 
 ```typescript
-window.PAGE_OS_EXT!.stop()
+window.EB_AGENT_EXT!.stop()
 ```
 
 ## Window Type Declaration
 
-If you are not importing `@page-os/core`, add:
+If you are not importing `@eb-agent/core`, add:
 
 ```typescript
-import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@page-os/core'
+import type { AgentActivity, AgentStatus, ExecutionResult, HistoricalEvent } from '@eb-agent/core'
 
 interface ExecuteConfig {
     baseURL: string
@@ -217,8 +217,8 @@ interface ExecuteConfig {
 
 declare global {
     interface Window {
-        PAGE_OS_EXT_VERSION?: string
-        PAGE_OS_EXT?: {
+        EB_AGENT_EXT_VERSION?: string
+        EB_AGENT_EXT?: {
             version: string
             execute: Execute
             stop: () => void

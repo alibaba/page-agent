@@ -27,17 +27,17 @@ export default function Header() {
 						<Link
 							href="/"
 							className="flex items-center gap-2 sm:gap-3 group shrink-0"
-							aria-label={isZh ? 'PageOS 首页' : 'PageOS home'}
+							aria-label={isZh ? 'EBAgent 首页' : 'EBAgent home'}
 							onClick={() => setMobileMenuOpen(false)}
 						>
 							<img
-								src="/page-os/assets/brand/page-os.webp"
-								alt="PageOS Logo"
+								src="/eb-agent/assets/brand/eb-agent.webp"
+								alt="EBAgent Logo"
 								className="w-10 h-10 rounded-xl group-hover:scale-110 transition-transform duration-200"
 							/>
 							<div>
 								<span className="text-base sm:text-xl font-bold text-gray-900 dark:text-white leading-tight flex items-baseline gap-1.5">
-									PageOS
+									EBAgent
 									<span className="hidden sm:inline text-[10px] font-mono font-normal text-gray-400 dark:text-gray-500 tabular-nums before:content-['v']">
 										{import.meta.env.VERSION}
 									</span>

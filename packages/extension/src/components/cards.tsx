@@ -5,7 +5,7 @@ import type {
 	HistoricalEvent,
 	ObservationEvent,
 	RetryEvent,
-} from '@page-os/core'
+} from '@eb-agent/core'
 import {
 	CheckCircle,
 	Eye,
@@ -326,6 +326,10 @@ export function EventCard({ event }: { event: HistoricalEvent }) {
 	}
 
 	if (event.type === 'observation') {
+		// Internal guardrail/self-correction messages (see ObservationEvent.internal) are addressed
+		// to the model, not the user — they still reach the LLM via <agent_history>, but shouldn't
+		// render as a user-facing status card here.
+		if ((event as ObservationEvent).internal) return null
 		return <ObservationCard event={event as ObservationEvent} />
 	}
 

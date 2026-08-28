@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const pageOSPkg = JSON.parse(readFileSync(resolve(__dirname, '../page-os/package.json'), 'utf-8'))
+const ebAgentPkg = JSON.parse(readFileSync(resolve(__dirname, '../eb-agent/package.json'), 'utf-8'))
 
 // Load .env from repo root
 dotenvConfig({ path: resolve(__dirname, '../../.env'), quiet: true })
@@ -28,8 +28,8 @@ const SPA_ROUTES = [
 	'docs/features/chrome-extension',
 	'docs/features/mcp-server',
 	'docs/features/third-party-agent',
-	'docs/advanced/page-os',
-	'docs/advanced/page-os-core',
+	'docs/advanced/eb-agent',
+	'docs/advanced/eb-agent-core',
 	'docs/advanced/page-controller',
 	'docs/advanced/custom-ui',
 	'docs/advanced/security-permissions',
@@ -68,7 +68,7 @@ function spaRoutes() {
 
 // Website Config (React Documentation Site)
 export default defineConfig(({ mode }) => ({
-	base: '/page-os/',
+	base: '/eb-agent/',
 	clearScreen: false,
 	plugins: [react(), tailwindcss(), spaRoutes()],
 	build: {
@@ -99,6 +99,6 @@ export default defineConfig(({ mode }) => ({
 			'import.meta.env.LLM_API_KEY': JSON.stringify(process.env.LLM_API_KEY),
 			'import.meta.env.LLM_BASE_URL': JSON.stringify(process.env.LLM_BASE_URL),
 		}),
-		'import.meta.env.VERSION': JSON.stringify(pageOSPkg.version),
+		'import.meta.env.VERSION': JSON.stringify(ebAgentPkg.version),
 	},
 }))

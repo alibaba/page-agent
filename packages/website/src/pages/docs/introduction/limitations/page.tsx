@@ -14,29 +14,29 @@ export default function LimitationsPage() {
 				</h1>
 				<p className="text-xl text-gray-600 dark:text-gray-300">
 					{isZh
-						? 'PageOS 基于 DOM 理解网页并执行操作。这决定了它的能力边界。'
-						: 'PageOS understands web pages via DOM and performs actions accordingly. This defines its capability boundary.'}
+						? 'EBAgent 基于 DOM 理解网页并执行操作。这决定了它的能力边界。'
+						: 'EBAgent understands web pages via DOM and performs actions accordingly. This defines its capability boundary.'}
 				</p>
 			</div>
 
 			<div className="prose prose-lg dark:prose-invert max-w-none">
-				{/* PageOS.js vs PageOSExt */}
-				<Heading id="pageos-js-vs-pageosext" className="text-2xl font-bold mb-3">
-					{isZh ? 'PageOS.js vs PageOSExt' : 'PageOS.js vs PageOSExt'}
+				{/* EBAgent.js vs EBAgentExt */}
+				<Heading id="eb-agent-js-vs-eb-agent-ext" className="text-2xl font-bold mb-3">
+					{isZh ? 'EBAgent.js vs EBAgentExt' : 'EBAgent.js vs EBAgentExt'}
 				</Heading>
 				<p className="text-gray-600 dark:text-gray-300 mb-4">
 					{isZh
-						? 'PageOS.js 是核心库，运行在页面内。PageOSExt 是可选的浏览器扩展，提供额外的浏览器级控制能力。'
-						: 'PageOS.js is the core library running inside a page. PageOSExt is an optional browser extension that adds browser-level control.'}
+						? 'EBAgent.js 是核心库，运行在页面内。EBAgentExt 是可选的浏览器扩展，提供额外的浏览器级控制能力。'
+						: 'EBAgent.js is the core library running inside a page. EBAgentExt is an optional browser extension that adds browser-level control.'}
 				</p>
 				<div className="overflow-x-auto mb-6">
 					<table className="w-full text-sm border-collapse">
 						<thead>
 							<tr className="border-b border-gray-200 dark:border-gray-700">
 								<th className="text-left py-3 pr-4"></th>
-								<th className="text-left py-3 px-4 font-semibold">PageOS.js</th>
+								<th className="text-left py-3 px-4 font-semibold">EBAgent.js</th>
 								<th className="text-left py-3 pl-4 font-semibold">
-									PageOSExt{' '}
+									EBAgentExt{' '}
 									<Link
 										href="/features/chrome-extension"
 										className="text-xs font-normal text-blue-600 dark:text-blue-400 hover:underline"
@@ -139,8 +139,8 @@ export default function LimitationsPage() {
 
 				<p className="mb-2 font-medium">
 					{isZh
-						? 'PageOS 不使用多模态模型，不截图，没有视觉能力。仅通过 DOM 结构理解页面。'
-						: 'PageOS does not use multimodal models, does not take screenshots, and has no visual capability. It reads pages through DOM structure only.'}
+						? 'EBAgent 不使用多模态模型，不截图，没有视觉能力。仅通过 DOM 结构理解页面。'
+						: 'EBAgent does not use multimodal models, does not take screenshots, and has no visual capability. It reads pages through DOM structure only.'}
 				</p>
 				<p className="mb-2 font-medium">
 					{isZh

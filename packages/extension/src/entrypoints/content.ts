@@ -13,19 +13,19 @@ export default defineContentScript({
 		initPageController()
 
 		// if auth token matches, expose agent to page
-		chrome.storage.local.get('PageOSExtUserAuthToken').then((result) => {
+		chrome.storage.local.get('EBAgentExtUserAuthToken').then((result) => {
 			// extension side token.
 			// @note this is isolated world. it is safe to assume user script cannot access it
-			const extToken = result.PageOSExtUserAuthToken
+			const extToken = result.EBAgentExtUserAuthToken
 			if (!extToken) return
 
 			// page side token
-			const pageToken = localStorage.getItem('PageOSExtUserAuthToken')
+			const pageToken = localStorage.getItem('EBAgentExtUserAuthToken')
 			if (!pageToken) return
 
 			if (pageToken !== extToken) return
 
-			console.log('[PageOSExt]: Auth tokens match. Exposing agent to page.')
+			console.log('[EBAgentExt]: Auth tokens match. Exposing agent to page.')
 
 			// add isolated world script
 			exposeAgentToPage().then(
@@ -38,29 +38,29 @@ export default defineContentScript({
 
 async function exposeAgentToPage() {
 	const { MultiPageAgent } = await import('@/agent/MultiPageAgent')
-	console.log('[PageOSExt]: MultiPageAgent loaded')
+	console.log('[EBAgentExt]: MultiPageAgent loaded')
 
 	/**
 	 * singleton MultiPageAgent to handle requests from the page
 	 */
-	let multiPageOS: InstanceType<typeof MultiPageAgent> | null = null
+	let multiEBAgent: InstanceType<typeof MultiPageAgent> | null = null
 
 	window.addEventListener('message', async (e) => {
 		if (e.source !== window) return
 
 		const data = e.data
 		if (typeof data !== 'object' || data === null) return
-		if (data.channel !== 'PAGE_OS_EXT_REQUEST') return
+		if (data.channel !== 'EB_AGENT_EXT_REQUEST') return
 
 		const { action, payload, id } = data
 
 		switch (action) {
 			case 'execute': {
 				// singleton check
-				if (multiPageOS && multiPageOS.status === 'running') {
+				if (multiEBAgent && multiEBAgent.status === 'running') {
 					window.postMessage(
 						{
-							channel: 'PAGE_OS_EXT_RESPONSE',
+							channel: 'EB_AGENT_EXT_RESPONSE',
 							id,
 							action: 'execute_result',
 							error: 'Agent is already running a task. Please wait until it finishes.',
@@ -75,33 +75,33 @@ async function exposeAgentToPage() {
 					const { systemInstruction, ...agentConfig } = config
 
 					// Dispose old instance before creating new one
-					multiPageOS?.dispose()
+					multiEBAgent?.dispose()
 
-					multiPageOS = new MultiPageAgent({
+					multiEBAgent = new MultiPageAgent({
 						...agentConfig,
 						instructions: systemInstruction ? { system: systemInstruction } : undefined,
 					})
 
 					// events
 
-					multiPageOS.addEventListener('statuschange', (event) => {
-						if (!multiPageOS) return
+					multiEBAgent.addEventListener('statuschange', (event) => {
+						if (!multiEBAgent) return
 						window.postMessage(
 							{
-								channel: 'PAGE_OS_EXT_RESPONSE',
+								channel: 'EB_AGENT_EXT_RESPONSE',
 								id,
 								action: 'status_change_event',
-								payload: multiPageOS.status,
+								payload: multiEBAgent.status,
 							},
 							'*'
 						)
 					})
 
-					multiPageOS.addEventListener('activity', (event) => {
-						if (!multiPageOS) return
+					multiEBAgent.addEventListener('activity', (event) => {
+						if (!multiEBAgent) return
 						window.postMessage(
 							{
-								channel: 'PAGE_OS_EXT_RESPONSE',
+								channel: 'EB_AGENT_EXT_RESPONSE',
 								id,
 								action: 'activity_event',
 								payload: (event as CustomEvent).detail,
@@ -110,14 +110,14 @@ async function exposeAgentToPage() {
 						)
 					})
 
-					multiPageOS.addEventListener('historychange', (event) => {
-						if (!multiPageOS) return
+					multiEBAgent.addEventListener('historychange', (event) => {
+						if (!multiEBAgent) return
 						window.postMessage(
 							{
-								channel: 'PAGE_OS_EXT_RESPONSE',
+								channel: 'EB_AGENT_EXT_RESPONSE',
 								id,
 								action: 'history_change_event',
-								payload: multiPageOS.history,
+								payload: multiEBAgent.history,
 							},
 							'*'
 						)
@@ -125,11 +125,11 @@ async function exposeAgentToPage() {
 
 					// result
 
-					const result = await multiPageOS.execute(task)
+					const result = await multiEBAgent.execute(task)
 
 					window.postMessage(
 						{
-							channel: 'PAGE_OS_EXT_RESPONSE',
+							channel: 'EB_AGENT_EXT_RESPONSE',
 							id,
 							action: 'execute_result',
 							payload: result,
@@ -139,7 +139,7 @@ async function exposeAgentToPage() {
 				} catch (error) {
 					window.postMessage(
 						{
-							channel: 'PAGE_OS_EXT_RESPONSE',
+							channel: 'EB_AGENT_EXT_RESPONSE',
 							id,
 							action: 'execute_result',
 							error: (error as Error).message,
@@ -152,7 +152,7 @@ async function exposeAgentToPage() {
 			}
 
 			case 'stop': {
-				multiPageOS?.stop()
+				multiEBAgent?.stop()
 				break
 			}
 

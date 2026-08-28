@@ -10,11 +10,11 @@ export default defineBackground(() => {
 
 	// generate user auth token
 
-	chrome.storage.local.get('PageOSExtUserAuthToken').then((result) => {
-		if (result.PageOSExtUserAuthToken) return
+	chrome.storage.local.get('EBAgentExtUserAuthToken').then((result) => {
+		if (result.EBAgentExtUserAuthToken) return
 
 		const userAuthToken = crypto.randomUUID()
-		chrome.storage.local.set({ PageOSExtUserAuthToken: userAuthToken })
+		chrome.storage.local.set({ EBAgentExtUserAuthToken: userAuthToken })
 	})
 
 	// message proxy

@@ -144,7 +144,7 @@ export default function Models() {
 				<Heading id="configuration">{isZh ? '配置方式' : 'Configuration'}</Heading>
 				<CodeEditor
 					code={`// OpenAI-compatible services (e.g., OpenAI, Azure OpenAI, OpenRouter)
-const pageOS = new PageOS({
+const ebAgent = new EBAgent({
   baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
   model: 'deepseek-chat'
@@ -157,7 +157,7 @@ const pageOS = new PageOS({
 				<Heading id="free-testing-api">{isZh ? '免费测试接口' : 'Free Testing API'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? '以下免费测试接口仅供 PageOS.js 和 PageOS Extension 的技术评估和测试使用。'
+						? '以下免费测试接口仅供 EBAgent.js 和 EBAgent Extension 的技术评估和测试使用。'
 						: 'The following free testing endpoint is provided for testing and technical evaluation.'}
 				</p>
 				<div className="my-4 p-4 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
@@ -225,7 +225,7 @@ LLM_MODEL_NAME="deepseek-chat"`}
 					)}
 				</p>
 				<CodeEditor
-					code={`const agent = new PageOS({
+					code={`const agent = new EBAgent({
   baseURL: '/api/llm-proxy',
   model: 'gpt-5.1',
   customFetch: (url, init) =>
@@ -248,7 +248,7 @@ LLM_MODEL_NAME="deepseek-chat"`}
 						<>
 							一些 LLM 能从主动缓存中受益很多。由于各个供应商的主动缓存接口不同，推荐使用{' '}
 							<Link
-								href="/advanced/page-os-core#configuration"
+								href="/advanced/eb-agent-core#configuration"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
 							>
 								transformRequestBody
@@ -260,7 +260,7 @@ LLM_MODEL_NAME="deepseek-chat"`}
 							Some LLMs benefit significantly from prompt caching. Because each provider exposes
 							caching differently, use{' '}
 							<Link
-								href="/advanced/page-os-core#configuration"
+								href="/advanced/eb-agent-core#configuration"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
 							>
 								transformRequestBody
@@ -282,7 +282,7 @@ LLM_MODEL_NAME="deepseek-chat"`}
 						</p>
 						<CodeEditor
 							language="typescript"
-							code={`const pageOS = new PageOS({
+							code={`const ebAgent = new EBAgent({
   baseURL: 'https://your-claude-proxy.example/v1',
   apiKey: 'your-api-key',
   model: 'claude-sonnet-5',
@@ -299,7 +299,7 @@ LLM_MODEL_NAME="deepseek-chat"`}
 						</Heading>
 						<CodeEditor
 							language="typescript"
-							code={`const pageOS = new PageOS({
+							code={`const ebAgent = new EBAgent({
   baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
   model: 'deepseek-chat',
@@ -337,8 +337,8 @@ LLM_MODEL_NAME="deepseek-chat"`}
 				<Heading id="local-runtimes">{isZh ? '本地 LLMs' : 'Local LLMs'}</Heading>
 				<p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
 					{isZh
-						? '通过 Ollama、LM Studio 等本地 OpenAI-compatible 运行时接入 PageOS，实现离线或局域网部署。'
-						: 'Use local OpenAI-compatible runtimes such as Ollama and LM Studio with PageOS for offline or LAN deployments.'}
+						? '通过 Ollama、LM Studio 等本地 OpenAI-compatible 运行时接入 EBAgent，实现离线或局域网部署。'
+						: 'Use local OpenAI-compatible runtimes such as Ollama and LM Studio with EBAgent for offline or LAN deployments.'}
 				</p>
 
 				<div className="space-y-10">
@@ -376,13 +376,13 @@ LLM_MODEL_NAME="deepseek-chat"`}
 						</Heading>
 						<CodeEditor
 							code={`// Local OpenAI-compatible runtime - no apiKey needed
-const pageOS = new PageOS({
+const ebAgent = new EBAgent({
   baseURL: 'http://localhost:11434/v1',
   model: 'llama3.1:8b'
 });
 
 // Or connect to LM Studio
-const lmStudioAgent = new PageOS({
+const lmStudioAgent = new EBAgent({
   baseURL: 'http://127.0.0.1:1234/v1',
   model: 'llama-3.1-8b'
 });

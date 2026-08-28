@@ -11,7 +11,7 @@ export default function QuickStart() {
 			<h1 className="text-4xl font-bold mb-6">Quick Start</h1>
 
 			<p className=" mb-6 leading-relaxed">
-				{isZh ? '几分钟内完成 page-os 的集成。' : 'Integrate page-os in minutes.'}
+				{isZh ? '几分钟内完成 eb-agent 的集成。' : 'Integrate eb-agent in minutes.'}
 			</p>
 
 			<Heading id="installation-steps" className="text-2xl font-bold mb-3">
@@ -60,8 +60,8 @@ export default function QuickStart() {
 					/>
 					<p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
 						{isZh
-							? '在 URL 后添加 ?autoInit=false 可只加载脚本，不自动创建 Demo Agent；之后可通过 new window.PageOS(...) 手动初始化。'
-							: 'Add ?autoInit=false to load the script without creating the demo agent automatically. You can then instantiate it with new window.PageOS(...).'}
+							? '在 URL 后添加 ?autoInit=false 可只加载脚本，不自动创建 Demo Agent；之后可通过 new window.EBAgent(...) 手动初始化。'
+							: 'Add ?autoInit=false to load the script without creating the demo agent automatically. You can then instantiate it with new window.EBAgent(...).'}
 					</p>
 					<table className="w-full border-collapse text-sm">
 						<thead>
@@ -91,9 +91,9 @@ export default function QuickStart() {
 						{isZh ? '📦 NPM 安装（推荐）' : '📦 NPM Install (Recommended)'}
 					</h3>
 					<CodeEditor
-						code={`// npm install page-os
+						code={`// npm install eb-agent
 
-import { PageOS } from 'page-os'`}
+import { EBAgent } from 'eb-agent'`}
 						language="bash"
 					/>
 				</div>
@@ -103,7 +103,7 @@ import { PageOS } from 'page-os'`}
 						{isZh ? '2. 初始化配置' : '2. Initialize Configuration'}
 					</h3>
 					<CodeEditor
-						code={`const agent = new PageOS({
+						code={`const agent = new EBAgent({
   model: 'deepseek-chat',
   baseURL: 'https://api.deepseek.com',
   apiKey: 'YOUR_API_KEY',

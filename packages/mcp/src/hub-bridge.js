@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { WebSocketServer } from 'ws'
 
 const EXT_ID = 'akldabonmimlicnjlflnapfeklbfemhj'
-const STORE_URL = `https://chromewebstore.google.com/detail/page-os-ext/${EXT_ID}`
+const STORE_URL = `https://chromewebstore.google.com/detail/eb-agent-ext/${EXT_ID}`
 const LOOPBACK_HOST = 'localhost'
 
 const launcherTemplate = readFileSync(
@@ -55,14 +55,14 @@ export class HubBridge {
 			this.#httpServer.on('error', (/** @type {NodeJS.ErrnoException} */ err) => {
 				if (err.code === 'EADDRINUSE') {
 					reject(
-						new Error(`Port ${this.port} is in use. Another PageOS MCP server may be running.`)
+						new Error(`Port ${this.port} is in use. Another EBAgent MCP server may be running.`)
 					)
 				} else {
 					reject(err)
 				}
 			})
 			this.#httpServer.listen(this.port, LOOPBACK_HOST, () => {
-				console.error(`[page-os-mcp] HTTP + WS on http://${LOOPBACK_HOST}:${this.port}`)
+				console.error(`[eb-agent-mcp] HTTP + WS on http://${LOOPBACK_HOST}:${this.port}`)
 				resolve()
 			})
 		})
@@ -107,7 +107,7 @@ export class HubBridge {
 		}
 
 		this.#hub = ws
-		console.error('[page-os-mcp] Hub connected')
+		console.error('[eb-agent-mcp] Hub connected')
 
 		ws.on('message', (/** @type {Buffer} */ rawData) => {
 			/** @type {{ type: string, success?: boolean, data?: string, message?: string }} */
@@ -128,7 +128,7 @@ export class HubBridge {
 		})
 
 		ws.on('close', () => {
-			console.error('[page-os-mcp] Hub disconnected')
+			console.error('[eb-agent-mcp] Hub disconnected')
 			if (this.#hub === ws) this.#hub = null
 			if (this.#pendingTask) {
 				this.#pendingTask.reject(new Error('Hub disconnected while task was running'))

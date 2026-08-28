@@ -1,4 +1,4 @@
-import type { BrowserState } from '@page-os/page-controller'
+import type { BrowserState } from '@eb-agent/page-controller'
 
 import type { TabsController } from './TabsController'
 
@@ -48,15 +48,20 @@ export class RemotePageController {
 
 	async getLastUpdateTime(): Promise<number> {
 		if (!this.currentTabId) throw new Error('tabsController not initialized.')
-		return sendMessage({
+		const result = await sendMessage({
 			type: 'PAGE_CONTROL',
 			action: 'get_last_update_time',
 			targetTabId: this.currentTabId,
 		})
+		// `sendMessage` resolves to null on a dropped connection (e.g. content script not
+		// injected yet). Fall back to "now" so callers (e.g. the `wait` tool) treat it as
+		// no time having elapsed and wait the full requested duration, rather than doing
+		// `Date.now() - null` (coerces to 0) which silently turns `wait` into a no-op.
+		return typeof result === 'number' ? result : Date.now()
 	}
 
 	async getBrowserState(): Promise<BrowserState> {
-		let browserState: BrowserState
+		let browserState: BrowserState | null
 		debug('getBrowserState', this.currentTabId)
 
 		const currentUrl = await this.getCurrentUrl()
@@ -76,6 +81,21 @@ export class RemotePageController {
 				action: 'get_browser_state',
 				targetTabId: this.currentTabId,
 			})
+			// `sendMessage` resolves to null on a dropped connection instead of throwing
+			// (e.g. "receiving end does not exist" right after a new tab is created, before
+			// the content script has injected). Without this fallback the `browserState.header =`
+			// write below would throw on null and crash the whole step — ending the entire task
+			// over a transient, retryable timing issue instead of just this one observation.
+			if (!browserState) {
+				browserState = {
+					url: currentUrl,
+					title: currentTitle,
+					header: '',
+					content:
+						'(failed to read page content — the page may still be loading. Wait a moment and try again.)',
+					footer: '',
+				}
+			}
 		}
 
 		const sum = await this.tabsController.summarizeTabs()
@@ -133,6 +153,73 @@ export class RemotePageController {
 		return this.remoteCallDomAction('scroll_horizontally', args)
 	}
 
+	async sendKeys(...args: any[]): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('send_keys', args)
+	}
+
+	// ======= WebMCP (via the main-world bridge) =======
+
+	/**
+	 * Whether the current tab's page exposes WebMCP.
+	 *
+	 * @remarks
+	 * Answered by the main-world bridge, since `document.modelContext` is invisible
+	 * from the isolated content-script world this extension's agent lives in.
+	 */
+	async webmcpStatus(): Promise<{ supported: boolean; canDiscover: boolean }> {
+		if (!this.currentTabId || !isContentScriptAllowed(await this.getCurrentUrl())) {
+			return { supported: false, canDiscover: false }
+		}
+
+		const result = await sendMessage({
+			type: 'PAGE_CONTROL',
+			action: 'webmcp_is_supported',
+			targetTabId: this.currentTabId,
+		})
+
+		return {
+			supported: Boolean(result?.supported),
+			canDiscover: Boolean(result?.canDiscover),
+		}
+	}
+
+	/** Tools the current page declared through WebMCP. */
+	async webmcpGetTools(): Promise<any[]> {
+		if (!this.currentTabId) return []
+
+		const result = await sendMessage({
+			type: 'PAGE_CONTROL',
+			action: 'webmcp_get_tools',
+			targetTabId: this.currentTabId,
+		})
+
+		return Array.isArray(result) ? result : []
+	}
+
+	/** Call one of the current page's declared tools. */
+	async webmcpExecuteTool(name: string, args: unknown): Promise<{ content: string }> {
+		if (!this.currentTabId) {
+			throw new Error('RemotePageController not initialized.')
+		}
+
+		const result = await sendMessage({
+			type: 'PAGE_CONTROL',
+			action: 'webmcp_execute_tool',
+			targetTabId: this.currentTabId,
+			payload: [name, args],
+		})
+
+		if (!result) {
+			throw new Error(
+				'Failed to reach the page to run this tool (content script not ready). Retry in a moment.'
+			)
+		}
+
+		if (!result.success) throw new Error(String(result.error ?? 'WebMCP tool call failed.'))
+
+		return normalizeBridgeResult(result.result)
+	}
+
 	// `execute_javascript` is intentionally not implemented: AbortSignal cannot cross context
 
 	/** @note Managed by content script via storage polling. */
@@ -155,18 +242,70 @@ export class RemotePageController {
 			}
 		}
 
-		return sendMessage({
+		const res = await sendMessage({
 			type: 'PAGE_CONTROL',
 			action: action,
 			targetTabId: this.currentTabId!,
 			payload,
 		})
+		// See getBrowserState() above: `sendMessage` resolves to null on a dropped connection
+		// rather than throwing. Callers (tools/index.ts) read `result.message` unconditionally,
+		// so a raw null here would throw a cryptic TypeError instead of a recoverable ActionResult.
+		if (!res) {
+			return {
+				success: false,
+				message:
+					'❌ Failed to communicate with the page (content script not ready or connection lost). Wait a moment and retry.',
+			}
+		}
+		return res
 	}
 }
 
 interface DomActionReturn {
 	success: boolean
 	message: string
+}
+
+/**
+ * Flatten whatever the page's tool returned into text.
+ *
+ * WebMCP is mid-flight on the result shape — the spec explainer returns
+ * `{ content: [{ type: 'text', text }] }`, Chrome's docs show a bare string — and
+ * everything has already survived a structured clone across two contexts by now.
+ */
+function normalizeBridgeResult(raw: unknown): { content: string } {
+	if (raw == null) return { content: '' }
+	if (typeof raw === 'string') return { content: raw }
+
+	if (typeof raw === 'object') {
+		const navigated = (raw as { navigated?: boolean }).navigated
+		if (navigated) return { content: '✅ Tool executed. The page navigated as a result.' }
+
+		const content = (raw as { content?: unknown }).content
+
+		if (Array.isArray(content)) {
+			const text = content
+				.map((part) =>
+					typeof part === 'string'
+						? part
+						: typeof (part as { text?: unknown })?.text === 'string'
+							? (part as { text: string }).text
+							: ''
+				)
+				.filter(Boolean)
+				.join('\n')
+			return { content: text }
+		}
+
+		if (typeof content === 'string') return { content }
+	}
+
+	try {
+		return { content: JSON.stringify(raw) ?? '' }
+	} catch {
+		return { content: '' }
+	}
 }
 
 /**

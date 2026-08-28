@@ -13,7 +13,7 @@
  *   { type: "result", success: boolean, data: string }
  *   { type: "error", message: string }
  */
-import type { ExecutionResult } from '@page-os/core'
+import type { ExecutionResult } from '@eb-agent/core'
 import { useEffect, useRef, useState } from 'react'
 
 import type { ExtConfig } from '@/agent/useAgent'
@@ -166,7 +166,7 @@ export class HubWs {
 		}
 
 		const ok = window.confirm(
-			'An external application is requesting to control your browser via PageOS Ext.\nAllow this session?'
+			'An external application is requesting to control your browser via EBAgent Ext.\nAllow this session?'
 		)
 		if (ok) this.#approved = true
 		return ok

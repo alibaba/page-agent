@@ -4,26 +4,28 @@ import CodeEditor from '@/components/CodeEditor'
 import { Heading } from '@/components/Heading'
 import { useLanguage } from '@/i18n/context'
 
-export default function PageOSDocs() {
+export default function EBAgentDocs() {
 	const { isZh } = useLanguage()
 
 	return (
 		<div>
-			<h1 className="text-4xl font-bold mb-6">PageOS</h1>
+			<h1 className="text-4xl font-bold mb-6">EBAgent</h1>
 
 			<p className="text-xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
 				{isZh
-					? 'PageOS 是带有内置 UI 面板的完整 Agent 类。它继承自 PageOSCore，并自动创建交互面板和 PageController。'
-					: 'PageOS is the complete Agent class with built-in UI panel. It extends PageOSCore and automatically creates an interactive panel and PageController.'}
+					? 'EBAgent 是带有内置 UI 面板的完整 Agent 类。它继承自 EBAgentCore，并自动创建交互面板和 PageController。'
+					: 'EBAgent is the complete Agent class with built-in UI panel. It extends EBAgentCore and automatically creates an interactive panel and PageController.'}
 			</p>
 
 			{/* When to use */}
 			<section className="mb-10">
-				<Heading id="when-to-use-pageos">{isZh ? '何时使用 PageOS' : 'When to Use PageOS'}</Heading>
+				<Heading id="when-to-use-eb-agent">
+					{isZh ? '何时使用 EBAgent' : 'When to Use EBAgent'}
+				</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? '在大多数场景下，你应该使用 PageOS。它提供了开箱即用的完整体验：'
-						: 'In most cases, you should use PageOS. It provides a complete out-of-the-box experience:'}
+						? '在大多数场景下，你应该使用 EBAgent。它提供了开箱即用的完整体验：'
+						: 'In most cases, you should use EBAgent. It provides a complete out-of-the-box experience:'}
 				</p>
 				<ul className="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-2 mb-6">
 					<li>
@@ -49,9 +51,9 @@ export default function PageOSDocs() {
 				<Heading id="basic-usage">{isZh ? '基本用法' : 'Basic Usage'}</Heading>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageOS } from 'page-os'
+					code={`import { EBAgent } from 'eb-agent'
 
-const agent = new PageOS({
+const agent = new EBAgent({
   // LLM Configuration (required)
   baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
@@ -75,25 +77,25 @@ console.log(result.history) // Full execution history`}
 				<Heading id="class-definition">{isZh ? '类定义' : 'Class Definition'}</Heading>
 				<CodeEditor
 					language="typescript"
-					code={`class PageOS extends PageOSCore {
+					code={`class EBAgent extends EBAgentCore {
   panel: Panel
   pageController: PageController
-  constructor(config: PageOSConfig)
+  constructor(config: EBAgentConfig)
 }`}
 				/>
 				<p className="text-gray-600 dark:text-gray-400 mt-4">
 					{isZh ? (
 						<>
-							PageOS 继承自{' '}
+							EBAgent 继承自{' '}
 							<Link
-								href="/advanced/page-os-core"
+								href="/advanced/eb-agent-core"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
 							>
-								PageOSCore
+								EBAgentCore
 							</Link>
 							，所有核心方法和事件都可用。配置项合并了{' '}
 							<Link
-								href="/advanced/page-os-core#configuration"
+								href="/advanced/eb-agent-core#configuration"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
 							>
 								AgentConfig
@@ -109,16 +111,16 @@ console.log(result.history) // Full execution history`}
 						</>
 					) : (
 						<>
-							PageOS extends{' '}
+							EBAgent extends{' '}
 							<Link
-								href="/advanced/page-os-core"
+								href="/advanced/eb-agent-core"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
 							>
-								PageOSCore
+								EBAgentCore
 							</Link>
 							. All core methods and events are available. Config merges{' '}
 							<Link
-								href="/advanced/page-os-core#configuration"
+								href="/advanced/eb-agent-core#configuration"
 								className="text-blue-600 dark:text-blue-400 hover:underline"
 							>
 								AgentConfig
@@ -141,8 +143,8 @@ console.log(result.history) // Full execution history`}
 				<Heading id="panel">{isZh ? 'UI 面板' : 'UI Panel'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
 					{isZh
-						? 'PageOS 自动创建一个 Panel 实例。你可以通过 panel 属性控制 UI：'
-						: 'PageOS automatically creates a Panel instance. You can control the UI via the panel property:'}
+						? 'EBAgent 自动创建一个 Panel 实例。你可以通过 panel 属性控制 UI：'
+						: 'EBAgent automatically creates a Panel instance. You can control the UI via the panel property:'}
 				</p>
 				<CodeEditor
 					language="typescript"
@@ -162,10 +164,10 @@ agent.panel.dispose()`}
 				/>
 			</section>
 
-			{/* Comparison with PageOSCore */}
+			{/* Comparison with EBAgentCore */}
 			<section className="mb-10">
-				<Heading id="pageos-vs-pageoscore">
-					{isZh ? 'PageOS vs PageOSCore' : 'PageOS vs PageOSCore'}
+				<Heading id="eb-agent-vs-eb-agent-core">
+					{isZh ? 'EBAgent vs EBAgentCore' : 'EBAgent vs EBAgentCore'}
 				</Heading>
 				<div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
 					<table className="w-full text-sm">
@@ -173,10 +175,10 @@ agent.panel.dispose()`}
 							<tr className="bg-gray-50 dark:bg-gray-800/50">
 								<th className="px-4 py-3 text-left font-medium text-gray-600 dark:text-gray-300"></th>
 								<th className="px-4 py-3 text-center font-medium text-gray-600 dark:text-gray-300">
-									PageOS
+									EBAgent
 								</th>
 								<th className="px-4 py-3 text-center font-medium text-gray-600 dark:text-gray-300">
-									PageOSCore
+									EBAgentCore
 								</th>
 							</tr>
 						</thead>

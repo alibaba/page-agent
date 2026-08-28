@@ -28,12 +28,12 @@ This is a **monorepo** with npm workspaces.
 
 Published packages:
 
-- **PageOS** (`packages/page-os/`) - Main entry with built-in UI Panel (npm: `page-os`)
-- **MCP** (`packages/mcp/`) - MCP server for browser control via PageOS extension (npm: `@page-os/mcp`)
-- **Core** (`packages/core/`) - Core agent logic without UI (npm: `@page-os/core`)
+- **EBAgent** (`packages/eb-agent/`) - Main entry with built-in UI Panel (npm: `eb-agent`)
+- **MCP** (`packages/mcp/`) - MCP server for browser control via EBAgent extension (npm: `@eb-agent/mcp`)
+- **Core** (`packages/core/`) - Core agent logic without UI (npm: `@eb-agent/core`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback, independent of LLM
-- **UI** (`packages/ui/`) - Panel and i18n, decoupled from PageOS
+- **UI** (`packages/ui/`) - Panel and i18n, decoupled from EBAgent
 
 Applications:
 
@@ -85,16 +85,16 @@ npm run build:ext
 - Start and serve a local `iife` script
 
     ```bash
-    npm run dev:demo # Serving IIFE with auto rebuild at http://localhost:5174/page-os.demo.js
+    npm run dev:demo # Serving IIFE with auto rebuild at http://localhost:5174/eb-agent.demo.js
     ```
 
 - Add a new bookmark
 
     ```javascript
-    javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5174/page-os.demo.js?lang=en-US&t=${Math.random()}`;s.onload=()=>console.log(%27PageOS ready!%27);document.head.appendChild(s);})();
+    javascript:(function(){var s=document.createElement('script');s.src=`http://localhost:5174/eb-agent.demo.js?lang=en-US&t=${Math.random()}`;s.onload=()=>console.log(%27EBAgent ready!%27);document.head.appendChild(s);})();
     ```
 
-- Click the bookmark on any page to load PageOS
+- Click the bookmark on any page to load EBAgent
 
 > Warning: AK in your local `.env` will be inlined in the iife script. Be very careful when you distribute the script.
 

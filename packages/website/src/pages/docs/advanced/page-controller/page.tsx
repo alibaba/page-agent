@@ -22,13 +22,15 @@ export default function PageControllerDocs() {
 			<section className="mb-10">
 				<Heading id="basic-usage">{isZh ? '基本用法' : 'Basic Usage'}</Heading>
 				<p className="text-gray-600 dark:text-gray-400 mb-4">
-					{isZh ? 'PageOS 接受 PageController 配置项：' : 'PageOS accepts PageController options:'}
+					{isZh
+						? 'EBAgent 接受 PageController 配置项：'
+						: 'EBAgent accepts PageController options:'}
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageOS } from 'page-os'
+					code={`import { EBAgent } from 'eb-agent'
 
-const agent = new PageOS({
+const agent = new EBAgent({
   baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
   model: 'gpt-5.2',
@@ -40,20 +42,20 @@ const agent = new PageOS({
 				/>
 				<p className="text-gray-600 dark:text-gray-400 mt-4">
 					{isZh
-						? 'PageOSCore 接受 PageController 实例：'
-						: 'PageOSCore accepts a PageController instance:'}
+						? 'EBAgentCore 接受 PageController 实例：'
+						: 'EBAgentCore accepts a PageController instance:'}
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageOSCore } from '@page-os/core'
-import { PageController } from '@page-os/page-controller'
+					code={`import { EBAgentCore } from '@eb-agent/core'
+import { PageController } from '@eb-agent/page-controller'
 
 const pageController = new PageController({
   enableMask: true,
   viewportExpansion: -1,  // extract full page
 })
 
-const agent = new PageOSCore({
+const agent = new EBAgentCore({
   pageController,
   baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',
@@ -74,8 +76,8 @@ const agent = new PageOSCore({
 							type: 'boolean',
 							defaultValue: 'false',
 							description: isZh
-								? '启用视觉遮罩覆盖层，在自动化期间阻止用户操作页面。通过 PageOS 创建时默认为 true。'
-								: 'Enable visual mask overlay that blocks user interaction during automation. Defaults to true when created via PageOS.',
+								? '启用视觉遮罩覆盖层，在自动化期间阻止用户操作页面。通过 EBAgent 创建时默认为 true。'
+								: 'Enable visual mask overlay that blocks user interaction during automation. Defaults to true when created via EBAgent.',
 						},
 						{
 							name: 'viewportExpansion',
@@ -268,8 +270,8 @@ const agent = new PageOSCore({
 				</p>
 				<CodeEditor
 					language="typescript"
-					code={`import { PageOSCore } from '@page-os/core'
-import type { PageController } from '@page-os/page-controller'
+					code={`import { EBAgentCore } from '@eb-agent/core'
+import type { PageController } from '@eb-agent/page-controller'
 
 class PuppeteerPageController implements PageController {
   async getBrowserState() { /* ... */ }
@@ -279,7 +281,7 @@ class PuppeteerPageController implements PageController {
   // ... other methods
 }
 
-const agent = new PageOSCore({
+const agent = new EBAgentCore({
   pageController: new PuppeteerPageController(),
   baseURL: 'https://api.deepseek.com',
   apiKey: 'your-api-key',

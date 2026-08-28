@@ -7,7 +7,7 @@ We provide security fixes on a best-effort basis for:
 | Version                                                   | Supported |
 | --------------------------------------------------------- | --------- |
 | `main`                                                    | Yes       |
-| Latest npm release of `page-os` and workspace packages | Yes       |
+| Latest npm release of `eb-agent` and workspace packages | Yes       |
 | Older releases                                            | No        |
 
 Please upgrade to the latest release before reporting an issue against an older build.

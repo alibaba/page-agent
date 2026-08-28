@@ -1,4 +1,4 @@
-# Contributing to PageOS
+# Contributing to EBAgent
 
 ♥️ We welcome contributions from everyone.
 
@@ -44,4 +44,4 @@ By contributing to this project, you agree that your contributions will be licen
 
 ---
 
-Thank you for helping make PageOS better! 🎉
+Thank you for helping make EBAgent better! 🎉

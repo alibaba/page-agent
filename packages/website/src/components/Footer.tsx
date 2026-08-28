@@ -24,7 +24,7 @@ export default function Footer() {
 							</a>
 						</p>
 						<p className="text-gray-600 dark:text-gray-300 text-xs mt-0.5">
-							© 2026 PageOS. All rights reserved.
+							© 2026 EBAgent. All rights reserved.
 						</p>
 					</div>
 

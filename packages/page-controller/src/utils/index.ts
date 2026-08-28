@@ -59,7 +59,7 @@ export async function movePointerToElement(element: HTMLElement, x: number, y: n
 	const offset = getIframeOffset(element)
 
 	window.dispatchEvent(
-		new CustomEvent('PageOS::MovePointerTo', {
+		new CustomEvent('EBAgent::MovePointerTo', {
 			detail: { x: x + offset.x, y: y + offset.y },
 		})
 	)
@@ -68,13 +68,13 @@ export async function movePointerToElement(element: HTMLElement, x: number, y: n
 }
 
 export async function clickPointer() {
-	window.dispatchEvent(new CustomEvent('PageOS::ClickPointer'))
+	window.dispatchEvent(new CustomEvent('EBAgent::ClickPointer'))
 }
 
 export async function enablePassThrough() {
-	window.dispatchEvent(new CustomEvent('PageOS::EnablePassThrough'))
+	window.dispatchEvent(new CustomEvent('EBAgent::EnablePassThrough'))
 }
 
 export async function disablePassThrough() {
-	window.dispatchEvent(new CustomEvent('PageOS::DisablePassThrough'))
+	window.dispatchEvent(new CustomEvent('EBAgent::DisablePassThrough'))
 }

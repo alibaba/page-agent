@@ -1,7 +1,7 @@
-import type { HistoricalEvent } from '@page-os/core'
+import type { HistoricalEvent } from '@eb-agent/core'
 import { type DBSchema, type IDBPDatabase, openDB } from 'idb'
 
-const DB_NAME = 'page-os-ext'
+const DB_NAME = 'eb-agent-ext'
 const DB_VERSION = 1
 
 export interface SessionRecord {
@@ -12,7 +12,7 @@ export interface SessionRecord {
 	createdAt: number
 }
 
-interface PageOSDB extends DBSchema {
+interface EBAgentDB extends DBSchema {
 	sessions: {
 		key: string
 		value: SessionRecord
@@ -20,11 +20,11 @@ interface PageOSDB extends DBSchema {
 	}
 }
 
-let dbPromise: Promise<IDBPDatabase<PageOSDB>> | null = null
+let dbPromise: Promise<IDBPDatabase<EBAgentDB>> | null = null
 
 function getDB() {
 	if (!dbPromise) {
-		dbPromise = openDB<PageOSDB>(DB_NAME, DB_VERSION, {
+		dbPromise = openDB<EBAgentDB>(DB_NAME, DB_VERSION, {
 			upgrade(db) {
 				const store = db.createObjectStore('sessions', { keyPath: 'id' })
 				store.createIndex('by-created', 'createdAt')

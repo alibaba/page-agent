@@ -13,7 +13,7 @@
 
 - ⬜ **P0** Confirm fork is clean and repo has its own git remote under our org (currently still
   `github.com/alibaba/page-agent` in every `package.json` `repository`/`homepage`).
-- 🔴 **DECISION: Product name & npm scope.** Pick the customer-facing name (e.g. "PageOS")
+- 🔴 **DECISION: Product name & npm scope.** Pick the customer-facing name (e.g. "EBAgent")
   and npm scope (e.g. `@equalbyte/*`). Everything in Phase 1 depends on this.
 - 🔴 **DECISION: Key model at launch.** Confirm we ship **both** BYOK *and* managed key (briefing
   said "customer's key OR my key, charge accordingly"). This drives Phase 3 scope.
@@ -22,7 +22,7 @@
 - ⬜ **P0** **MIT license compliance (important, not optional):** MIT lets us rebrand and sell, **but
   we must retain the original copyright + license text.** Keep the original `Copyright (C) 2025
   Alibaba Group Holding Limited` notice in `LICENSE` (and the header of
-  `packages/core/src/PageOSCore.ts`); add our own copyright alongside — do **not** delete theirs.
+  `packages/core/src/EBAgentCore.ts`); add our own copyright alongside — do **not** delete theirs.
   We can freely rebrand product name, UI, and marketing.
 
 ---
@@ -32,11 +32,11 @@
 Remove all upstream (Alibaba / Qwen / demo) references from anything customer-visible.
 
 - ⬜ **Package metadata** — update `repository.url` + `homepage` in: root `package.json`,
-  `packages/core/package.json`, `packages/ui/package.json`, `packages/page-os/package.json`,
+  `packages/core/package.json`, `packages/ui/package.json`, `packages/eb-agent/package.json`,
   `packages/mcp/package.json`. Also `author` fields (`Simon<gaomeng1900>`).
-- ⬜ **npm package names** — decide rename `@page-os/*` → `@<scope>/*` (or keep libs private /
-  `"private": true` if we don't publish them). Note published entry is `page-os`.
-- ⬜ **Copyright header** — `packages/core/src/PageOSCore.ts` (see Phase 0 MIT note — keep theirs, add ours).
+- ⬜ **npm package names** — decide rename `@eb-agent/*` → `@<scope>/*` (or keep libs private /
+  `"private": true` if we don't publish them). Note published entry is `eb-agent`.
+- ⬜ **Copyright header** — `packages/core/src/EBAgentCore.ts` (see Phase 0 MIT note — keep theirs, add ours).
 - ⬜ **README & docs banner** — `README.md` (banner from `page-agent.github.io`, badges, HN/X links),
   `docs/README-zh.md`, `docs/CHANGELOG.md`, `docs/terms-and-privacy.md`, `CONTRIBUTING.md`,
   `docs/CODE_OF_CONDUCT.md`, `docs/SECURITY.md`.
@@ -64,9 +64,9 @@ Today the bundle is Alibaba-hosted and the demo default backend is
 `https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run` (baked into `demo.ts`,
 extension `constants.ts`, website `constants.ts`).
 
-- ⬜ **Build the CDN bundle** — `npm run build -w page-os` → produces `page-os.demo.js` (IIFE)
-  via `packages/page-os/vite.iife.config.js` into `dist/iife/`.
-- ⬜ **Remove baked demo defaults** — in `packages/page-os/src/demo.ts` replace `DEMO_BASE_URL`,
+- ⬜ **Build the CDN bundle** — `npm run build -w eb-agent` → produces `eb-agent.demo.js` (IIFE)
+  via `packages/eb-agent/vite.iife.config.js` into `dist/iife/`.
+- ⬜ **Remove baked demo defaults** — in `packages/eb-agent/src/demo.ts` replace `DEMO_BASE_URL`,
   `DEMO_API_KEY='NA'`, `DEMO_MODEL='qwen3.5-plus'` with our gateway URL + tenant-token model
   (see Phase 3). Same for extension + website `constants.ts`.
 - ⬜ **Host on our CDN** — upload bundle to chosen CDN. Provide **versioned, immutable URLs**
@@ -84,7 +84,7 @@ extension `constants.ts`, website `constants.ts`).
 **Problem:** current code supports only (a) a key **baked at build** (`vite.iife.config.js` `define`
 of `LLM_API_KEY/BASE_URL/MODEL_NAME`) or (b) a key **in the script URL** (`?apiKey=` in `demo.ts`) —
 which **leaks the secret to anyone viewing the page.** Neither gives per-customer segregation. The
-`PageOSConfig` / LLM layer (`packages/llms`) is OpenAI-compatible and takes `{ model, baseURL,
+`EBAgentConfig` / LLM layer (`packages/llms`) is OpenAI-compatible and takes `{ model, baseURL,
 apiKey }`, so both modes below plug into the same client.
 
 ### 3A — BYOK (customer brings their own key)

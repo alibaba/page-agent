@@ -1,10 +1,30 @@
-import { InvokeError, InvokeErrorTypes } from '@page-os/llms'
+import { InvokeError, InvokeErrorTypes } from '@eb-agent/llms'
 import chalk from 'chalk'
+import { jsonrepair } from 'jsonrepair'
 import * as z from 'zod/v4'
 
-import type { PageOSTool } from '../tools'
+import type { EBAgentTool } from '../tools'
 
 const log = console.log.bind(console, chalk.yellow('[autoFixer]'))
+
+/**
+ * Detect `done` text that states an unresolved question or an unexecuted
+ * intention ("would you like X or Y?", "let me search...", "I'm unable to
+ * proceed without...") instead of an actual completed result or a genuine
+ * dead end. Deliberately broad/over-inclusive: a false positive here just
+ * means we pause for confirmation instead of ending the task, which is
+ * always recoverable — a false negative reproduces the "done ends the task,
+ * next message starts an unrelated new task" bug.
+ */
+export function looksNonTerminal(text: string | undefined): boolean {
+	if (!text) return false
+	const trimmed = text.trim()
+	if (!trimmed) return false
+
+	return /\?\s*["')\]]*$|\b(let me\b|i will\b|i['’]ll\b|i need to\b|i should now\b|i['’]m going to\b|next[,]? i\b|unable to proceed\b|i can['’]t (proceed|continue)\b)/i.test(
+		trimmed
+	)
+}
 
 /**
  * Normalize LLM response and fix common format issues.
@@ -18,7 +38,7 @@ const log = console.log.bind(console, chalk.yellow('[autoFixer]'))
  * - Primitive action input for single-field tools (e.g. `{"click_element_by_index": 2}`)
  * - etc.
  */
-export function normalizeResponse(response: any, tools?: Map<string, PageOSTool>): any {
+export function normalizeResponse(response: any, tools?: Map<string, EBAgentTool>): any {
 	let resolvedArguments: any
 
 	const choice = (response as { choices?: Choice[] }).choices?.[0]
@@ -34,10 +54,10 @@ export function normalizeResponse(response: any, tools?: Map<string, PageOSTool>
 	if (toolCall?.function?.arguments) {
 		resolvedArguments = safeJsonParse(toolCall.function.arguments)
 
-		// case: sometimes the model only returns the action level
+		// case: sometimes the model calls the leaf tool directly instead of wrapping in AgentOutput
 		if (toolCall.function.name && toolCall.function.name !== 'AgentOutput') {
 			log(`#1: fixing tool_call`)
-			resolvedArguments = { action: safeJsonParse(resolvedArguments) }
+			resolvedArguments = { action: { [toolCall.function.name]: safeJsonParse(resolvedArguments) } }
 		}
 	} else {
 		// case: sometimes the model returns json in content instead of tool_calls
@@ -81,8 +101,46 @@ export function normalizeResponse(response: any, tools?: Map<string, PageOSTool>
 
 	// fix double stringified arguments
 	resolvedArguments = safeJsonParse(resolvedArguments)
+
+	// case: arguments never became valid JSON (e.g. model emitted an unquoted
+	// string value, breaking JSON syntax). `safeJsonParse` falls back to
+	// returning the original string rather than throwing, so without this
+	// check `resolvedArguments` stays a string primitive and every later
+	// `resolvedArguments.action = ...` write below throws an opaque native
+	// TypeError ("Cannot create property 'action' on string ..."). Fail
+	// loudly and retryably instead so the caller's retry loop can re-sample
+	// the model for a well-formed response.
+	if (typeof resolvedArguments !== 'object' || resolvedArguments === null) {
+		// jsonrepair (and the {...} extraction fallback) couldn't recover this one — log the
+		// exact offending text so it's visible in the console without digging through the
+		// raw response payload, in case this repair still doesn't cover every case.
+		console.error('[autoFixer] unrecoverable malformed model response:', resolvedArguments)
+		throw new InvokeError(
+			InvokeErrorTypes.INVALID_TOOL_ARGS,
+			'Model response is not valid JSON (likely an unescaped/unquoted string value)',
+			undefined,
+			response
+		)
+	}
+
 	if (resolvedArguments.action) {
 		resolvedArguments.action = safeJsonParse(resolvedArguments.action)
+	}
+
+	// case: model re-nests the whole macro object one level too deep inside `action`
+	// (e.g. { action: { evaluation_previous_goal, memory, next_goal, action: {...} } })
+	// instead of just { toolName: toolInput }. Unwrap until we hit the real action,
+	// promoting any reflection fields only set at the nested level.
+	for (let depth = 0; depth < 3; depth++) {
+		const nested = resolvedArguments.action
+		if (!nested || typeof nested !== 'object' || !nested.action) break
+
+		log(`#6: fixing tool_call (unwrapping re-nested macro object, depth ${depth + 1})`)
+		resolvedArguments.evaluation_previous_goal =
+			resolvedArguments.evaluation_previous_goal ?? nested.evaluation_previous_goal
+		resolvedArguments.memory = resolvedArguments.memory ?? nested.memory
+		resolvedArguments.next_goal = resolvedArguments.next_goal ?? nested.next_goal
+		resolvedArguments.action = safeJsonParse(nested.action)
 	}
 
 	// validate and fix action input using tool schemas
@@ -127,7 +185,7 @@ export function normalizeResponse(response: any, tools?: Map<string, PageOSTool>
  * Also coerces primitive inputs for single-field tools:
  * e.g. `{"click_element_by_index": 2}` → `{"click_element_by_index": {"index": 2}}`
  */
-function validateAction(action: any, tools: Map<string, PageOSTool>): any {
+function validateAction(action: any, tools: Map<string, EBAgentTool>): any {
 	if (typeof action !== 'object' || action === null) return action
 
 	const toolName = Object.keys(action)[0]
@@ -169,13 +227,47 @@ function validateAction(action: any, tools: Map<string, PageOSTool>): any {
 
 /**
  * Safely parse JSON, return original input if not json.
+ *
+ * Smaller/local models frequently emit near-JSON (missing quotes around a
+ * string value, trailing commas, etc.) instead of retrying into the same
+ * mistake — see the bug this guards against in `normalizeResponse` above.
+ * `jsonrepair` fixes these common near-misses; genuinely non-JSON input
+ * either comes back as a JSON string literal (safe: callers type-check for
+ * an object) or throws, in which case we fall back to the original input
+ * exactly as before.
  */
 function safeJsonParse(input: any): any {
 	if (typeof input === 'string') {
+		const trimmed = input.trim()
 		try {
-			return JSON.parse(input.trim())
+			return JSON.parse(trimmed)
 		} catch {
-			return input
+			// The model wrapped the intended JSON in prose/code fences (```json ... ```
+			// or leading/trailing commentary). Try repairing just the extracted {...}
+			// span FIRST when there's surrounding text: jsonrepair treats newline-
+			// separated "prose, then JSON, then stray token" input as multiple loose
+			// values and repairs it into a wrapping array (silently discarding the
+			// object shape we actually want), so repairing the raw string as-is would
+			// "succeed" with the wrong shape instead of failing loudly.
+			const extracted = /({[\s\S]*})/.exec(trimmed)?.[1]
+			if (extracted && extracted !== trimmed) {
+				try {
+					const repaired = jsonrepair(extracted)
+					log('repaired malformed JSON from model response (after extracting {...} span)')
+					return JSON.parse(repaired)
+				} catch {
+					// fall through to repairing the whole string
+				}
+			}
+
+			// repair near-JSON as-is (missing quotes, trailing commas, etc.)
+			try {
+				const repaired = jsonrepair(trimmed)
+				log('repaired malformed JSON from model response')
+				return JSON.parse(repaired)
+			} catch {
+				return input
+			}
 		}
 	}
 	return input

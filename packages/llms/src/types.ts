@@ -4,11 +4,19 @@
 import type * as z from 'zod/v4'
 
 /**
+ * Multimodal message content part - OpenAI standard content block format.
+ * Used to attach images alongside text in a single message (vision-capable models only).
+ */
+export type MessageContentPart =
+	| { type: 'text'; text: string }
+	| { type: 'image_url'; image_url: { url: string; detail?: 'low' | 'high' | 'auto' } }
+
+/**
  * Message format - OpenAI standard (industry standard)
  */
 export interface Message {
 	role: 'system' | 'user' | 'assistant' | 'tool'
-	content?: string | null
+	content?: string | MessageContentPart[] | null
 	tool_calls?: {
 		id: string
 		type: 'function'

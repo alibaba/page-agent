@@ -172,9 +172,9 @@ interface TreeNode {
  * 将 dom 信息处理成适合 llm 阅读的文本格式
  * @形如
  * ``` text
- * [0]<a aria-label=page-os.js 首页 />
+ * [0]<a aria-label=eb-agent.js 首页 />
  * [1]<div >P />
- * [2]<div >page-os.js
+ * [2]<div >eb-agent.js
  * UI Agent in your webpage />
  * [3]<a >文档 />
  * [4]<a aria-label=查看源码（在新窗口打开）>源码 />

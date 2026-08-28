@@ -669,11 +669,101 @@
 		max-height: 0;
 	}
 
+	.imagePreviewRow {
+		padding: 0 8px;
+
+		&.hidden {
+			display: none;
+		}
+
+		.imageChip {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			margin: 6px 0 0;
+			padding: 3px 8px 3px 3px;
+			background: rgba(255, 255, 255, 0.4);
+			border: 1px solid rgba(255, 255, 255, 0.3);
+			border-radius: 999px;
+			color: rgb(20, 20, 20);
+			font-size: 12px;
+
+			.imageChipThumb {
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				object-fit: cover;
+			}
+
+			.imageChipRemove {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 16px;
+				height: 16px;
+				padding: 0;
+				border: none;
+				border-radius: 50%;
+				background: transparent;
+				color: inherit;
+				cursor: pointer;
+
+				svg {
+					width: 11px;
+					height: 11px;
+				}
+
+				&:hover {
+					background: rgba(0, 0, 0, 0.1);
+				}
+			}
+		}
+	}
+
 	.inputSection {
 		display: flex;
 		align-items: flex-end;
 		gap: 4px;
 		padding: 8px 8px;
+
+		/*
+		 * Visually hidden, not display:none — clicking a display:none file input
+		 * silently fails to open the picker in Firefox (and some other browsers).
+		 */
+		.imageFileInput {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			padding: 0;
+			margin: -1px;
+			overflow: hidden;
+			clip: rect(0, 0, 0, 0);
+			white-space: nowrap;
+			border: 0;
+		}
+
+		.attachButton {
+			flex-shrink: 0;
+			width: 34px;
+			height: 34px;
+			border: 1px solid rgba(255, 255, 255, 0.3);
+			border-radius: 10px;
+			background: rgba(255, 255, 255, 0.4);
+			color: rgb(20, 20, 20);
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			svg {
+				width: 15px;
+				height: 15px;
+			}
+
+			&:hover {
+				background: rgba(255, 255, 255, 0.6);
+			}
+		}
 
 		.taskInput {
 			flex: 1;

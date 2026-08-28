@@ -71,7 +71,7 @@ export default function FeaturesSection() {
 									</div>
 									<div className="flex items-center gap-2.5 rounded-xl border border-emerald-200/60 bg-emerald-50 px-5 py-3 font-mono text-sm text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400">
 										<span className="shrink-0 text-xs text-emerald-500">✓</span>
-										{'<script src="page-os.js"></script>'}
+										{'<script src="eb-agent.js"></script>'}
 									</div>
 								</div>
 								<div className="px-7 pb-5">

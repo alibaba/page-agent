@@ -81,7 +81,10 @@ export function modelPatch(body: Record<string, any>, baseURL?: string) {
 			debug('Patch Claude: disable thinking')
 			body.thinking = { type: 'disabled' }
 
-			if (provider !== 'openrouter') {
+			// openrouter and Anthropic's own OpenAI-compatible endpoint both expect
+			// standard OpenAI tool_choice shapes. Only 3rd-party proxies speaking
+			// Claude's native Messages API format need this conversion.
+			if (provider !== 'openrouter' && provider !== 'anthropic') {
 				// Convert tool_choice to Claude format
 				if (body.tool_choice === 'required') {
 					// 'required' -> { type: 'any' } (must call some tool)
@@ -207,12 +210,13 @@ export function normalizeModelName(modelName: string): string {
 	return normalizedName
 }
 
-export function getProvider(baseURL?: string): 'openrouter' | undefined {
+export function getProvider(baseURL?: string): 'openrouter' | 'anthropic' | undefined {
 	if (!baseURL) return undefined
 	try {
 		const url = new URL(baseURL)
 		const hostname = url.hostname
 		if (hostname === 'openrouter.ai') return 'openrouter'
+		if (hostname === 'api.anthropic.com') return 'anthropic'
 		return undefined
 	} catch (e) {
 		return undefined

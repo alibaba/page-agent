@@ -1,5 +1,5 @@
 {
-    "name": "@page-os/page-controller",
+    "name": "@eb-agent/page-controller",
     "version": "1.11.0",
     "type": "module",
     "main": "./src/PageController.ts",
@@ -25,9 +25,9 @@
     "files": [
         "dist/"
     ],
-    "description": "Page controller for page-os - DOM operations and element interactions",
+    "description": "Page controller for eb-agent - DOM operations and element interactions",
     "keywords": [
-        "page-os",
+        "eb-agent",
         "dom",
         "browser-automation",
         "web-automation"

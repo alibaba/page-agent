@@ -50,14 +50,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
-- **Robust abort handling** - Rewrote the aborting system; sync tools, loop execution, and LLM clients now correctly respect task abort signals (`ctx.signal`). Also decoupled `AbortError` from `InvokeError` in `@page-os/llms`.
+- **Robust abort handling** - Rewrote the aborting system; sync tools, loop execution, and LLM clients now correctly respect task abort signals (`ctx.signal`). Also decoupled `AbortError` from `InvokeError` in `@eb-agent/llms`.
 - **Claude Opus 4.8 support** - Added support for Claude Opus 4.8 model.
 
 ### Improvements
 
-- **Concurrency guard** - Prevented concurrent `execute()` calls on a single PageOS/Core instance to avoid race conditions.
+- **Concurrency guard** - Prevented concurrent `execute()` calls on a single EBAgent/Core instance to avoid race conditions.
 - **Model recommendations refresh** - Updated default and tested model list recommendations.
-- **Test coverage** - Added comprehensive Vitest unit tests for the `@page-os/llms` package.
+- **Test coverage** - Added comprehensive Vitest unit tests for the `@eb-agent/llms` package.
 - **Improved documentation** - Added website documentation for the `ctx.signal` abort contract and `execute()` concurrency rules.
 
 ### Bug Fixes
@@ -170,7 +170,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Features
 
-- **Beta MCP support** - New `@page-os/mcp` package lets MCP clients such as Claude Desktop and Copilot control the browser through the PageOS extension
+- **Beta MCP support** - New `@eb-agent/mcp` package lets MCP clients such as Claude Desktop and Copilot control the browser through the EBAgent extension
 - **Better iframe handling** - Same-origin iframe elements are handled more reliably during DOM extraction and actions
 - **Extension history workflows** - Users can rerun past tasks, export history sessions as JSON, and approve MCP-triggered tasks before execution
 
@@ -195,8 +195,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
-- **`data-browser-use-ignore` → `data-page-os-ignore`** - DOM ignore attribute renamed to match the project identity
-- **Config types restructured** - `PageOSConfig` split into `AgentConfig` + `PageOSCoreConfig`; config definitions moved from `config/index.ts` to `types.ts`
+- **`data-browser-use-ignore` → `data-eb-agent-ignore`** - DOM ignore attribute renamed to match the project identity
+- **Config types restructured** - `EBAgentConfig` split into `AgentConfig` + `EBAgentCoreConfig`; config definitions moved from `config/index.ts` to `types.ts`
 - **Zod v3/v4 dual support** - Libraries now accept both `zod@^3.25` and `zod@^4.0` as peer dependencies
 
 ### Features
@@ -214,7 +214,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Extension v0.1.9
 
-> PageOS 1.5.1
+> EBAgent 1.5.1
 
 - **Advanced config panel** - New collapsible section exposing Max Steps, System Instruction, and experimental `llms.txt` toggle
 - Streamlined User Auth Token description
@@ -236,8 +236,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Unified zod imports (`* as z`) across all packages for consistency
 - Better Zod error formatting with `z.prettifyError()` in LLM client
-- Exported `InvokeError` and `InvokeErrorType` as values (not just types) from `@page-os/llms`
-- Exported `SupportedLanguage` type from `@page-os/core`
+- Exported `InvokeError` and `InvokeErrorType` as values (not just types) from `@eb-agent/llms`
+- Exported `SupportedLanguage` type from `@eb-agent/core`
 
 ### Extension v0.1.8
 
@@ -252,7 +252,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
-- **Lifecycle: `stop()` vs `dispose()`** - New `stop()` method to cancel the current task while keeping the agent reusable. `dispose()` is now terminal — a disposed agent cannot be reused. This affects both `PageOSCore` and `PanelAgentAdapter`.
+- **Lifecycle: `stop()` vs `dispose()`** - New `stop()` method to cancel the current task while keeping the agent reusable. `dispose()` is now terminal — a disposed agent cannot be reused. This affects both `EBAgentCore` and `PanelAgentAdapter`.
 
 ### Features
 
@@ -311,14 +311,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🎉 First Stable Release
 
-PageOS is now ready for production use. The API is stable and breaking changes will follow semantic versioning.
+EBAgent is now ready for production use. The API is stable and breaking changes will follow semantic versioning.
 
 ### Features
 
 #### Core
 
-- **PageOS** - Main entry class with built-in UI Panel
-- **PageOSCore** - Headless agent class for custom UI or programmatic use
+- **EBAgent** - Main entry class with built-in UI Panel
+- **EBAgentCore** - Headless agent class for custom UI or programmatic use
 - **DOM Analysis** - Text-based DOM extraction with high-intensity dehydration
 - **LLM Support** - Works with OpenAI, Claude, DeepSeek, Qwen, and other OpenAI-compatible APIs
 - **Tool System** - Built-in tools for click, input, scroll, select, and more
@@ -343,11 +343,11 @@ PageOS is now ready for production use. The API is stable and breaking changes w
 
 | Package                       | Description                        |
 | ----------------------------- | ---------------------------------- |
-| `page-os`                  | Main entry with UI Panel           |
-| `@page-os/core`            | Core agent logic without UI        |
-| `@page-os/llms`            | LLM client with retry logic        |
-| `@page-os/page-controller` | DOM operations and visual feedback |
-| `@page-os/ui`              | Panel and i18n                     |
+| `eb-agent`                  | Main entry with UI Panel           |
+| `@eb-agent/core`            | Core agent logic without UI        |
+| `@eb-agent/llms`            | LLM client with retry logic        |
+| `@eb-agent/page-controller` | DOM operations and visual feedback |
+| `@eb-agent/ui`              | Panel and i18n                     |
 
 ### Known Limitations
 

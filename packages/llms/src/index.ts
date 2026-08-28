@@ -84,14 +84,14 @@ export function parseLLMConfig(config: LLMConfig): ResolvedLLMConfig {
 	// Runtime validation as defensive programming (types already guarantee these)
 	if (!config.baseURL || !config.model) {
 		throw new Error(
-			'[PageOS] LLM configuration required. Please provide: baseURL, model. ' +
+			'[EBAgent] LLM configuration required. Please provide: baseURL, model. ' +
 				'See: https://equalbyte.github.io/agentic-page/docs/features/models'
 		)
 	}
 
 	if (config.temperature !== undefined) {
 		console.warn(
-			'[PageOS] LLMConfig.temperature is deprecated and will be removed in a future version. ' +
+			'[EBAgent] LLMConfig.temperature is deprecated and will be removed in a future version. ' +
 				'Use transformRequestBody to set it only for models you have verified accept it.'
 		)
 	}

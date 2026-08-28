@@ -4,11 +4,12 @@
 import type {
 	AgentActivity,
 	AgentStatus,
+	ExecuteOptions,
 	ExecutionResult,
 	HistoricalEvent,
 	SupportedLanguage,
-} from '@page-os/core'
-import type { LLMConfig } from '@page-os/llms'
+} from '@eb-agent/core'
+import type { LLMConfig } from '@eb-agent/llms'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { MultiPageAgent } from './MultiPageAgent'
@@ -35,7 +36,7 @@ export interface UseAgentResult {
 	activity: AgentActivity | null
 	currentTask: string
 	config: ExtConfig | null
-	execute: (task: string) => Promise<ExecutionResult>
+	execute: (task: string, options?: ExecuteOptions) => Promise<ExecutionResult>
 	stop: () => void
 	configure: (config: ExtConfig) => Promise<void>
 }
@@ -106,13 +107,13 @@ export function useAgent(): UseAgentResult {
 		}
 	}, [config])
 
-	const execute = useCallback(async (task: string) => {
+	const execute = useCallback(async (task: string, options?: ExecuteOptions) => {
 		const agent = agentRef.current
 		if (!agent) throw new Error('Agent not initialized')
 
 		setCurrentTask(task)
 		setHistory([])
-		return agent.execute(task)
+		return agent.execute(task, options)
 	}, [])
 
 	const stop = useCallback(() => {

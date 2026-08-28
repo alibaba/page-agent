@@ -1,9 +1,9 @@
-import type { LLMConfig } from '@page-os/llms'
+import type { LLMConfig } from '@eb-agent/llms'
 
 // Demo LLM for testing.
 // TODO: point at the EqualByte LLM gateway (see PRODUCTIZATION-TASKS.md Phase 2/3).
-export const DEMO_MODEL = 'deepseek-chat'
-export const DEMO_BASE_URL = 'https://api.deepseek.com'
+export const DEMO_MODEL = 'claude-haiku-4-5'
+export const DEMO_BASE_URL = 'https://api.anthropic.com/v1'
 // export const DEMO_API_KEY = ''
 
 export const DEMO_CONFIG: LLMConfig = {

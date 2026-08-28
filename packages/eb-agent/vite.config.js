@@ -27,9 +27,9 @@ export default defineConfig({
 	publicDir: false,
 	build: {
 		lib: {
-			entry: resolve(__dirname, 'src/PageOS.ts'),
-			name: 'PageOS',
-			fileName: 'page-os',
+			entry: resolve(__dirname, 'src/EBAgent.ts'),
+			name: 'EBAgent',
+			fileName: 'eb-agent',
 			formats: ['es'],
 		},
 		outDir: resolve(__dirname, 'dist', 'esm'),
@@ -38,7 +38,7 @@ export default defineConfig({
 				'chalk',
 				'zod',
 				'zod/v4',
-				// NOTE: internal @page-os/* packages are deliberately BUNDLED here.
+				// NOTE: internal @eb-agent/* packages are deliberately BUNDLED here.
 				// They are not published to any registry, so the tarball must be
 				// self-contained for consumers installing from the .tgz.
 			],

@@ -1,0 +1,51 @@
+{
+    "name": "@eb-agent/capabilities",
+    "version": "1.11.0",
+    "type": "module",
+    "main": "./src/index.ts",
+    "types": "./src/index.ts",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./src/index.ts"
+        }
+    },
+    "publishConfig": {
+        "main": "./dist/lib/eb-agent-capabilities.js",
+        "module": "./dist/lib/eb-agent-capabilities.js",
+        "types": "./dist/lib/index.d.ts",
+        "exports": {
+            ".": {
+                "types": "./dist/lib/index.d.ts",
+                "import": "./dist/lib/eb-agent-capabilities.js",
+                "default": "./dist/lib/eb-agent-capabilities.js"
+            }
+        }
+    },
+    "files": [
+        "dist/"
+    ],
+    "description": "Capability registry, resolver, policy and execution engine for eb-agent - with a WebMCP adapter",
+    "keywords": [
+        "eb-agent",
+        "webmcp",
+        "mcp",
+        "ai-agent",
+        "capabilities",
+        "tools"
+    ],
+    "author": "EqualByte",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/EqualByte/agentic-page.git",
+        "directory": "packages/capabilities"
+    },
+    "homepage": "https://equalbyte.github.io/agentic-page/",
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest run",
+        "prepublishOnly": "node ../../scripts/pre-publish.js",
+        "postpublish": "node ../../scripts/post-publish.js"
+    }
+}

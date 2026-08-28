@@ -192,7 +192,8 @@ describe('OpenAIClient.invoke — HTTP errors', () => {
 		[429, InvokeErrorTypes.RATE_LIMIT],
 		[500, InvokeErrorTypes.SERVER_ERROR],
 		[502, InvokeErrorTypes.SERVER_ERROR],
-		[418, InvokeErrorTypes.UNKNOWN],
+		[400, InvokeErrorTypes.CLIENT_ERROR],
+		[418, InvokeErrorTypes.CLIENT_ERROR],
 	])('maps status %i to %s', async (status, type) => {
 		const { client, fetchMock } = makeClient()
 		fetchMock.mockResolvedValue(jsonResponse({ error: { message: 'nope' } }, status))

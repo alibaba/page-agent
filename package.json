@@ -5,10 +5,11 @@
     "type": "module",
     "workspaces": [
         "packages/page-controller",
+        "packages/capabilities",
         "packages/ui",
         "packages/llms",
         "packages/core",
-        "packages/page-os",
+        "packages/eb-agent",
         "packages/mcp",
         "packages/extension",
         "packages/website"
@@ -26,13 +27,13 @@
         "npm": "^11.6.3"
     },
     "scripts": {
-        "start": "npm run dev --workspace=@page-os/website",
-        "dev:ext": "npm run dev -w @page-os/ext",
-        "dev:demo": "npm run dev:demo --workspace=page-os",
+        "start": "npm run dev --workspace=@eb-agent/website",
+        "dev:ext": "npm run dev -w @eb-agent/ext",
+        "dev:demo": "npm run dev:demo --workspace=eb-agent",
         "build": "node scripts/build.js",
         "build:libs": "node scripts/build-libs.js",
-        "build:website": "npm run build:website --workspace=@page-os/website",
-        "build:ext": "npm run zip -w @page-os/ext",
+        "build:website": "npm run build:website --workspace=@eb-agent/website",
+        "build:ext": "npm run zip -w @eb-agent/ext",
         "version": "node scripts/sync-version.js",
         "postpublish": "npm run postpublish --workspaces --if-present",
         "typecheck": "tsc --noEmit -p tsconfig.typecheck.json && tsc --noEmit -p packages/extension/tsconfig.json",

@@ -1,4 +1,4 @@
-# Privacy Policy for PageOS Extension
+# Privacy Policy for EBAgent Extension
 
 This document has moved. Please see our full **[Terms of Use & Privacy](../../docs/terms-and-privacy.md)**.
 

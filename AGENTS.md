@@ -4,16 +4,17 @@
 
 This is a **monorepo** with npm workspaces:
 
-- **PageOS** (`packages/page-os/`) - Main entry with built-in UI Panel, published as `page-os` on npm
+- **EBAgent** (`packages/eb-agent/`) - Main entry with built-in UI Panel, published as `eb-agent` on npm
 - **Extension** (`packages/extension/`) - Browser extension (WXT + React)
 - **Website** (`packages/website/`) - React docs and landing page. **When working on website, follow `packages/website/AGENTS.md`**
 
 Internal packages:
 
-- **Core** (`packages/core/`) - PageOSCore without UI (npm: `@page-os/core`)
+- **Core** (`packages/core/`) - EBAgentCore without UI (npm: `@eb-agent/core`)
 - **LLMs** (`packages/llms/`) - LLM client with reflection-before-action mental model
 - **Page Controller** (`packages/page-controller/`) - DOM operations and visual feedback (SimulatorMask), independent of LLM
-- **UI** (`packages/ui/`) - Panel and i18n. Decoupled from PageOS
+- **Capabilities** (`packages/capabilities/`) - Capability registry, resolver, policy/approval, execution engine and review store, plus the WebMCP and remote-MCP adapters (npm: `@eb-agent/capabilities`)
+- **UI** (`packages/ui/`) - Panel and i18n. Decoupled from EBAgent
 
 ## Development Commands
 
@@ -35,31 +36,34 @@ Source-first monorepo: library `package.json` exports point to `src/*.ts` during
 
 ```
 packages/
-├── core/                    # npm: "@page-os/core" ⭐ Core agent logic (headless)
-├── page-os/              # npm: "page-os" entry class (with UI + controller + demo builds)
-├── website/                 # @page-os/website (private)
-├── llms/                    # @page-os/llms
+├── core/                    # npm: "@eb-agent/core" ⭐ Core agent logic (headless)
+├── eb-agent/              # npm: "eb-agent" entry class (with UI + controller + demo builds)
+├── website/                 # @eb-agent/website (private)
+├── llms/                    # @eb-agent/llms
 ├── extension/               # Browser extension
-├── page-controller/         # @page-os/page-controller
-└── ui/                      # @page-os/ui
+├── page-controller/         # @eb-agent/page-controller
+├── capabilities/            # @eb-agent/capabilities (registry + policy + WebMCP adapter)
+└── ui/                      # @eb-agent/ui
 ```
 
 `workspaces` in `package.json` must be in topological order.
 
 ### Module Boundaries
 
-- **PageOS**: Main entry with UI. Extends PageOSCore and adds Panel. Imports from `@page-os/core`, `@page-os/ui`
-- **Core**: PageOSCore without UI. Imports from `@page-os/llms`, `@page-os/page-controller`
-- **LLMs**: LLM client with MacroToolInput contract. No dependency on page-os
-- **UI**: Panel and i18n. Decoupled from PageOS via PanelAgentAdapter interface
+- **EBAgent**: Main entry with UI. Extends EBAgentCore and adds Panel. Imports from `@eb-agent/core`, `@eb-agent/ui`
+- **Core**: EBAgentCore without UI. Imports from `@eb-agent/llms`, `@eb-agent/page-controller`
+- **LLMs**: LLM client with MacroToolInput contract. No dependency on eb-agent
+- **UI**: Panel and i18n. Decoupled from EBAgent via PanelAgentAdapter interface
 - **Page Controller**: DOM operations with optional visual feedback (SimulatorMask). No LLM dependency. Enable mask via `enableMask: true` config
+- **Capabilities**: What the current application can *do*, independent of how. No LLM and no DOM dependency — adapters are injected. WebMCP is one adapter behind this layer, never the core: see `packages/capabilities/src/adapters/WebMCPAdapter.ts`, the only file in the library that touches `document.modelContext`. Capability sources, in priority order: `native_webmcp` > `developer_defined` > `remote_mcp` > `api` > `dom` > `generated`
+- **WebMCP in the extension**: the extension's agent runs in an isolated world, where `document.modelContext` does not exist. It reaches page-declared tools through `entrypoints/webmcp-world.ts` (injected into the MAIN world) + `agent/webmcpBridge.content.ts`, exposed to the capability layer as a `WebMCPPort` (`agent/RemoteWebMCPAdapter.ts`). The extension consumes page tools but never publishes into a page it does not own
 
-### PageController ↔ PageOS Communication
+### PageController ↔ EBAgent Communication
 
 All communication is async and isolated:
 
 ```typescript
-// PageOS delegates DOM operations to PageController
+// EBAgent delegates DOM operations to PageController
 await this.pageController.updateTree()
 await this.pageController.clickElement(index)
 await this.pageController.inputText(index, text)
@@ -74,23 +78,23 @@ const pageInfo = await this.pageController.getPageInfo()
 
 1. **DOM Extraction**: Live DOM → `FlatDomTree` via `page-controller/src/dom/dom_tree/`
 2. **Dehydration**: DOM tree → simplified text for LLM
-3. **LLM Processing**: AI returns action plans (page-os)
-4. **Indexed Operations**: PageOS calls PageController by element index
+3. **LLM Processing**: AI returns action plans (eb-agent)
+4. **Indexed Operations**: EBAgent calls PageController by element index
 
 ## Key Files Reference
 
-### PageOS (`packages/page-os/`)
+### EBAgent (`packages/eb-agent/`)
 
 | File               | Description                                  |
 | ------------------ | -------------------------------------------- |
-| `src/PageOS.ts` | ⭐ Main class with UI, extends PageOSCore |
+| `src/EBAgent.ts` | ⭐ Main class with UI, extends EBAgentCore |
 | `src/demo.ts`      | IIFE demo entry (auto-init with demo API)    |
 
 ### Core (`packages/core/`)
 
 | File                   | Description                             |
 | ---------------------- | --------------------------------------- |
-| `src/PageOSCore.ts` | ⭐ Core agent class without UI          |
+| `src/EBAgentCore.ts` | ⭐ Core agent class without UI          |
 | `src/tools/`           | Tool definitions calling PageController |
 | `src/config/`          | Configuration types and constants       |
 | `src/prompts/`         | System prompt templates                 |
@@ -132,11 +136,11 @@ const pageInfo = await this.pageController.getPageInfo()
 - **Location**: co-located, `src/foo.test.ts` next to `src/foo.ts`
 - **Coverage today**: `packages/llms` only — other packages will follow incrementally
 - **Adding tests to a new package**: create `vitest.config.ts` in the package and add a `"test": "vitest run"` script. Root `npm test` and `node scripts/ci.js` pick it up through npm workspaces.
-- **Template**: See @page-os/llms
+- **Template**: See @eb-agent/llms
 
 ```bash
 npm test                            # all packages with a test script
-npm test -w @page-os/llms        # single package
+npm test -w @eb-agent/llms        # single package
 cd packages/llms && npx vitest      # watch mode in one package
 ```
 

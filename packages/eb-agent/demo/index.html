@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>eb-agent — WebMCP capability demo</title>
+		<style>
+			:root {
+				color-scheme: light dark;
+				--bg: #ffffff;
+				--fg: #16181d;
+				--muted: #5c6370;
+				--line: #e3e6ea;
+				--card: #f7f8fa;
+				--accent: #2f6df6;
+			}
+			@media (prefers-color-scheme: dark) {
+				:root {
+					--bg: #14161a;
+					--fg: #e8eaed;
+					--muted: #9aa1ac;
+					--line: #2a2e35;
+					--card: #1c1f25;
+				}
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+				padding: 2rem 1.5rem 4rem;
+				background: var(--bg);
+				color: var(--fg);
+				font:
+					15px/1.55 ui-sans-serif,
+					system-ui,
+					-apple-system,
+					sans-serif;
+			}
+			main {
+				max-width: 1080px;
+				margin: 0 auto;
+				display: grid;
+				gap: 1.5rem;
+				grid-template-columns: 1fr 1fr;
+			}
+			header {
+				grid-column: 1 / -1;
+			}
+			h1 {
+				font-size: 1.35rem;
+				margin: 0 0 0.35rem;
+			}
+			h2 {
+				font-size: 0.95rem;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				color: var(--muted);
+				margin: 0 0 0.75rem;
+			}
+			#status {
+				font-size: 0.85rem;
+				color: var(--muted);
+				padding: 0.5rem 0.75rem;
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				display: inline-block;
+			}
+			section {
+				border: 1px solid var(--line);
+				border-radius: 12px;
+				padding: 1rem 1.15rem;
+				background: var(--card);
+			}
+			.wide {
+				grid-column: 1 / -1;
+			}
+			form {
+				display: flex;
+				gap: 0.5rem;
+				flex-wrap: wrap;
+				align-items: end;
+				margin-bottom: 0.75rem;
+			}
+			label {
+				display: block;
+				font-size: 0.8rem;
+				color: var(--muted);
+				margin-bottom: 0.25rem;
+			}
+			input {
+				padding: 0.45rem 0.6rem;
+				border: 1px solid var(--line);
+				border-radius: 6px;
+				background: var(--bg);
+				color: var(--fg);
+				min-width: 180px;
+			}
+			button {
+				padding: 0.45rem 0.9rem;
+				border: 1px solid var(--accent);
+				background: var(--accent);
+				color: #fff;
+				border-radius: 6px;
+				cursor: pointer;
+				font-size: 0.85rem;
+			}
+			ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			#results li,
+			#cart li {
+				display: flex;
+				justify-content: space-between;
+				gap: 1rem;
+				padding: 0.4rem 0;
+				border-bottom: 1px solid var(--line);
+				font-size: 0.9rem;
+			}
+			#results span {
+				color: var(--muted);
+				font-size: 0.82rem;
+			}
+			.empty,
+			.total {
+				color: var(--muted);
+			}
+			.cap {
+				border: 1px solid var(--line);
+				border-radius: 8px;
+				padding: 0.7rem 0.85rem;
+				margin-bottom: 0.6rem;
+				background: var(--bg);
+			}
+			.cap code {
+				font-size: 0.85rem;
+				font-weight: 600;
+			}
+			.cap p {
+				margin: 0.4rem 0 0.6rem;
+				font-size: 0.82rem;
+				color: var(--muted);
+			}
+			.badges {
+				display: inline-flex;
+				gap: 0.35rem;
+				margin-left: 0.5rem;
+				flex-wrap: wrap;
+			}
+			.badge {
+				font-size: 0.7rem;
+				padding: 0.1rem 0.45rem;
+				border-radius: 99px;
+				border: 1px solid var(--line);
+				color: var(--muted);
+			}
+			.badge--native_webmcp {
+				border-color: #2f9e5f;
+				color: #2f9e5f;
+			}
+			.badge--dom {
+				border-color: #c98a1b;
+				color: #c98a1b;
+			}
+			.badge--consequential {
+				border-color: #d1453b;
+				color: #d1453b;
+			}
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				font-size: 0.8rem;
+			}
+			th,
+			td {
+				text-align: left;
+				padding: 0.35rem 0.4rem;
+				border-bottom: 1px solid var(--line);
+			}
+			th {
+				color: var(--muted);
+				font-weight: 500;
+			}
+			.status--success {
+				color: #2f9e5f;
+			}
+			.status--denied,
+			.status--error {
+				color: #d1453b;
+			}
+			#log {
+				font-family: ui-monospace, monospace;
+				font-size: 0.78rem;
+				color: var(--muted);
+				max-height: 160px;
+				overflow-y: auto;
+			}
+			.note {
+				font-size: 0.8rem;
+				color: var(--muted);
+				margin: 0.5rem 0 0;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<h1>eb-agent — WebMCP capability demo</h1>
+				<p id="status">Loading…</p>
+				<p class="note">
+					<strong>search_products</strong>, <strong>get_product</strong>,
+					<strong>add_to_cart</strong> and <strong>checkout</strong> are declared by this page as
+					real WebMCP tools. <strong>apply_coupon</strong> deliberately has none — the capability
+					layer generates it from the form below and runs it through the DOM. One workflow, both
+					paths, with a human gate on checkout.
+				</p>
+			</header>
+
+			<section>
+				<h2>Catalogue</h2>
+				<form id="search-form">
+					<div>
+						<label for="search-query">Product name</label>
+						<input id="search-query" name="query" placeholder="e.g. runner" />
+					</div>
+					<button type="submit">Search</button>
+				</form>
+				<ul id="results"></ul>
+			</section>
+
+			<section>
+				<h2>Cart</h2>
+				<ul id="cart"></ul>
+				<form id="coupon-form" aria-label="Apply Coupon">
+					<div>
+						<label for="coupon-code">Coupon code</label>
+						<input id="coupon-code" name="coupon" placeholder="RUN10" />
+					</div>
+					<button type="submit">Apply Coupon</button>
+				</form>
+				<p class="note">No WebMCP tool exists for this form — it is DOM-only on purpose.</p>
+			</section>
+
+			<section class="wide">
+				<h2>Capability registry</h2>
+				<p class="note" style="margin-bottom: 0.75rem">
+					<button id="review" type="button">Review capabilities…</button>
+					Approve, rename or reject what eb-agent inferred. Inferred capabilities stay
+					internal until a human approves them.
+				</p>
+				<ul id="capabilities"></ul>
+			</section>
+
+			<section>
+				<h2>Audit trail</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Tool</th>
+							<th>Via</th>
+							<th>Risk</th>
+							<th>Approved</th>
+							<th>Status</th>
+							<th>Time</th>
+						</tr>
+					</thead>
+					<tbody id="audit"></tbody>
+				</table>
+			</section>
+
+			<section>
+				<h2>Application log</h2>
+				<div id="log"></div>
+			</section>
+		</main>
+
+		<script type="module" src="./shop.ts"></script>
+	</body>
+</html>

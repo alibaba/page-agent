@@ -13,7 +13,7 @@ const debug = console.debug.bind(console, `\x1b[90m${PREFIX}\x1b[0m`)
  * - `tabs.query({ active: true })` does not work in multi-window scenarios.
  * - Extension pages (side panel, hub tab) can resolve their own windowId.
  *   We just find the active tab within that window.
- * - Content scripts (PAGE_OS_EXT) can't self-report a windowId.
+ * - Content scripts (EB_AGENT_EXT) can't self-report a windowId.
  *   Chrome populates `sender.tab` for every content-script message,
  *   which is the tab hosting the script.
  */
@@ -82,6 +82,20 @@ export function handleTabControlMessage(
 				.then((newTab) => {
 					debug('open_new_tab: success', newTab)
 					sendResponse({ success: true, tabId: newTab.id })
+				})
+				.catch((error) => {
+					sendResponse({ error: error instanceof Error ? error.message : String(error) })
+				})
+			return true // async response
+		}
+
+		case 'navigate_tab': {
+			debug('navigate_tab', payload)
+			chrome.tabs
+				.update(payload.tabId, { url: payload.url })
+				.then((tab) => {
+					debug('navigate_tab: success', tab)
+					sendResponse({ success: true, tabId: payload.tabId })
 				})
 				.catch((error) => {
 					sendResponse({ error: error instanceof Error ? error.message : String(error) })

@@ -1,6 +1,6 @@
-import type { HistoricalEvent } from '@page-os/core'
+import type { HistoricalEvent } from '@eb-agent/core'
 
-const EXPORT_FILE_PREFIX = 'page-os-history'
+const EXPORT_FILE_PREFIX = 'eb-agent-history'
 const MAX_TASK_SLUG_LENGTH = 40
 
 export function serializeHistoryExport(history: HistoricalEvent[]): string {

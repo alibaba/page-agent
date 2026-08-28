@@ -1,11 +1,11 @@
-# PageOS
+# EBAgent
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://equalbyte.github.io/agentic-page/assets/readme/banner-dark.png">
-  <img alt="PageOS Banner" src="https://equalbyte.github.io/agentic-page/assets/readme/banner-light.png">
+  <img alt="EBAgent Banner" src="https://equalbyte.github.io/agentic-page/assets/readme/banner-light.png">
 </picture>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-auto.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/page-os)](https://bundlephobia.com/package/page-os) [![Downloads](https://img.shields.io/npm/dt/page-os.svg)](https://www.npmjs.com/package/page-os) [![GitHub stars](https://img.shields.io/github/stars/EqualByte/agentic-page.svg)](https://github.com/EqualByte/agentic-page)
+[![License: MIT](https://img.shields.io/badge/License-MIT-auto.svg)](https://opensource.org/licenses/MIT) [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/) [![Bundle Size](https://img.shields.io/bundlephobia/minzip/eb-agent)](https://bundlephobia.com/package/eb-agent) [![Downloads](https://img.shields.io/npm/dt/eb-agent.svg)](https://www.npmjs.com/package/eb-agent) [![GitHub stars](https://img.shields.io/github/stars/EqualByte/agentic-page.svg)](https://github.com/EqualByte/agentic-page)
 
 纯 JS 实现的 GUI agent。使用自然语言操作你的 Web 应用。无须后端、客户端、浏览器插件。
 
@@ -13,7 +13,7 @@
 
 <a href="https://equalbyte.github.io/agentic-page/" target="_blank"><b>🚀 Demo</b></a> | <a href="https://equalbyte.github.io/agentic-page/docs/introduction/overview" target="_blank"><b>📖 Docs</b></a> | <a href="https://x.com/equalbyte" target="_blank"><b>𝕏 Follow on X</b></a>
 
-<!-- TODO: 录制并嵌入 PageOS 演示视频（旧视频为上游品牌） -->
+<!-- TODO: 录制并嵌入 EBAgent 演示视频（旧视频为上游品牌） -->
 
 ---
 
@@ -39,7 +39,7 @@
 
 ### 一行代码集成
 
-通过我们免费的 Demo LLM 快速体验 PageOS：
+通过我们免费的 Demo LLM 快速体验 EBAgent：
 
 ```html
 <script src="{URL}" crossorigin="true"></script>
@@ -49,21 +49,21 @@
 
 | Mirrors | URL                                                                                 |
 | ------- | ----------------------------------------------------------------------------------- |
-| Global  | https://cdn.jsdelivr.net/npm/page-os@1.11.0/dist/iife/page-os.demo.js         |
-| China   | https://registry.npmmirror.com/page-os/1.11.0/files/dist/iife/page-os.demo.js |
+| Global  | https://cdn.jsdelivr.net/npm/eb-agent@1.11.0/dist/iife/eb-agent.demo.js         |
+| China   | https://registry.npmmirror.com/eb-agent/1.11.0/files/dist/iife/eb-agent.demo.js |
 
-在 URL 后添加 `?autoInit=false` 可只加载脚本，不自动创建 Demo Agent；之后可通过 `new window.PageOS(...)` 手动初始化。
+在 URL 后添加 `?autoInit=false` 可只加载脚本，不自动创建 Demo Agent；之后可通过 `new window.EBAgent(...)` 手动初始化。
 
 ### NPM 安装
 
 ```bash
-npm install page-os
+npm install eb-agent
 ```
 
 ```javascript
-import { PageOS } from 'page-os'
+import { EBAgent } from 'eb-agent'
 
-const agent = new PageOS({
+const agent = new EBAgent({
     model: 'deepseek-chat',
     baseURL: 'https://api.deepseek.com',
     apiKey: 'YOUR_API_KEY',
@@ -91,7 +91,7 @@ await agent.execute('点击登录按钮')
 
 本项目基于 **[`browser-use`](https://github.com/browser-use/browser-use)** 的优秀工作构建。
 
-`PageOS` 专为**客户端网页增强**设计，不是服务端自动化工具。
+`EBAgent` 专为**客户端网页增强**设计，不是服务端自动化工具。
 
 ```
 DOM processing components and prompt are derived from browser-use:
@@ -111,4 +111,4 @@ this project possible.
 
 ---
 
-**⭐ 如果觉得 PageOS 有用或有趣，请给项目点个星！**
+**⭐ 如果觉得 EBAgent 有用或有趣，请给项目点个星！**

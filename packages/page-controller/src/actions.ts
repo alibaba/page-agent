@@ -231,6 +231,48 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 	blurLastClickedElement()
 }
 
+/** Well-supported keys for `sendKeys`, mapped to their KeyboardEvent init. */
+const KEY_SPECS = {
+	Enter: { key: 'Enter', code: 'Enter', keyCode: 13 },
+	Tab: { key: 'Tab', code: 'Tab', keyCode: 9 },
+	Escape: { key: 'Escape', code: 'Escape', keyCode: 27 },
+	ArrowDown: { key: 'ArrowDown', code: 'ArrowDown', keyCode: 40 },
+	ArrowUp: { key: 'ArrowUp', code: 'ArrowUp', keyCode: 38 },
+	ArrowLeft: { key: 'ArrowLeft', code: 'ArrowLeft', keyCode: 37 },
+	ArrowRight: { key: 'ArrowRight', code: 'ArrowRight', keyCode: 39 },
+	Backspace: { key: 'Backspace', code: 'Backspace', keyCode: 8 },
+	Delete: { key: 'Delete', code: 'Delete', keyCode: 46 },
+} as const
+
+export type SendableKey = keyof typeof KEY_SPECS
+
+/**
+ * Dispatch a keydown → keypress → keyup sequence for a supported key,
+ * focusing the element first.
+ *
+ * @note Browsers restrict the native "Enter submits the enclosing form"
+ * behavior to trusted (real) key events — synthetic events cannot trigger
+ * it directly. This works for the common (and far more prevalent) case of
+ * frameworks listening for onKeyDown/onKeyUp with key === 'Enter' to
+ * trigger search/submit, which is how most SPA search boxes actually work.
+ * @private Internal method, subject to change at any time.
+ */
+export async function sendKeys(element: HTMLElement, key: SendableKey) {
+	const spec = KEY_SPECS[key]
+	if (!spec) {
+		throw new Error(`Unsupported key "${key}". Supported: ${Object.keys(KEY_SPECS).join(', ')}`)
+	}
+
+	element.focus({ preventScroll: true })
+
+	const opts = { bubbles: true, cancelable: true, ...spec }
+	element.dispatchEvent(new KeyboardEvent('keydown', opts))
+	element.dispatchEvent(new KeyboardEvent('keypress', opts))
+	element.dispatchEvent(new KeyboardEvent('keyup', opts))
+
+	await waitFor(0.2)
+}
+
 /**
  * @todo browser-use version is very complex and supports menu tags, need to follow up
  * @private Internal method, subject to change at any time.

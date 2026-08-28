@@ -1,5 +1,5 @@
 {
-    "name": "@page-os/llms",
+    "name": "@eb-agent/llms",
     "version": "1.11.0",
     "type": "module",
     "main": "./src/index.ts",
@@ -11,23 +11,23 @@
         }
     },
     "publishConfig": {
-        "main": "./dist/lib/page-os-llms.js",
-        "module": "./dist/lib/page-os-llms.js",
+        "main": "./dist/lib/eb-agent-llms.js",
+        "module": "./dist/lib/eb-agent-llms.js",
         "types": "./dist/lib/index.d.ts",
         "exports": {
             ".": {
                 "types": "./dist/lib/index.d.ts",
-                "import": "./dist/lib/page-os-llms.js",
-                "default": "./dist/lib/page-os-llms.js"
+                "import": "./dist/lib/eb-agent-llms.js",
+                "default": "./dist/lib/eb-agent-llms.js"
             }
         }
     },
     "files": [
         "dist/"
     ],
-    "description": "LLM client with reflection-before-action mental model for page-os",
+    "description": "LLM client with reflection-before-action mental model for eb-agent",
     "keywords": [
-        "page-os",
+        "eb-agent",
         "llm",
         "openai",
         "tool-calling",

@@ -1,5 +1,5 @@
+import type { EBAgent as EBAgentType } from 'eb-agent'
 import { Check, Copy, Sparkles } from 'lucide-react'
-import type { PageOS as PageOSType } from 'page-os'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'wouter'
 
@@ -15,7 +15,7 @@ import {
 } from '../../constants'
 import { useLanguage } from '../../i18n/context'
 
-let pageOSModule: Promise<typeof import('page-os')> | null = null
+let ebAgentModule: Promise<typeof import('eb-agent')> | null = null
 
 /**
  * Get the bookmarklet injection script
@@ -27,7 +27,7 @@ function getInjection(cdnSource: 'china' | 'international', isZh?: boolean) {
 	const locale = isZh ? 'zh-CN' : 'en-US'
 
 	const injection = encodeURI(
-		`javascript:(function(){var s=document.createElement('script');s.src=\`${cdn}?lang=${locale}&t=\${Math.random()}\`;s.setAttribute('crossorigin', true);s.type="text/javascript";s.onload=()=>console.log('PageOS script loaded!');document.body.appendChild(s);})();`
+		`javascript:(function(){var s=document.createElement('script');s.src=\`${cdn}?lang=${locale}&t=\${Math.random()}\`;s.setAttribute('crossorigin', true);s.type="text/javascript";s.onload=()=>console.log('EBAgent script loaded!');document.body.appendChild(s);})();`
 	)
 
 	return `
@@ -38,12 +38,12 @@ function getInjection(cdnSource: 'china' | 'international', isZh?: boolean) {
 		onclick="return false;"
 		title="Drag me to your bookmarks bar!"
 	>
-		✨ PageOS
+		✨ EBAgent
 	</a>
 	`
 }
 
-const INSTALL_CMD = 'npm install page-os'
+const INSTALL_CMD = 'npm install eb-agent'
 
 export default function HeroSection() {
 	const { language, isZh } = useLanguage()
@@ -68,8 +68,8 @@ export default function HeroSection() {
 
 	const [ready, setReady] = useState(false)
 	useEffect(() => {
-		pageOSModule ??= import('page-os')
-		pageOSModule.then(() => setReady(true))
+		ebAgentModule ??= import('eb-agent')
+		ebAgentModule.then(() => setReady(true))
 	}, [])
 
 	const suggestions: string[] = isZh
@@ -95,20 +95,20 @@ export default function HeroSection() {
 	}
 
 	const handleExecute = async () => {
-		if (!task.trim() || !ready || !pageOSModule) return
+		if (!task.trim() || !ready || !ebAgentModule) return
 
-		const { PageOS } = await pageOSModule
+		const { EBAgent } = await ebAgentModule
 		const win = window as any
 
-		if (!win.pageOS || win.pageOS.disposed) {
-			win.pageOS = new (PageOS as typeof PageOSType)({
+		if (!win.ebAgent || win.ebAgent.disposed) {
+			win.ebAgent = new (EBAgent as typeof EBAgentType)({
 				interactiveBlacklist: [document.getElementById('root')!],
 				language: language,
 
 				instructions: {
-					system: 'You are a helpful assistant on PageOS website.',
+					system: 'You are a helpful assistant on EBAgent website.',
 					getPageInstructions: (url: string) => {
-						return url.includes('page-os') ? 'This is PageOS demo page.' : undefined
+						return url.includes('eb-agent') ? 'This is EBAgent demo page.' : undefined
 					},
 				},
 
@@ -124,10 +124,14 @@ export default function HeroSection() {
 					import.meta.env.DEV && import.meta.env.LLM_API_KEY
 						? import.meta.env.LLM_API_KEY
 						: undefined,
+				visionModel:
+					import.meta.env.DEV && import.meta.env.LLM_VISION_MODEL_NAME
+						? { model: import.meta.env.LLM_VISION_MODEL_NAME }
+						: undefined,
 			})
 		}
 
-		await win.pageOS.execute(task)
+		await win.ebAgent.execute(task)
 	}
 
 	const termsLink = (
@@ -268,13 +272,13 @@ export default function HeroSection() {
 													: 'Tell the agent what to do on this page…'
 											}
 											className="w-full border-none bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400 dark:text-white dark:placeholder:text-gray-500"
-											data-page-os-not-interactive
+											data-eb-agent-not-interactive
 										/>
 										<button
 											onClick={handleExecute}
 											disabled={!ready}
 											className="shrink-0 cursor-pointer rounded-xl bg-linear-to-r from-indigo-600 to-fuchsia-600 px-5 py-2.5 text-sm font-medium text-white shadow-md shadow-indigo-500/25 transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
-											data-page-os-not-interactive
+											data-eb-agent-not-interactive
 										>
 											{ready ? (
 												isZh ? (
@@ -297,7 +301,7 @@ export default function HeroSection() {
 										key={label}
 										onClick={() => setTask(suggestionTasks[i])}
 										className="cursor-pointer rounded-full border border-gray-200/80 bg-white/60 px-3.5 py-1.5 text-xs text-gray-600 backdrop-blur-sm transition-colors hover:border-indigo-300 hover:text-indigo-600 dark:border-white/10 dark:bg-white/5 dark:text-gray-400 dark:hover:border-indigo-500/50 dark:hover:text-indigo-300"
-										data-page-os-not-interactive
+										data-eb-agent-not-interactive
 									>
 										{label}
 									</button>
