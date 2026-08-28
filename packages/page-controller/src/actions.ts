@@ -248,6 +248,7 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 	}
 
 	selectElement.value = option.value
+	selectElement.dispatchEvent(new Event('input', { bubbles: true }))
 	selectElement.dispatchEvent(new Event('change', { bubbles: true }))
 
 	await waitFor(0.1) // Wait to ensure change event processing completes
