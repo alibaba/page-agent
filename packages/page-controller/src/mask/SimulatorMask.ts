@@ -171,7 +171,7 @@ export class SimulatorMask extends EventTarget {
 
 		this.#cursor.classList.remove(cursorStyles.clicking)
 		// Force reflow to restart animation
-		void this.#cursor.offsetHeight
+		this.#cursor.getBoundingClientRect()
 		this.#cursor.classList.add(cursorStyles.clicking)
 	}
 

@@ -225,7 +225,7 @@ export class Panel {
 
 	show(): void {
 		this.wrapper.style.display = 'block'
-		void this.wrapper.offsetHeight
+		this.wrapper.getBoundingClientRect() // force reflow before opacity transition
 		this.wrapper.style.opacity = '1'
 		this.wrapper.style.transform = 'translateX(-50%) translateY(0)'
 	}
