@@ -85,15 +85,16 @@ function isBackgroundDark() {
 	const htmlBgColor = htmlStyle.backgroundColor
 	const bodyBgColor = bodyStyle.backgroundColor
 
-	// The body's background might be transparent, in which case we should
-	// fall back to the html element's background.
-	if (isColorDark(bodyBgColor)) {
-		return true
-	} else if (bodyBgColor === 'transparent' || bodyBgColor.startsWith('rgba(0, 0, 0, 0)')) {
+	// The body's background might be see-through, in which case we should
+	// fall back to the html element's background. getLuminance returns null for
+	// exactly the colours that do not describe the page — fully transparent and
+	// mostly transparent alike — so ask it rather than string-matching one
+	// spelling of transparent.
+	if (getLuminance(bodyBgColor) === null) {
 		return isColorDark(htmlBgColor)
 	}
 
-	return false
+	return isColorDark(bodyBgColor)
 }
 
 /**
@@ -140,14 +141,16 @@ function isMainContentBackgroundDark() {
  * @returns {{r: number, g: number, b: number}|null}
  */
 function parseRgbColor(colorString: string) {
-	const rgbMatch = /rgba?\((\d+),\s*(\d+),\s*(\d+)/.exec(colorString)
+	const rgbMatch = /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?/.exec(colorString)
 	if (!rgbMatch) {
 		return null // Not a valid rgb/rgba string
 	}
+	const alpha = rgbMatch[4] === undefined ? 1 : Number.parseFloat(rgbMatch[4])
 	return {
 		r: parseInt(rgbMatch[1]),
 		g: parseInt(rgbMatch[2]),
 		b: parseInt(rgbMatch[3]),
+		a: Number.isNaN(alpha) ? 1 : alpha,
 	}
 }
 
@@ -157,13 +160,23 @@ function parseRgbColor(colorString: string) {
  * @returns {number|null} - The luminance, or null if the color is transparent or unparseable.
  */
 function getLuminance(colorString: string): number | null {
-	if (!colorString || colorString === 'transparent' || colorString.startsWith('rgba(0, 0, 0, 0)')) {
+	if (!colorString || colorString === 'transparent') {
 		return null // Transparent has no meaningful luminance
 	}
 
 	const rgb = parseRgbColor(colorString)
 	if (!rgb) {
 		return null // Could not parse color
+	}
+
+	// A mostly-transparent colour says almost nothing about what the page looks
+	// like — whatever is painted behind it dominates. Only the fully
+	// transparent `rgba(0, 0, 0, 0)` used to be excluded, so a light page with a
+	// faint tint such as `rgba(0, 0, 0, 0.03)` measured as near-black and was
+	// reported dark. Treat anything under half opacity the same as transparent
+	// and let the next check decide.
+	if (rgb.a < 0.5) {
+		return null
 	}
 
 	// Standard perceived luminance formula
