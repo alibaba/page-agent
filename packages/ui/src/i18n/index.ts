@@ -18,7 +18,11 @@ export class I18n {
 	// 类型安全的翻译方法
 	t(key: TranslationKey, params?: TranslationParams): string {
 		const value = this.getNestedValue(this.translations, key)
-		if (!value) {
+		// Only a string is a translation. A key that lands on an intermediate
+		// object ('ui.panel') used to reach interpolate() and throw
+		// `template.replace is not a function`, and the previous falsy check
+		// also rejected a legitimately empty translation.
+		if (typeof value !== 'string') {
 			console.warn(`Translation key "${key}" not found for language "${this.language}"`)
 			return key
 		}
@@ -29,8 +33,19 @@ export class I18n {
 		return value
 	}
 
-	private getNestedValue(obj: any, path: string): string | undefined {
-		return path.split('.').reduce((current, key) => current?.[key], obj)
+	private getNestedValue(obj: unknown, path: string): unknown {
+		// Own properties only: `current?.[key]` walks the prototype chain, so
+		// t('toString') resolved to Object.prototype.toString — a Function
+		// returned from a method whose signature promises a string.
+		return path
+			.split('.')
+			.reduce<unknown>(
+				(current, key) =>
+					typeof current === 'object' && current !== null && Object.hasOwn(current, key)
+						? (current as Record<string, unknown>)[key]
+						: undefined,
+				obj
+			)
 	}
 
 	private interpolate(template: string, params: TranslationParams): string {
