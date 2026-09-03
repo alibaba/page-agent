@@ -213,9 +213,13 @@ export function modelPatch(body: Record<string, any>, baseURL?: string) {
 export function normalizeModelName(modelName: string): string {
 	let normalizedName = modelName.toLowerCase()
 
-	// remove prefix before '/'
-	if (normalizedName.includes('/')) {
-		normalizedName = normalizedName.split('/')[1]
+	// remove every prefix before the model name. Taking segment [1] only works
+	// for a two-part id: a gateway id like `together/meta-llama/llama-3-70b`
+	// resolved to `meta-llama`, and `provider/org/claude-opus-4` to `org`,
+	// so the model-specific patches in modelPatch never matched.
+	const segments = normalizedName.split('/').filter(Boolean)
+	if (segments.length > 0) {
+		normalizedName = segments[segments.length - 1]!
 	}
 
 	// remove '_'
