@@ -54,7 +54,7 @@
         "@types/node": "^26.1.1",
         "@vitejs/plugin-react": "^6.0.3",
         "chalk": "^6.0.0",
-        "concurrently": "^10.0.3",
+        "concurrently": "^10.0.5",
         "dotenv": "^17.4.2",
         "eslint": "^10.7.0",
         "globals": "^17.7.0",
