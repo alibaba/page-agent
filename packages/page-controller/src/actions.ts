@@ -227,8 +227,6 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 	}
 
 	await waitFor(0.1)
-
-	blurLastClickedElement()
 }
 
 /**
