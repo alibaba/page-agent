@@ -18,6 +18,8 @@
  *   TESTING_OPENROUTER_KEY=...
  *   TESTING_DEEPSEEK_KEY=...
  *   TESTING_ALIYUN_KEY=...
+ *   TESTING_MINIMAX_KEY=...
+ *   TESTING_MINIMAX_CN_KEY=...
  */
 import { config as dotenvConfig } from 'dotenv'
 import { dirname, resolve } from 'path'
@@ -152,6 +154,17 @@ const PROVIDERS = {
 		baseURL: 'https://api.deepseek.com',
 		apiKey: process.env.TESTING_DEEPSEEK_KEY,
 	},
+	// MiniMax exposes the same OpenAI-compatible model ids on two regional
+	// hosts: the global host (api.minimax.io) and the China host
+	// (api.minimaxi.com). Each needs its own key.
+	minimax: {
+		baseURL: 'https://api.minimax.io/v1',
+		apiKey: process.env.TESTING_MINIMAX_KEY,
+	},
+	minimaxChina: {
+		baseURL: 'https://api.minimaxi.com/v1',
+		apiKey: process.env.TESTING_MINIMAX_CN_KEY,
+	},
 } as const
 
 const ECHO_TOOL: Tool<{ message: string }, string> = {
@@ -219,6 +232,39 @@ describe.concurrent('DeepSeek — native', () => {
 	const nativeModels = MODEL_GROUPS.DeepSeek.filter((model) => model !== 'deepseek-3.2')
 
 	for (const model of nativeModels) {
+		it.skipIf(!apiKey)(
+			model,
+			async () => {
+				await expectEchoToolCall(baseURL, apiKey!, model)
+			},
+			TEST_TIMEOUT
+		)
+	}
+})
+
+// MiniMax's own OpenAI-compatible API serves the current generation
+// (MiniMax-M3, MiniMax-M2.7). The older MiniMax-M2.5 is only reachable via
+// OpenRouter resellers, not the native endpoints, so it is excluded here.
+const MINIMAX_NATIVE_MODELS = MODEL_GROUPS.MiniMax.filter((model) => model !== 'MiniMax-M2.5')
+
+describe.concurrent('MiniMax — global native', () => {
+	const { baseURL, apiKey } = PROVIDERS.minimax
+
+	for (const model of MINIMAX_NATIVE_MODELS) {
+		it.skipIf(!apiKey)(
+			model,
+			async () => {
+				await expectEchoToolCall(baseURL, apiKey!, model)
+			},
+			TEST_TIMEOUT
+		)
+	}
+})
+
+describe.concurrent('MiniMax — China native', () => {
+	const { baseURL, apiKey } = PROVIDERS.minimaxChina
+
+	for (const model of MINIMAX_NATIVE_MODELS) {
 		it.skipIf(!apiKey)(
 			model,
 			async () => {

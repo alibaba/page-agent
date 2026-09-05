@@ -61,11 +61,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'claude-sonnet-4-5',
 		'claude-haiku-4-5',
 	],
-	MiniMax: [
-		// 'MiniMax-M3', low success rate
-		'MiniMax-M2.7',
-		'MiniMax-M2.5',
-	],
+	MiniMax: ['MiniMax-M3', 'MiniMax-M2.7', 'MiniMax-M2.5'],
 	xAI: ['grok-4.5', 'grok-4.3', 'grok-build-0.1'],
 	Tencent: ['hy3'],
 	MoonshotAI: ['kimi-k3', 'kimi-k2.7-code', 'kimi-k2.6', 'kimi-k2.5'],
