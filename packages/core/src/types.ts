@@ -132,6 +132,18 @@ export interface AgentConfig extends LLMConfig {
 	experimentalLlmsTxt?: boolean
 
 	/**
+	 * @experimental
+	 * Enable experimental pointer-based tools (currently only `hover_element_by_index`).
+	 * Disabled by default — keep tool surface minimal until real usage shows the value.
+	 * Also pass `experimentalPointerActions: true` to the underlying `PageControllerConfig`
+	 * to actually allow the action to run; mismatched flags will cause the tool to
+	 * fail with an explanatory message.
+	 * @see https://github.com/alibaba/page-agent/issues/222
+	 * @default false
+	 */
+	experimentalPointerActions?: boolean
+
+	/**
 	 * Transform page content before sending to LLM.
 	 * Called after DOM extraction and simplification, before LLM invocation.
 	 * Use cases: inspect extraction results, modify page info, mask sensitive data.

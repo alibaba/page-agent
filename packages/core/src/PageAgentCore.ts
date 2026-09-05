@@ -114,6 +114,14 @@ export class PageAgentCore extends EventTarget {
 		this.tools = new Map(tools)
 		this.pageController = config.pageController
 
+		if (!this.config.experimentalScriptExecutionTool) {
+			this.tools.delete('execute_javascript')
+		}
+
+		if (!this.config.experimentalPointerActions) {
+			this.tools.delete('hover_element_by_index')
+		}
+
 		this.#llm.addEventListener('retry', (e) => {
 			const { attempt, maxAttempts, lastError } = (e as CustomEvent).detail
 			this.#emitActivity({ type: 'retrying', attempt, maxAttempts })
@@ -141,9 +149,6 @@ export class PageAgentCore extends EventTarget {
 			}
 		}
 
-		if (!this.config.experimentalScriptExecutionTool) {
-			this.tools.delete('execute_javascript')
-		}
 	}
 
 	/** Get current agent status */

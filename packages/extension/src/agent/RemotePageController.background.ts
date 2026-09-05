@@ -4,7 +4,13 @@
  */
 
 export function handlePageControlMessage(
-	message: { type: 'PAGE_CONTROL'; action: string; payload: any; targetTabId: number },
+	message: {
+		type: 'PAGE_CONTROL'
+		action: string
+		payload: any
+		targetTabId: number
+		experimentalPointerActions?: boolean
+	},
 	sender: chrome.runtime.MessageSender,
 	sendResponse: (response: unknown) => void
 ): true | undefined {
@@ -26,6 +32,7 @@ export function handlePageControlMessage(
 			type: 'PAGE_CONTROL',
 			action,
 			payload,
+			experimentalPointerActions: message.experimentalPointerActions,
 		})
 		.then((result) => {
 			sendResponse(result)

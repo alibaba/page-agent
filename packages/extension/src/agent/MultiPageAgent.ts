@@ -25,7 +25,9 @@ export class MultiPageAgent extends PageAgentCore {
 	constructor(config: MultiPageAgentConfig) {
 		// multi page controller
 		const tabsController = new TabsController()
-		const pageController = new RemotePageController(tabsController)
+		const pageController = new RemotePageController(tabsController, {
+			experimentalPointerActions: config.experimentalPointerActions,
+		})
 		const customTools = createTabTools(tabsController)
 
 		// system prompt - auto-detect language if not specified

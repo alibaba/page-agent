@@ -8,7 +8,9 @@
  */
 import {
 	clickElement,
+	dispatchHoverLeave,
 	getElementByIndex,
+	hoverElement,
 	inputTextElement,
 	scrollHorizontally,
 	scrollVertically,
@@ -26,6 +28,14 @@ import { isAnchorElement } from './utils'
 export interface PageControllerConfig extends dom.DomConfig {
 	/** Enable visual mask overlay during operations (default: false) */
 	enableMask?: boolean
+
+	/**
+	 * Enable experimental pointer-based actions (currently only hover).
+	 * @experimental Disabled by default. Tool registration in `PageAgentCore` is gated on
+	 * this flag — see `AgentConfig.experimentalPointerActions`.
+	 * @default false
+	 */
+	experimentalPointerActions?: boolean
 }
 
 /**
@@ -81,6 +91,9 @@ export class PageController extends EventTarget {
 
 	/** Whether the tree has been indexed at least once */
 	private isIndexed = false
+
+	/** Elements that currently represent the synthetic hover ancestry, outermost first. */
+	private syntheticHoverPath: HTMLElement[] = []
 
 	/** Visual mask overlay for blocking user interaction during automation */
 	private mask: InstanceType<typeof import('./mask/SimulatorMask').SimulatorMask> | null = null
@@ -238,6 +251,17 @@ export class PageController extends EventTarget {
 		}
 	}
 
+	/** Clear synthetic hover state before a pointer action or controller teardown. */
+	private clearSyntheticHover(nextElement: HTMLElement | null): void {
+		const retained = nextElement
+			? this.syntheticHoverPath.filter((element) => element.contains(nextElement))
+			: []
+		for (const element of [...this.syntheticHoverPath].reverse()) {
+			if (!element.contains(nextElement)) dispatchHoverLeave(element, nextElement)
+		}
+		this.syntheticHoverPath = retained
+	}
+
 	/**
 	 * Click element by index
 	 */
@@ -246,6 +270,7 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
+			this.clearSyntheticHover(element)
 			await clickElement(element)
 
 			// Handle links that open in new tabs
@@ -276,6 +301,7 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
+			this.clearSyntheticHover(element)
 			await inputTextElement(element, text)
 
 			return {
@@ -298,6 +324,7 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
+			this.clearSyntheticHover(element)
 			await selectOptionElement(element as HTMLSelectElement, optionText)
 
 			return {
@@ -308,6 +335,39 @@ export class PageController extends EventTarget {
 			return {
 				success: false,
 				message: `❌ Failed to select option: ${error}`,
+			}
+		}
+	}
+
+	/**
+	 * Hover over element by index (reveal dropdown menus / hidden submenus before clicking).
+	 * Requires `experimentalPointerActions: true` in PageControllerConfig — the matching
+	 * `hover_element_by_index` tool is gated on `AgentConfig.experimentalPointerActions`.
+	 * @experimental
+	 */
+	async hoverElement(index: number): Promise<ActionResult> {
+		if (!this.config.experimentalPointerActions) {
+			return {
+				success: false,
+				message:
+					'❌ hoverElement is disabled. Set `experimentalPointerActions: true` in PageControllerConfig to enable it.',
+			}
+		}
+
+		try {
+			this.assertIndexed()
+			const element = getElementByIndex(this.selectorMap, index)
+			const elemText = this.elementTextMap.get(index)
+			this.syntheticHoverPath = await hoverElement(element, this.syntheticHoverPath)
+
+			return {
+				success: true,
+				message: `✅ Dispatched synthetic hover events to element (${elemText ?? index}). CSS :hover is not activated.`,
+			}
+		} catch (error) {
+			return {
+				success: false,
+				message: `❌ Failed to hover over element: ${error}`,
 			}
 		}
 	}
@@ -421,6 +481,7 @@ export class PageController extends EventTarget {
 	 * Dispose and clean up resources
 	 */
 	dispose(): void {
+		this.clearSyntheticHover(null)
 		dom.cleanUpHighlights()
 		this.flatTree = null
 		this.selectorMap.clear()

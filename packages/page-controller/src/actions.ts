@@ -41,12 +41,115 @@ export function getElementByIndex(
 	return element
 }
 
+/**
+ * @experimental Pointer hover — opt-in via PageControllerConfig.experimentalPointerActions.
+ * Dispatch synthetic hover-related events without clicking or focusing the element.
+ * This can invoke JavaScript hover handlers, but does not activate the browser's
+ * CSS `:hover` state.
+ * @private Internal method, subject to change at any time.
+ */
+
+export async function hoverElement(
+	element: HTMLElement,
+	previousElementOrPath?: HTMLElement | null | readonly HTMLElement[]
+): Promise<HTMLElement[]> {
+	clearLastClickedElement()
+	const previousPath = Array.isArray(previousElementOrPath)
+		? previousElementOrPath
+		: previousElementOrPath
+			? [previousElementOrPath]
+			: []
+	const previousElement = previousPath.at(-1)
+	const ancestorPath: HTMLElement[] = []
+	for (let ancestor: HTMLElement | null = element; ancestor; ancestor = ancestor.parentElement) {
+		ancestorPath.unshift(ancestor)
+	}
+
+	if (previousElement && previousElement !== element) {
+		dispatchHoverLeave(previousElement, element)
+		for (const ancestor of [...previousPath.slice(0, -1)].reverse()) {
+			if (!ancestor.contains(element)) dispatchHoverLeave(ancestor, element)
+		}
+	}
+
+	await scrollIntoViewIfNeeded(element)
+
+	const rect = element.getBoundingClientRect()
+	const x = rect.left + rect.width / 2
+	const y = rect.top + rect.height / 2
+
+	await movePointerToElement(element, x, y)
+
+	const pointerOpts = {
+		bubbles: true,
+		cancelable: true,
+		clientX: x,
+		clientY: y,
+		pointerType: 'mouse',
+		relatedTarget: previousElement ?? null,
+		composed: true,
+	}
+	const mouseOpts = {
+		bubbles: true,
+		cancelable: true,
+		clientX: x,
+		clientY: y,
+		relatedTarget: previousElement ?? null,
+		composed: true,
+	}
+
+	// Hover — pointer events first, then mouse events (spec order)
+	element.dispatchEvent(new PointerEvent('pointerover', pointerOpts))
+	for (const ancestor of ancestorPath) {
+		if (ancestor !== element && !previousPath.includes(ancestor)) {
+			ancestor.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
+		}
+	}
+	element.dispatchEvent(new PointerEvent('pointerenter', { ...pointerOpts, bubbles: false }))
+	element.dispatchEvent(new MouseEvent('mouseover', mouseOpts))
+	for (const ancestor of ancestorPath) {
+		if (ancestor !== element && !previousPath.includes(ancestor)) {
+			ancestor.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
+		}
+	}
+	element.dispatchEvent(new MouseEvent('mouseenter', { ...mouseOpts, bubbles: false }))
+
+	return ancestorPath
+}
+
+/**
+ * Dispatch the leave half of a synthetic pointer transition. Native leave
+ * events do not fire when moving into a descendant, while bubbling out events
+ * retain relatedTarget so delegated handlers can perform the same check.
+ */
+export function dispatchHoverLeave(
+	previousElement: HTMLElement,
+	relatedTarget: HTMLElement | null
+) {
+	const movingWithinPreviousElement = relatedTarget
+		? previousElement.contains(relatedTarget)
+		: false
+	const pointerLeaveOpts = { bubbles: true, pointerType: 'mouse', relatedTarget }
+	previousElement.dispatchEvent(new PointerEvent('pointerout', pointerLeaveOpts))
+	previousElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget }))
+
+	if (!movingWithinPreviousElement) {
+		previousElement.dispatchEvent(
+			new PointerEvent('pointerleave', { ...pointerLeaveOpts, bubbles: false })
+		)
+		previousElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false, relatedTarget }))
+	}
+}
+
 let lastClickedElement: HTMLElement | null = null
 
-function blurLastClickedElement() {
+export function clearLastClickedElement() {
 	if (lastClickedElement) {
-		lastClickedElement.dispatchEvent(new PointerEvent('pointerout', { bubbles: true }))
-		lastClickedElement.dispatchEvent(new PointerEvent('pointerleave', { bubbles: false }))
+		const pointerLeaveOpts = { bubbles: true, pointerType: 'mouse' as const }
+		lastClickedElement.dispatchEvent(new PointerEvent('pointerout', pointerLeaveOpts))
+		lastClickedElement.dispatchEvent(
+			new PointerEvent('pointerleave', { ...pointerLeaveOpts, bubbles: false })
+		)
 		lastClickedElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
 		lastClickedElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
 		lastClickedElement.blur()
@@ -62,7 +165,7 @@ function blurLastClickedElement() {
  * @private Internal method, subject to change at any time.
  */
 export async function clickElement(element: HTMLElement) {
-	blurLastClickedElement()
+	clearLastClickedElement()
 
 	lastClickedElement = element
 
@@ -228,7 +331,7 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 
 	await waitFor(0.1)
 
-	blurLastClickedElement()
+	clearLastClickedElement()
 }
 
 /**
