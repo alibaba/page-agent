@@ -4,6 +4,11 @@
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
         "useDefineForClassFields": true,
         "strictNullChecks": true,
+
+        "verbatimModuleSyntax": false,
+        "noUncheckedIndexedAccess": false,
+        "noImplicitOverride": false,
+
         "jsx": "react-jsx",
         "types": ["node", "chrome"],
         "paths": {
