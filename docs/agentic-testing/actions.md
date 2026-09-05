@@ -4,7 +4,7 @@
 
 1. Build: `npm run build -w @page-agent/page-controller`.
 2. Load `packages/page-controller/dist/lib/page-controller.js` in the page via `import()` (URL or Blob).
-3. Call exported actions directly on DOM elements; do not instantiate `PageController` or modify the bundle.
+3. Call exported actions directly on DOM elements, never native input; do not instantiate `PageController` or modify the bundle.
 
 ## Cases
 
