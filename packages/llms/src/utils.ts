@@ -47,8 +47,15 @@ export function modelPatch(body: Record<string, any>, baseURL?: string) {
 	const modelName = normalizeModelName(model)
 
 	if (modelName.startsWith('qwen')) {
-		debug('Patch Qwen: disable thinking')
-		body.enable_thinking = false
+		if (provider === 'openrouter' && modelName.startsWith('qwen38-max')) {
+			// OpenRouter forces thinking on for this endpoint, and Qwen rejects tool_choice in thinking mode
+			debug('Patch Qwen3.8-max on OpenRouter: reasoning_effort=low, remove tool_choice')
+			body.reasoning_effort = 'low'
+			delete body.tool_choice
+		} else {
+			debug('Patch Qwen: disable thinking')
+			body.enable_thinking = false
+		}
 		if (body.temperature === undefined && !/max|plus/.test(modelName)) {
 			debug('Patch Qwen: raise temperature to 1.0')
 			body.temperature = 1.0
@@ -132,8 +139,14 @@ export function modelPatch(body: Record<string, any>, baseURL?: string) {
 	}
 
 	if (modelName.startsWith('glm')) {
-		debug('Patch GLM: disable thinking')
-		body.thinking = { type: 'disabled' }
+		if (/^glm-5[3-9]/.test(modelName)) {
+			// GLM 5.3+ cannot disable thinking
+			debug('Patch GLM 5.3+: reasoning_effort=low')
+			body.reasoning_effort = 'low'
+		} else {
+			debug('Patch GLM: disable thinking')
+			body.thinking = { type: 'disabled' }
+		}
 	}
 
 	if (modelName.startsWith('hy')) {

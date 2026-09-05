@@ -4,11 +4,17 @@
  * Purpose: verify request formatting and `modelPatch` (see `utils.ts`) work
  * for every model below, across the providers that serve them. Not a
  * correctness/quality eval — the tool call is trivial and forced via
- * `toolChoiceName`, so a failure here means the request/response shape is
- * wrong for that model, not that the model is "dumb".
+ * `toolChoiceName`; the only assertion is that the model called the tool.
+ * A failure here means the request/response shape is wrong for that model,
+ * not that the model is "dumb".
  *
  * Tests `OpenAIClient` directly (not the `LLM` retry wrapper), so a failure
  * always reflects the very first request/response — no retry can mask it.
+ *
+ * A model may only be left out of a provider's block when that provider does
+ * not serve it. A model a provider serves but rejects is not supported there:
+ * fix `modelPatch` at the model-family level or drop the model from the list.
+ * Never skip it.
  *
  * Per the `*.live.test.ts` convention this suite is excluded from `npm test`
  * (slow, costs tokens) — run it manually with `npm run test:live`. Each
@@ -41,6 +47,10 @@ const TEST_TIMEOUT = 30_000
  */
 const MODEL_GROUPS: Record<string, string[]> = {
 	Qwen: [
+		'qwen3.8-max',
+		'qwen3.8-flash',
+		'qwen3.8-27b',
+		'qwen3.7-flash',
 		'qwen3.7-max',
 		'qwen3.7-plus',
 		'qwen3.6-max',
@@ -51,6 +61,7 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'qwen3-max',
 	],
 	OpenAI: [
+		'gpt-6-astra',
 		'gpt-5.6-sol',
 		'gpt-5.6-terra',
 		'gpt-5.6-luna',
@@ -65,8 +76,17 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'gpt-4.1',
 		'gpt-4.1-mini',
 	],
-	DeepSeek: ['deepseek-v4-pro', 'deepseek-v4-flash', 'deepseek-3.2'],
+	DeepSeek: [
+		'deepseek-v4-flash-vision-exp',
+		'deepseek-v4-pro',
+		'deepseek-v4-flash',
+		'deepseek-3.2',
+	],
 	Google: [
+		'gemini-3.8-flash',
+		'gemini-3.7-flash',
+		'gemini-3.6-flash',
+		'gemini-3.5-flash-lite',
 		'gemini-3.5-flash',
 		'gemini-3.1-pro',
 		'gemini-3.1-flash-lite',
@@ -74,7 +94,10 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'gemini-2.5-flash',
 	],
 	Anthropic: [
+		'claude-fable-5-1',
+		'claude-opus-5',
 		'claude-sonnet-5',
+		'claude-fable-5',
 		'claude-opus-4-8',
 		'claude-opus-4-7',
 		'claude-opus-4-6',
@@ -82,11 +105,11 @@ const MODEL_GROUPS: Record<string, string[]> = {
 		'claude-sonnet-4-5',
 		'claude-haiku-4-5',
 	],
-	MiniMax: ['MiniMax-M3', 'MiniMax-M2.7', 'MiniMax-M2.5'],
-	xAI: ['grok-4.5', 'grok-4.3', 'grok-build-0.1'],
-	Tencent: ['hy3'],
+	MiniMax: ['MiniMax-M2.7', 'MiniMax-M2.5'],
+	xAI: ['grok-4.6', 'grok-4.5', 'grok-4.3', 'grok-build-0.1'],
+	Tencent: ['hy4-preview', 'hy3'],
 	MoonshotAI: ['kimi-k3', 'kimi-k2.7-code', 'kimi-k2.6', 'kimi-k2.5'],
-	'Z.AI': ['glm-5.2', 'glm-5.1', 'glm-5', 'glm-4.7'],
+	'Z.AI': ['glm-5.3-flash', 'glm-5.3', 'glm-5.2', 'glm-5.1', 'glm-5', 'glm-4.7'],
 }
 
 /**
@@ -112,14 +135,18 @@ const OPENROUTER_VENDOR_SLUG: Record<string, string> = {
  * `<vendor-slug>/<lowercased-name>` heuristic — dated snapshots, "-preview"
  * suffixes, "v"-prefixed versions, or dots instead of hyphens in the
  * version number. Verified against `GET https://openrouter.ai/api/v1/models`
- * on 2026-07-10; re-check when models are added to `MODEL_GROUPS`.
+ * on 2026-09-06; re-check when models are added to `MODEL_GROUPS`.
  */
 const OPENROUTER_ID_OVERRIDES: Record<string, string> = {
+	'qwen3.8-max': 'qwen/qwen3.8-max-0902',
 	'qwen3.6-max': 'qwen/qwen3.6-max-preview',
 	'qwen3.5-plus': 'qwen/qwen3.5-plus-20260420',
 	'qwen3.5-flash': 'qwen/qwen3.5-flash-02-23',
+	'deepseek-v4-pro': 'deepseek/deepseek-v4-pro-0813',
+	'deepseek-v4-flash': 'deepseek/deepseek-v4-flash-0731',
 	'deepseek-3.2': 'deepseek/deepseek-v3.2',
 	'gemini-3.1-pro': 'google/gemini-3.1-pro-preview',
+	'claude-fable-5-1': 'anthropic/claude-fable-5.1',
 	'claude-opus-4-8': 'anthropic/claude-opus-4.8',
 	'claude-opus-4-7': 'anthropic/claude-opus-4.7',
 	'claude-opus-4-6': 'anthropic/claude-opus-4.6',
@@ -172,7 +199,7 @@ async function expectEchoToolCall(baseURL: string, apiKey: string, model: string
 	const result = await client.invoke(PROMPT, { echo: ECHO_TOOL }, new AbortController().signal, {
 		toolChoiceName: 'echo',
 	})
-	expect(result.toolResult).toBe('PING')
+	expect(result.toolCall.name).toBe('echo')
 }
 
 describe.concurrent('OpenRouter — all listed models', () => {
@@ -194,6 +221,7 @@ describe.concurrent('OpenRouter — all listed models', () => {
 
 // Aliyun native ids that don't match the display name in MODEL_GROUPS.
 const ALIYUN_ID_OVERRIDES: Record<string, string> = {
+	'qwen3.8-max': 'qwen3.8-max-0902',
 	'qwen3.6-max': 'qwen3.6-max-preview',
 }
 
@@ -214,8 +242,7 @@ describe.concurrent('Aliyun DashScope — Qwen native', () => {
 
 describe.concurrent('DeepSeek — native', () => {
 	const { baseURL, apiKey } = PROVIDERS.deepseek
-	// deepseek-3.2 isn't served on DeepSeek's own API (only via OpenRouter
-	// resellers) — its official API only accepts deepseek-v4-pro/-flash.
+	// deepseek-3.2 isn't served on DeepSeek's own API (only via OpenRouter resellers).
 	const nativeModels = MODEL_GROUPS.DeepSeek.filter((model) => model !== 'deepseek-3.2')
 
 	for (const model of nativeModels) {
