@@ -1,4 +1,4 @@
-import { type AgentConfig, PageAgentCore } from '@page-agent/core'
+import { type AgentConfig, PageAgentCore, type SupportedLanguage } from '@page-agent/core'
 
 import { RemotePageController } from './RemotePageController'
 import { TabsController } from './TabsController'
@@ -6,9 +6,11 @@ import SYSTEM_PROMPT from './system_prompt.md?raw'
 import { createTabTools } from './tabTools'
 
 /** Detect user language from browser settings */
-function detectLanguage(): 'en-US' | 'zh-CN' {
+function detectLanguage(): SupportedLanguage {
 	const lang = navigator.language || navigator.languages?.[0] || 'en-US'
-	return lang.startsWith('zh') ? 'zh-CN' : 'en-US'
+	if (lang.startsWith('zh')) return 'zh-CN'
+	if (lang.startsWith('ar')) return 'ar-EG'
+	return 'en-US'
 }
 
 interface MultiPageAgentConfig extends AgentConfig {
@@ -30,7 +32,8 @@ export class MultiPageAgent extends PageAgentCore {
 
 		// system prompt - auto-detect language if not specified
 		const language = config.language ?? detectLanguage()
-		const targetLanguage = language === 'zh-CN' ? '中文' : 'English'
+		const targetLanguage =
+			language === 'zh-CN' ? '中文' : language.startsWith('ar') ? 'العربية' : 'English'
 		const systemPrompt = SYSTEM_PROMPT.replace(
 			/Default working language: \*\*.*?\*\*/,
 			`Default working language: **${targetLanguage}**`

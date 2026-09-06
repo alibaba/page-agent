@@ -393,6 +393,9 @@ export class Panel {
 		wrapper.className = styles.wrapper
 		wrapper.setAttribute('data-browser-use-ignore', 'true')
 		wrapper.setAttribute('data-page-agent-ignore', 'true')
+		if (this.#i18n.getLanguage().startsWith('ar')) {
+			wrapper.setAttribute('dir', 'rtl')
+		}
 
 		wrapper.innerHTML = `
 			<div class="${styles.background}"></div>

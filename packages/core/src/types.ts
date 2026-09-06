@@ -5,7 +5,7 @@ import type { PageAgentCore } from './PageAgentCore'
 import type { PageAgentTool } from './tools'
 
 /** Supported UI languages */
-export type SupportedLanguage = 'en-US' | 'zh-CN'
+export type SupportedLanguage = 'en-US' | 'zh-CN' | 'ar-EG' | 'ar'
 
 export interface AgentConfig extends LLMConfig {
 	language?: SupportedLanguage

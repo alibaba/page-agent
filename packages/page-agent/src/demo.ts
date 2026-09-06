@@ -1,7 +1,7 @@
 /**
  * IIFE demo entry - auto-initializes with built-in demo API for testing
  */
-import { PageAgent, type PageAgentConfig } from './PageAgent'
+import { PageAgent, type PageAgentConfig, type SupportedLanguage } from './PageAgent'
 
 const currentScript = document.currentScript as HTMLScriptElement | null
 const currentScriptURL = currentScript?.src ? new URL(currentScript.src) : null
@@ -32,7 +32,7 @@ if (autoInit) {
 			const model = url.searchParams.get('model') || DEMO_MODEL
 			const baseURL = url.searchParams.get('baseURL') || DEMO_BASE_URL
 			const apiKey = url.searchParams.get('apiKey') || DEMO_API_KEY
-			const language = (url.searchParams.get('lang') as 'zh-CN' | 'en-US') || 'zh-CN'
+			const language = (url.searchParams.get('lang') as SupportedLanguage) || 'zh-CN'
 			showPanel = ((url.searchParams.get('showPanel') as 'true' | 'false') || 'true') === 'true'
 			config = { model, baseURL, apiKey, language }
 		} else {
