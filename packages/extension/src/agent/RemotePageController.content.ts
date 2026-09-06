@@ -77,6 +77,7 @@ export function initPageController() {
 			case 'update_tree':
 			case 'clean_up_highlights':
 			case 'click_element':
+			case 'hover_element':
 			case 'input_text':
 			case 'select_option':
 			case 'scroll':
@@ -118,6 +119,8 @@ function getMethodName(action: string): string {
 
 		case 'click_element':
 			return 'clickElement' as const
+		case 'hover_element':
+			return 'hoverElement' as const
 		case 'input_text':
 			return 'inputText' as const
 		case 'select_option':
