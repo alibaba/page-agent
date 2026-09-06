@@ -8,7 +8,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/alibaba/page-agent/main-ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/alibaba/page-agent/actions/workflows/main-ci.yml)
 [![npm](https://img.shields.io/npm/v/page-agent?style=flat-square&label=npm)](https://www.npmjs.com/package/page-agent)
 [![downloads](https://img.shields.io/npm/dt/page-agent?style=flat-square)](https://www.npmjs.com/package/page-agent)
-[![size](https://img.shields.io/bundlephobia/minzip/page-agent?style=flat-square&label=size)](https://bundlephobia.com/package/page-agent)
+[![Minzipped bundle size (excluding Zod)](https://deno.bundlejs.com/?q=page-agent&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22zod%22%5D%7D%7D&badge&badge-style=flat-square)](https://bundlejs.com/?q=page-agent&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22zod%22%5D%7D%7D 'Minified + gzip size, excluding the Zod peer dependency')
 [![license](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](https://opensource.org/licenses/MIT)
 [![typescript](https://img.shields.io/badge/%3C%2F%3E-typescript-blue?style=flat-square)](http://www.typescriptlang.org/)
 [![Chrome Web Store Rating](https://img.shields.io/chrome-web-store/rating/akldabonmimlicnjlflnapfeklbfemhj?style=flat-square&label=chrome%20rating)](https://chromewebstore.google.com/detail/page-agent-ext/akldabonmimlicnjlflnapfeklbfemhj)
@@ -56,12 +56,12 @@ Fastest way to try PageAgent with our free Demo LLM:
 
 ```html
 <script
-    src="https://cdn.jsdelivr.net/npm/page-agent@1.12.2/dist/iife/page-agent.demo.js"
+    src="https://cdn.jsdelivr.net/npm/page-agent@1.12.4/dist/iife/page-agent.demo.js"
     crossorigin="anonymous"
 ></script>
 
 <!-- China CDN mirror if you can't access jsDelivr -->
-<!-- https://registry.npmmirror.com/page-agent/1.12.2/files/dist/iife/page-agent.demo.js -->
+<!-- https://registry.npmmirror.com/page-agent/1.12.4/files/dist/iife/page-agent.demo.js -->
 ```
 
 > **⚠️ For technical evaluation only.** This demo CDN uses our free [testing LLM API](https://alibaba.github.io/page-agent/docs/features/models#free-testing-api). By using it, you agree to its [terms](https://github.com/alibaba/page-agent/blob/main/docs/terms-and-privacy.md).

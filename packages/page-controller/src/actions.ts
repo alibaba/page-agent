@@ -237,7 +237,6 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		element.dispatchEvent(new Event('input', { bubbles: true }))
 	}
 
-	blurLastClickedElement()
 	await waitFor(0.1)
 
 	const actualText = isContentEditable
