@@ -1,0 +1,46 @@
+{
+	"ui": {
+		"panel": {
+			"ready": "Ready",
+			"thinking": "Thinking...",
+			"taskInput": "Enter new task, describe steps in detail, press Enter to submit",
+			"userAnswerPrompt": "Please answer the question above, press Enter to submit",
+			"taskTerminated": "Task terminated",
+			"taskCompleted": "Task completed",
+			"userAnswer": "User answer: {{input}}",
+			"question": "Question: {{question}}",
+			"waitingPlaceholder": "Waiting for task to start...",
+			"stop": "Stop",
+			"close": "Close",
+			"expand": "Expand history",
+			"collapse": "Collapse history",
+			"step": "Step {{number}}"
+		},
+		"tools": {
+			"clicking": "Clicking element [{{index}}]...",
+			"inputting": "Inputting text to element [{{index}}]...",
+			"selecting": "Selecting option \"{{text}}\"...",
+			"scrolling": "Scrolling page...",
+			"waiting": "Waiting {{seconds}} seconds...",
+			"askingUser": "Asking user...",
+			"done": "Task done",
+			"clicked": "🖱️ Clicked element [{{index}}]",
+			"inputted": "⌨️ Inputted text \"{{text}}\"",
+			"selected": "☑️ Selected option \"{{text}}\"",
+			"scrolled": "🛞 Page scrolled",
+			"waited": "⌛️ Wait completed",
+			"executing": "Executing {{toolName}}...",
+			"resultSuccess": "success",
+			"resultFailure": "failed",
+			"resultError": "error"
+		},
+		"errors": {
+			"elementNotFound": "No interactive element found at index {{index}}",
+			"taskRequired": "Task description is required",
+			"executionFailed": "Task execution failed",
+			"notInputElement": "Element is not an input or textarea",
+			"notSelectElement": "Element is not a select element",
+			"optionNotFound": "Option \"{{text}}\" not found"
+		}
+	}
+}

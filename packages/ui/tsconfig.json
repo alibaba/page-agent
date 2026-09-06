@@ -1,8 +1,9 @@
 {
     "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo"
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.tsbuildinfo",
+        "resolveJsonModule": true
     },
-    "include": ["**/*.ts", "**/*.js"],
+    "include": ["**/*.ts", "**/*.js", "**/*.json"],
     "exclude": ["dist", "node_modules"]
 }

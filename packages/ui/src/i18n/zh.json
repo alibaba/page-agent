@@ -1,0 +1,46 @@
+{
+	"ui": {
+		"panel": {
+			"ready": "准备就绪",
+			"thinking": "正在思考...",
+			"taskInput": "输入新任务，详细描述步骤，回车提交",
+			"userAnswerPrompt": "请回答上面问题，回车提交",
+			"taskTerminated": "任务已终止",
+			"taskCompleted": "任务结束",
+			"userAnswer": "用户回答: {{input}}",
+			"question": "询问: {{question}}",
+			"waitingPlaceholder": "等待任务开始...",
+			"stop": "终止",
+			"close": "关闭",
+			"expand": "展开历史",
+			"collapse": "收起历史",
+			"step": "步骤 {{number}}"
+		},
+		"tools": {
+			"clicking": "正在点击元素 [{{index}}]...",
+			"inputting": "正在输入文本到元素 [{{index}}]...",
+			"selecting": "正在选择选项 \"{{text}}\"...",
+			"scrolling": "正在滚动页面...",
+			"waiting": "等待 {{seconds}} 秒...",
+			"askingUser": "正在询问用户...",
+			"done": "结束任务",
+			"clicked": "🖱️ 已点击元素 [{{index}}]",
+			"inputted": "⌨️ 已输入文本 \"{{text}}\"",
+			"selected": "☑️ 已选择选项 \"{{text}}\"",
+			"scrolled": "🛞 页面滚动完成",
+			"waited": "⌛️ 等待完成",
+			"executing": "正在执行 {{toolName}}...",
+			"resultSuccess": "成功",
+			"resultFailure": "失败",
+			"resultError": "错误"
+		},
+		"errors": {
+			"elementNotFound": "未找到索引为 {{index}} 的交互元素",
+			"taskRequired": "任务描述不能为空",
+			"executionFailed": "任务执行失败",
+			"notInputElement": "元素不是输入框或文本域",
+			"notSelectElement": "元素不是选择框",
+			"optionNotFound": "未找到选项 \"{{text}}\""
+		}
+	}
+}
