@@ -19,7 +19,20 @@
  * @edit exclude aria-hidden elements
  * @edit make sure attributes exist for interactive candidates.
  * @edit fix "aria-*" attributes check
+ * @edit adjustable label text opacity
+ * @edit doHighlightElements only skips painting, indexing is unaffected
  */
+
+/**
+ * @edit adjustable opacity
+ * Encodes an opacity (0-1) as the alpha byte suffix of a #rrggbb color.
+ * @param {number} opacity
+ * @returns {string}
+ */
+const toAlphaHex = (opacity) =>
+	Math.floor(opacity * 255)
+		.toString(16)
+		.padStart(2, '0')
 
 export default (
 	args = {
@@ -37,13 +50,19 @@ export default (
 		interactiveWhitelist: [],
 		highlightOpacity: 0.1,
 		highlightLabelOpacity: 0.5,
+		highlightLabelTextOpacity: 1,
 	}
 ) => {
 	/**
 	 * @edit
 	 */
-	const { interactiveBlacklist, interactiveWhitelist, highlightOpacity, highlightLabelOpacity } =
-		args
+	const {
+		interactiveBlacklist,
+		interactiveWhitelist,
+		highlightOpacity,
+		highlightLabelOpacity,
+		highlightLabelTextOpacity,
+	} = args
 
 	const { doHighlightElements, focusHighlightIndex, viewportExpansion, debugMode } = args
 	let highlightIndex = 0 // Reset highlight index
@@ -227,16 +246,8 @@ export default (
 			 * @edit adjustable opacity
 			 */
 			// const backgroundColor = baseColor + "1A"; // 10% opacity version of the color
-			const backgroundColor =
-				baseColor +
-				Math.floor(highlightOpacity * 255)
-					.toString(16)
-					.padStart(2, '0')
-			baseColor =
-				baseColor +
-				Math.floor(highlightLabelOpacity * 255)
-					.toString(16)
-					.padStart(2, '0')
+			const backgroundColor = baseColor + toAlphaHex(highlightOpacity)
+			baseColor = baseColor + toAlphaHex(highlightLabelOpacity)
 
 			// Get iframe offset if necessary
 			let iframeOffset = { x: 0, y: 0 }
@@ -278,7 +289,10 @@ export default (
 			label.className = 'playwright-highlight-label'
 			label.style.position = 'fixed'
 			label.style.background = baseColor
-			label.style.color = 'white'
+			/**
+			 * @edit adjustable label text opacity
+			 */
+			label.style.color = '#ffffff' + toAlphaHex(highlightLabelTextOpacity ?? 1)
 			label.style.padding = '1px 4px'
 			label.style.borderRadius = '4px'
 			label.style.fontSize = `${Math.min(12, Math.max(8, firstRect.height / 2))}px`
@@ -1415,7 +1429,10 @@ export default (
    * @param {HTMLElement} node - The node to highlight.
    * @param {HTMLElement | null} parentIframe - The parent iframe node.
    * @param {boolean} isParentHighlighted - Whether the parent node is highlighted.
-   * @returns {boolean} Whether the element was highlighted.
+   * @edit reports index assignment, not painting. Since doHighlightElements only skips
+   * painting, an element can be indexed without an overlay being drawn. Children read
+   * this as their `isParentHighlighted`, so it must not depend on the overlay.
+   * @returns {boolean} Whether a highlight index was assigned to the element.
    */
 	function handleHighlighting(nodeData, node, parentIframe, isParentHighlighted) {
 		if (!nodeData.isInteractive) return false // Not interactive, definitely don't highlight
@@ -1451,14 +1468,20 @@ export default (
 					} else {
 						highlightElement(node, nodeData.highlightIndex, parentIframe)
 					}
-					return true // Successfully highlighted
 				}
+
+				/**
+				 * @edit doHighlightElements only skips painting, indexing is unaffected.
+				 * Children must see the same parent-highlighted status either way,
+				 * otherwise turning off the overlay would change the assigned indexes.
+				 */
+				return true // Index assigned
 			} else {
 				// console.log(`Skipping highlight for ${nodeData.tagName} (outside viewport)`);
 			}
 		}
 
-		return false // Did not highlight
+		return false // No index assigned
 	}
 
 	/**
