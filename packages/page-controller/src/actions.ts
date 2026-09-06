@@ -245,7 +245,15 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 		throw new Error(`Option with text "${optionText}" not found in select element`)
 	}
 
-	selectElement.value = option.value
+	// Go through the prototype's setter, as inputTextElement does. React
+	// installs its own `value` setter on the instance to track changes, so a
+	// direct assignment updates the DOM but leaves React's tracker holding the
+	// old value — it then treats the change event as a no-op and never runs
+	// onChange, so the component's state keeps the option that was replaced.
+	getNativeValueSetter(selectElement).call(selectElement, option.value)
+
+	// A real selection fires input before change; frameworks listen for either.
+	selectElement.dispatchEvent(new Event('input', { bubbles: true }))
 	selectElement.dispatchEvent(new Event('change', { bubbles: true }))
 
 	await waitFor(0.1) // Wait to ensure change event processing completes
