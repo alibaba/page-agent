@@ -1664,7 +1664,7 @@ export default (
 			}
 		}
 
-		// Process children, with special handling for iframes and rich text editors
+		// Process children, with special handling for iframes, rich text editors, and tables
 		if (node.tagName) {
 			const tagName = node.tagName.toLowerCase()
 
@@ -1691,6 +1691,44 @@ export default (
 				(tagName === 'body' && node.getAttribute('data-id')?.startsWith('mce_'))
 			) {
 				// Process all child nodes to capture formatted text
+				for (const child of node.childNodes) {
+					const domElement = buildDomTree(child, parentIframe, nodeWasHighlighted)
+					if (domElement) nodeData.children.push(domElement)
+				}
+			}
+			// Handle tables - add table-specific data
+			else if (tagName === 'table') {
+				// Add table-specific extra data
+				addExtraData(node, {
+					table: true,
+					rows: [],
+					columns: 0,
+				})
+				// Process table children
+				for (const child of node.childNodes) {
+					const domElement = buildDomTree(child, parentIframe, nodeWasHighlighted)
+					if (domElement) nodeData.children.push(domElement)
+				}
+			}
+			// Handle table rows
+			else if (tagName === 'tr') {
+				addExtraData(node, {
+					row: true,
+					cells: [],
+				})
+				// Process row children
+				for (const child of node.childNodes) {
+					const domElement = buildDomTree(child, parentIframe, nodeWasHighlighted)
+					if (domElement) nodeData.children.push(domElement)
+				}
+			}
+			// Handle table cells
+			else if (tagName === 'td' || tagName === 'th') {
+				addExtraData(node, {
+					cell: true,
+					isHeader: tagName === 'th',
+				})
+				// Process cell children
 				for (const child of node.childNodes) {
 					const domElement = buildDomTree(child, parentIframe, nodeWasHighlighted)
 					if (domElement) nodeData.children.push(domElement)
