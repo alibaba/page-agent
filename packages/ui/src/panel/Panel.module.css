@@ -2,7 +2,14 @@
 	position: fixed;
 	bottom: 100px;
 	left: 50%;
-	transform: translateX(-50%) translateY(20px);
+	/* `--drag-x` / `--drag-y` are written by the drag handler. Panel.ts sets the
+	   same transform inline in show()/hide(), and must keep this suffix.
+	   Declared here rather than left to the `var()` fallback: custom properties
+	   inherit, and the panel is injected into pages we do not control, so a host
+	   page using these names would otherwise shift the panel across the screen. */
+	--drag-x: 0px;
+	--drag-y: 0px;
+	transform: translateX(-50%) translateY(20px) translate(var(--drag-x, 0px), var(--drag-y, 0px));
 	opacity: 0;
 	z-index: 2147483642; /* 比 SimulatorMask 高一层 */
 	box-sizing: border-box;
@@ -29,6 +36,11 @@
 	height: var(--height);
 
 	transition: all 0.3s ease-in-out;
+
+	/* No transition while dragging, or the panel lags behind the pointer */
+	&.dragging {
+		transition: none;
+	}
 
 	/* 响应式设计 */
 	@media (max-width: 480px) {
@@ -106,8 +118,14 @@
 	position: absolute;
 	inset: 0;
 
-	cursor: pointer;
+	/* The header doubles as the drag handle */
+	cursor: grab;
+	touch-action: none; /* Don't scroll the page while dragging by touch */
 	flex-shrink: 0; /* 防止 header 被压缩 */
+
+	.dragging & {
+		cursor: grabbing;
+	}
 
 	background: rgba(0, 0, 0, 0.5);
 	backdrop-filter: blur(10px);
