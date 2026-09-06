@@ -68,11 +68,20 @@ function ReflectionItem({ icon, value }: { icon: string; value: string }) {
 		<Fragment>
 			<span className="text-xs flex justify-center">{icon}</span>
 			<span
+				role="button"
+				tabIndex={0}
+				aria-expanded={expanded}
 				className={cn(
 					'text-[11px] text-muted-foreground cursor-pointer hover:text-muted-foreground/70',
 					!expanded && 'line-clamp-1'
 				)}
 				onClick={() => setExpanded(!expanded)}
+				onKeyDown={(e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						e.preventDefault()
+						setExpanded(!expanded)
+					}
+				}}
 			>
 				{value}
 			</span>
