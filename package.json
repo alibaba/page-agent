@@ -40,7 +40,7 @@
         "test:live": "npm run test:live --workspaces --if-present",
         "lint": "eslint .",
         "ci": "node scripts/ci.js",
-        "cleanup": "rm -rf packages/*/dist && rm -rf packages/*/.output",
+        "cleanup": "node scripts/cleanup.js",
         "prepare": "husky || true"
     },
     "devDependencies": {
