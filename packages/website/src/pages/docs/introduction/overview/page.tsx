@@ -33,11 +33,14 @@ export default function Overview() {
 						<img src="https://img.shields.io/npm/dt/page-agent.svg" alt="Downloads" />
 					</a>
 					<a
-						href="https://bundlephobia.com/package/page-agent"
+						href="https://bundlejs.com/?q=page-agent&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22zod%22%5D%7D%7D"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						<img src="https://img.shields.io/bundlephobia/minzip/page-agent" alt="Bundle Size" />
+						<img
+							src="https://deno.bundlejs.com/?q=page-agent&config=%7B%22esbuild%22%3A%7B%22external%22%3A%5B%22zod%22%5D%7D%7D&badge"
+							alt="Minzipped bundle size (excluding Zod)"
+						/>
 					</a>
 					<a href="https://github.com/alibaba/page-agent" target="_blank" rel="noopener noreferrer">
 						<img
