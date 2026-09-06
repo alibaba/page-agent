@@ -5,6 +5,7 @@
 	transform: translateX(-50%) translateY(20px);
 	opacity: 0;
 	z-index: 2147483642; /* 比 SimulatorMask 高一层 */
+
 	box-sizing: border-box;
 
 	overflow: visible;
@@ -29,6 +30,11 @@
 	height: var(--height);
 
 	transition: all 0.3s ease-in-out;
+
+	&.dragging {
+		transition: none !important;
+		will-change: transform;
+	}
 
 	/* 响应式设计 */
 	@media (max-width: 480px) {
@@ -169,6 +175,11 @@
 			line-height: 1;
 			font-weight: 500;
 			transition: all 0.3s ease-in-out;
+
+			&.dragging {
+				transition: none !important;
+				will-change: transform;
+			}
 			position: relative;
 			overflow: hidden;
 			display: flex;
