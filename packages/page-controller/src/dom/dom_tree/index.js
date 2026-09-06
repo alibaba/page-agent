@@ -688,6 +688,39 @@ export default (
 	}
 
 	/**
+	 * @edit dropdown/menu option detection
+	 * li/option elements (or role=option/menuitem/listitem) inside a dropdown or menu
+	 * container are treated as indexable even when visually disabled (cursor: not-allowed),
+	 * so the LLM sees the complete option list.
+	 */
+	const DROPDOWN_OPTION_ROLES = new Set([
+		'option',
+		'menuitem',
+		'menuitemradio',
+		'menuitemcheckbox',
+		'listitem',
+	])
+	const DROPDOWN_CONTAINER_SELECTOR = [
+		'[role="listbox"]',
+		'[role="menu"]',
+		'[role="menubar"]',
+		'select',
+		'.el-select-dropdown',
+		'.el-dropdown-menu',
+		'[data-toggle="dropdown"]',
+	].join(', ')
+
+	function isDropdownOptionElement(element) {
+		if (!element || element.nodeType !== Node.ELEMENT_NODE) return false
+		const tagName = element.tagName.toLowerCase()
+		const role = element.getAttribute('role')
+		if (tagName !== 'li' && tagName !== 'option' && !(role && DROPDOWN_OPTION_ROLES.has(role))) {
+			return false
+		}
+		return Boolean(element.closest(DROPDOWN_CONTAINER_SELECTOR))
+	}
+
+	/**
 	 * Checks if an element is interactive.
 	 *
 	 * lots of comments, and uncommented code - to show the logic of what we already tried
@@ -709,6 +742,15 @@ export default (
 		}
 		if (interactiveWhitelist.includes(element)) {
 			return true // Skip whitelisted elements
+		}
+
+		/**
+		 * @edit dropdown options should stay indexable even when disabled,
+		 * otherwise the LLM cannot see or select the full option list
+		 * (e.g. Element UI / Avue selects with disabled options).
+		 */
+		if (isDropdownOptionElement(element)) {
+			return true
 		}
 
 		// Cache the tagName and style lookups
