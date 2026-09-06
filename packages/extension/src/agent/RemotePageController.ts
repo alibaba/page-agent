@@ -125,6 +125,10 @@ export class RemotePageController {
 		return this.remoteCallDomAction('select_option', args)
 	}
 
+	async uploadFile(...args: any[]): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('upload_file', args)
+	}
+
 	async scroll(...args: any[]): Promise<DomActionReturn> {
 		return this.remoteCallDomAction('scroll', args)
 	}

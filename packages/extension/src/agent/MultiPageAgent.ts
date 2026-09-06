@@ -4,6 +4,7 @@ import { RemotePageController } from './RemotePageController'
 import { TabsController } from './TabsController'
 import SYSTEM_PROMPT from './system_prompt.md?raw'
 import { createTabTools } from './tabTools'
+import { createUploadTools } from './uploadTools'
 
 /** Detect user language from browser settings */
 function detectLanguage(): 'en-US' | 'zh-CN' {
@@ -26,7 +27,10 @@ export class MultiPageAgent extends PageAgentCore {
 		// multi page controller
 		const tabsController = new TabsController()
 		const pageController = new RemotePageController(tabsController)
-		const customTools = createTabTools(tabsController)
+		const customTools = {
+			...createTabTools(tabsController),
+			...createUploadTools(pageController),
+		}
 
 		// system prompt - auto-detect language if not specified
 		const language = config.language ?? detectLanguage()

@@ -79,6 +79,7 @@ export function initPageController() {
 			case 'click_element':
 			case 'input_text':
 			case 'select_option':
+			case 'upload_file':
 			case 'scroll':
 			case 'scroll_horizontally':
 			case 'execute_javascript':
@@ -122,6 +123,8 @@ function getMethodName(action: string): string {
 			return 'inputText' as const
 		case 'select_option':
 			return 'selectOption' as const
+		case 'upload_file':
+			return 'uploadFile' as const
 		case 'scroll':
 			return 'scroll' as const
 		case 'scroll_horizontally':
