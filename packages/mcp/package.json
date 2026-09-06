@@ -27,6 +27,9 @@
     "engines": {
         "node": ">=20"
     },
+    "scripts": {
+        "test": "node --test test/*.test.js"
+    },
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.30.0",
         "ws": "^8.21.3",
