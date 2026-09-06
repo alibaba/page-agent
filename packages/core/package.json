@@ -1,7 +1,7 @@
 {
     "name": "@page-agent/core",
     "private": false,
-    "version": "1.12.3",
+    "version": "1.12.4",
     "type": "module",
     "main": "./src/PageAgentCore.ts",
     "types": "./src/PageAgentCore.ts",
@@ -55,8 +55,8 @@
     },
     "dependencies": {
         "chalk": "^6.0.0",
-        "@page-agent/llms": "1.12.3",
-        "@page-agent/page-controller": "1.12.3"
+        "@page-agent/llms": "1.12.4",
+        "@page-agent/page-controller": "1.12.4"
     },
     "peerDependencies": {
         "zod": "^3.25.0 || ^4.0.0"
