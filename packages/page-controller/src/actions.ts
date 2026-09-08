@@ -62,6 +62,12 @@ function blurLastClickedElement() {
  * @private Internal method, subject to change at any time.
  */
 export async function clickElement(element: HTMLElement) {
+	if (isSelectElement(element)) {
+		throw new Error(
+			'Clicking a native <select> cannot open its options. Select the option by its visible text instead.'
+		)
+	}
+
 	blurLastClickedElement()
 
 	lastClickedElement = element
@@ -125,14 +131,37 @@ export async function clickElement(element: HTMLElement) {
 	await waitFor(0.2)
 }
 
+/** `<input>` types whose `value` is not user-typed text. */
+const NON_TEXT_INPUT_TYPES = new Set([
+	'button',
+	'checkbox',
+	'file',
+	'image',
+	'radio',
+	'reset',
+	'submit',
+])
+
+function assertAcceptsText(element: HTMLElement): void {
+	const acceptsText =
+		isTextAreaElement(element) ||
+		element.isContentEditable ||
+		(isInputElement(element) && !NON_TEXT_INPUT_TYPES.has(element.type))
+	if (!acceptsText) {
+		const tag = isInputElement(element)
+			? `<input type="${element.type}">`
+			: `<${element.tagName.toLowerCase()}>`
+		throw new Error(`${tag} does not accept text input.`)
+	}
+}
+
 /**
  * @private Internal method, subject to change at any time.
  */
 export async function inputTextElement(element: HTMLElement, text: string) {
+	assertAcceptsText(element)
+
 	const isContentEditable = element.isContentEditable
-	if (!isInputElement(element) && !isTextAreaElement(element) && !isContentEditable) {
-		throw new Error('Element is not an input, textarea, or contenteditable')
-	}
 
 	await clickElement(element)
 
@@ -217,16 +246,26 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 
 		// Trigger blur for validation
 		element.blur()
-	} else {
-		getNativeValueSetter(element as HTMLInputElement | HTMLTextAreaElement).call(element, text)
+
+		await waitFor(0.1)
+		return
 	}
 
-	// Only dispatch shared input event for non-contenteditable (contenteditable has its own)
-	if (!isContentEditable) {
-		element.dispatchEvent(new Event('input', { bubbles: true }))
-	}
+	const input = element as HTMLInputElement | HTMLTextAreaElement
+	const valueBefore = input.value
+	getNativeValueSetter(input).call(input, text)
+	input.dispatchEvent(new Event('input', { bubbles: true }))
 
 	await waitFor(0.1)
+
+	// Pages may legitimately reformat the value (masks, normalizers), so a different value
+	// is not a failure. An unchanged or emptied field means the page discarded the input.
+	const value = input.value
+	if (value !== text && (value === valueBefore || value === '')) {
+		throw new Error(
+			`The page discarded the input. The field now contains ${JSON.stringify(value)}. Inspect the current page state before retrying.`
+		)
+	}
 }
 
 /**
@@ -245,10 +284,19 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 		throw new Error(`Option with text "${optionText}" not found in select element`)
 	}
 
-	selectElement.value = option.value
+	// Assigning `value` would pick the first option with that value; index targets this exact option.
+	selectElement.selectedIndex = option.index
+	selectElement.dispatchEvent(new Event('input', { bubbles: true }))
 	selectElement.dispatchEvent(new Event('change', { bubbles: true }))
 
 	await waitFor(0.1) // Wait to ensure change event processing completes
+
+	if (selectElement.selectedIndex !== option.index) {
+		const current = selectElement.selectedOptions.item(0)?.textContent?.trim() ?? ''
+		throw new Error(
+			`The page discarded the selection. Expected option ${JSON.stringify(optionText)}, but the current option is ${JSON.stringify(current)}. Inspect the current page state before retrying.`
+		)
+	}
 }
 
 interface ScrollableElement extends Element {
