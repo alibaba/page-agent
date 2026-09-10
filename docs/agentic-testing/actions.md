@@ -21,6 +21,7 @@
 | el-scroll    | [Element Plus Scrollbar](https://element-plus.org/en-US/component/scrollbar.html) — vertical / horizontal | Scroll target container in both directions. | Correct region and direction.                         |
 | mui-input    | [MUI Autocomplete](https://mui.com/material-ui/react-autocomplete/) — Controlled states                   | Type, select, clear.                        | Displayed inputValue/value stay consistent.           |
 | radix-select | [Radix Select](https://www.radix-ui.com/primitives/docs/components/select)                                | Select, reopen, select another.             | Value updates; focus returns to trigger.              |
+| imask-input  | [IMask](https://imask.js.org/) — phone mask                                                               | Fill, repeat, clear, retype.                | Formatting, clearing, and repeated input work.        |
 
 ## References
 
