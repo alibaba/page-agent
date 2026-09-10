@@ -158,7 +158,7 @@ function assertAcceptsText(element: HTMLElement): void {
 /**
  * @private Internal method, subject to change at any time.
  */
-export async function inputTextElement(element: HTMLElement, text: string) {
+export async function inputTextElement(element: HTMLElement, text: string): Promise<string> {
 	assertAcceptsText(element)
 
 	const isContentEditable = element.isContentEditable
@@ -248,24 +248,16 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 		element.blur()
 
 		await waitFor(0.1)
-		return
+		return element.innerText
 	}
 
 	const input = element as HTMLInputElement | HTMLTextAreaElement
-	const valueBefore = input.value
 	getNativeValueSetter(input).call(input, text)
 	input.dispatchEvent(new Event('input', { bubbles: true }))
 
 	await waitFor(0.1)
 
-	// Pages may legitimately reformat the value (masks, normalizers), so a different value
-	// is not a failure. An unchanged or emptied field means the page discarded the input.
-	const value = input.value
-	if (value !== text && (value === valueBefore || value === '')) {
-		throw new Error(
-			`The page discarded the input. The field now contains ${JSON.stringify(value)}. Inspect the current page state before retrying.`
-		)
-	}
+	return input.value
 }
 
 /**

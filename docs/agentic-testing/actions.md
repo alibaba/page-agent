@@ -5,6 +5,7 @@
 1. Build: `npm run build -w @page-agent/page-controller`.
 2. Load `packages/page-controller/dist/lib/page-controller.js` in the page via `import()` (URL or Blob).
 3. Call exported actions directly on DOM elements, never native input; do not instantiate `PageController` or modify the bundle.
+4. Use computer use to reveal hover-only controls before calling their actions. Resolve elements again after framework renders; a detached element is not the current control.
 
 ## Cases
 
@@ -21,6 +22,18 @@
 | el-scroll    | [Element Plus Scrollbar](https://element-plus.org/en-US/component/scrollbar.html) — vertical / horizontal | Scroll target container in both directions. | Correct region and direction.                         |
 | mui-input    | [MUI Autocomplete](https://mui.com/material-ui/react-autocomplete/) — Controlled states                   | Type, select, clear.                        | Displayed inputValue/value stay consistent.           |
 | radix-select | [Radix Select](https://www.radix-ui.com/primitives/docs/components/select)                                | Select, reopen, select another.             | Value updates; focus returns to trigger.              |
+
+## Input and selection guards
+
+Use only synthetic test values. Inspect both the action outcome and the rendered value; an error alone does not prove that the input was rejected.
+
+| ID                  | Page / demo                                                                                           | Actions                                                                                              | Expected                                                                                                       |
+| ------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| native-text         | [Selenium web form](https://www.selenium.dev/selenium/web/web-form.html) — text / password / textarea | Replace, repeat the same value, clear, and retype.                                                   | Values persist; repeated input and clearing succeed.                                                           |
+| native-select       | [Selenium web form](https://www.selenium.dev/selenium/web/web-form.html) — Dropdown (select)          | Try `clickElement` and `inputTextElement`; then select `Two` and `Three` with `selectOptionElement`. | Misused actions throw without changing the selection; selecting by visible text succeeds.                      |
+| native-input-guards | [Selenium web form](https://www.selenium.dev/selenium/web/web-form.html) — checkbox / radio / file    | Call `inputTextElement` on each control.                                                             | Each call throws before changing checked state or opening a file chooser.                                      |
+| imask-phone         | [IMask](https://imask.js.org/) — phone mask                                                           | Input digits, repeat the same digits, clear, and retype.                                             | Formatting succeeds, including when the formatted value already matches the existing value. Clearing succeeds. |
+| antd-number         | [AntD InputNumber](https://ant.design/components/input-number/) — Formatter                           | Replace a formatted number, repeat the same number, then blur.                                       | The action outcome agrees with the displayed and retained value.                                               |
 
 ## References
 

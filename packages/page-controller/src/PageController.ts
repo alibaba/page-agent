@@ -276,11 +276,14 @@ export class PageController extends EventTarget {
 			this.assertIndexed()
 			const element = getElementByIndex(this.selectorMap, index)
 			const elemText = this.elementTextMap.get(index)
-			await inputTextElement(element, text)
+			const value = await inputTextElement(element, text)
 
 			return {
 				success: true,
-				message: `✅ Input text (${text}) into element (${elemText ?? index}).`,
+				message:
+					value === text
+						? `✅ Input text (${text}) into element (${elemText ?? index}).`
+						: `✅ Input action completed for element (${elemText ?? index}). Note: requested ${JSON.stringify(text)}; current value is ${JSON.stringify(value)}.`,
 			}
 		} catch (error) {
 			return {
