@@ -70,7 +70,8 @@
         "vitest": "^4.1.11"
     },
     "overrides": {
-        "typescript": "^6.0.3"
+        "typescript": "^6.0.3",
+        "image-size": "npm:image-size-next@^2.1.1"
     },
     "lint-staged": {
         "*.{js,ts,cjs,cts,mjs,mts}": [
