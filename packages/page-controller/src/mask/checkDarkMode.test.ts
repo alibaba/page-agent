@@ -33,6 +33,18 @@ describe('isPageDark', () => {
 		expect(isPageDark()).toBe(true)
 	})
 
+	it('blends a translucent dark body over a mid-grey <html>', () => {
+		document.documentElement.style.backgroundColor = 'rgb(160, 160, 160)'
+		document.body.style.backgroundColor = 'rgba(0, 0, 0, 0.4)'
+		expect(isPageDark()).toBe(true)
+	})
+
+	it('blends a translucent light body over a mid-grey <html>', () => {
+		document.documentElement.style.backgroundColor = 'rgb(100, 100, 100)'
+		document.body.style.backgroundColor = 'rgba(255, 255, 255, 0.45)'
+		expect(isPageDark()).toBe(false)
+	})
+
 	it('keeps a mostly opaque dark background', () => {
 		document.body.style.backgroundColor = 'rgba(20, 20, 20, 0.9)'
 		expect(isPageDark()).toBe(true)

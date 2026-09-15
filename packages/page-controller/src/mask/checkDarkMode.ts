@@ -85,16 +85,13 @@ function isBackgroundDark() {
 	const htmlBgColor = htmlStyle.backgroundColor
 	const bodyBgColor = bodyStyle.backgroundColor
 
-	// The body's background might be see-through, in which case we should
-	// fall back to the html element's background. getLuminance returns null for
-	// exactly the colours that do not describe the page — fully transparent and
-	// mostly transparent alike — so ask it rather than string-matching one
-	// spelling of transparent.
-	if (getLuminance(bodyBgColor) === null) {
-		return isColorDark(htmlBgColor)
-	}
+	// A see-through body shows the <html> background behind it, so blend the two
+	// rather than judging the body colour on its own. A transparent <html> leaves
+	// the default white canvas behind the body.
+	const htmlLuminance = getLuminance(htmlBgColor) ?? 255
+	const luminance = getLuminance(bodyBgColor, htmlLuminance) ?? htmlLuminance
 
-	return isColorDark(bodyBgColor)
+	return luminance < 128
 }
 
 /**
@@ -156,31 +153,28 @@ function parseRgbColor(colorString: string) {
 
 /**
  * Calculates the perceived luminance (0-255) of a CSS color string.
+ * A translucent color is blended with the luminance of whatever is behind it.
  * @param {string} colorString - e.g., "rgb(50, 50, 50)" or "rgba(0, 0, 0, 0.5)"
+ * @param {number} backdropLuminance - Luminance behind the color. Defaults to white.
  * @returns {number|null} - The luminance, or null if the color is transparent or unparseable.
  */
-function getLuminance(colorString: string): number | null {
+function getLuminance(colorString: string, backdropLuminance = 255): number | null {
 	if (!colorString || colorString === 'transparent') {
 		return null // Transparent has no meaningful luminance
 	}
 
 	const rgb = parseRgbColor(colorString)
-	if (!rgb) {
-		return null // Could not parse color
-	}
-
-	// A mostly-transparent colour says almost nothing about what the page looks
-	// like — whatever is painted behind it dominates. Only the fully
-	// transparent `rgba(0, 0, 0, 0)` used to be excluded, so a light page with a
-	// faint tint such as `rgba(0, 0, 0, 0.03)` measured as near-black and was
-	// reported dark. Treat anything under half opacity the same as transparent
-	// and let the next check decide.
-	if (rgb.a < 0.5) {
-		return null
+	if (!rgb || rgb.a === 0) {
+		return null // Could not parse color, or it is fully transparent
 	}
 
 	// Standard perceived luminance formula
-	return 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b
+	const luminance = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b
+
+	// The formula is linear in r, g and b, so blending luminances matches
+	// blending the colors first. A faint tint such as `rgba(0, 0, 0, 0.03)` then
+	// stays close to its backdrop instead of measuring as black.
+	return rgb.a * luminance + (1 - rgb.a) * backdropLuminance
 }
 
 /**
