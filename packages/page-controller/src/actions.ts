@@ -87,8 +87,7 @@ export async function clickElement(element: HTMLElement) {
 	await enablePassThrough()
 	const hitTarget = doc.elementFromPoint(x, y)
 	await disablePassThrough()
-	const target =
-		hitTarget instanceof HTMLElement && element.contains(hitTarget) ? hitTarget : element
+	const target = hitTarget && element.contains(hitTarget) ? hitTarget : element
 
 	const pointerOpts = {
 		bubbles: true,
@@ -119,8 +118,11 @@ export async function clickElement(element: HTMLElement) {
 	target.dispatchEvent(new MouseEvent('mouseup', mouseOpts))
 
 	// Click — activation behavior (navigation, form submit, etc.) triggers
-	// via bubbling from target up to the interactive ancestor.
-	target.click()
+	// via bubbling from target up to the interactive ancestor. SVG elements do
+	// not expose HTMLElement.click(), so dispatch the bubbling event directly.
+	const click = (target as Element & { click?: () => void }).click
+	if (typeof click === 'function') click.call(target)
+	else target.dispatchEvent(new MouseEvent('click', mouseOpts))
 
 	await waitFor(0.2)
 }
