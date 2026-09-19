@@ -1626,6 +1626,20 @@ export default (
 			) {
 				nodeData.attributes.checked = node.checked ? 'true' : 'false' // Store as string for consistency
 			}
+
+			// Component libraries commonly hide the native input and expose its
+			// clickable label instead. Preserve the associated control state on the
+			// label so the agent can decide whether an action is necessary.
+			if (node.tagName.toLowerCase() === 'label' && node.control) {
+				const control = node.control
+				if (
+					control.tagName.toLowerCase() === 'input' &&
+					(control.type === 'checkbox' || control.type === 'radio')
+				) {
+					nodeData.attributes.type = control.type
+					nodeData.attributes.checked = control.checked ? 'true' : 'false'
+				}
+			}
 		}
 
 		let nodeWasHighlighted = false
