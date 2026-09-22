@@ -10,6 +10,7 @@ import {
 	clickElement,
 	getElementByIndex,
 	inputTextElement,
+	pressKeyElement,
 	scrollHorizontally,
 	scrollVertically,
 	selectOptionElement,
@@ -286,6 +287,28 @@ export class PageController extends EventTarget {
 			return {
 				success: false,
 				message: `❌ Failed to input text: ${error}`,
+			}
+		}
+	}
+
+	/**
+	 * Press a keyboard key on an element by index
+	 */
+	async pressKey(index: number, key: string): Promise<ActionResult> {
+		try {
+			this.assertIndexed()
+			const element = getElementByIndex(this.selectorMap, index)
+			const elemText = this.elementTextMap.get(index)
+			await pressKeyElement(element, key)
+
+			return {
+				success: true,
+				message: `✅ Pressed key (${JSON.stringify(key)}) on element (${elemText ?? index}).`,
+			}
+		} catch (error) {
+			return {
+				success: false,
+				message: `❌ Failed to press key: ${error}`,
 			}
 		}
 	}

@@ -125,6 +125,81 @@ export async function clickElement(element: HTMLElement) {
 	await waitFor(0.2)
 }
 
+const KEY_DEFINITIONS: Record<string, { key: string; code: string }> = {
+	Enter: { key: 'Enter', code: 'Enter' },
+	Escape: { key: 'Escape', code: 'Escape' },
+	Tab: { key: 'Tab', code: 'Tab' },
+	ArrowUp: { key: 'ArrowUp', code: 'ArrowUp' },
+	ArrowDown: { key: 'ArrowDown', code: 'ArrowDown' },
+	ArrowLeft: { key: 'ArrowLeft', code: 'ArrowLeft' },
+	ArrowRight: { key: 'ArrowRight', code: 'ArrowRight' },
+	Backspace: { key: 'Backspace', code: 'Backspace' },
+	Delete: { key: 'Delete', code: 'Delete' },
+	Home: { key: 'Home', code: 'Home' },
+	End: { key: 'End', code: 'End' },
+	PageUp: { key: 'PageUp', code: 'PageUp' },
+	PageDown: { key: 'PageDown', code: 'PageDown' },
+	Space: { key: ' ', code: 'Space' },
+}
+
+function getKeyDefinition(key: string): { key: string; code: string } {
+	if (key === ' ') return KEY_DEFINITIONS.Space
+
+	const normalizedKey = key.trim()
+	const definition = KEY_DEFINITIONS[normalizedKey]
+	if (definition) return definition
+
+	if (normalizedKey.length === 1 && /[a-z]/i.test(normalizedKey)) {
+		return { key: normalizedKey, code: `Key${normalizedKey.toUpperCase()}` }
+	}
+	if (normalizedKey.length === 1 && /\d/.test(normalizedKey)) {
+		return { key: normalizedKey, code: `Digit${normalizedKey}` }
+	}
+
+	return { key: normalizedKey, code: normalizedKey }
+}
+
+/**
+ * Focus an element and dispatch a keyboard key press.
+ *
+ * @private Internal method, subject to change at any time.
+ */
+export async function pressKeyElement(element: HTMLElement, key: string) {
+	if (typeof key !== 'string' || key.length === 0 || (key.trim().length === 0 && key !== ' ')) {
+		throw new Error('Keyboard key must be a non-empty string')
+	}
+
+	await scrollIntoViewIfNeeded(element)
+	const frame = element.ownerDocument.defaultView?.frameElement
+	if (frame) await scrollIntoViewIfNeeded(frame)
+
+	const { key: eventKey, code } = getKeyDefinition(key)
+	const view = element.ownerDocument.defaultView
+	if (!view) throw new Error('Element does not belong to a window')
+
+	element.focus({ preventScroll: true })
+	element.dispatchEvent(
+		new view.KeyboardEvent('keydown', {
+			key: eventKey,
+			code,
+			bubbles: true,
+			cancelable: true,
+			composed: true,
+		})
+	)
+	element.dispatchEvent(
+		new view.KeyboardEvent('keyup', {
+			key: eventKey,
+			code,
+			bubbles: true,
+			cancelable: true,
+			composed: true,
+		})
+	)
+
+	await waitFor(0.1)
+}
+
 /**
  * @private Internal method, subject to change at any time.
  */

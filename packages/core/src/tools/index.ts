@@ -120,6 +120,22 @@ tools.set(
 )
 
 tools.set(
+	'press_key',
+	tool({
+		description:
+			'Press a keyboard key on an interactive element by index. Use this after input_text when Enter is needed to submit or confirm; examples include Enter, Escape, Tab, and ArrowDown.',
+		inputSchema: z.object({
+			index: z.int().min(0),
+			key: z.string().min(1),
+		}),
+		execute: async function (this: PageAgentCore, input) {
+			const result = await this.pageController.pressKey(input.index, input.key)
+			return result.message
+		},
+	})
+)
+
+tools.set(
 	'select_dropdown_option',
 	tool({
 		description:
@@ -197,6 +213,5 @@ tools.set(
 	})
 )
 
-// @todo send_keys
 // @todo upload_file
 // @todo extract_structured_data

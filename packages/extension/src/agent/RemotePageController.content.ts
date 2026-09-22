@@ -78,6 +78,7 @@ export function initPageController() {
 			case 'clean_up_highlights':
 			case 'click_element':
 			case 'input_text':
+			case 'press_key':
 			case 'select_option':
 			case 'scroll':
 			case 'scroll_horizontally':
@@ -120,6 +121,8 @@ function getMethodName(action: string): string {
 			return 'clickElement' as const
 		case 'input_text':
 			return 'inputText' as const
+		case 'press_key':
+			return 'pressKey' as const
 		case 'select_option':
 			return 'selectOption' as const
 		case 'scroll':
