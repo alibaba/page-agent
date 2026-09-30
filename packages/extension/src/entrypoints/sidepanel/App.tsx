@@ -195,11 +195,14 @@ export default function App() {
 				<InputGroup className="relative rounded-lg">
 					<InputGroupTextarea
 						ref={textareaRef}
-						placeholder="Describe your task... (Enter to send)"
+						placeholder={
+							isRunning
+								? 'Draft your next task... (send when the current task ends)'
+								: 'Describe your task... (Enter to send)'
+						}
 						value={inputValue}
 						onChange={(e) => setInputValue(e.target.value)}
 						onKeyDown={handleKeyDown}
-						disabled={isRunning}
 						className="text-xs pr-12 min-h-10"
 					/>
 					<InputGroupAddon align="inline-end" className="absolute bottom-0 right-0">
