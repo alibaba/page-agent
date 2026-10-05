@@ -53,7 +53,7 @@
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
         "@types/node": "^26.4.1",
         "@vitejs/plugin-react": "^6.1.1",
-        "chalk": "^6.0.0",
+        "chalk": "^6.0.1",
         "concurrently": "^10.0.5",
         "dotenv": "^17.4.2",
         "eslint": "^10.9.1",

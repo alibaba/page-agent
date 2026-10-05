@@ -28,8 +28,8 @@
         "node": ">=20"
     },
     "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.30.0",
-        "ws": "^8.21.3",
-        "zod": "^4.5.1"
+        "@modelcontextprotocol/sdk": "^1.32.0",
+        "ws": "^8.22.0",
+        "zod": "^4.6.5"
     }
 }
