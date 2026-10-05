@@ -49,12 +49,12 @@
         "postpublish": "node ../../scripts/post-publish.js"
     },
     "dependencies": {
-        "chalk": "^6.0.0"
+        "chalk": "^6.0.1"
     },
     "peerDependencies": {
         "zod": "^3.25.0 || ^4.0.0"
     },
     "devDependencies": {
-        "zod": "^4.5.1"
+        "zod": "^4.6.5"
     }
 }
