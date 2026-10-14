@@ -238,11 +238,19 @@ export async function selectOptionElement(selectElement: HTMLSelectElement, opti
 		throw new Error('Element is not a select element')
 	}
 
+	const needle = optionText.trim()
 	const options = Array.from(selectElement.options)
-	const option = options.find((opt) => opt.textContent?.trim() === optionText.trim())
+	// Prefer exact visible text (existing behavior), then option value.
+	// Dehydrated DOM includes `value=...`, and i18n UIs often use English/codes
+	// as values while showing localized textContent — agents pass either.
+	const option =
+		options.find((opt) => (opt.textContent?.trim() ?? '') === needle) ??
+		options.find((opt) => opt.value === needle || opt.value === optionText)
 
 	if (!option) {
-		throw new Error(`Option with text "${optionText}" not found in select element`)
+		throw new Error(
+			`Option with text or value "${optionText}" not found in select element`
+		)
 	}
 
 	selectElement.value = option.value
