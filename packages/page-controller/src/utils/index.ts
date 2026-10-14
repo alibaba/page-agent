@@ -10,6 +10,32 @@ export function isInputElement(el: Element): el is HTMLInputElement {
 	return el?.nodeType === 1 && el.tagName === 'INPUT'
 }
 
+/** Input types that accept a string via the value setter (not checkbox/file/etc.). */
+const TEXT_LIKE_INPUT_TYPES = new Set([
+	'',
+	'text',
+	'search',
+	'tel',
+	'url',
+	'email',
+	'password',
+	'number',
+	'date',
+	'time',
+	'datetime-local',
+	'month',
+	'week',
+])
+
+/**
+ * True when `inputText` can set a string value on this control.
+ * Checkbox / radio / file / button-like types stay on click (or upload) paths.
+ */
+export function isTextLikeInputElement(el: Element): el is HTMLInputElement {
+	if (!isInputElement(el)) return false
+	return TEXT_LIKE_INPUT_TYPES.has(el.type)
+}
+
 export function isTextAreaElement(el: Element): el is HTMLTextAreaElement {
 	return el?.nodeType === 1 && el.tagName === 'TEXTAREA'
 }

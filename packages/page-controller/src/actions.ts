@@ -12,6 +12,7 @@ import {
 	isInputElement,
 	isSelectElement,
 	isTextAreaElement,
+	isTextLikeInputElement,
 	movePointerToElement,
 	waitFor,
 } from './utils'
@@ -130,6 +131,11 @@ export async function clickElement(element: HTMLElement) {
  */
 export async function inputTextElement(element: HTMLElement, text: string) {
 	const isContentEditable = element.isContentEditable
+	if (isInputElement(element) && !isTextLikeInputElement(element)) {
+		throw new Error(
+			`Element is an <input type="${element.type}"> control; use click (or upload for file), not input_text`
+		)
+	}
 	if (!isInputElement(element) && !isTextAreaElement(element) && !isContentEditable) {
 		throw new Error('Element is not an input, textarea, or contenteditable')
 	}
