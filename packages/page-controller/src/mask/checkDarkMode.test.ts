@@ -6,6 +6,7 @@ afterEach(() => {
 	document.documentElement.className = ''
 	document.documentElement.removeAttribute('style')
 	document.body.removeAttribute('style')
+	document.body.replaceChildren()
 })
 
 describe('isPageDark', () => {
@@ -43,6 +44,17 @@ describe('isPageDark', () => {
 		document.documentElement.style.backgroundColor = 'rgb(100, 100, 100)'
 		document.body.style.backgroundColor = 'rgba(255, 255, 255, 0.45)'
 		expect(isPageDark()).toBe(false)
+	})
+
+	it('blends a translucent #app over the page background', () => {
+		document.documentElement.style.backgroundColor = 'rgb(160, 160, 160)'
+		const app = document.createElement('div')
+		app.id = 'app'
+		app.style.backgroundColor = 'rgba(0, 0, 0, 0.3)'
+		// happy-dom has no layout, so give #app the full viewport
+		app.getBoundingClientRect = () => new DOMRect(0, 0, window.innerWidth, window.innerHeight)
+		document.body.append(app)
+		expect(isPageDark()).toBe(true)
 	})
 
 	it('keeps a mostly opaque dark background', () => {

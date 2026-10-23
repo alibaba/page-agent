@@ -77,6 +77,13 @@ function isColorSchemeDark() {
  * Checks the background color of the body element to determine if the page is dark.
  */
 function isBackgroundDark() {
+	return getPageBackgroundLuminance() < 128
+}
+
+/**
+ * Luminance of the page background: the body over the <html> background.
+ */
+function getPageBackgroundLuminance() {
 	// We check both <html> and <body> because some pages set the color on <html>
 	const htmlStyle = window.getComputedStyle(document.documentElement)
 	const bodyStyle = window.getComputedStyle(document.body || document.documentElement)
@@ -89,9 +96,7 @@ function isBackgroundDark() {
 	// rather than judging the body colour on its own. A transparent <html> leaves
 	// the default white canvas behind the body.
 	const htmlLuminance = getLuminance(htmlBgColor) ?? 255
-	const luminance = getLuminance(bodyBgColor, htmlLuminance) ?? htmlLuminance
-
-	return luminance < 128
+	return getLuminance(bodyBgColor, htmlLuminance) ?? htmlLuminance
 }
 
 /**
@@ -116,6 +121,8 @@ function isTextColorLight() {
 function isMainContentBackgroundDark() {
 	const { innerWidth: vw, innerHeight: vh } = window
 	const minArea = vw * vh * 0.5
+	// A translucent container shows the page background behind it
+	const pageLuminance = getPageBackgroundLuminance()
 
 	const selectors = ['#app', '#root', '#__next']
 	for (const selector of selectors) {
@@ -125,7 +132,7 @@ function isMainContentBackgroundDark() {
 		const rect = el.getBoundingClientRect()
 		if (rect.width * rect.height < minArea) continue
 
-		if (isColorDark(window.getComputedStyle(el).backgroundColor)) return true
+		if (isColorDark(window.getComputedStyle(el).backgroundColor, pageLuminance)) return true
 	}
 	return false
 }
@@ -180,9 +187,10 @@ function getLuminance(colorString: string, backdropLuminance = 255): number | nu
 /**
  * Determines if a color is "dark" based on its calculated luminance.
  * @param {string} colorString - The CSS color string (e.g., "rgb(50, 50, 50)").
+ * @param {number} backdropLuminance - Luminance behind the color. Defaults to white.
  * @param {number} threshold - A value between 0 and 255. Colors with luminance below this will be considered dark. Default is 128.
  */
-function isColorDark(colorString: string, threshold = 128) {
-	const luminance = getLuminance(colorString)
+function isColorDark(colorString: string, backdropLuminance?: number, threshold = 128) {
+	const luminance = getLuminance(colorString, backdropLuminance)
 	return luminance !== null && luminance < threshold
 }
