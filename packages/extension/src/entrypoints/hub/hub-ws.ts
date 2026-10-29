@@ -9,6 +9,7 @@
  *   { type: "stop" }
  *
  * Outbound (Hub → Caller):
+ *   { type: "auth", token: string }
  *   { type: "ready" }
  *   { type: "result", success: boolean, data: string }
  *   { type: "error", message: string }
@@ -19,6 +20,11 @@ import { useEffect, useRef, useState } from 'react'
 import type { ExtConfig } from '@/agent/useAgent'
 
 // --- Protocol types ---
+
+interface AuthMessage {
+	type: 'auth'
+	token: string
+}
 
 interface ExecuteMessage {
 	type: 'execute'
@@ -47,7 +53,7 @@ interface ErrorMessage {
 	message: string
 }
 
-type OutboundMessage = ReadyMessage | ResultMessage | ErrorMessage
+type OutboundMessage = AuthMessage | ReadyMessage | ResultMessage | ErrorMessage
 
 export type HubWsState = 'connecting' | 'connected' | 'disconnected'
 
@@ -73,10 +79,17 @@ export class HubWs {
 	#approved = false
 	#handlers: HubWsHandlers
 	#port: number
+	#token: string
 	#onStateChange: (state: HubWsState) => void
 
-	constructor(port: number, handlers: HubWsHandlers, onStateChange: (state: HubWsState) => void) {
+	constructor(
+		port: number,
+		token: string,
+		handlers: HubWsHandlers,
+		onStateChange: (state: HubWsState) => void
+	) {
 		this.#port = port
+		this.#token = token
 		this.#handlers = handlers
 		this.#onStateChange = onStateChange
 	}
@@ -98,6 +111,7 @@ export class HubWs {
 
 		ws.addEventListener('open', () => {
 			this.#setState('connected')
+			this.#send({ type: 'auth', token: this.#token })
 			this.#send({ type: 'ready' })
 		})
 
@@ -202,8 +216,12 @@ export function useHubWs(
 	configure: (config: ExtConfig) => Promise<void>,
 	config: ExtConfig | null
 ): { wsState: HubWsState } {
-	const wsPort = new URLSearchParams(location.search).get('ws')
-	const [wsState, setWsState] = useState<HubWsState>(() => (wsPort ? 'connecting' : 'disconnected'))
+	const searchParams = new URLSearchParams(location.search)
+	const wsPort = searchParams.get('ws')
+	const wsToken = searchParams.get('token')
+	const [wsState, setWsState] = useState<HubWsState>(() =>
+		wsPort && wsToken ? 'connecting' : 'disconnected'
+	)
 	const hubWsRef = useRef<HubWs | null>(null)
 
 	const latestRef = useRef({ execute, stop, configure, config })
@@ -212,10 +230,11 @@ export function useHubWs(
 	})
 
 	useEffect(() => {
-		if (!wsPort) return
+		if (!wsPort || !wsToken) return
 
 		const hubWs = new HubWs(
 			Number(wsPort),
+			wsToken,
 			{
 				onExecute: async (task, incomingConfig) => {
 					const { execute, configure, config } = latestRef.current
@@ -237,7 +256,7 @@ export function useHubWs(
 			hubWs.disconnect()
 			hubWsRef.current = null
 		}
-	}, [wsPort])
+	}, [wsPort, wsToken])
 
 	return { wsState }
 }

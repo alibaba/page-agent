@@ -199,6 +199,7 @@
 			{
 				const EXT_ID = '__EXT_ID__'
 				const wsPort = __WS_PORT__
+				const wsToken = '__WS_TOKEN__'
 
 				const zh = {
 					connecting_title: '正在连接 Page Agent',
@@ -229,7 +230,7 @@
 					if (!globalThis.chrome?.runtime?.sendMessage) {
 						showInstall()
 					} else {
-						chrome.runtime.sendMessage(EXT_ID, { type: 'OPEN_HUB', wsPort }, (response) => {
+						chrome.runtime.sendMessage(EXT_ID, { type: 'OPEN_HUB', wsPort, wsToken }, (response) => {
 							if (chrome.runtime.lastError || !response?.ok) showInstall()
 						})
 					}

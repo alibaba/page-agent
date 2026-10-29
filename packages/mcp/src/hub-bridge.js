@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import crypto from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import http from 'node:http'
 import { fileURLToPath } from 'node:url'
@@ -22,6 +23,9 @@ export class HubBridge {
 	/** @type {number} */
 	port
 
+	/** @type {string} */
+	wsToken
+
 	/** @type {http.Server} */
 	#httpServer
 
@@ -37,11 +41,13 @@ export class HubBridge {
 	/** @param {number} port */
 	constructor(port) {
 		this.port = port
+		this.wsToken = crypto.randomUUID()
 		this.#httpServer = http.createServer((_req, res) => {
 			const html = launcherTemplate
 				.replaceAll('__EXT_ID__', EXT_ID)
 				.replaceAll('__STORE_URL__', STORE_URL)
 				.replaceAll('__WS_PORT__', String(port))
+				.replaceAll('__WS_TOKEN__', this.wsToken)
 			res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
 			res.end(html)
 		})
@@ -107,14 +113,32 @@ export class HubBridge {
 		}
 
 		this.#hub = ws
-		console.error('[page-agent-mcp] Hub connected')
+		console.error('[page-agent-mcp] Hub connected, awaiting auth handshake...')
+
+		// auth handshake: expect { type: 'auth', token } within 3s
+		const authTimeout = setTimeout(() => {
+			ws.close(4003, 'Unauthorized: Handshake timeout')
+		}, 3000)
+
+		let authenticated = false
 
 		ws.on('message', (/** @type {Buffer} */ rawData) => {
-			/** @type {{ type: string, success?: boolean, data?: string, message?: string }} */
+			/** @type {{ type: string, success?: boolean, data?: string, message?: string, token?: string }} */
 			let msg
 			try {
 				msg = JSON.parse(rawData.toString('utf-8'))
 			} catch {
+				return
+			}
+
+			if (!authenticated) {
+				if (msg.type === 'auth' && msg.token === this.wsToken) {
+					authenticated = true
+					clearTimeout(authTimeout)
+					console.error('[page-agent-mcp] Hub authenticated successfully')
+				} else {
+					ws.close(4003, 'Unauthorized: Invalid token')
+				}
 				return
 			}
 
@@ -134,6 +158,19 @@ export class HubBridge {
 				this.#pendingTask.reject(new Error('Hub disconnected while task was running'))
 				this.#pendingTask = null
 			}
+		})
+	}
+
+	async close() {
+		return new Promise((resolve) => {
+			if (this.#hub) {
+				this.#hub.terminate()
+				this.#hub = null
+			}
+			this.#wss.close()
+			this.#httpServer.close(() => resolve())
+			// fallback for windows handle leaks during tests
+			setTimeout(resolve, 100)
 		})
 	}
 }
