@@ -33,7 +33,6 @@
         "zod": "^4.5.1"
     },
     "scripts": {
-        "test": "node --test tests/*.test.js",
-        "ci": "npm run test"
+        "test": "vitest run"
     }
 }
