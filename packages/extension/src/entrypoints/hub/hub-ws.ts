@@ -223,7 +223,9 @@ export function useHubWs(
 	const searchParams = new URLSearchParams(location.search)
 	const wsPort = searchParams.get('ws')
 	const wsToken = searchParams.get('token') || ''
-	const [wsState, setWsState] = useState<HubWsState>(() => (wsPort ? 'connecting' : 'disconnected'))
+	const [wsState, setWsState] = useState<HubWsState>(() =>
+		wsPort ? 'connecting' : 'disconnected'
+	)
 	const hubWsRef = useRef<HubWs | null>(null)
 
 	const latestRef = useRef({ execute, stop, configure, config })
