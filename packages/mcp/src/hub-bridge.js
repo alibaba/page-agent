@@ -176,9 +176,19 @@ export class HubBridge {
 
 	/** @param {import('ws').WebSocket} candidate */
 	#promoteCandidate(candidate) {
-		if (this.#hub && this.#hub.readyState === 1) {
-			candidate.close(4000, 'Another hub is already connected')
-			return
+		// if an active hub exists, check if it is still fully open
+		if (this.#hub) {
+			if (this.#hub.readyState === 1) {
+				// active hub is fully open, reject the candidate
+				candidate.close(4000, 'Another hub is already connected')
+				return
+			} else {
+				// active hub is closing or closed, cleanup its pending task before replacing
+				if (this.#pendingTask) {
+					this.#pendingTask.reject(new Error('Hub was replaced while a task was pending'))
+					this.#pendingTask = null
+				}
+			}
 		}
 		this.#hub = candidate
 	}
