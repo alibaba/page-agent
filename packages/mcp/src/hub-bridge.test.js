@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { WebSocket } from 'ws'
+
 import { HubBridge } from './hub-bridge.js'
 
 describe('HubBridge Auth Handshake', () => {
