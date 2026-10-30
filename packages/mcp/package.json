@@ -31,5 +31,8 @@
         "@modelcontextprotocol/sdk": "^1.30.0",
         "ws": "^8.21.3",
         "zod": "^4.5.1"
+    },
+    "scripts": {
+        "test": "vitest run"
     }
 }
