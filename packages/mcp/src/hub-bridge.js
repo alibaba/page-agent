@@ -42,12 +42,19 @@ export class HubBridge {
 	constructor(port) {
 		this.port = port
 		this.wsToken = crypto.randomUUID()
-		this.#httpServer = http.createServer((_req, res) => {
+		this.#httpServer = http.createServer((req, res) => {
+			// secure endpoint for launcher to fetch token
+			if (req.url === '/auth-token' && req.headers['x-requested-with'] === 'XMLHttpRequest') {
+				res.writeHead(200, { 'Content-Type': 'application/json' })
+				res.end(JSON.stringify({ token: this.wsToken }))
+				return
+			}
+
+			// serve launcher without the token
 			const html = launcherTemplate
 				.replaceAll('__EXT_ID__', EXT_ID)
 				.replaceAll('__STORE_URL__', STORE_URL)
 				.replaceAll('__WS_PORT__', String(port))
-			// do not expose token in html, it is printed to stderr instead
 			res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
 			res.end(html)
 		})
@@ -93,15 +100,14 @@ export class HubBridge {
 		if (this.#pendingTask) throw new Error('Agent is already running a task.')
 
 		return new Promise((resolve, reject) => {
-			this.#pendingTask = { resolve, reject }(/** @type {import('ws').WebSocket} */ this.#hub).send(
-				JSON.stringify({ type: 'execute', task, config })
-			)
+			this.#pendingTask = { resolve, reject }
+			/** @type {import('ws').WebSocket} */ (this.#hub).send(JSON.stringify({ type: 'execute', task, config }))
 		})
 	}
 
 	stopTask() {
 		if (this.connected) {
-			;/** @type {import('ws').WebSocket} */ (this.#hub).send(JSON.stringify({ type: 'stop' }))
+			/** @type {import('ws').WebSocket} */ (this.#hub).send(JSON.stringify({ type: 'stop' }))
 		}
 	}
 
@@ -109,7 +115,6 @@ export class HubBridge {
 
 	/** @param {import('ws').WebSocket} ws */
 	#onConnection(ws) {
-		// use a candidate variable. we do not store it in #hub until authenticated
 		let candidate = ws
 		let authenticated = false
 
@@ -132,14 +137,6 @@ export class HubBridge {
 			}
 
 			if (!authenticated) {
-				// backward compatibility: allow older extensions to connect
-				if (msg.type === 'ready') {
-					authenticated = true
-					clearTimeout(authTimeout)
-					this.#promoteCandidate(candidate)
-					return
-				}
-
 				if (msg.type === 'auth' && msg.token === this.wsToken) {
 					authenticated = true
 					clearTimeout(authTimeout)
@@ -164,7 +161,7 @@ export class HubBridge {
 			if (authenticated) {
 				console.error('[page-agent-mcp] Hub disconnected')
 				if (this.#hub === ws) this.#hub = null
-				if (this.#pendingTask) {
+				if (this.#hub === ws && this.#pendingTask) {
 					this.#pendingTask.reject(new Error('Hub disconnected while task was running'))
 					this.#pendingTask = null
 				}
