@@ -1,0 +1,53 @@
+import { describe, it, expect, beforeAll, afterAll } from 'vitest'
+import { WebSocket } from 'ws'
+import { HubBridge } from './hub-bridge.js'
+
+describe('HubBridge Auth Handshake', () => {
+	let bridge
+	const port = 34567
+
+	beforeAll(async () => {
+		bridge = new HubBridge(port)
+		await bridge.start()
+	})
+
+	afterAll(async () => {
+		await bridge.close()
+	})
+
+	it('rejects connection with invalid token', () => {
+		return new Promise((resolve) => {
+			const ws = new WebSocket(`ws://localhost:${port}`)
+			ws.on('open', () => {
+				ws.send(JSON.stringify({ type: 'auth', token: 'wrong-token' }))
+			})
+			ws.on('close', (code) => {
+				expect(code).toBe(4003)
+				resolve()
+			})
+		})
+	})
+
+	it('accepts connection with valid token and processes task', () => {
+		return new Promise((resolve) => {
+			const ws = new WebSocket(`ws://localhost:${port}`)
+			ws.on('open', () => {
+				ws.send(JSON.stringify({ type: 'auth', token: bridge.wsToken }))
+			})
+			ws.on('message', (data) => {
+				const msg = JSON.parse(data.toString())
+				if (msg.type === 'execute') {
+					ws.send(JSON.stringify({ type: 'result', success: true, data: 'mocked' }))
+				}
+			})
+
+			setTimeout(async () => {
+				const res = await bridge.executeTask('test task')
+				expect(res.success).toBe(true)
+				expect(res.data).toBe('mocked')
+				ws.close()
+				resolve()
+			}, 50)
+		})
+	})
+})
