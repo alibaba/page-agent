@@ -76,7 +76,7 @@ export class HubBridge {
 			})
 			this.#httpServer.listen(this.port, LOOPBACK_HOST, () => {
 				console.error(`[page-agent-mcp] HTTP + WS on http://${LOOPBACK_HOST}:${this.port}`)
-				console.error(`[page-agent-mcp] AUTH TOKEN: ${this.wsToken}`)
+				// token is not printed to stderr to prevent credential leaks
 				resolve()
 			})
 		})
@@ -198,6 +198,10 @@ export class HubBridge {
 	 */
 	async close() {
 		return new Promise((resolve) => {
+			if (this.#pendingTask) {
+				this.#pendingTask.reject(new Error('Bridge is closing'))
+				this.#pendingTask = null
+			}
 			if (this.#hub) {
 				this.#hub.terminate()
 				this.#hub = null
