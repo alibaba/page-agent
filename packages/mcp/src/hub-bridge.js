@@ -160,10 +160,12 @@ export class HubBridge {
 		ws.on('close', () => {
 			if (authenticated) {
 				console.error('[page-agent-mcp] Hub disconnected')
-				if (this.#hub === ws) this.#hub = null
-				if (this.#hub === ws && this.#pendingTask) {
-					this.#pendingTask.reject(new Error('Hub disconnected while task was running'))
-					this.#pendingTask = null
+				if (this.#hub === ws) {
+					if (this.#pendingTask) {
+						this.#pendingTask.reject(new Error('Hub disconnected while task was running'))
+						this.#pendingTask = null
+					}
+					this.#hub = null
 				}
 			}
 		})
