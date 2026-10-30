@@ -101,13 +101,15 @@ export class HubBridge {
 
 		return new Promise((resolve, reject) => {
 			this.#pendingTask = { resolve, reject }
-			/** @type {import('ws').WebSocket} */ (this.#hub).send(JSON.stringify({ type: 'execute', task, config }))
+			if (this.#hub) {
+				this.#hub.send(JSON.stringify({ type: 'execute', task, config }))
+			}
 		})
 	}
 
 	stopTask() {
-		if (this.connected) {
-			/** @type {import('ws').WebSocket} */ (this.#hub).send(JSON.stringify({ type: 'stop' }))
+		if (this.connected && this.#hub) {
+			this.#hub.send(JSON.stringify({ type: 'stop' }))
 		}
 	}
 
@@ -148,6 +150,9 @@ export class HubBridge {
 				return
 			}
 
+			// only the active hub can resolve tasks
+			if (this.#hub !== ws) return
+
 			if (msg.type === 'result') {
 				this.#pendingTask?.resolve({ success: msg.success ?? false, data: msg.data ?? '' })
 				this.#pendingTask = null
@@ -158,15 +163,13 @@ export class HubBridge {
 		})
 
 		ws.on('close', () => {
-			if (authenticated) {
+			if (authenticated && this.#hub === ws) {
 				console.error('[page-agent-mcp] Hub disconnected')
-				if (this.#hub === ws) {
-					if (this.#pendingTask) {
-						this.#pendingTask.reject(new Error('Hub disconnected while task was running'))
-						this.#pendingTask = null
-					}
-					this.#hub = null
+				if (this.#pendingTask) {
+					this.#pendingTask.reject(new Error('Hub disconnected while task was running'))
+					this.#pendingTask = null
 				}
+				this.#hub = null
 			}
 		})
 	}
