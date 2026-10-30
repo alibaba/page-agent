@@ -47,7 +47,7 @@ export class HubBridge {
 				.replaceAll('__EXT_ID__', EXT_ID)
 				.replaceAll('__STORE_URL__', STORE_URL)
 				.replaceAll('__WS_PORT__', String(port))
-				.replaceAll('__WS_TOKEN__', this.wsToken)
+			// do not expose token in html, it is printed to stderr instead
 			res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
 			res.end(html)
 		})
@@ -69,6 +69,7 @@ export class HubBridge {
 			})
 			this.#httpServer.listen(this.port, LOOPBACK_HOST, () => {
 				console.error(`[page-agent-mcp] HTTP + WS on http://${LOOPBACK_HOST}:${this.port}`)
+				console.error(`[page-agent-mcp] AUTH TOKEN: ${this.wsToken}`)
 				resolve()
 			})
 		})
@@ -92,14 +93,15 @@ export class HubBridge {
 		if (this.#pendingTask) throw new Error('Agent is already running a task.')
 
 		return new Promise((resolve, reject) => {
-			this.#pendingTask = { resolve, reject }
-			this.#hub.send(JSON.stringify({ type: 'execute', task, config }))
+			this.#pendingTask = { resolve, reject }(/** @type {import('ws').WebSocket} */ this.#hub).send(
+				JSON.stringify({ type: 'execute', task, config })
+			)
 		})
 	}
 
 	stopTask() {
 		if (this.connected) {
-			this.#hub.send(JSON.stringify({ type: 'stop' }))
+			;/** @type {import('ws').WebSocket} */ (this.#hub).send(JSON.stringify({ type: 'stop' }))
 		}
 	}
 
@@ -107,20 +109,18 @@ export class HubBridge {
 
 	/** @param {import('ws').WebSocket} ws */
 	#onConnection(ws) {
-		if (this.#hub && this.#hub.readyState === 1) {
-			ws.close(4000, 'Another hub is already connected')
-			return
-		}
+		// use a candidate variable. we do not store it in #hub until authenticated
+		let candidate = ws
+		let authenticated = false
 
-		this.#hub = ws
 		console.error('[page-agent-mcp] Hub connected, awaiting auth handshake...')
 
 		// auth handshake: expect { type: 'auth', token } within 3s
 		const authTimeout = setTimeout(() => {
-			ws.close(4003, 'Unauthorized: Handshake timeout')
+			if (!authenticated) {
+				ws.close(4003, 'Unauthorized: Handshake timeout')
+			}
 		}, 3000)
-
-		let authenticated = false
 
 		ws.on('message', (/** @type {Buffer} */ rawData) => {
 			/** @type {{ type: string, success?: boolean, data?: string, message?: string, token?: string }} */
@@ -132,9 +132,18 @@ export class HubBridge {
 			}
 
 			if (!authenticated) {
+				// backward compatibility: allow older extensions to connect
+				if (msg.type === 'ready') {
+					authenticated = true
+					clearTimeout(authTimeout)
+					this.#promoteCandidate(candidate)
+					return
+				}
+
 				if (msg.type === 'auth' && msg.token === this.wsToken) {
 					authenticated = true
 					clearTimeout(authTimeout)
+					this.#promoteCandidate(candidate)
 					console.error('[page-agent-mcp] Hub authenticated successfully')
 				} else {
 					ws.close(4003, 'Unauthorized: Invalid token')
@@ -152,15 +161,29 @@ export class HubBridge {
 		})
 
 		ws.on('close', () => {
-			console.error('[page-agent-mcp] Hub disconnected')
-			if (this.#hub === ws) this.#hub = null
-			if (this.#pendingTask) {
-				this.#pendingTask.reject(new Error('Hub disconnected while task was running'))
-				this.#pendingTask = null
+			if (authenticated) {
+				console.error('[page-agent-mcp] Hub disconnected')
+				if (this.#hub === ws) this.#hub = null
+				if (this.#pendingTask) {
+					this.#pendingTask.reject(new Error('Hub disconnected while task was running'))
+					this.#pendingTask = null
+				}
 			}
 		})
 	}
 
+	/** @param {import('ws').WebSocket} candidate */
+	#promoteCandidate(candidate) {
+		if (this.#hub && this.#hub.readyState === 1) {
+			candidate.close(4000, 'Another hub is already connected')
+			return
+		}
+		this.#hub = candidate
+	}
+
+	/**
+	 * @returns {Promise<void>}
+	 */
 	async close() {
 		return new Promise((resolve) => {
 			if (this.#hub) {
