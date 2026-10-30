@@ -1,3 +1,4 @@
+
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { WebSocket } from 'ws'
 
@@ -30,11 +31,13 @@ describe('HubBridge Auth Handshake', () => {
 	})
 
 	it('accepts connection with valid token and processes task', () => {
-		return new Promise((resolve) => {
+		return new Promise((resolve, reject) => {
 			const ws = new WebSocket(`ws://localhost:${port}`)
+
 			ws.on('open', () => {
 				ws.send(JSON.stringify({ type: 'auth', token: bridge.wsToken }))
 			})
+
 			ws.on('message', (data) => {
 				const msg = JSON.parse(data.toString())
 				if (msg.type === 'execute') {
@@ -42,13 +45,22 @@ describe('HubBridge Auth Handshake', () => {
 				}
 			})
 
-			setTimeout(async () => {
-				const res = await bridge.executeTask('test task')
-				expect(res.success).toBe(true)
-				expect(res.data).toBe('mocked')
-				ws.close()
-				resolve()
-			}, 50)
+			ws.on('error', reject)
+
+			// poll until the bridge reports a connected hub, then run the task
+			const interval = setInterval(async () => {
+				if (!bridge.connected) return
+				clearInterval(interval)
+				try {
+					const res = await bridge.executeTask('test task')
+					expect(res.success).toBe(true)
+					expect(res.data).toBe('mocked')
+					ws.close()
+					resolve()
+				} catch (err) {
+					reject(err)
+				}
+			}, 10)
 		})
 	})
 })
