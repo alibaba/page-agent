@@ -129,15 +129,21 @@ export function dispatchHoverLeave(
 	const movingWithinPreviousElement = relatedTarget
 		? previousElement.contains(relatedTarget)
 		: false
-	const pointerLeaveOpts = { bubbles: true, pointerType: 'mouse', relatedTarget }
+	// `composed: true` lets the leave events escape a shadow root, mirroring the
+	// hover events, so that hosts observing them can close their menus/tooltips.
+	const pointerLeaveOpts = { bubbles: true, composed: true, pointerType: 'mouse', relatedTarget }
 	previousElement.dispatchEvent(new PointerEvent('pointerout', pointerLeaveOpts))
-	previousElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget }))
+	previousElement.dispatchEvent(
+		new MouseEvent('mouseout', { bubbles: true, composed: true, relatedTarget })
+	)
 
 	if (!movingWithinPreviousElement) {
 		previousElement.dispatchEvent(
 			new PointerEvent('pointerleave', { ...pointerLeaveOpts, bubbles: false })
 		)
-		previousElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false, relatedTarget }))
+		previousElement.dispatchEvent(
+			new MouseEvent('mouseleave', { bubbles: false, composed: true, relatedTarget })
+		)
 	}
 }
 
@@ -145,13 +151,15 @@ let lastClickedElement: HTMLElement | null = null
 
 export function clearLastClickedElement() {
 	if (lastClickedElement) {
-		const pointerLeaveOpts = { bubbles: true, pointerType: 'mouse' as const }
+		const pointerLeaveOpts = { bubbles: true, composed: true, pointerType: 'mouse' as const }
 		lastClickedElement.dispatchEvent(new PointerEvent('pointerout', pointerLeaveOpts))
 		lastClickedElement.dispatchEvent(
 			new PointerEvent('pointerleave', { ...pointerLeaveOpts, bubbles: false })
 		)
-		lastClickedElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }))
-		lastClickedElement.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false }))
+		lastClickedElement.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, composed: true }))
+		lastClickedElement.dispatchEvent(
+			new MouseEvent('mouseleave', { bubbles: false, composed: true })
+		)
 		lastClickedElement.blur()
 		lastClickedElement = null
 	}

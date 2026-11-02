@@ -43,6 +43,7 @@ function createPageController(): PageController {
 		showMask: vi.fn(async () => {}),
 		hideMask: vi.fn(),
 		cleanUpHighlights: vi.fn(),
+		clearHoverState: vi.fn(),
 		getLastUpdateTime: vi.fn(() => Date.now()),
 		getBrowserState: vi.fn(async () => browserState),
 		dispose: vi.fn(),
@@ -149,6 +150,16 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 
 			await agent.stop()
 			await result
+		})
+
+		it('clears the synthetic hover state when the task ends', async () => {
+			const fetchMock = createFetchMock().mockResolvedValueOnce(doneResponse('all done'))
+			const pageController = createPageController()
+			const agent = createAgent(fetchMock, { pageController })
+
+			await agent.execute('do something')
+
+			expect(pageController.clearHoverState).toHaveBeenCalled()
 		})
 	})
 

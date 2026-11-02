@@ -263,6 +263,17 @@ export class PageController extends EventTarget {
 	}
 
 	/**
+	 * Clear the synthetic hover state.
+	 *
+	 * Dispatches leave/out events for the currently hovered elements, so that
+	 * hover-driven menus and tooltips close again. Call this when a task ends,
+	 * otherwise the page stays in a hovered state until the next pointer action.
+	 */
+	async clearHoverState(): Promise<void> {
+		this.clearSyntheticHover(null)
+	}
+
+	/**
 	 * Click element by index
 	 */
 	async clickElement(index: number): Promise<ActionResult> {

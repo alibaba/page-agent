@@ -146,6 +146,73 @@ describe('PageController', () => {
 			expect(menuLeaves).toEqual(['pointerleave', 'mouseleave'])
 		})
 
+		it('clears synthetic hover state on demand', async () => {
+			document.body.innerHTML =
+				'<div id="menu"><button id="item">Item</button></div><button id="outside">Outside</button>'
+			const menu = document.querySelector<HTMLDivElement>('#menu')!
+			const item = document.querySelector<HTMLButtonElement>('#item')!
+			const outside = document.querySelector<HTMLButtonElement>('#outside')!
+			const menuLeaves: string[] = []
+			const itemLeaves: string[] = []
+			for (const evt of ['pointerleave', 'mouseleave']) {
+				menu.addEventListener(evt, () => menuLeaves.push(evt))
+				item.addEventListener(evt, () => itemLeaves.push(evt))
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: item,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(1, {
+				ref: outside,
+			})
+
+			await controller.hoverElement(0)
+			await controller.clearHoverState()
+
+			expect(itemLeaves).toEqual(['pointerleave', 'mouseleave'])
+			expect(menuLeaves).toEqual(['pointerleave', 'mouseleave'])
+
+			// the hover path is reset, so no stale leave events are dispatched later on
+			itemLeaves.length = 0
+			menuLeaves.length = 0
+			await controller.hoverElement(1)
+
+			expect(itemLeaves).toEqual([])
+			expect(menuLeaves).toEqual([])
+		})
+
+		it('composes hover leave events so they escape a shadow root', async () => {
+			document.body.innerHTML = ''
+			const host = document.createElement('div')
+			document.body.appendChild(host)
+			const shadow = host.attachShadow({ mode: 'open' })
+			const inner = document.createElement('button')
+			shadow.appendChild(inner)
+			const outside = document.createElement('button')
+			document.body.appendChild(outside)
+
+			const composedFlags: boolean[] = []
+			for (const evt of ['pointerout', 'mouseout', 'pointerleave', 'mouseleave']) {
+				inner.addEventListener(evt, (event) => composedFlags.push(event.composed))
+			}
+
+			const controller = new PageController({ experimentalPointerActions: true })
+			;(controller as unknown as { isIndexed: boolean }).isIndexed = true
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(0, {
+				ref: inner,
+			})
+			;(controller as unknown as { selectorMap: Map<number, unknown> }).selectorMap.set(1, {
+				ref: outside,
+			})
+
+			await controller.hoverElement(0)
+			await controller.hoverElement(1)
+
+			expect(composedFlags).toEqual([true, true, true, true])
+		})
+
 		it('preserves mouse pointer metadata when clearing synthetic hover', async () => {
 			document.body.innerHTML =
 				'<button id="item">Item</button><button id="outside">Outside</button>'

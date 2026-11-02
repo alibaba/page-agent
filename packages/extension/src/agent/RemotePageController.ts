@@ -120,6 +120,20 @@ export class RemotePageController {
 		})
 	}
 
+	/** Clear the synthetic hover state so hover-driven menus/tooltips close. */
+	async clearHoverState(): Promise<void> {
+		if (!this.currentTabId || !isContentScriptAllowed(await this.getCurrentUrl())) {
+			return
+		}
+
+		await sendMessage({
+			type: 'PAGE_CONTROL',
+			action: 'clear_hover_state',
+			targetTabId: this.currentTabId,
+			experimentalPointerActions: this.experimentalPointerActions,
+		})
+	}
+
 	async clickElement(...args: any[]): Promise<DomActionReturn> {
 		const res = await this.remoteCallDomAction('click_element', args)
 		// @note may cause page navigation, wait for 1 second to ensure the page loading started

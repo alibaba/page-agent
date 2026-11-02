@@ -371,6 +371,7 @@ export class PageAgentCore extends EventTarget {
 			finalStatus = 'error'
 			throw error
 		} finally {
+			await suppress(() => this.pageController.clearHoverState?.())
 			await suppress(() => this.pageController.cleanUpHighlights())
 			await suppress(() => this.pageController.hideMask())
 			this.#abortController.abort()

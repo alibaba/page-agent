@@ -81,6 +81,7 @@ export function initPageController() {
 			case 'get_browser_state':
 			case 'update_tree':
 			case 'clean_up_highlights':
+			case 'clear_hover_state':
 			case 'click_element':
 			case 'input_text':
 			case 'select_option':
@@ -119,6 +120,8 @@ function getMethodName(action: string): string {
 			return 'updateTree' as const
 		case 'clean_up_highlights':
 			return 'cleanUpHighlights' as const
+		case 'clear_hover_state':
+			return 'clearHoverState' as const
 
 		// DOM actions
 
