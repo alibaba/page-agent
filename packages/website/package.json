@@ -4,6 +4,7 @@
     "version": "1.12.4",
     "type": "module",
     "scripts": {
+        "test": "vitest run",
         "dev": "vite --host 0.0.0.0",
         "build:website": "vite build",
         "preview": "vite preview"
