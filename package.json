@@ -67,7 +67,7 @@
         "unplugin-dts": "^1.0.3",
         "vite": "^8.3.5",
         "vite-plugin-css-injected-by-js": "^5.0.2",
-        "vitest": "^4.1.11"
+        "vitest": "^4.1.12"
     },
     "overrides": {
         "typescript": "^6.0.3"
