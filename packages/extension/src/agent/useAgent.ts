@@ -47,6 +47,9 @@ export function useAgent(): UseAgentResult {
 	const [activity, setActivity] = useState<AgentActivity | null>(null)
 	const [currentTask, setCurrentTask] = useState('')
 	const [config, setConfig] = useState<ExtConfig | null>(null)
+	const [configGeneration, setConfigGeneration] = useState(0)
+	const nextConfigGenerationRef = useRef(0)
+	const configReadyWaitersRef = useRef(new Map<number, () => void>())
 
 	useEffect(() => {
 		chrome.storage.local.get(['llmConfig', 'language', 'advancedConfig']).then((result) => {
@@ -76,6 +79,12 @@ export function useAgent(): UseAgentResult {
 			instructions: systemInstruction ? { system: systemInstruction } : undefined,
 		})
 		agentRef.current = agent
+		for (const [generation, resolve] of configReadyWaitersRef.current) {
+			if (generation <= configGeneration) {
+				resolve()
+				configReadyWaitersRef.current.delete(generation)
+			}
+		}
 
 		const handleStatusChange = (e: Event) => {
 			const newStatus = agent.status as AgentStatus
@@ -104,7 +113,7 @@ export function useAgent(): UseAgentResult {
 			agent.removeEventListener('activity', handleActivity)
 			agent.dispose()
 		}
-	}, [config])
+	}, [config, configGeneration])
 
 	const execute = useCallback(async (task: string) => {
 		const agent = agentRef.current
@@ -143,7 +152,13 @@ export function useAgent(): UseAgentResult {
 				disableNamedToolChoice,
 			}
 			await chrome.storage.local.set({ advancedConfig })
+			const generation = ++nextConfigGenerationRef.current
+			const ready = new Promise<void>((resolve) => {
+				configReadyWaitersRef.current.set(generation, resolve)
+			})
 			setConfig({ ...llmConfig, ...advancedConfig, language })
+			setConfigGeneration(generation)
+			await ready
 		},
 		[]
 	)

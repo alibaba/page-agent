@@ -7,6 +7,10 @@ import { platform } from 'node:os'
 import * as z from 'zod/v4'
 
 import { HubBridge } from './hub-bridge.js'
+import { registerPdfTools } from './pdf-tools.js'
+import { PdfWorkspace } from './pdf-workspace.js'
+import { PyMuPdfBackend } from './pymupdf-backend.js'
+import { ResumableTaskRunner } from './task-runner.js'
 
 const env = process.env
 const port = parseInt(env.PORT || '38401')
@@ -22,13 +26,17 @@ if (env.LLM_API_KEY) llmConfig.apiKey = env.LLM_API_KEY
 
 const hub = new HubBridge(port)
 await hub.start()
+const pdfWorkspace = new PdfWorkspace({ backend: new PyMuPdfBackend() })
+const taskRunner = new ResumableTaskRunner({ hub, workspace: pdfWorkspace, llmConfig })
 
 // Open launcher in default browser
 const url = `http://localhost:${port}`
 const cmd = platform() === 'darwin' ? 'open' : platform() === 'win32' ? 'start ""' : 'xdg-open'
-exec(`${cmd} "${url}"`, (err) => {
-	if (err) console.error(`[page-agent-mcp] Could not open browser: ${err.message}`)
-})
+if (env.PAGE_AGENT_NO_LAUNCH !== '1') {
+	exec(`${cmd} "${url}"`, (err) => {
+		if (err) console.error(`[page-agent-mcp] Could not open browser: ${err.message}`)
+	})
+}
 
 // --- MCP server (stdio) ---
 
@@ -37,19 +45,24 @@ const mcpServer = new McpServer({ name: 'page-agent', version })
 mcpServer.registerTool(
 	'execute_task',
 	{
-		description: "Execute a task in user's browser.",
+		description:
+			"Execute a task in the user's browser. Active PDF-job memory is injected automatically unless autoResume is false.",
 		inputSchema: {
 			task: z
 				.string()
 				.describe(
-					'Task description. Give specific instructions for the task. Steps preferable. And the information you want to get after the task is done.'
+					'Task description. Give specific instructions, a bounded unit of work, and the information to return.'
 				),
+			jobId: z.string().optional().describe('PDF job to resume; defaults to the active job.'),
+			autoResume: z
+				.boolean()
+				.optional()
+				.describe('Set false for browser work unrelated to the active PDF job.'),
 		},
 	},
-	async ({ task }) => {
+	async ({ task, jobId, autoResume = true }) => {
 		try {
-			const config = Object.keys(llmConfig).length > 0 ? llmConfig : undefined
-			const result = await hub.executeTask(task, config)
+			const result = await taskRunner.execute({ task, jobId, autoResume })
 			return {
 				content: [
 					{
@@ -74,14 +87,27 @@ mcpServer.registerTool(
 	{
 		description: 'Check the current status of the Page Agent hub.',
 	},
-	async () => ({
-		content: [
-			{
-				type: 'text',
-				text: JSON.stringify({ connected: hub.connected, busy: hub.busy }, null, 2),
-			},
-		],
-	})
+	async () => {
+		const activeJob = await pdfWorkspace.getActiveJob()
+		return {
+			content: [
+				{
+					type: 'text',
+					text: JSON.stringify(
+						{
+							connected: hub.connected,
+							busy: hub.busy,
+							activePdfJob: activeJob
+								? { jobId: activeJob.jobId, nextAction: activeJob.nextAction }
+								: null,
+						},
+						null,
+						2
+					),
+				},
+			],
+		}
+	}
 )
 
 mcpServer.registerTool(
@@ -94,6 +120,8 @@ mcpServer.registerTool(
 		return { content: [{ type: 'text', text: 'Stop signal sent.' }] }
 	}
 )
+
+registerPdfTools(mcpServer, { z, workspace: pdfWorkspace, runner: taskRunner })
 
 const transport = new StdioServerTransport()
 await mcpServer.connect(transport)

@@ -20,8 +20,20 @@ jobs:
           node-version: 24
           cache: 'npm'
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Install dependencies
-        run: npm ci
+        run: |
+          npm ci
+          python -m pip install pymupdf
 
       - name: CI checks
         run: node scripts/ci.js
+
+      - name: Tests
+        run: npm test
+        env:
+          PDF_PYTHON: python
