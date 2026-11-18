@@ -26,10 +26,26 @@ export function isAnchorElement(el: Element): el is HTMLAnchorElement {
 
 /** Iframe offset for translating element coordinates to top-frame viewport. */
 export function getIframeOffset(element: HTMLElement): { x: number; y: number } {
-	const frame = element.ownerDocument.defaultView?.frameElement as HTMLElement | null
-	if (!frame) return { x: 0, y: 0 }
-	const rect = frame.getBoundingClientRect()
-	return { x: rect.left, y: rect.top }
+	// Walk every frame up to the top one. Reading only the immediate
+	// frameElement leaves out the offset of each frame above it, so in a nested
+	// iframe the pointer is placed short of the element by the outer frames'
+	// combined offset.
+	let view = element.ownerDocument.defaultView
+	let x = 0
+	let y = 0
+
+	// A cycle is not reachable through real frame parentage, but the loop reads
+	// host-controlled objects, so bound it rather than trust that.
+	for (let depth = 0; depth < 32; depth++) {
+		const frame = view?.frameElement as HTMLElement | null
+		if (!frame) break
+		const rect = frame.getBoundingClientRect()
+		x += rect.left
+		y += rect.top
+		view = frame.ownerDocument.defaultView
+	}
+
+	return { x, y }
 }
 
 /**
