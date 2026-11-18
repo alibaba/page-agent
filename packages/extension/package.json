@@ -26,7 +26,7 @@
         "clsx": "^2.1.1",
         "idb": "^8.0.4",
         "lucide-react": "^1.73.0",
-        "motion": "^12.42.2",
+        "motion": "^14.14.0",
         "next-themes": "^0.4.6",
         "react": "^19.3.1",
         "react-dom": "^19.3.1",
