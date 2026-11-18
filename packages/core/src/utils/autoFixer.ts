@@ -56,7 +56,7 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
 				// case: sometimes even 2-levels of wrapping
 				if (resolvedArguments?.type === 'function') {
 					log(`#3: fixing tool_call`)
-					resolvedArguments = safeJsonParse(resolvedArguments.function.arguments)
+					resolvedArguments = safeJsonParse(resolvedArguments.function?.arguments)
 				}
 
 				// case: and sometimes action level only
@@ -81,6 +81,24 @@ export function normalizeResponse(response: any, tools?: Map<string, PageAgentTo
 
 	// fix double stringified arguments
 	resolvedArguments = safeJsonParse(resolvedArguments)
+
+	// The model does not always answer with an object: `arguments: "null"`,
+	// a bare number, a quoted string and `true` all parse to a non-object.
+	// Everything below reads `.action` off this value and #5 assigns to it,
+	// and assigning a property to a primitive throws in module (strict-mode)
+	// code — so a malformed answer crashed the fixer that exists to absorb it.
+	// An array takes the assignment without complaint but drops it again on
+	// JSON.stringify, so the repacked call goes out with no action at all.
+	// Drop both and let #5 supply the wait fallback, same as a missing action.
+	if (
+		typeof resolvedArguments !== 'object' ||
+		resolvedArguments === null ||
+		Array.isArray(resolvedArguments)
+	) {
+		log(`#0: response arguments were not an object`)
+		resolvedArguments = {}
+	}
+
 	if (resolvedArguments.action) {
 		resolvedArguments.action = safeJsonParse(resolvedArguments.action)
 	}
