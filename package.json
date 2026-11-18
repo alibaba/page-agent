@@ -55,7 +55,7 @@
         "@vitejs/plugin-react": "^6.3.0",
         "chalk": "^6.0.0",
         "concurrently": "^10.0.7",
-        "dotenv": "^17.4.2",
+        "dotenv": "^18.0.10",
         "eslint": "^10.15.0",
         "globals": "^17.14.0",
         "happy-dom": "^21.0.4",
@@ -67,7 +67,7 @@
         "unplugin-dts": "^1.1.2",
         "vite": "^8.3.8",
         "vite-plugin-css-injected-by-js": "^5.0.3",
-        "vitest": "^4.1.12"
+        "vitest": "^5.1.0"
     },
     "overrides": {
         "typescript": "^6.0.3"
