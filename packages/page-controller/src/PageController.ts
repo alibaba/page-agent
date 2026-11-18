@@ -18,6 +18,7 @@ import * as dom from './dom'
 import type { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
 import { getPageInfo } from './dom/getPageInfo'
 import { patchReact } from './patches/react'
+import { patchAntDesignVue } from './patches/ant-design-vue'
 import { isAnchorElement } from './utils'
 
 /**
@@ -92,6 +93,7 @@ export class PageController extends EventTarget {
 		this.config = config
 
 		patchReact(this)
+		patchAntDesignVue(this)
 
 		if (config.enableMask) this.initMask()
 	}
