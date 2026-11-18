@@ -13,6 +13,7 @@ import {
 	scrollHorizontally,
 	scrollVertically,
 	selectOptionElement,
+	uploadFileToElement,
 } from './actions'
 import * as dom from './dom'
 import type { FlatDomTree, InteractiveElementDomNode } from './dom/dom_tree/type'
@@ -45,6 +46,25 @@ export interface BrowserState {
 interface ActionResult {
 	success: boolean
 	message: string
+}
+
+/**
+ * File payload for uploadFile. `dataBase64` keeps the payload JSON-serializable
+ * so it can cross extension messaging boundaries (File objects cannot).
+ */
+export interface UploadFileData {
+	name: string
+	type: string
+	dataBase64: string
+}
+
+function decodeUploadFile(fileData: UploadFileData): File {
+	const binary = atob(fileData.dataBase64)
+	const bytes = new Uint8Array(binary.length)
+	for (let i = 0; i < binary.length; i++) {
+		bytes[i] = binary.charCodeAt(i)
+	}
+	return new File([bytes], fileData.name, { type: fileData.type })
 }
 
 /**
@@ -286,6 +306,36 @@ export class PageController extends EventTarget {
 			return {
 				success: false,
 				message: `❌ Failed to input text: ${error}`,
+			}
+		}
+	}
+
+	/**
+	 * Upload files into a file input by index.
+	 * The index may point at the file input itself or at the visible upload
+	 * button/label/dropzone — the real (often hidden) input is resolved from it.
+	 */
+	async uploadFile(index: number, files: UploadFileData[] | File[]): Promise<ActionResult> {
+		try {
+			this.assertIndexed()
+			const element = getElementByIndex(this.selectorMap, index)
+			const elemText = this.elementTextMap.get(index)
+
+			const fileObjects = files.map((f) => (f instanceof File ? f : decodeUploadFile(f)))
+			if (fileObjects.length === 0) {
+				throw new Error('No files provided')
+			}
+			await uploadFileToElement(element, fileObjects)
+
+			const names = fileObjects.map((f) => f.name).join(', ')
+			return {
+				success: true,
+				message: `✅ Set file(s) (${names}) on file input for element (${elemText ?? index}).`,
+			}
+		} catch (error) {
+			return {
+				success: false,
+				message: `❌ Failed to upload file: ${error}`,
 			}
 		}
 	}

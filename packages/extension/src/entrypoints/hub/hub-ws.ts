@@ -16,6 +16,8 @@
 import type { ExecutionResult } from '@page-agent/core'
 import { useEffect, useRef, useState } from 'react'
 
+import type { RemoteUploadFile } from '@/agent/uploadTools'
+import { describeAvailableUploadFiles, setAvailableUploadFiles } from '@/agent/uploadTools'
 import type { ExtConfig } from '@/agent/useAgent'
 
 // --- Protocol types ---
@@ -24,6 +26,8 @@ interface ExecuteMessage {
 	type: 'execute'
 	task: string
 	config?: Record<string, unknown>
+	/** Files the caller offers for upload; served at GET /files/{id} on its HTTP bridge */
+	files?: RemoteUploadFile[]
 }
 
 interface StopMessage {
@@ -56,7 +60,8 @@ export type HubWsState = 'connecting' | 'connected' | 'disconnected'
 export interface HubWsHandlers {
 	onExecute: (
 		task: string,
-		config?: Record<string, unknown>
+		config?: Record<string, unknown>,
+		files?: RemoteUploadFile[]
 	) => Promise<{ success: boolean; data: string }>
 	onStop: () => void
 }
@@ -180,7 +185,7 @@ export class HubWs {
 
 		this.#busy = true
 		try {
-			const result = await this.#handlers.onExecute(msg.task, msg.config)
+			const result = await this.#handlers.onExecute(msg.task, msg.config, msg.files)
 			this.#send({ type: 'result', success: result.success, data: result.data })
 		} catch (err) {
 			this.#send({ type: 'error', message: err instanceof Error ? err.message : String(err) })
@@ -217,13 +222,18 @@ export function useHubWs(
 		const hubWs = new HubWs(
 			Number(wsPort),
 			{
-				onExecute: async (task, incomingConfig) => {
+				onExecute: async (task, incomingConfig, files) => {
 					const { execute, configure, config } = latestRef.current
 					if (incomingConfig) {
 						await configure({ ...config, ...incomingConfig } as ExtConfig)
 					}
-					const result = await execute(task)
-					return { success: result.success, data: result.data }
+					try {
+						setAvailableUploadFiles(files ?? [], wsPort ? Number(wsPort) : null)
+						const result = await execute(task + describeAvailableUploadFiles())
+						return { success: result.success, data: result.data }
+					} finally {
+						setAvailableUploadFiles([], null)
+					}
 				},
 				onStop: () => latestRef.current.stop(),
 			},
