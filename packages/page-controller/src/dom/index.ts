@@ -204,6 +204,7 @@ export function flatTreeToString(
 		'value',
 		'placeholder',
 		'data-date-format',
+		'data-value',
 		'alt',
 		'aria-label',
 		'aria-expanded',
