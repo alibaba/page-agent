@@ -109,6 +109,22 @@ const agent = new PageAgentCore({
 								: 'Additional HTML attributes to include in DOM extraction. Supports wildcard * (e.g. data-* matches all data- prefixed attributes). Common attributes like role, aria-label are included by default.',
 						},
 						{
+							name: 'doHighlightElements',
+							type: 'boolean',
+							defaultValue: 'true',
+							description: isZh
+								? '观察页面时绘制高亮框选层（边框 + 序号标签）。设为 false 可以完全不改变页面外观，元素序号仍会照常分配，所有基于序号的操作不受影响。'
+								: 'Paint the highlight overlay (boxes and index labels) while observing the page. Set to false to leave the page visually untouched. Element indexes are still assigned, so all indexed actions keep working.',
+						},
+						{
+							name: 'highlightLabelTextOpacity',
+							type: 'number',
+							defaultValue: '1',
+							description: isZh
+								? '序号文字的不透明度，取值 0-1。与 highlightOpacity、highlightLabelOpacity 一起设为 0 可以隐藏整个高亮层。超出范围的值不会被裁剪。'
+								: 'Opacity of the index number text in the highlight label, between 0 and 1. Set to 0 along with highlightOpacity and highlightLabelOpacity to hide the whole highlight overlay. Values outside the range are not clamped.',
+						},
+						{
 							name: 'keepSemanticTags',
 							type: 'boolean',
 							defaultValue: 'false',

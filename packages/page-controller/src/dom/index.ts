@@ -30,6 +30,27 @@ export interface DomConfig {
 	highlightLabelOpacity?: number
 
 	/**
+	 * Paint the highlight overlay (boxes and index labels) while observing the page.
+	 * Set to `false` to keep the page visually untouched, e.g. for embedded guides or custom UI.
+	 * @note Element indexes are still assigned, so all indexed actions keep working.
+	 *       Only the painting is skipped.
+	 * @default true
+	 **/
+	doHighlightElements?: boolean
+
+	/**
+	 * Opacity of the index number text inside the highlight label, between 0 and 1.
+	 * Set to 0, along with `highlightOpacity` and `highlightLabelOpacity`,
+	 * to hide the highlight overlay while keeping it in the DOM.
+	 * @note Not clamped, matching `highlightOpacity` and `highlightLabelOpacity`.
+	 *       A value outside 0-1 encodes to an unparseable color, so the browser drops
+	 *       the declaration and the digits fall back to the inherited color. The label
+	 *       itself still renders.
+	 * @default 1
+	 **/
+	highlightLabelTextOpacity?: number
+
+	/**
 	 * Preserve semantic landmark tags in dehydrated output even if not interactive
 	 * @note maybe confusing for LLM combining with page scrolling, use with caution
 	 **/
@@ -76,7 +97,7 @@ export function getFlatTree(config: DomConfig): FlatDomTree {
 	}
 
 	const elements = domTree({
-		doHighlightElements: true,
+		doHighlightElements: config.doHighlightElements ?? true,
 		debugMode: true,
 		focusHighlightIndex: -1,
 		viewportExpansion,
@@ -84,6 +105,7 @@ export function getFlatTree(config: DomConfig): FlatDomTree {
 		interactiveWhitelist,
 		highlightOpacity: config.highlightOpacity ?? 0.0,
 		highlightLabelOpacity: config.highlightLabelOpacity ?? 0.1,
+		highlightLabelTextOpacity: config.highlightLabelTextOpacity ?? 1,
 	}) as FlatDomTree
 
 	const currentUrl = window.location.href
