@@ -123,7 +123,7 @@ tools.set(
 	'select_dropdown_option',
 	tool({
 		description:
-			'Select dropdown option for interactive element index by the text of the option you want to select',
+			'Select dropdown option for interactive element index by the visible text or value of the option you want to select',
 		inputSchema: z.object({
 			index: z.int().min(0),
 			text: z.string(),

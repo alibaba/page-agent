@@ -291,7 +291,7 @@ export class PageController extends EventTarget {
 	}
 
 	/**
-	 * Select dropdown option by index and option text
+	 * Select dropdown option by index and option text or value
 	 */
 	async selectOption(index: number, optionText: string): Promise<ActionResult> {
 		try {
