@@ -36,7 +36,9 @@ export function getIframeOffset(element: HTMLElement): { x: number; y: number } 
  * Get native value setter from the element's own prototype (iframe-safe).
  * @note for React
  */
-export function getNativeValueSetter(element: HTMLInputElement | HTMLTextAreaElement) {
+export function getNativeValueSetter(
+	element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+) {
 	// eslint-disable-next-line @typescript-eslint/unbound-method
 	return Object.getOwnPropertyDescriptor(Object.getPrototypeOf(element) as object, 'value')!
 		.set as (v: string) => void
