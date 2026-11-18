@@ -30,7 +30,11 @@ export class I18n {
 	}
 
 	private getNestedValue(obj: any, path: string): string | undefined {
-		return path.split('.').reduce((current, key) => current?.[key], obj)
+		return path.split('.').reduce((current, key) => {
+			if (current === null || typeof current !== 'object') return undefined
+			// Only own properties, so inherited keys (`toString`, `constructor`, ...) are not resolved
+			return Object.hasOwn(current, key) ? current[key] : undefined
+		}, obj)
 	}
 
 	private interpolate(template: string, params: TranslationParams): string {
