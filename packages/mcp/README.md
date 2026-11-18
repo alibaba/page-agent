@@ -19,16 +19,16 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
     "mcpServers": {
         "page-agent": {
             "command": "npx",
-            "args": ["-y", "@page-agent/mcp"],
-            "env": {
-                "LLM_BASE_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-                "LLM_API_KEY": "sk-xxx",
-                "LLM_MODEL_NAME": "qwen3.5-plus"
-            }
+            "args": ["-y", "@page-agent/mcp"]
         }
     }
 }
 ```
+
+Configure LLM credentials in Page Agent Ext. Avoid passing `LLM_*` from MCP client
+configuration because it can trigger the Hub to rebuild the extension agent while a task is
+starting, causing `Task aborted`.
+Configure the URL, API key, and model in the browser extension.
 
 ### Cursor / Copilot
 
