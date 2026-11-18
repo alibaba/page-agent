@@ -25,8 +25,6 @@ export default function ThemeSwitcher() {
 			document.documentElement.classList.remove('dark')
 			document.documentElement.style.colorScheme = 'light'
 		}
-		// 保存到 localStorage
-		localStorage.setItem('theme', theme)
 	}, [theme])
 
 	// 监听系统主题变化
@@ -46,7 +44,9 @@ export default function ThemeSwitcher() {
 	}, [])
 
 	const toggleTheme = () => {
-		setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))
+		const nextTheme = theme === 'light' ? 'dark' : 'light'
+		setTheme(nextTheme)
+		localStorage.setItem('theme', nextTheme)
 	}
 
 	return (
