@@ -23,7 +23,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
             "env": {
                 "LLM_BASE_URL": "https://dashscope.aliyuncs.com/compatible-mode/v1",
                 "LLM_API_KEY": "sk-xxx",
-                "LLM_MODEL_NAME": "qwen3.5-plus"
+                "LLM_MODEL_NAME": "qwen3.8-flash"
             }
         }
     }

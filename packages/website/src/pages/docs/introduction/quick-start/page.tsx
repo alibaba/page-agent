@@ -105,7 +105,7 @@ import { PageAgent } from 'page-agent'`}
 					</h3>
 					<CodeEditor
 						code={`const agent = new PageAgent({
-  model: 'qwen3.5-plus',
+  model: 'qwen3.8-flash',
   baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   apiKey: 'YOUR_API_KEY',
   language: '${isZh ? 'zh-CN' : 'en-US'}'

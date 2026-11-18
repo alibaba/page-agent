@@ -78,7 +78,7 @@ npm install page-agent
 import { PageAgent } from 'page-agent'
 
 const agent = new PageAgent({
-    model: 'qwen3.5-plus',
+    model: 'qwen3.8-flash',
     baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     apiKey: 'YOUR_API_KEY',
     language: 'en-US',
