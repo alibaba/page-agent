@@ -228,8 +228,11 @@ export class PageAgentCore extends EventTarget {
 		this.#setStatus('running')
 		this.#emitHistoryChange()
 
-		// Disable ask_user tool if onAskUser is not set
-		if (!this.onAskUser) this.tools.delete('ask_user')
+		// Disable only the built-in ask_user tool when onAskUser is not set.
+		// A custom tool with the same name must remain available without onAskUser.
+		if (!this.onAskUser && this.config.customTools?.ask_user === undefined) {
+			this.tools.delete('ask_user')
+		}
 
 		const onBeforeStep = this.config.onBeforeStep
 		const onAfterStep = this.config.onAfterStep

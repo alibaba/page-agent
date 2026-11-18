@@ -140,6 +140,31 @@ describe.concurrent('PageAgentCore lifecycle', () => {
 			expect(agent.status).toBe('completed')
 		})
 
+		it('preserves a custom ask_user override without onAskUser', async () => {
+			const customAskUser = vi.fn(async (question: string) => `custom: ${question}`)
+			const fetchMock = createFetchMock()
+				.mockResolvedValueOnce(
+					agentResponse({ action: { ask_user: { question: 'Which option?' } } })
+				)
+				.mockResolvedValueOnce(doneResponse('finished'))
+			const agent = createAgent(fetchMock, {
+				customTools: {
+					ask_user: tool({
+						description: 'Ask through a custom channel.',
+						inputSchema: z.object({ question: z.string() }),
+						execute: async (input) => customAskUser(input.question),
+					}),
+				},
+			})
+
+			const result = await agent.execute('ask then finish')
+
+			expect(result).toMatchObject({ success: true, data: 'finished' })
+			expect(customAskUser).toHaveBeenCalledOnce()
+			expect(customAskUser).toHaveBeenCalledWith('Which option?')
+			expect(fetchMock).toHaveBeenCalledTimes(2)
+		})
+
 		it('throws when a task is already running', async () => {
 			const fetchMock = createFetchMock().mockResolvedValueOnce(waitResponse())
 			const agent = createAgent(fetchMock)
