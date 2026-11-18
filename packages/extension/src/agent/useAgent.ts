@@ -40,6 +40,15 @@ export interface UseAgentResult {
 	configure: (config: ExtConfig) => Promise<void>
 }
 
+/** Compare configs by value, treating missing keys and `undefined` as equal */
+function isSameConfig(a: ExtConfig, b: ExtConfig): boolean {
+	const keys = new Set([...Object.keys(a), ...Object.keys(b)]) as Set<keyof ExtConfig>
+	for (const key of keys) {
+		if (a[key] !== b[key]) return false
+	}
+	return true
+}
+
 export function useAgent(): UseAgentResult {
 	const agentRef = useRef<MultiPageAgent | null>(null)
 	const [status, setStatus] = useState<AgentStatus>('idle')
@@ -47,6 +56,10 @@ export function useAgent(): UseAgentResult {
 	const [activity, setActivity] = useState<AgentActivity | null>(null)
 	const [currentTask, setCurrentTask] = useState('')
 	const [config, setConfig] = useState<ExtConfig | null>(null)
+	const configRef = useRef<ExtConfig | null>(null)
+	configRef.current = config
+	/** Callers awaiting the agent rebuild triggered by their setConfig */
+	const configReadyResolversRef = useRef<(() => void)[]>([])
 
 	useEffect(() => {
 		chrome.storage.local.get(['llmConfig', 'language', 'advancedConfig']).then((result) => {
@@ -98,6 +111,10 @@ export function useAgent(): UseAgentResult {
 		agent.addEventListener('historychange', handleHistoryChange)
 		agent.addEventListener('activity', handleActivity)
 
+		const resolvers = configReadyResolversRef.current
+		configReadyResolversRef.current = []
+		for (const resolve of resolvers) resolve()
+
 		return () => {
 			agent.removeEventListener('statuschange', handleStatusChange)
 			agent.removeEventListener('historychange', handleHistoryChange)
@@ -143,7 +160,20 @@ export function useAgent(): UseAgentResult {
 				disableNamedToolChoice,
 			}
 			await chrome.storage.local.set({ advancedConfig })
-			setConfig({ ...llmConfig, ...advancedConfig, language })
+
+			const next: ExtConfig = { ...llmConfig, ...advancedConfig, language }
+			// Unchanged config must not rebuild the agent: the [config] effect's
+			// cleanup would dispose an agent that a caller (e.g. the hub, which
+			// configures right before execute) is about to run, aborting its task.
+			if (configRef.current && isSameConfig(configRef.current, next)) return
+
+			// Resolve only after the [config] effect has installed the new agent,
+			// so callers never execute on the agent that is being disposed.
+			const ready = new Promise<void>((resolve) => {
+				configReadyResolversRef.current.push(resolve)
+			})
+			setConfig(next)
+			await ready
 		},
 		[]
 	)
