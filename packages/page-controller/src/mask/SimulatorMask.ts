@@ -12,6 +12,9 @@ export class SimulatorMask extends EventTarget {
 
 	#disposed = false
 
+	/** Pending delayed hide (wrapper class removal after fade-out); cancelled by show()/dispose() */
+	#hideTimer: ReturnType<typeof setTimeout> | null = null
+
 	#cursor = document.createElement('div')
 
 	#currentCursorX = 0
@@ -176,7 +179,18 @@ export class SimulatorMask extends EventTarget {
 	}
 
 	show() {
-		if (this.shown || this.#disposed) return
+		if (this.#disposed) return
+
+		// Cancel a pending hide: the delayed class removal must not hide a mask
+		// that is re-shown within the fade-out window. Otherwise the wrapper loses
+		// the visible class while `shown` stays true, and every later show()
+		// early-returns — the mask becomes permanently invisible.
+		if (this.#hideTimer) {
+			clearTimeout(this.#hideTimer)
+			this.#hideTimer = null
+		}
+
+		if (this.shown) return
 
 		this.shown = true
 		this.motion?.start()
@@ -202,13 +216,22 @@ export class SimulatorMask extends EventTarget {
 
 		this.#cursor.classList.remove(cursorStyles.clicking)
 
-		setTimeout(() => {
-			this.wrapper.classList.remove(styles.visible)
+		if (this.#hideTimer) clearTimeout(this.#hideTimer)
+		this.#hideTimer = setTimeout(() => {
+			this.#hideTimer = null
+			// Skip if the mask was re-shown while the fade-out timer was pending
+			if (!this.shown) {
+				this.wrapper.classList.remove(styles.visible)
+			}
 		}, 800) // Match the animation duration
 	}
 
 	dispose() {
 		this.#disposed = true
+		if (this.#hideTimer) {
+			clearTimeout(this.#hideTimer)
+			this.#hideTimer = null
+		}
 		this.motion?.dispose()
 		this.wrapper.remove()
 		this.dispatchEvent(new Event('dispose'))
