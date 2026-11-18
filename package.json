@@ -58,7 +58,7 @@
         "dotenv": "^17.4.2",
         "eslint": "^10.9.1",
         "globals": "^17.12.0",
-        "happy-dom": "^20.13.2",
+        "happy-dom": "^21.0.4",
         "husky": "^9.1.7",
         "lint-staged": "^17.4.1",
         "prettier": "^3.9.6",
