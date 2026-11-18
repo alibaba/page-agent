@@ -162,7 +162,7 @@ export default function Models() {
 const pageAgent = new PageAgent({
   baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   apiKey: 'your-api-key',
-  model: 'qwen3.5-plus'
+  model: 'qwen3.8-flash'
 });
 `}
 				/>
@@ -209,9 +209,9 @@ const pageAgent = new PageAgent({
 						</a>
 					</p>
 					<CodeEditor
-						code={`# qwen3.5-plus / qwen3.5-flash
+						code={`# qwen3.8-flash / qwen3.5-flash
 LLM_BASE_URL="https://page-ag-testing-ohftxirgbn.cn-shanghai.fcapp.run"
-LLM_MODEL_NAME="qwen3.5-plus"`}
+LLM_MODEL_NAME="qwen3.8-flash"`}
 					/>
 				</div>
 			</section>
@@ -317,7 +317,7 @@ LLM_MODEL_NAME="qwen3.5-plus"`}
 							code={`const pageAgent = new PageAgent({
   baseURL: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   apiKey: 'your-api-key',
-  model: 'qwen3.5-plus',
+  model: 'qwen3.8-flash',
   transformRequestBody: (requestBody) => {
     const [systemMessage, ...restMessages] = requestBody.messages
 
