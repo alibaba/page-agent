@@ -132,13 +132,14 @@ function matchAttributes(
 		if (pattern.includes('*')) {
 			const regex = globToRegex(pattern)
 			for (const key of Object.keys(attrs)) {
-				if (regex.test(key) && attrs[key].trim()) {
-					result[key] = attrs[key].trim()
+				const value = attrs[key]
+				if (regex.test(key) && typeof value === 'string' && value.trim()) {
+					result[key] = value.trim()
 				}
 			}
 		} else {
 			const value = attrs[pattern]
-			if (value && value.trim()) {
+			if (typeof value === 'string' && value.trim()) {
 				result[pattern] = value.trim()
 			}
 		}
