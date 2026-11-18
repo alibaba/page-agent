@@ -204,7 +204,7 @@ export class PageAgentCore extends EventTarget {
 	}
 
 	/**
-	 * external errors (pre-checks/config/hooks) will threw;
+	 * external errors (pre-checks/config/hooks) will throw;
 	 * agent errors will be caught and added to history, and return a failed result
 	 */
 	async execute(task: string): Promise<ExecutionResult> {
