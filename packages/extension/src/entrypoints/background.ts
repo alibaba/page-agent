@@ -5,16 +5,13 @@ export default defineBackground(() => {
 	console.log('[Background] Service Worker started')
 
 	// generate user auth token
-
 	chrome.storage.local.get('PageAgentExtUserAuthToken').then((result) => {
 		if (result.PageAgentExtUserAuthToken) return
-
 		const userAuthToken = crypto.randomUUID()
 		chrome.storage.local.set({ PageAgentExtUserAuthToken: userAuthToken })
 	})
 
 	// message proxy
-
 	chrome.runtime.onMessage.addListener((message, sender, sendResponse): true | undefined => {
 		if (message.type === 'TAB_CONTROL') {
 			return handleTabControlMessage(message, sender, sendResponse)
@@ -27,10 +24,9 @@ export default defineBackground(() => {
 	})
 
 	// external messages (from localhost launcher page via externally_connectable)
-
 	chrome.runtime.onMessageExternal.addListener((message, sender, sendResponse) => {
 		if (message.type === 'OPEN_HUB') {
-			openOrFocusHubTab(message.wsPort).then(() => {
+			openOrFocusHubTab(message.wsPort, message.wsToken).then(() => {
 				if (sender.tab?.id) chrome.tabs.remove(sender.tab.id)
 				sendResponse({ ok: true })
 			})
@@ -39,21 +35,21 @@ export default defineBackground(() => {
 	})
 
 	// setup
-
 	chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {})
 })
 
-async function openOrFocusHubTab(wsPort: number) {
+async function openOrFocusHubTab(wsPort: number, wsToken?: string) {
 	const hubUrl = chrome.runtime.getURL('hub.html')
 	const existing = await chrome.tabs.query({ url: `${hubUrl}*` })
+	const tokenParam = wsToken ? `&token=${wsToken}` : ''
 
 	if (existing.length > 0 && existing[0].id) {
 		await chrome.tabs.update(existing[0].id, {
 			active: true,
-			url: `${hubUrl}?ws=${wsPort}`,
+			url: `${hubUrl}?ws=${wsPort}${tokenParam}`,
 		})
 		return
 	}
 
-	await chrome.tabs.create({ url: `${hubUrl}?ws=${wsPort}`, pinned: true })
+	await chrome.tabs.create({ url: `${hubUrl}?ws=${wsPort}${tokenParam}`, pinned: true })
 }
