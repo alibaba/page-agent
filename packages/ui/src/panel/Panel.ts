@@ -11,7 +11,7 @@ import styles from './Panel.module.css'
 export interface PanelConfig {
 	language?: SupportedLanguage
 	/**
-	 * Whether to prompt for next task after task completion
+	 * Whether to allow drafting the next task during execution and prompt after completion
 	 * @default true
 	 */
 	promptForNextTask?: boolean
@@ -117,7 +117,6 @@ export class Panel {
 		// Show/hide based on status
 		if (status === 'running') {
 			this.show()
-			this.#hideInputArea() // Hide input while running
 		}
 
 		// Handle completion
@@ -125,10 +124,8 @@ export class Panel {
 			if (!this.#isExpanded) {
 				this.#expand()
 			}
-			if (this.#shouldShowInputArea()) {
-				this.#showInputArea()
-			}
 		}
+		this.#updateInputArea()
 	}
 
 	/** Handle agent history change - re-render history list from agent.history */
@@ -174,10 +171,31 @@ export class Panel {
 	 * question card and pending state so the agent loop can settle.
 	 */
 	#askUser(question: string, signal?: AbortSignal): Promise<string> {
+		if (signal?.aborted) return Promise.reject(signal.reason as DOMException)
+
 		return new Promise((resolve, reject) => {
+			// Keep the next-task draft separate from the answer to this question.
+			const taskDraft = this.#taskInput.value
+			const restoreDraft = () => {
+				this.#removeTempCards()
+				this.#isWaitingForUserAnswer = false
+				this.#userAnswerResolver = null
+				this.#taskInput.value = taskDraft
+				this.#updateInputArea()
+			}
+			const onAbort = () => {
+				restoreDraft()
+				reject(signal!.reason as DOMException)
+			}
+
 			// Set `waiting for user answer` state
 			this.#isWaitingForUserAnswer = true
-			this.#userAnswerResolver = resolve
+			this.#userAnswerResolver = (answer) => {
+				signal?.removeEventListener('abort', onAbort)
+				restoreDraft()
+				resolve(answer)
+			}
+			this.#taskInput.value = ''
 
 			// Expand history panel
 			if (!this.#isExpanded) {
@@ -196,19 +214,10 @@ export class Panel {
 			this.#historySection.appendChild(cardElement)
 			this.#scrollToBottom()
 
-			this.#showInputArea(this.#i18n.t('ui.panel.userAnswerPrompt'))
+			this.#showInputArea()
+			this.#taskInput.focus()
 
-			signal?.addEventListener(
-				'abort',
-				() => {
-					this.#removeTempCards()
-					this.#isWaitingForUserAnswer = false
-					this.#userAnswerResolver = null
-					// reason is a DOMException AbortError (abort() takes no args).
-					reject(signal.reason as DOMException)
-				},
-				{ once: true }
-			)
+			signal?.addEventListener('abort', onAbort, { once: true })
 		})
 	}
 
@@ -245,6 +254,7 @@ export class Panel {
 		this.#isWaitingForUserAnswer = false
 		this.#userAnswerResolver = null
 		// Show input area
+		this.#taskInput.value = ''
 		this.#showInputArea()
 	}
 
@@ -314,46 +324,47 @@ export class Panel {
 		const input = this.#taskInput.value.trim()
 		if (!input) return
 
-		// Hide input area
-		this.#hideInputArea()
-
 		if (this.#isWaitingForUserAnswer) {
 			// Handle user input mode
-			this.#handleUserAnswer(input)
+			this.#userAnswerResolver?.(input)
 		} else {
+			// Drafting is allowed while running, but submitting a new task is not.
+			if (this.#agent.status === 'running') return
+			this.#taskInput.value = ''
 			// Execute task via agent
 			this.#agent.execute(input)
 		}
 	}
 
 	/**
-	 * Handle user answer
+	 * Update input visibility without discarding a draft
 	 */
-	#handleUserAnswer(input: string): void {
-		this.#removeTempCards()
-
-		// Reset state
-		this.#isWaitingForUserAnswer = false
-
-		// Call resolver to return user input
-		if (this.#userAnswerResolver) {
-			this.#userAnswerResolver(input)
-			this.#userAnswerResolver = null
+	#updateInputArea(): void {
+		if (this.#shouldShowInputArea()) {
+			this.#showInputArea()
+		} else {
+			this.#hideInputArea()
 		}
 	}
 
 	/**
 	 * Show input area
 	 */
-	#showInputArea(placeholder?: string): void {
-		// Clear input field
-		this.#taskInput.value = ''
-		this.#taskInput.placeholder = placeholder || this.#i18n.t('ui.panel.taskInput')
+	#showInputArea(): void {
+		const wasHidden = this.#inputSection.classList.contains(styles.hidden)
+		this.#taskInput.placeholder = this.#i18n.t(
+			this.#isWaitingForUserAnswer
+				? 'ui.panel.userAnswerPrompt'
+				: this.#agent.status === 'running'
+					? 'ui.panel.taskDraft'
+					: 'ui.panel.taskInput'
+		)
 		this.#inputSection.classList.remove(styles.hidden)
-		// Focus on input field
-		setTimeout(() => {
-			this.#taskInput.focus()
-		}, 100)
+		if (wasHidden) {
+			setTimeout(() => {
+				this.#taskInput.focus()
+			}, 100)
+		}
 	}
 
 	/**
@@ -369,6 +380,7 @@ export class Panel {
 	#shouldShowInputArea(): boolean {
 		// Always show input area if waiting for user input
 		if (this.#isWaitingForUserAnswer) return true
+		if (this.#agent.status === 'running') return this.#config.promptForNextTask ?? true
 
 		const history = this.#agent.history
 		if (history.length === 0) {
