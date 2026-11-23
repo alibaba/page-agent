@@ -46,7 +46,7 @@
     "devDependencies": {
         "@commitlint/cli": "^21.2.4",
         "@commitlint/config-conventional": "^21.2.2",
-        "@eslint-react/eslint-plugin": "^5.30.2",
+        "@eslint-react/eslint-plugin": "^5.30.5",
         "@eslint/js": "^10.0.1",
         "@microsoft/api-extractor": "^7.60.1",
         "@tailwindcss/vite": "^4.3.5",
@@ -60,14 +60,14 @@
         "globals": "^17.14.0",
         "happy-dom": "^21.0.4",
         "husky": "^9.1.7",
-        "lint-staged": "^17.6.0",
+        "lint-staged": "^17.6.1",
         "prettier": "^3.10.1",
         "typescript": "^6.0.3",
-        "typescript-eslint": "^8.72.2",
+        "typescript-eslint": "^8.73.0",
         "unplugin-dts": "^1.1.2",
         "vite": "^8.3.8",
         "vite-plugin-css-injected-by-js": "^5.0.3",
-        "vitest": "^5.1.0"
+        "vitest": "^5.1.1"
     },
     "overrides": {
         "typescript": "^6.0.3"
