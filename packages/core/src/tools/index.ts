@@ -197,6 +197,21 @@ tools.set(
 	})
 )
 
-// @todo send_keys
+tools.set(
+	'press_key',
+	tool({
+		description:
+			'Press a keyboard key on an interactive element. Use this to submit a form or trigger a search when there is no submit button, e.g. after typing into a search box that requires Enter.',
+		inputSchema: z.object({
+			index: z.int().min(0),
+			key: z.string(),
+		}),
+		execute: async function (this: PageAgentCore, input) {
+			const result = await this.pageController.pressKey(input.index, input.key)
+			return result.message
+		},
+	})
+)
+
 // @todo upload_file
 // @todo extract_structured_data
