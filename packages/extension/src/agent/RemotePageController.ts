@@ -121,6 +121,10 @@ export class RemotePageController {
 		return this.remoteCallDomAction('input_text', args)
 	}
 
+	async pressKey(...args: any[]): Promise<DomActionReturn> {
+		return this.remoteCallDomAction('press_key', args)
+	}
+
 	async selectOption(...args: any[]): Promise<DomActionReturn> {
 		return this.remoteCallDomAction('select_option', args)
 	}

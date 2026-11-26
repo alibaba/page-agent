@@ -82,6 +82,7 @@ export function initPageController() {
 			case 'scroll':
 			case 'scroll_horizontally':
 			case 'execute_javascript':
+			case 'press_key':
 				pc[methodName](...(payload || []))
 					.then((result: any) => sendResponse(result))
 					.catch((error: any) =>
@@ -128,6 +129,8 @@ function getMethodName(action: string): string {
 			return 'scrollHorizontally' as const
 		case 'execute_javascript':
 			return 'executeJavascript' as const
+		case 'press_key':
+			return 'pressKey' as const
 
 		default:
 			return action

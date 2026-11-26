@@ -230,6 +230,40 @@ export async function inputTextElement(element: HTMLElement, text: string) {
 }
 
 /**
+ * Press a keyboard key on an element.
+ * Useful for search boxes or forms that require Enter to submit.
+ *
+ * @private Internal method, subject to change at any time.
+ */
+export async function pressKeyElement(element: HTMLElement, key: string) {
+	if (!isHTMLElement(element)) {
+		throw new Error('Element is not an HTMLElement')
+	}
+
+	const code = KEY_TO_CODE[key] || key
+	const opts = { key, code, bubbles: true, cancelable: true, composed: true }
+
+	element.focus({ preventScroll: true })
+
+	element.dispatchEvent(new KeyboardEvent('keydown', opts))
+	element.dispatchEvent(new KeyboardEvent('keyup', opts))
+
+	await waitFor(0.1)
+}
+
+const KEY_TO_CODE: Record<string, string> = {
+	Enter: 'Enter',
+	Tab: 'Tab',
+	Escape: 'Escape',
+	Backspace: 'Backspace',
+	Space: 'Space',
+	ArrowDown: 'ArrowDown',
+	ArrowUp: 'ArrowUp',
+	ArrowLeft: 'ArrowLeft',
+	ArrowRight: 'ArrowRight',
+}
+
+/**
  * @todo browser-use version is very complex and supports menu tags, need to follow up
  * @private Internal method, subject to change at any time.
  */
